@@ -4,15 +4,17 @@ import {
   ViewPlugin,
   PluginValue,
   ViewUpdate,
-  EditorView
+  EditorView,
+  WidgetType
 } from "@codemirror/view"
 import {
   RangeSetBuilder,
   Extension
 } from '@codemirror/state';
+
 import AnyBlockPlugin from "./main";
 
-export function editorExtension(plugin_this: AnyBlockPlugin) {
+export function abEditorExtension(plugin_this: AnyBlockPlugin) {  
   return ViewPlugin.fromClass(
     AnyBlockPluginValue,
     {
@@ -29,6 +31,7 @@ export class AnyBlockPluginValue implements PluginValue {
   }
 
   update(update: ViewUpdate) {
+    // console.log("update from PluginValue")
     if (update.docChanged || update.viewportChanged) {
       this.decorations = this.buildDecorations(/*plugin_this*/update.view);
     }
@@ -38,8 +41,19 @@ export class AnyBlockPluginValue implements PluginValue {
   private buildDecorations(view: EditorView): DecorationSet {
     const builder = new RangeSetBuilder<Decoration>();  // 范围生成器
 
-    let matchInfo = this.findKeyword(view)
-    matchInfo = this.match2Block(matchInfo)    
+    let matchInfo = this.lineMatch_keyword(view)
+    matchInfo = this.line2BlockMatch(matchInfo)   
+
+    /*matchInfo.forEach(item => {
+      builder.add(
+        item.from,
+        item.to,
+        Decoration.replace({
+          widget: new EmojiWidget(),
+          block: true
+        })
+      )
+    })*/
 
     matchInfo.forEach(item => {
       builder.add(
@@ -59,7 +73,7 @@ export class AnyBlockPluginValue implements PluginValue {
   }
 
   // @private
-  private findKeyword(view: EditorView) {
+  private lineMatch_keyword(view: EditorView) {
     const matchInfo = []
     const visibleRanges = view.visibleRanges;
     // console.log("view", view)
@@ -67,10 +81,10 @@ export class AnyBlockPluginValue implements PluginValue {
     for (const { from, to } of visibleRanges) {
       const visibleText = view.state.sliceDoc(from, to);  // 渲染可见的文字
       const regExp = /%{|%}/gi
-      const matchList = visibleText.match(regExp);   // 匹配项
+      const matchList: RegExpMatchArray|null= visibleText.match(regExp);        // 匹配项
       if (!matchList) {break}
       let prevIndex = 0
-      console.log("matchList", matchList)
+      // console.log("matchList", matchList)
       // 获取所有匹配项的位置
       for (const matchItem of matchList){
         const from2 = visibleText.indexOf(matchItem, prevIndex)
@@ -88,7 +102,7 @@ export class AnyBlockPluginValue implements PluginValue {
   }
 
   // @private
-  private match2Block(
+  private line2BlockMatch(
     matchInfo: {
       from: number;
       to: number;
@@ -116,5 +130,15 @@ export class AnyBlockPluginValue implements PluginValue {
       }
     }
     return matchInfoNew
+  }
+}
+
+export class EmojiWidget extends WidgetType {
+  toDOM(view: EditorView): HTMLElement {
+    const div = document.createElement("div"); // span
+
+    div.innerText = "👉";
+
+    return div;
   }
 }
