@@ -62,9 +62,17 @@ const underlineField = StateField.define<DecorationSet>({
   // 光标移动也会触发update，但上下滚动文档不会
   // update: (value: Value, transaction: Transaction) => Value;
   update(underlines, tr) {
-    // 这里主要注意两个方法：underlines.map() 和 underlines.update()，都是用来更新范围状态的。
-    //    应该是一个用来映射原有的，一个用来增加新的。
-    //    例如(0000)中间插入字符，先变成(00)11(00)再变成(00)(11)(00)或(001100)
+    /** 这里主要注意两个方法：underlines.map() 和 underlines.update()，都是用来更新范围状态的。
+     *  underlines.update()
+     *    用来增加新的
+     *    没有这个就没有样式，因为上面create方法没写。也能用来增加新的
+     *    另外update不怕重复添加，例如from-to:5-20，再添加3-16，就会变成3-20
+     *  underlines.map()
+     *    用来映射原有的，编辑时重新映射from-to
+     *    例如(0000)中间插入字符，先变成(00)11(00)再变成(00)(11)(00)或(001100)
+     *    如果不加map，缩短范围时会出bug（范围只增不减）。
+     *    @warning 另外其实应该先add再更新，否则下划线会延迟一个动作再修改，会产生错位，感觉这个demo是做错了
+     */
     underlines = underlines.map(tr.changes)
     for (let e of tr.effects) if (e.is(addUnderline)) {
       underlines = underlines.update({
