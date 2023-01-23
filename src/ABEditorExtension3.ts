@@ -94,6 +94,7 @@ const underlineField = StateField.define<DecorationSet>({
     for(let item of listSpecKeyword){
       let from = item.from
       let to = item.to
+      const underlineMark: Decoration = Decoration.replace({widget: new ABReplaceWidget(mdText.slice(from, to))})
       decorationSet = decorationSet.update({
         add: [underlineMark.range(from, to)]
       })
@@ -102,11 +103,11 @@ const underlineField = StateField.define<DecorationSet>({
 
     // console.log("update - effectsState", editorState)
     console.log("update - decorationSet", decorationSet)
+    console.log("update - cursor", editor.getCursor().line, editor.getCursor().ch)
     return decorationSet
   },
   provide: f => EditorView.decorations.from(f)
 })
-
 
 // Extension
 const underlineTheme = EditorView.baseTheme({
@@ -114,4 +115,4 @@ const underlineTheme = EditorView.baseTheme({
 })
 
 // const underlineMark: Decoration = Decoration.replace({widget: new ABReplaceWidget("")}) // Decoration，下划线样式（mark）
-const underlineMark: Decoration = Decoration.mark({class: "ab-underline"})
+// const underlineMark: Decoration = Decoration.mark({class: "ab-underline"})

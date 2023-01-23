@@ -6,3 +6,7 @@ available in the app when your plugin is enabled.
 If your plugin does not need CSS, delete this file.
 
 */
+.ab-replace{
+  background-color: #272e3a;
+  border-radius: 4px;
+}
