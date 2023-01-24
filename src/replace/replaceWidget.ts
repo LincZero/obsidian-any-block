@@ -12,12 +12,11 @@ export class ABReplaceWidget extends WidgetType {
     
     const div = document.createElement("div");
     div.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
-    // div.setAttribute("style", "background-color: #272e3a")
-    // div.innerText = "👉" + this.text;
+
+    // pre不好用，这里还是得用<br>换行最好
     div.innerHTML = `
-    <div class="drop-shadow">
-      <span>👉</span>
-      <div>${this.text}</div>
+    <div class="drop-shadow ab-note">
+      <p>${this.text.split("\n").join("<br/>")}</p>
     </div>
     <div class="edit-block-button" aria-label="Edit this block">
       ${str_icon_code2}

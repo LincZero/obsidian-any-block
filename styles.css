@@ -10,3 +10,6 @@ If your plugin does not need CSS, delete this file.
   background-color: #272e3a;
   border-radius: 4px;
 }
+.ab-note{
+  padding: 24px 12px 12px 12px;
+}
