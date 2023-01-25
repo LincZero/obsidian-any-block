@@ -5,6 +5,6 @@
 	"minAppVersion": "0.15.0",
 	"description": "You can flexibility to create a 'Block' by some means.",
 	"author": "LincZero",
-	// "authorUrl": "https://github.com/LincZero",
+	"authorUrl": "https://github.com/LincZero",
 	"isDesktopOnly": false
 }

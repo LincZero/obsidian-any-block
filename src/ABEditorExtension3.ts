@@ -89,21 +89,26 @@ const underlineField = StateField.define<DecorationSet>({
     decorationSet = decorationSet.update({            // 减少，全部删掉
       filter: (from, to, value)=>{return false}
     })
-    let listSpecKeyword: SpecKeyword[] = ABRangeManager.blockMatch_keyword(mdText)
-    if (!listSpecKeyword.length) return decorationSet // 增加
-    for(let item of listSpecKeyword){
-      let from = item.from
-      let to = item.to
-      const underlineMark: Decoration = Decoration.replace({widget: new ABReplaceWidget(mdText.slice(from, to))})
-      decorationSet = decorationSet.update({
-        add: [underlineMark.range(from, to)]
-      })
+    // 如果在纯编辑模式 或 光标位置在块内，则不启用
+    if(true){
+      let listSpecKeyword: SpecKeyword[] = ABRangeManager.blockMatch_keyword(mdText)
+      if (!listSpecKeyword.length) return decorationSet // 增加
+      for(let item of listSpecKeyword){
+        let from = item.from
+        let to = item.to
+        const underlineMark: Decoration = Decoration.replace({widget: new ABReplaceWidget(mdText.slice(from, to))})
+        decorationSet = decorationSet.update({
+          add: [underlineMark.range(from, to)]
+        })
+      }
+      decorationSet = decorationSet.map(tr.changes)     // 映射
     }
-    decorationSet = decorationSet.map(tr.changes)     // 映射
 
     // console.log("update - effectsState", editorState)
     console.log("update - decorationSet", decorationSet)
-    console.log("update - cursor", editor.getCursor().line, editor.getCursor().ch)
+    console.log("update - cursor", editor.getCursor().line, editor.getCursor().ch, editor.getCursor("from"), editor.getCursor("to"))
+    console.log("update - selected", editor.getSelection()) // 选中的文字而非范围
+    console.log("update - range", editor.getRange(editor.getCursor("from"), editor.getCursor("to")))
     return decorationSet
   },
   provide: f => EditorView.decorations.from(f)
