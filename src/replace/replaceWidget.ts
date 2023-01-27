@@ -1,43 +1,76 @@
+import {Editor, EditorPosition} from 'obsidian';
 import {EditorView, WidgetType} from "@codemirror/view"
 
 export class ABReplaceWidget extends WidgetType {
   text: string
+  from: number
+  to: number
+  global_editor: Editor
 
-  constructor(text: string){
+  constructor(text: string, from: number, to: number){
     super()
     this.text = text
+    this.from = from
+    this.to = to
   }
 
   toDOM(view: EditorView): HTMLElement {
-    
+    // 根元素
     const div = document.createElement("div");
     div.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
 
-    // pre不好用，这里还是得用<br>换行最好
-    div.innerHTML = `
-    <div class="drop-shadow ab-note">
-      <p>${this.text.split("\n").join("<br/>")}</p>
-    </div>
-    <div class="edit-block-button" aria-label="Edit this block">
-      ${str_icon_code2}
-    </div>
-    `
-    
-    /**const div = document.createDiv({
-      cls: ["ab-replace"]
-    })/
-    /*const editButton = div.createEl("img", {
-      cls: ["ab-switchButton"],
-      //text: str_icon_code2,
-      title: "Edit this block",
-      // attr: {"src": "code-2"}////////////////
-    })*/
-    /*const adText = div.createDiv({
-      text: "👉" + this.text
-    })*/
-    // div.innerText = "👉" + this.text;
+    // 文本元素。pre不好用，这里还是得用<br>换行最好
+    let dom_note = div.createEl("div", {cls: ["drop-shadow", "ab-note"]});
+    dom_note.innerHTML = `<p>${this.text.split("\n").join("<br/>")}</p>`
+
+    // 编辑按钮
+    let dom_edit = div.createEl("div", {
+      cls: ["edit-block-button"], 
+      attr: {"aria-label": "Edit this block"}
+    });
+    dom_edit.innerHTML = ABReplaceWidget.str_icon_code2
+    dom_edit.onclick = ()=>{
+        // @ts-ignore 这里会说View没有editor属性
+      const editor: Editor = view.editor
+      let pos = this.getCursorPos(editor, this.from)
+      console.log("pos", pos)
+      if (pos) editor.setCursor(1,1)
+    }
     return div;
   }
+
+  private getCursorPos(editor:Editor, total_ch:number): EditorPosition|null{
+    let count_ch = 0
+    let list_text: string[] = editor.getValue().split("\n")
+    for (let i=0; i<list_text.length; i++){
+      if (count_ch+list_text[i].length >= total_ch) return {line:i, ch:total_ch-count_ch}
+      count_ch = count_ch + list_text[i].length + 1
+    }
+    return null
+  }
+
+  static str_icon_code2 = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-darkreader-inline-stroke="" style="--darkreader-inline-stroke:currentColor;"><path d="m18 16 4-4-4-4"></path><path d="m6 8-4 4 4 4"></path><path d="m14.5 4-5 16"></path></svg>`
 }
 
-const str_icon_code2 = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-darkreader-inline-stroke="" style="--darkreader-inline-stroke:currentColor;"><path d="m18 16 4-4-4-4"></path><path d="m6 8-4 4 4 4"></path><path d="m14.5 4-5 16"></path></svg>`
+/*`
+<div class="drop-shadow ab-note">
+  <p>${this.text.split("\n").join("<br/>")}</p>
+</div>
+<div class="edit-block-button" aria-label="Edit this block">
+  ${str_icon_code2}
+</div>
+`*/
+
+/**const div = document.createDiv({
+  cls: ["ab-replace"]
+})/
+/*const editButton = div.createEl("img", {
+  cls: ["ab-switchButton"],
+  //text: str_icon_code2,
+  title: "Edit this block",
+  // attr: {"src": "code-2"}////////////////
+})*/
+/*const adText = div.createDiv({
+  text: "👉" + this.text
+})*/
+// div.innerText = "👉" + this.text;

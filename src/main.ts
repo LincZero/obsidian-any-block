@@ -1,6 +1,6 @@
 import {
   Plugin,
-  Notice,
+  Notice,View,MarkdownView, Editor
 } from "obsidian";
 import { abCodeBlockProcessor } from "./ABCodeBlockProcessor";
 import { abEditorExtension } from "./ABEditorExtension";
@@ -25,12 +25,26 @@ export default class AnyBlockPlugin extends Plugin {
     })
     this.registerEvent(
       this.app.workspace.on('file-open', (fileObj) => {
-          console.log("ab-file-open:", fileObj);
-          replace2AnyBlock(this)
+        console.log("ab-file-open:", fileObj);
+        replace2AnyBlock(this)
       })
     );
 
     // 渲染模式 后处理器
     this.registerMarkdownPostProcessor(abPostProcessor);
+
+    /*this.addCommand({
+      id: "dd",
+      name: "dd",
+      callback: ()=>{
+        const view: View|null = this.app.workspace.getActiveViewOfType(MarkdownView);
+        if (view) {
+          // @ts-ignore 这里会说View没有editor属性
+          const editor: Editor = view.editor
+          editor.setCursor(1,1)
+        }
+        else console.log("have no view")
+      }
+    })*/
 	}
 }
