@@ -7,11 +7,12 @@ export class ABReplaceWidget extends WidgetType {
   to: number
   global_editor: Editor
 
-  constructor(text: string, from: number, to: number){
+  constructor(text: string, from: number, to: number, ediot: Editor){
     super()
     this.text = text
     this.from = from
     this.to = to
+    this.global_editor = ediot
   }
 
   toDOM(view: EditorView): HTMLElement {
@@ -29,14 +30,22 @@ export class ABReplaceWidget extends WidgetType {
       attr: {"aria-label": "Edit this block"}
     });
     dom_edit.innerHTML = ABReplaceWidget.str_icon_code2
-    dom_edit.onclick = ()=>{
-        // @ts-ignore 这里会说View没有editor属性
-      const editor: Editor = view.editor
-      let pos = this.getCursorPos(editor, this.from)
-      console.log("pos", pos)
-      if (pos) editor.setCursor(1,1)
-    }
+
+    // 通过控制光标移动间接取消显示块
+    div.ondblclick = ()=>{this.moveCursorToHead()}
+    dom_edit.onclick = ()=>{this.moveCursorToHead()}
     return div;
+  }
+
+  private moveCursorToHead(): void{
+      /** @warning 注意这里千万不能用 toDOM 方法给的 view 参数
+       * const editor: Editor = view.editor // @ts-ignore
+       * 否则editor是undefined
+       */
+      const editor: Editor = this.global_editor
+      let pos = this.getCursorPos(editor, this.from)
+      console.log("pos", pos, editor, editor.getCursor())
+      if (pos) editor.setCursor(pos)
   }
 
   private getCursorPos(editor:Editor, total_ch:number): EditorPosition|null{
