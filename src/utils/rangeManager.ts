@@ -1,4 +1,3 @@
-
 // 匹配关键字接口
 export interface SpecKeyword {
   from: number,
@@ -7,8 +6,27 @@ export interface SpecKeyword {
   match: string
 }
 
+// 正则
+const reg_k1 = /%{/gi
+const reg_k2 = /%}/gi
+const reg_auto = /^%a/gi
+const reg_line = /^%l/gi
+const reg_paragraph = /^%p/gi
+const list_reg = [reg_k1, reg_k2]
+const reg_total = new RegExp(list_reg
+  .map((pattern) => pattern.source).join("|"), "gi");	
+
+const rangeReg = {
+  reg_k1,
+  reg_k2,
+  reg_auto,
+  reg_line,
+  reg_paragraph
+}
+
+/** AnyBlock范围管理器 */
 export class ABRangeManager{
-  private specKeywords:SpecKeyword[] 
+  private specKeywords:SpecKeyword[]
 
   constructor(mdText: string){
     this.specKeywords = ABRangeManager.blockMatch_keyword(mdText)
@@ -23,8 +41,7 @@ export class ABRangeManager{
     // 行 - 匹配关键字
   static lineMatch_keyword(mdText: string): SpecKeyword[] {
     const matchInfo: SpecKeyword[] = []
-    const regExp = /%{|%}/gi
-    const matchList: RegExpMatchArray|null= mdText.match(regExp);        // 匹配项
+    const matchList: RegExpMatchArray|null= mdText.match(reg_total);        // 匹配项
 
     if (!matchList) return []
     let prevIndex = 0
@@ -32,11 +49,15 @@ export class ABRangeManager{
       const from2 = mdText.indexOf(matchItem, prevIndex)
       const to2 = from2 + matchItem.length;
       prevIndex = to2;
+      let match2
+      for (let reg of list_reg){
+        if (matchItem.match(reg)) {match2 = reg; break;}
+      }
       matchInfo.push({
         from: from2,
         to: to2,
         keyword: matchItem,
-        match: "%{|%}"
+        match: String(match2)
       })
     }
     return matchInfo

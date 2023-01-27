@@ -13,7 +13,7 @@ let global_plugin_this: any;
 export function replace2AnyBlock(plugin_this: AnyBlockPlugin/*view: EditorView*/) {
   global_plugin_this = plugin_this
   // 常用变量
-  const view: View|null = this.app.workspace.getActiveViewOfType(MarkdownView); // 不在编辑模式会返回null
+  const view: View|null = this.app.workspace.getActiveViewOfType(MarkdownView); // 未聚焦(active)会返回null
   if (!view) return false
     // @ts-ignore 这里会说View没有editor属性
   const editor: Editor = view.editor
@@ -117,10 +117,6 @@ const underlineField = StateField.define<DecorationSet>({
       }
       decorationSet = decorationSet.map(tr.changes)     // 映射
     }
-
-    // console.log("update - effectsState", editorState)
-    // console.log("update - decorationSet", decorationSet)
-    // console.log("update - range", editor.getRange(editor.getCursor("from"), editor.getCursor("to")))
     return decorationSet
   },
   provide: f => EditorView.decorations.from(f)
@@ -130,6 +126,3 @@ const underlineField = StateField.define<DecorationSet>({
 const underlineTheme = EditorView.baseTheme({
   ".ab-underline": { textDecoration: "underline 3px red" }
 })
-
-// const underlineMark: Decoration = Decoration.replace({widget: new ABReplaceWidget("")}) // Decoration，下划线样式（mark）
-// const underlineMark: Decoration = Decoration.mark({class: "ab-underline"})

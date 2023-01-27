@@ -1,4 +1,4 @@
-import {Editor, EditorPosition} from 'obsidian';
+import {Editor, EditorPosition, MarkdownRenderChild, MarkdownRenderer} from 'obsidian';
 import {EditorView, WidgetType} from "@codemirror/view"
 
 export class ABReplaceWidget extends WidgetType {
@@ -9,7 +9,7 @@ export class ABReplaceWidget extends WidgetType {
 
   constructor(text: string, from: number, to: number, ediot: Editor){
     super()
-    this.text = text
+    this.text = text.substring(2, text.length-2).trim()
     this.from = from
     this.to = to
     this.global_editor = ediot
@@ -18,11 +18,33 @@ export class ABReplaceWidget extends WidgetType {
   toDOM(view: EditorView): HTMLElement {
     // 根元素
     const div = document.createElement("div");
-    div.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
 
-    // 文本元素。pre不好用，这里还是得用<br>换行最好
-    let dom_note = div.createEl("div", {cls: ["drop-shadow", "ab-note"]});
-    dom_note.innerHTML = `<p>${this.text.split("\n").join("<br/>")}</p>`
+    // 引用模式
+    if (this.text.indexOf("md")==0) {
+      console.log("md模式")
+      div.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
+      let dom_note = div.createEl("div", {cls: ["drop-shadow", "ab-note"]});
+      const child = new MarkdownRenderChild(dom_note);
+      const text = this.text.substring("md".length).trim()
+      // ctx.addChild(child);
+      MarkdownRenderer.renderMarkdown(this.text, dom_note, "", child); // var[2]: Obsidian/插件测试/AnyBlock2.md
+    }
+    else if (this.text.indexOf("quote")==0) {
+      console.log("quote模式")
+      div.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
+      let dom_note = div.createEl("div");
+      const child = new MarkdownRenderChild(dom_note);
+      const text = this.text.substring("quote".length).trim().split("\n").map((line)=>{return "> "+line}).join("\n")
+      // ctx.addChild(child);
+      MarkdownRenderer.renderMarkdown(text, dom_note, "", child);
+    }
+    else{
+      console.log("普通文本模式")
+      div.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
+      let dom_note = div.createEl("div", {cls: ["drop-shadow", "ab-note"]});
+      // 文本元素。pre不好用，这里还是得用<br>换行最好
+      dom_note.innerHTML = `<p>${this.text.split("\n").join("<br/>")}</p>`
+    }
 
     // 编辑按钮
     let dom_edit = div.createEl("div", {
