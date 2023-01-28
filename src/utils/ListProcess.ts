@@ -2,16 +2,18 @@ import { MarkdownRenderer, MarkdownRenderChild } from 'obsidian'
 
 export default class ListProcess{
 
-  /** 列表转表格 */
-  static list2table(text: string, div: HTMLDivElement) {
+  /** 列表转表格
+   * @param modeMD: md（使用md嵌套功能）功耗可能较大
+   */
+  static list2table(text: string, div: HTMLDivElement, modeMD=false) {
     let list_itemInfo = this.list2data(text)
-    return this.data2table(list_itemInfo, div)
+    return this.data2table(list_itemInfo, div, modeMD)
   }
 
   /** 列表转列表格 */
-  static list2lt(text: string, div: HTMLDivElement) {
+  static list2lt(text: string, div: HTMLDivElement, modeMD=false) {
     let list_itemInfo = this.list2data(text, true)
-    return this.data2table(list_itemInfo, div)
+    return this.data2table(list_itemInfo, div, modeMD)
   }
 
   /** 列表转mermaid流程图 */
@@ -22,12 +24,13 @@ export default class ListProcess{
 
   /** 列表文本转列表数据 
    *  @bug 不能跨缩进，后面再对异常缩进进行修复
+   *  @bug 内换行` | `可能有bug
    *  @param modeT: 保留缩进模式
    *  @param modeG: 识别符号 ` | `（该选项暂时不可用，强制为true）
    */
   private static list2data(text: string, modeT=false, modeG=true){
     // 列表文本转列表数据
-    let list_itemInfo = []
+    let list_itemInfo:{content:string,level:number}[] = []
     const list_text = text.split("\n")
     for (let line of list_text) {                                             // 每行
       if (/^\s*?-\s(.*?)/.test(line)) {
@@ -59,8 +62,14 @@ export default class ListProcess{
           }
         }
       }
-      else{
-        break
+      else{                                                                   // 内换行
+        let itemInfo = list_itemInfo.pop()
+        if(itemInfo){
+          list_itemInfo.push({
+            content: itemInfo.content+"\n"+line.trim(),
+            level: itemInfo.level
+          })
+        }
       }
     }
     return list_itemInfo
@@ -72,7 +81,8 @@ export default class ListProcess{
       content: string;
       level: number;
     }[], 
-    div: HTMLDivElement
+    div: HTMLDivElement,
+    modeMD: boolean,
   ){
     // 组装成表格数据 (列表是深度优先)
     let list_itemInfo2 = []
@@ -118,10 +128,19 @@ export default class ListProcess{
       let tr = div.createEl("tr")
       for (let item of list_itemInfo2){
         if (item.tableLine==index_line) {
-          tr.createEl("td", {
-            text: item.content, 
-            attr:{"rowspan": item.tableRow}
-          })
+          if (modeMD) {   // md版
+            let td = tr.createEl("td", {
+              attr:{"rowspan": item.tableRow}
+            })
+            const child = new MarkdownRenderChild(td);
+            MarkdownRenderer.renderMarkdown(item.content, td, "", child);
+          }
+          else{           // 非md版
+            tr.createEl("td", {
+              text: item.content, 
+              attr:{"rowspan": item.tableRow}
+            })
+          }
         }
       }
     }

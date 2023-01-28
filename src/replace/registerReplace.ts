@@ -49,13 +49,21 @@ registerReplace((processor)=>{
   return true
 })
 
-// 列表转表格
+// 列表转表格、md表格
 registerReplace((processor)=>{
   if (processor.text.indexOf("list2table")!=0) return false
 
   processor.div.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
   let dom_note = processor.div.createEl("div");
-  ListProcess.list2table(processor.text.substring("list2table".length).trim(), dom_note)
+  ListProcess.list2table(processor.text.substring("list2table".length).trim(), dom_note, false)
+  return true
+})
+registerReplace((processor)=>{
+  if (processor.text.indexOf("list2mdtable")!=0) return false
+
+  processor.div.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
+  let dom_note = processor.div.createEl("div");
+  ListProcess.list2table(processor.text.substring("list2mdtable".length).trim(), dom_note, true)
   return true
 })
 
