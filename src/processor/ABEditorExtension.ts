@@ -12,7 +12,7 @@ import {
   Extension
 } from '@codemirror/state';
 
-import AnyBlockPlugin from "./main";
+import AnyBlockPlugin from "../main";
 
 export function abEditorExtension(plugin_this: AnyBlockPlugin) {  
   return ViewPlugin.fromClass(

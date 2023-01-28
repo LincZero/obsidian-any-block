@@ -4,7 +4,7 @@ import {
   MarkdownRenderer,
 } from "obsidian";
 
-import AnyBlockPlugin from "./main";
+import AnyBlockPlugin from "../main";
 
 export const mditOptions = { html: true };
 

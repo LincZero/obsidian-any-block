@@ -1,9 +1,9 @@
 import { Plugin } from "obsidian";
-import { abCodeBlockProcessor } from "./ABCodeBlockProcessor";
-// import { abEditorExtension } from "./ABEditorExtension";
-// import { underlineSelection } from "./ABEditorExtension2";
-import { replace2AnyBlock } from "./ABEditorExtension3";
-import { abPostProcessor } from "./ABPostProcessor";
+import { abCodeBlockProcessor } from "./processor/ABCodeBlockProcessor";
+// import { abEditorExtension } from "./processor/ABEditorExtension";
+// import { underlineSelection } from "./processor/ABEditorExtension2";
+import { replace2AnyBlock } from "./processor/ABEditorExtension3";
+import { abPostProcessor } from "./processor/ABPostProcessor";
 
 
 export default class AnyBlockPlugin extends Plugin {

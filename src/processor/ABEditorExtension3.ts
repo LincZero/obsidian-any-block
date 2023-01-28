@@ -2,9 +2,9 @@ import {EditorView, Decoration, DecorationSet} from "@codemirror/view"
 import {StateField, StateEffect, EditorState} from "@codemirror/state"
 import {MarkdownView, View, Editor, EditorPosition} from 'obsidian';
 
-import AnyBlockPlugin from './main'
-import { ABRangeManager, SpecKeyword } from "./utils/rangeManager"
-import { ABReplaceWidget } from "./replace/replaceWidget"
+import AnyBlockPlugin from '../main'
+import { ABRangeManager, SpecKeyword } from "../utils/rangeManager"
+import { ABReplaceWidget } from "../replace/replaceWidget"
 
 let global_plugin_this: any;
 
