@@ -7,17 +7,17 @@
  `%{` and `%}` include some content
 
  such as
+ 
  ```
  %{list2mdtable
 
 - **语言** | **三元换行符** | **特点**
-
 - java
-	- 
-		```java
-		System.out.println("Hello World");
-		```
-		- 这语句有点长
+  - 
+      ```java
+      System.out.println("Hello World");
+      ```
+        - 这语句有点长
 - c
     - 
       ```c
@@ -26,7 +26,7 @@
         - 原始的C输出
 - c++
     - 
-	    ```cpp
+      ```cpp
       std::cunt<<"Hello Wrold"
       ```
         - 流输出，但是这东西开销大，竞赛党别用

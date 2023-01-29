@@ -120,8 +120,6 @@ export default class ListProcess{
       })
     }
 
-    console.log("list_itemInfo2", list_itemInfo2)
-
     // 表格数据 组装成表格
     div = div.createEl("table").createEl("tbody")
     for (let index_line=0; index_line<prev_line+1; index_line++){
