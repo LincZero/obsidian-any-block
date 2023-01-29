@@ -1,3 +1,8 @@
+import {EditorView, Decoration, DecorationSet} from "@codemirror/view"
+import {Editor} from 'obsidian';
+
+import { ABReplaceWidget } from "../replace/replaceWidget"
+
 // 匹配关键字接口
 export interface SpecKeyword {
   from: number,
@@ -26,11 +31,11 @@ const rangeReg = {
 
 /** AnyBlock范围管理器 */
 export class ABRangeManager{
-  private specKeywords:SpecKeyword[]
+  /*private specKeywords:SpecKeyword[]
 
   constructor(mdText: string){
     this.specKeywords = ABRangeManager.blockMatch_keyword(mdText)
-  }
+  }*/
 
   // 块 - 匹配关键字
   static blockMatch_keyword(mdText: string): SpecKeyword[] {
@@ -38,8 +43,8 @@ export class ABRangeManager{
     return this.line2BlockMatch(listSpecKeyword)
   }
 
-    // 行 - 匹配关键字
-  static lineMatch_keyword(mdText: string): SpecKeyword[] {
+  // 行 - 匹配关键字
+  private static lineMatch_keyword(mdText: string): SpecKeyword[] {
     const matchInfo: SpecKeyword[] = []
     const matchList: RegExpMatchArray|null= mdText.match(reg_total);        // 匹配项
 
@@ -64,7 +69,7 @@ export class ABRangeManager{
   }
 
   // 转化 - 匹配关键字
-  static line2BlockMatch(listSpecKeyword: SpecKeyword[]): SpecKeyword[]{
+  private static line2BlockMatch(listSpecKeyword: SpecKeyword[]): SpecKeyword[]{
     let countBracket = 0  // 括号计数
     let prevBracket = []  // 括号栈
     let listSpecKeyword_new = []
@@ -84,5 +89,13 @@ export class ABRangeManager{
       }
     }
     return listSpecKeyword_new
+  }
+
+  static decoration_line(){
+    return Decoration.mark({class: "ab-underline"})
+  }
+
+  static decoration_block(text:string, from:number, to:number, editor:Editor){
+    return Decoration.replace({widget: new ABReplaceWidget(text, from, to, editor)})
   }
 }

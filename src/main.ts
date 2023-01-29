@@ -4,13 +4,19 @@ import { abCodeBlockProcessor } from "./processor/ABCodeBlockProcessor";
 // import { underlineSelection } from "./processor/ABEditorExtension2";
 import { Replace2AnyBlock } from "./processor/ABEditorExtension3";
 import { abPostProcessor } from "./processor/ABPostProcessor";
+import { ABSettingInterface, ABSettingTab, AB_SETTINGS } from "./config/ABSettingTab"
 
 
 export default class AnyBlockPlugin extends Plugin {
+  settings: ABSettingInterface
   renderFromMD = abCodeBlockProcessor.bind(this); // 不然的话这个方法是没this变量的
+
 	async onload() {
+    await this.loadSettings();
+    this.addSettingTab(new ABSettingTab(this.app, this));
+
     // 代码块
-    this.registerCodeBlock()
+    this.registerMarkdownCodeBlockProcessor("ab-md", this.renderFromMD);
 
     // 非渲染模式 cm扩展 - ViewPlugin
     //this.registerEditorExtension(abEditorExtension(this));
@@ -22,7 +28,6 @@ export default class AnyBlockPlugin extends Plugin {
     })
     this.registerEvent(
       this.app.workspace.on('file-open', (fileObj) => {
-        console.log("ab-file-open:", fileObj);
         new Replace2AnyBlock(this)
       })
     );
@@ -30,9 +35,11 @@ export default class AnyBlockPlugin extends Plugin {
     // 渲染模式 后处理器
     this.registerMarkdownPostProcessor(abPostProcessor);
   }
-  
-  /** 代码块 */
-  private registerCodeBlock(){
-    this.registerMarkdownCodeBlockProcessor("ab-md", this.renderFromMD);
-  }
+
+  async loadSettings() {
+		this.settings = Object.assign({}, AB_SETTINGS, await this.loadData());
+	}
+	async saveSettings() {
+		await this.saveData(this.settings);
+	}
 }

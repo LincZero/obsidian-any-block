@@ -4,7 +4,6 @@ import {MarkdownView, View, Editor, EditorPosition} from 'obsidian';
 
 import AnyBlockPlugin from '../main'
 import { ABRangeManager, SpecKeyword } from "../utils/rangeManager"
-import { ABReplaceWidget } from "../replace/replaceWidget"
 
 // 获取 - 模式
 enum Editor_mode{
@@ -126,7 +125,7 @@ function stateField_update (decorationSet:DecorationSet, tr:Transaction){
     }
   }
 
-  // 修改范围
+  // 范围选择器
   /** @bug 这里的mdText是未修改前的mdText，光标的位置也是 会延迟一拍 */
   decorationSet = decorationSet.update({            // 减少，全部删掉
     filter: (from, to, value)=>{return false}
@@ -141,10 +140,10 @@ function stateField_update (decorationSet:DecorationSet, tr:Transaction){
     // 如果光标位置在块内，则不启用块，仅使用高亮
     let underlineMark: Decoration
     if (cursor_from_ch>=from && cursor_from_ch<=to || cursor_to_ch>=from && cursor_to_ch<=to) {
-      underlineMark = Decoration.mark({class: "ab-underline"})
+      underlineMark = ABRangeManager.decoration_line()
     }
     else {
-      underlineMark = Decoration.replace({widget: new ABReplaceWidget(mdText.slice(from, to), from, to, editor)})
+      underlineMark = ABRangeManager.decoration_block(mdText.slice(from, to), from, to, editor)
     }
     decorationSet = decorationSet.update({
       add: [underlineMark.range(from, to)]
