@@ -29,7 +29,10 @@ const rangeReg = {
   reg_paragraph
 }
 
-/** AnyBlock范围管理器 */
+/** AnyBlock范围管理器
+ * 一段文字可以生成一个实例
+ * 一次性使用
+ */
 export class ABRangeManager{
   /*private specKeywords:SpecKeyword[]
 
@@ -37,13 +40,13 @@ export class ABRangeManager{
     this.specKeywords = ABRangeManager.blockMatch_keyword(mdText)
   }*/
 
-  // 块 - 匹配关键字
+  /** 块 - 匹配关键字 */
   static blockMatch_keyword(mdText: string): SpecKeyword[] {
     let listSpecKeyword = this.lineMatch_keyword(mdText)
     return this.line2BlockMatch(listSpecKeyword)
   }
 
-  // 行 - 匹配关键字
+  /** 行 - 匹配关键字 */
   private static lineMatch_keyword(mdText: string): SpecKeyword[] {
     const matchInfo: SpecKeyword[] = []
     const matchList: RegExpMatchArray|null= mdText.match(reg_total);        // 匹配项
@@ -68,7 +71,7 @@ export class ABRangeManager{
     return matchInfo
   }
 
-  // 转化 - 匹配关键字
+  /** 转化 - 匹配关键字 */
   private static line2BlockMatch(listSpecKeyword: SpecKeyword[]): SpecKeyword[]{
     let countBracket = 0  // 括号计数
     let prevBracket = []  // 括号栈
@@ -98,4 +101,8 @@ export class ABRangeManager{
   static decoration_block(text:string, from:number, to:number, editor:Editor){
     return Decoration.replace({widget: new ABReplaceWidget(text, from, to, editor)})
   }
+}
+
+export class ABListRangeManager{
+
 }
