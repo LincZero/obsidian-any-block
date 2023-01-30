@@ -58,13 +58,13 @@ export class ABDecorationManager{
       }
       else if (this.rangeSpec.match=="list"){
         const text = this.r_this.mdText.slice(this.rangeSpec.from, this.rangeSpec.to)
-        if (this.rangeSpec.keyword=="list2mdtable"){
+        if (this.rangeSpec.keyword){
           return Decoration.replace({widget: new ABReplaceWidget(
             text, this.rangeSpec.from, this.rangeSpec.to, this.r_this.editor
           )})
         }
         else {
-          return Decoration.mark({class: "ab-line-yellow"})
+          return Decoration.mark({class: "ab-line-list"})
         }
       }
       else{

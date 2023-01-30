@@ -105,6 +105,7 @@ export class Replace2AnyBlock{
     if(editor_mode!=Editor_mode.SOURCE_LIVE) {
       return decorationSet
     }
+    const cursorSpec = this.getCursorCh()
     const list_abRangeManager:ABRangeManager[] = list_ABRangeManager.map(c => {
       return new c(this.mdText)
     })
@@ -112,7 +113,7 @@ export class Replace2AnyBlock{
       let listRangeSpec: RangeSpec[] = abManager.specKeywords
       for(let rangeSpec of listRangeSpec){             // 遍历每个范围管理器里的多个范围集
         decorationSet = decorationSet.update({
-          add: [new ABDecorationManager(this, rangeSpec, this.getCursorCh())
+          add: [new ABDecorationManager(this, rangeSpec, cursorSpec)
             .decoration.range(rangeSpec.from, rangeSpec.to)] // @bug
         })
       }

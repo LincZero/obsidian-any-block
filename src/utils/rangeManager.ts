@@ -1,9 +1,11 @@
+import { EditorPosition } from 'obsidian'
+
 /** 匹配关键字接口 
  * 范围内容 = mdText.text.substring(2, text.length-2).trim()
  */
 export interface RangeSpec {
-  from: number,     // 范围1
-  to: number,       // 范围2
+  from: number,     // 替换范围1
+  to: number,       // 替换范围2
   keyword: string,  // 关键字参数
   match: string,    // 范围选择方式
 }
@@ -13,14 +15,28 @@ export interface RangeSpec {
  * 一次性使用
  */
 export class ABRangeManager{
-  _specKeywords:RangeSpec[]
   mdText: string = ""     // 全文文本
+  /** 行数 - total_ch 映射表
+   * 该表的长度是 行数+1
+   * map_line_ch[i] = 序列i行最前面的位置
+   * map_line_ch[i+1]-1 = 序列i行最后面的位置
+   */
+  map_line_ch: number[]  // line-ch 映射表
+  _specKeywords:RangeSpec[]
   public get specKeywords(){
     return this._specKeywords
   }
 
   constructor(mdText: string){
     this.mdText = mdText
+
+    this.map_line_ch = [0]
+    let count_ch = 0
+    for (let line of mdText.split("\n")){
+      count_ch = count_ch + line.length + 1
+      this.map_line_ch.push(count_ch)
+    }
+    
     this._specKeywords = this.blockMatch_keyword()
   }
 
@@ -104,23 +120,24 @@ class ABRangeManager_list extends ABRangeManager{
   }
 
   private lineMatch_keyword(): RangeSpec[] {
-    /** 行数 - total_ch 映射表
-     * 该表的长度是 行数+1
-     * map_line_ch[i] = 序列i行最前面的位置
-     * map_line_ch[i+1]-1 = 序列i行最后面的位置
-     */
-    let map_line_ch:number[] = [0]
-    let matchInfo2:{line_from:number, line_to:number}[] = []
+    let matchInfo2:{
+      line_from:number, 
+      line_to:number,
+      list_header:string
+    }[] = []
     const list_text = this.mdText.split("\n")
+    let list_header = ""
     let is_list_mode = false  // 是否在列表中
     let prev_list_from = 0    // 在列表中时，在哪开始
     for (let i=0; i<list_text.length; i++){
-      map_line_ch.push(map_line_ch[map_line_ch.length-1]+list_text[i].length+1)
-      
       if (this.reg_list.test(list_text[i])){  // 该行是列表
         if (is_list_mode) continue            // 已经进入列表中
         else{
-          prev_list_from = i
+          if (i!=0 && list_text[i-1].indexOf("list")==0) { // 如果有列表头则加上这个范围
+            prev_list_from = i-1
+            list_header = list_text[i-1]
+          }
+          else { prev_list_from = i }
           is_list_mode = true
           continue
         }
@@ -132,9 +149,11 @@ class ABRangeManager_list extends ABRangeManager{
         if (is_list_mode) {                   // 已经进入列表中
           matchInfo2.push({
             line_from: prev_list_from,
-            line_to: i
+            line_to: i,
+            list_header: list_header
           })
           is_list_mode = false
+          list_header = ""
         }
         continue
       }
@@ -142,17 +161,19 @@ class ABRangeManager_list extends ABRangeManager{
     if (is_list_mode){                        // 结束循环收尾
       matchInfo2.push({
         line_from: prev_list_from,
-        line_to: list_text.length
+        line_to: list_text.length,
+        list_header: list_header
       })
       is_list_mode = false
+      list_header = ""
     }
 
     const matchInfo: RangeSpec[] = []
     for (let item of matchInfo2){
       matchInfo.push({
-        from: map_line_ch[item.line_from],
-        to: map_line_ch[item.line_to]-1,
-        keyword: item.line_from==0?"":list_text[item.line_from-1], // 列表上一行的内容
+        from: this.map_line_ch[item.line_from],
+        to: this.map_line_ch[item.line_to]-1,
+        keyword: item.list_header,
         match: "list"
       })
     }
