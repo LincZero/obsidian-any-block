@@ -3,10 +3,14 @@ import {StateField, StateEffect, EditorState, Transaction} from "@codemirror/sta
 import {MarkdownView, View, Editor, EditorPosition} from 'obsidian';
 
 import AnyBlockPlugin from '../main'
-import { list_ABManager, ABRangeManager, SpecKeyword } from "../utils/rangeManager"
+import { list_ABRangeManager, ABRangeManager, RangeSpec } from "../utils/rangeManager"
+import { ABDecorationManager } from "../utils/decorationManager"
 
 /** 总逻辑梳理
- * 状态字段 -> 范围管理器/装饰管理器 -> 替换管理器
+ * mermaid
+ * - 状态字段
+ *   - 范围管理器 (全文文本构造) interface SpecKeyword : 一个状态字段有多个范围管理器
+ *     - 装饰管理器 (传入范围管理器) / 替换管理器 : 一个范围管理器有多个范围，每个范围可以使用的装饰不同
  */
 
 // 获取 - 模式
@@ -64,7 +68,7 @@ export class Replace2AnyBlock{
         [this.decorationField] 
       ))
       stateEffects.push(StateEffect.appendConfig.of(
-        [list_ABManager.map(c=>{return c.decoration_theme()})] 
+        [ABDecorationManager.decoration_theme()] 
       ))
     }
   
@@ -89,11 +93,6 @@ export class Replace2AnyBlock{
     // 获取 - 编辑器模式
     let editor_mode: Editor_mode = this.getEditorMode()
 
-    // 获取 - 光标from-to
-    const cursor_ch = this.getCursorCh()
-    let cursor_from_ch = cursor_ch.from
-    let cursor_to_ch = cursor_ch.to
-
     // 装饰调整（删增改）
     // 装饰调整 - 删
     /** @bug 这里的mdText是未修改前的mdText，光标的位置也是 会延迟一拍 */
@@ -106,24 +105,16 @@ export class Replace2AnyBlock{
     if(editor_mode!=Editor_mode.SOURCE_LIVE) {
       return decorationSet
     }
-    const list_abManager:ABRangeManager[] = list_ABManager.map(c => {
+    const list_abRangeManager:ABRangeManager[] = list_ABRangeManager.map(c => {
       return new c(this.mdText)
     })
-    for (let abManager of list_abManager){
-      let listSpecKeyword: SpecKeyword[] = abManager.specKeywords
-      for(let item of listSpecKeyword){
-        let from = item.from
-        let to = item.to
-        // 如果光标位置在块内，则不启用块，仅使用高亮
-        let underlineMark: Decoration
-        if (cursor_from_ch>=from && cursor_from_ch<=to || cursor_to_ch>=from && cursor_to_ch<=to) {
-          underlineMark = abManager.decoration_line()
-        }
-        else {
-          underlineMark = abManager.decoration_block(this.mdText.slice(from, to), item, this.editor)
-        }
+    for (let abManager of list_abRangeManager){     // 遍历多个范围管理器
+      let listRangeSpec: RangeSpec[] = abManager.specKeywords
+      for(let rangeSpec of listRangeSpec){             // 遍历每个范围管理器里的多个范围集
+        console.log("rangeSpec", rangeSpec)
         decorationSet = decorationSet.update({
-          add: [underlineMark.range(from, to)]
+          add: [new ABDecorationManager(this, rangeSpec, this.getCursorCh())
+            .decoration.range(rangeSpec.from, rangeSpec.to)]
         })
       }
     }

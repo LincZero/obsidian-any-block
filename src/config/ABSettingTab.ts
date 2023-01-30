@@ -55,7 +55,17 @@ export class ABSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName('html标签选择器')
-      .setDesc('用`<ab>`和`</ab>`选择范围<red>（功能还没做，暂时无效）</red>')
+      .setDesc(
+        createFragment(e => {
+          const div:HTMLDivElement = e.createDiv()
+          div.createSpan({text: "用"});
+          div.createEl("code", {text: "`<ab>`"});
+          div.createSpan({text: "和"});
+          div.createEl("code", {text: "`</ab>`"});
+          div.createSpan({text: "选择范围"});
+          div.createEl("strong", {text: "（功能还没做，暂时无效）"});
+        })
+      )
 			.addToggle(component=>
         component
           .setValue(this.plugin.settings.bool_range_html)
