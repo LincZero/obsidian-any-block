@@ -1,7 +1,9 @@
-import {EditorView, Decoration, DecorationSet} from "@codemirror/view"
+import {EditorView, Decoration} from "@codemirror/view"
+import {Extension} from "@codemirror/state"
 import {Editor} from 'obsidian';
 
 import { ABReplaceWidget } from "../replace/replaceWidget"
+import { registerReplace } from 'src/replace/registerReplace';
 
 // 匹配关键字接口
 export interface SpecKeyword {
@@ -11,45 +13,61 @@ export interface SpecKeyword {
   match: string
 }
 
-// 正则
-const reg_k1 = /%{/gi
-const reg_k2 = /%}/gi
-const reg_auto = /^%a/gi
-const reg_line = /^%l/gi
-const reg_paragraph = /^%p/gi
-const list_reg = [reg_k1, reg_k2]
-const reg_total = new RegExp(list_reg
-  .map((pattern) => pattern.source).join("|"), "gi");	
-
-const rangeReg = {
-  reg_k1,
-  reg_k2,
-  reg_auto,
-  reg_line,
-  reg_paragraph
-}
-
 /** AnyBlock范围管理器
  * 一段文字可以生成一个实例
  * 一次性使用
  */
 export class ABRangeManager{
-  /*private specKeywords:SpecKeyword[]
+  _specKeywords:SpecKeyword[]
+  mdText: string = ""
 
   constructor(mdText: string){
-    this.specKeywords = ABRangeManager.blockMatch_keyword(mdText)
-  }*/
+    this.mdText = mdText
+    this._specKeywords = this.blockMatch_keyword()
+  }
+
+  public get specKeywords(){
+    return this._specKeywords
+  }
+
+  protected blockMatch_keyword(): SpecKeyword[]{
+    throw("Error: 没有重载 ABRangeManager::blockMatch_keyword")
+  }
+
+  decoration_line():Decoration{
+    throw("Error: 没有重载 ABRangeManager::decoration_line")
+  }
+
+  decoration_block(text:string, from:number, to:number, editor:Editor):Decoration{
+    throw("Error: 没有重载 ABRangeManager::decoration_block")
+  }
+
+  static decoration_theme():Extension{
+    throw("Error: 没有重载 ABRangeManager::decoration_theme")
+  }
+}
+
+class ABRangeManager_brace extends ABRangeManager {
+  reg_k1: RegExp
+  reg_k2: RegExp
+  list_reg: RegExp[]
+  reg_total: RegExp
 
   /** 块 - 匹配关键字 */
-  static blockMatch_keyword(mdText: string): SpecKeyword[] {
-    let listSpecKeyword = this.lineMatch_keyword(mdText)
+  protected blockMatch_keyword(): SpecKeyword[] {
+    this.reg_k1 = /^%{/gmi
+    this.reg_k2 = /^%}/gmi
+    this.list_reg = [this.reg_k1, this.reg_k2]
+    this.reg_total = new RegExp(this.list_reg.map((pattern) => pattern.source).join("|"), "gmi")
+
+    let listSpecKeyword = this.lineMatch_keyword(this.mdText)
     return this.line2BlockMatch(listSpecKeyword)
   }
 
   /** 行 - 匹配关键字 */
-  private static lineMatch_keyword(mdText: string): SpecKeyword[] {
+  private lineMatch_keyword(mdText: string): SpecKeyword[] {
     const matchInfo: SpecKeyword[] = []
-    const matchList: RegExpMatchArray|null= mdText.match(reg_total);        // 匹配项
+    const matchList: RegExpMatchArray|null= mdText.match(this.reg_total);        // 匹配项
 
     if (!matchList) return []
     let prevIndex = 0
@@ -57,22 +75,22 @@ export class ABRangeManager{
       const from2 = mdText.indexOf(matchItem, prevIndex)
       const to2 = from2 + matchItem.length;
       prevIndex = to2;
-      let match2
-      for (let reg of list_reg){
-        if (matchItem.match(reg)) {match2 = reg; break;}
+      let reg_match // 匹配的正则项
+      for (let reg in this.list_reg){
+        if (matchItem.match(reg)) {reg_match = reg; break;}
       }
       matchInfo.push({
         from: from2,
         to: to2,
         keyword: matchItem,
-        match: String(match2)
+        match: String(reg_match)
       })
     }
     return matchInfo
   }
 
   /** 转化 - 匹配关键字 */
-  private static line2BlockMatch(listSpecKeyword: SpecKeyword[]): SpecKeyword[]{
+  private line2BlockMatch(listSpecKeyword: SpecKeyword[]): SpecKeyword[]{
     let countBracket = 0  // 括号计数
     let prevBracket = []  // 括号栈
     let listSpecKeyword_new = []
@@ -94,15 +112,63 @@ export class ABRangeManager{
     return listSpecKeyword_new
   }
 
-  static decoration_line(){
-    return Decoration.mark({class: "ab-underline"})
+  decoration_line(){
+    return Decoration.mark({class: "ab-line-brace"})
   }
 
-  static decoration_block(text:string, from:number, to:number, editor:Editor){
+  decoration_block(text:string, from:number, to:number, editor:Editor){
     return Decoration.replace({widget: new ABReplaceWidget(text, from, to, editor)})
   }
+
+  static decoration_theme(){
+    return EditorView.baseTheme({
+      ".ab-line-brace": { textDecoration: "underline 3px red" }
+    })
+  }
 }
 
-export class ABListRangeManager{
+class ABRangeManager_list extends ABRangeManager{
+  protected blockMatch_keyword(): SpecKeyword[] {
+    return [{
+      from: 5,
+      to: 10,
+      keyword: "",
+      match: ""
+    }]
+  }
 
+  decoration_line(){
+    return Decoration.mark({class: "ab-line-list"})
+  }
+
+  decoration_block(text:string, from:number, to:number, editor:Editor){
+    return Decoration.replace({widget: new ABReplaceWidget(text, from, to, editor)})
+  }
+
+  static decoration_theme(){
+    return EditorView.baseTheme({
+      ".ab-line-list": { textDecoration: "underline 3px cyan" }
+    })
+  }
 }
+
+// 总结构思考
+/*
+ABRange[]
+[
+  {
+    type: 范围类别1
+    rangeSet: SpecKeyword[]
+  },
+  {
+    type: 范围类别2
+    rangeSet: SpecKeyword[]
+  }
+]*/
+
+/** 管理器列表。
+ * 暂不支持注册的方式扩展添加 */
+export const list_ABManager=[
+  ABRangeManager_brace,
+  ABRangeManager_list
+]
