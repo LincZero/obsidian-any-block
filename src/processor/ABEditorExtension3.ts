@@ -5,6 +5,10 @@ import {MarkdownView, View, Editor, EditorPosition} from 'obsidian';
 import AnyBlockPlugin from '../main'
 import { list_ABManager, ABRangeManager, SpecKeyword } from "../utils/rangeManager"
 
+/** 总逻辑梳理
+ * 状态字段 -> 范围管理器/装饰管理器 -> 替换管理器
+ */
+
 // 获取 - 模式
 enum Editor_mode{
   NONE,
@@ -116,7 +120,7 @@ export class Replace2AnyBlock{
           underlineMark = abManager.decoration_line()
         }
         else {
-          underlineMark = abManager.decoration_block(this.mdText.slice(from, to), from, to, this.editor)
+          underlineMark = abManager.decoration_block(this.mdText.slice(from, to), item, this.editor)
         }
         decorationSet = decorationSet.update({
           add: [underlineMark.range(from, to)]

@@ -12,7 +12,7 @@ export class ABReplaceWidget extends WidgetType {
 
   constructor(text: string, from: number, to: number, ediot: Editor){
     super()
-    this.text = text.substring(2, text.length-2).trim()
+    this.text = text
     this.from = from
     this.to = to
     this.global_editor = ediot
@@ -22,9 +22,11 @@ export class ABReplaceWidget extends WidgetType {
     // 根元素
     this.div = document.createElement("div");
 
+    let is_been_processor = false
     for (let abReplaceProcessor of list_replace){
-      if (abReplaceProcessor(this)) break
+      if (abReplaceProcessor(this)) {is_been_processor=true; break}
     }
+    if(!is_been_processor){} /////////////////////////
 
     // 编辑按钮
     let dom_edit = this.div.createEl("div", {
