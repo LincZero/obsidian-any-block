@@ -111,10 +111,9 @@ export class Replace2AnyBlock{
     for (let abManager of list_abRangeManager){     // 遍历多个范围管理器
       let listRangeSpec: RangeSpec[] = abManager.specKeywords
       for(let rangeSpec of listRangeSpec){             // 遍历每个范围管理器里的多个范围集
-        console.log("rangeSpec", rangeSpec)
         decorationSet = decorationSet.update({
           add: [new ABDecorationManager(this, rangeSpec, this.getCursorCh())
-            .decoration.range(rangeSpec.from, rangeSpec.to)]
+            .decoration.range(rangeSpec.from, rangeSpec.to)] // @bug
         })
       }
     }

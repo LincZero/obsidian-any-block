@@ -34,36 +34,41 @@ export class ABDecorationManager{
       this.isBlock = true
     }
 
-    this.initDecorationSet()
+    this.decoration = this.initDecorationSet()
   }
 
-  initDecorationSet(){
+  initDecorationSet(): Decoration{
     if (!this.isBlock) {
       if (this.rangeSpec.match=="brace"){
-        this.decoration = Decoration.mark({class: "ab-line-brace"})
+        return Decoration.mark({class: "ab-line-brace"})
       }
       else if (this.rangeSpec.match=="list"){
-        this.decoration = Decoration.mark({class: "ab-line-list"})
+        return Decoration.mark({class: "ab-line-list"})
       }
       else{
-        this.decoration = Decoration.mark({class: "ab-line-blue"})
+        return Decoration.mark({class: "ab-line-blue"})
       }
     }
     else{ // text:string, item:SpecKeyword, editor:Editor
       if (this.rangeSpec.match=="brace"){
         const text = this.r_this.mdText.slice(this.rangeSpec.from+2, this.rangeSpec.to-2)
-        this.decoration = Decoration.replace({widget: new ABReplaceWidget(
+        return Decoration.replace({widget: new ABReplaceWidget(
           text, this.rangeSpec.from, this.rangeSpec.to, this.r_this.editor
         )})
       }
       else if (this.rangeSpec.match=="list"){
         const text = this.r_this.mdText.slice(this.rangeSpec.from, this.rangeSpec.to)
-        this.decoration = Decoration.replace({widget: new ABReplaceWidget(
-          "list2mdtable\n"+text, this.rangeSpec.from, this.rangeSpec.to, this.r_this.editor
-        )})
+        if (this.rangeSpec.keyword=="list2mdtable"){
+          return Decoration.replace({widget: new ABReplaceWidget(
+            text, this.rangeSpec.from, this.rangeSpec.to, this.r_this.editor
+          )})
+        }
+        else {
+          return Decoration.mark({class: "ab-line-yellow"})
+        }
       }
       else{
-        this.decoration = Decoration.mark({class: "ab-line-yellow"})
+        return Decoration.mark({class: "ab-line-yellow"})
       }
     }
   }
@@ -71,10 +76,16 @@ export class ABDecorationManager{
   static decoration_theme():Extension{
     return [
       EditorView.baseTheme({
-        ".ab-line-brace": { textDecoration: "underline 3px red" }
+        ".ab-line-brace": { textDecoration: "underline 2px red" }
       }),
       EditorView.baseTheme({
-        ".ab-line-list": { textDecoration: "underline 3px cyan" }
+        ".ab-line-list": { textDecoration: "underline 2px cyan" }
+      }),
+      EditorView.baseTheme({
+        ".ab-line-yellow": { textDecoration: "underline 3px yellow" }
+      }),
+      EditorView.baseTheme({
+        ".ab-line-blue": { textDecoration: "underline 3px blue" }
       })
     ]
   }
