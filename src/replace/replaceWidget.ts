@@ -2,30 +2,23 @@ import {Editor, EditorPosition, MarkdownRenderChild, MarkdownRenderer} from 'obs
 import {EditorView, WidgetType} from "@codemirror/view"
 
 import {list_replace} from "./registerReplace"
-import {RangeSpec} from "../utils/rangeManager"
+import {RangeSpec} from "../manager/abRangeManager"
 
 export class ABReplaceWidget extends WidgetType {
   rangeSpec: RangeSpec
-  header: string
-  text: string
-  from: number
-  to: number
   global_editor: Editor
   div: HTMLDivElement
 
   constructor(rangeSpec: RangeSpec, editor: Editor){
     super()
     this.rangeSpec = rangeSpec
-    this.header = rangeSpec.header
-    this.text = rangeSpec.text
-    this.from = rangeSpec.from
-    this.to = rangeSpec.to
     this.global_editor = editor
   }
 
   toDOM(view: EditorView): HTMLElement {
     // 根元素
     this.div = document.createElement("div");
+    this.div.setAttribute("type_header", this.rangeSpec.header)
 
     let is_been_processor = false
     for (let abReplaceProcessor of list_replace){
@@ -52,8 +45,7 @@ export class ABReplaceWidget extends WidgetType {
        * 否则editor是undefined
        */
       const editor: Editor = this.global_editor
-      let pos = this.getCursorPos(editor, this.from)
-      console.log("pos", pos, editor, editor.getCursor())
+      let pos = this.getCursorPos(editor, this.rangeSpec.from)
       if (pos) editor.setCursor(pos)
   }
 

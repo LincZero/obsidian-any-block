@@ -3,15 +3,17 @@ import {StateField, StateEffect, EditorState, Transaction} from "@codemirror/sta
 import {MarkdownView, View, Editor, EditorPosition} from 'obsidian';
 
 import AnyBlockPlugin from '../main'
-import { list_ABRangeManager, ABRangeManager, RangeSpec } from "../utils/rangeManager"
-import { ABDecorationManager } from "../utils/decorationManager"
+import { list_ABRangeManager, ABRangeManager, RangeSpec } from "./abRangeManager"
+import { ABDecorationManager } from "./abDecorationManager"
 
 /** 总逻辑梳理
  * mermaid
- * - 状态字段
- * - 范围管理器 (全文文本构造) interface SpecKeyword : 一个状态字段有一个范围管理器
- *   - 子范围管理器：一个范围管理器有多个子范围管理器
+ * - 状态管理器 : 用来设置状态的
+ *   - 范围管理器 (全文文本构造) interface SpecKeyword : 一个文档有多个范围管理器
  *     - 装饰管理器 (传入范围管理器) / 替换管理器 : 一个子范围管理器有多个范围，每个范围可以使用的装饰不同
+ * 
+ * 流程：
+ * - 选择范围
  */
 
 // 获取 - 模式
@@ -22,10 +24,11 @@ enum Editor_mode{
   PREVIEW
 }
 
-/** 启用状态字段装饰功能
+/** 状态管理器
+ * 启用状态字段装饰功能
  * 一次性使用
  */
-export class Replace2AnyBlock{
+export class ABStateManager{
   plugin_this: AnyBlockPlugin
   replace_this=this
   view: View
@@ -146,8 +149,13 @@ export class Replace2AnyBlock{
       if(editor_dom?.classList.contains('is-live-preview')) return Editor_mode.SOURCE_LIVE
       else return Editor_mode.SOURCE
     }
-    else if (str=="preview") return Editor_mode.PREVIEW  // 但其实不会判定，因为实时是不触发update方法的
-    else {console.log("无法获取编辑器模式，可能会产生BUG"); return Editor_mode.NONE;}
+    else if (str=="preview"){
+      return Editor_mode.PREVIEW  // 但其实不会判定，因为实时是不触发update方法的
+    }
+    else {
+      /*console.log("无法获取编辑器模式，可能会产生BUG");*/ 
+      return Editor_mode.NONE;
+    } // 点一下编辑器再点其他布局位置，就会发生
   }
 
   /** 获取光标位于全文第几个字符 */

@@ -4,19 +4,21 @@ import {
 } from "obsidian"
 import { MarkdownRenderChild } from "obsidian";
 
-export function abPostProcessor(
-  el: HTMLElement, 
-  ctx: MarkdownPostProcessorContext
-) {
-  const codeblocks = el.querySelectorAll("code");
+export class ABPosthtmlManager{
+  static processor(
+    el: HTMLElement, 
+    ctx: MarkdownPostProcessorContext
+  ) {
+    const codeblocks = el.querySelectorAll("code");
 
-  for (let index = 0; index < codeblocks.length; index++) {
-    const codeblock = codeblocks.item(index);
-    const text = codeblock.innerText.trim();
+    for (let index = 0; index < codeblocks.length; index++) {
+      const codeblock = codeblocks.item(index);
+      const text = codeblock.innerText.trim();
 
-    // 匹配则创建MarkdownRenderChild实例
-    if (text[0] === ":" && text[text.length - 1] === ":") {
-      ctx.addChild(new Emoji(codeblock, text)); // 将参数1HTML
+      // 匹配则创建MarkdownRenderChild实例
+      if (text[0] === ":" && text[text.length - 1] === ":") {
+        ctx.addChild(new Emoji(codeblock, text)); // 将参数1HTML
+      }
     }
   }
 }

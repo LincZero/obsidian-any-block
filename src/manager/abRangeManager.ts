@@ -1,18 +1,14 @@
-import { EditorPosition } from 'obsidian'
-
-/** 匹配关键字接口 
- * 范围内容 = mdText.text.substring(2, text.length-2).trim()
- */
+/** 匹配关键字接口 */
 export interface RangeSpec {
-  from: number,
-  to: number,
-  header: string,  // 关键字参数
-  match: string,   // 范围选择方式
-  text: string
+  from: number,     // 替换范围
+  to: number,       // .
+  header: string,   // 头不是信息
+  match: string,    // 范围选择方式
+  text: string      // 内容信息
 }
 
 /** AnyBlock范围管理器
- * 一段文字可以生成一个实例
+ * 一段文字可以生成一个实例，主要负责返回RangeSpec类型
  * 一次性使用
  */
 export class ABRangeManager{
@@ -59,7 +55,6 @@ class ABRangeManager_brace extends ABRangeManager {
     //this.list_reg = [this.reg_k1, this.reg_k2]
     //this.reg_total = new RegExp(this.list_reg.map((pattern) => pattern.source).join("|"), "gmi")
 
-    console.log("this.lineMatch_keyword()",this.lineMatch_keyword())
     return this.lineMatch_keyword()
   }
 
@@ -89,57 +84,6 @@ class ABRangeManager_brace extends ABRangeManager {
     }
     return matchInfo
   }
-
-  /** 行 - 匹配关键字（内联） */
-  /*private lineMatch_keyword_line(): RangeSpec[] {
-    const matchInfo: RangeSpec[] = []
-    const matchList: RegExpMatchArray|null= this.mdText.match(this.reg_total);        // 匹配项
-
-    if (!matchList) return []
-    let prevIndex = 0
-    for (const matchItem of matchList){
-      const from2 = this.mdText.indexOf(matchItem, prevIndex)
-      const to2 = from2 + matchItem.length;
-      prevIndex = to2;
-      let reg_match // 匹配的正则项
-      for (let reg in this.list_reg){
-        if (matchItem.match(reg)) {reg_match = reg; break;}
-      }
-      matchInfo.push({
-        from: from2,//////////////////// @bug 还要去除brace模式的头部信息，然后填写text
-        to: to2,
-        header: matchItem,
-        match: String(reg_match),
-        text: ""
-      })
-    }
-    return matchInfo
-  }*/
-
-  /** 转化 - 匹配关键字 */
-  /*private line2BlockMatch(listSpecKeyword: RangeSpec[]): RangeSpec[]{
-    let countBracket = 0  // 括号计数
-    let prevBracket = []  // 括号栈
-    let listSpecKeyword_new: RangeSpec[] = []
-    for (const matchItem of listSpecKeyword) {
-      if (matchItem.header=="%{") {
-        countBracket++
-        prevBracket.push(matchItem.from)
-      }
-      else if(matchItem.header=="%}" && countBracket>0) {
-        countBracket--
-        const from = prevBracket.pop() as number
-        listSpecKeyword_new.push({
-          from: from,
-          to: matchItem.to,
-          header: "",
-          match: "brace",
-          text: this.mdText.slice(from+2, matchItem.to-2)
-        })
-      }
-    }
-    return listSpecKeyword_new
-  }*/
 }
 
 class ABRangeManager_list extends ABRangeManager{
@@ -212,7 +156,7 @@ class ABRangeManager_list extends ABRangeManager{
       matchInfo.push({
         from: from,
         to: to,
-        header: item.list_header,
+        header: item.list_header.indexOf("2")==0?"list"+item.list_header:item.list_header, // list选择器语法糖
         match: "list",
         text: item.list_header==""?
           this.mdText.slice(from, to):
@@ -230,3 +174,57 @@ export const list_ABRangeManager=[
   ABRangeManager_brace,
   ABRangeManager_list
 ]
+
+// 旧brace方法（内联用），现在的方法不能搞内联，这些代码先注释着等以后备用
+{
+  /** 行 - 匹配关键字（内联） */
+  /*private lineMatch_keyword_line(): RangeSpec[] {
+    const matchInfo: RangeSpec[] = []
+    const matchList: RegExpMatchArray|null= this.mdText.match(this.reg_total);        // 匹配项
+
+    if (!matchList) return []
+    let prevIndex = 0
+    for (const matchItem of matchList){
+      const from2 = this.mdText.indexOf(matchItem, prevIndex)
+      const to2 = from2 + matchItem.length;
+      prevIndex = to2;
+      let reg_match // 匹配的正则项
+      for (let reg in this.list_reg){
+        if (matchItem.match(reg)) {reg_match = reg; break;}
+      }
+      matchInfo.push({
+        from: from2,//////////////////// @bug 还要去除brace模式的头部信息，然后填写text
+        to: to2,
+        header: matchItem,
+        match: String(reg_match),
+        text: ""
+      })
+    }
+    return matchInfo
+  }*/
+
+  /** 转化 - 匹配关键字 */
+  /*private line2BlockMatch(listSpecKeyword: RangeSpec[]): RangeSpec[]{
+    let countBracket = 0  // 括号计数
+    let prevBracket = []  // 括号栈
+    let listSpecKeyword_new: RangeSpec[] = []
+    for (const matchItem of listSpecKeyword) {
+      if (matchItem.header=="%{") {
+        countBracket++
+        prevBracket.push(matchItem.from)
+      }
+      else if(matchItem.header=="%}" && countBracket>0) {
+        countBracket--
+        const from = prevBracket.pop() as number
+        listSpecKeyword_new.push({
+          from: from,
+          to: matchItem.to,
+          header: "",
+          match: "brace",
+          text: this.mdText.slice(from+2, matchItem.to-2)
+        })
+      }
+    }
+    return listSpecKeyword_new
+  }*/
+}

@@ -1,23 +1,26 @@
 import {EditorView, Decoration, DecorationSet} from "@codemirror/view"
 import {Extension} from "@codemirror/state"
-import {RangeSpec} from "./rangeManager"
 
-
-import {Editor} from 'obsidian';
-
+import { ABStateManager } from './abStateManager';
+import { RangeSpec } from "./abRangeManager"
 import { ABReplaceWidget } from "../replace/replaceWidget"
-import { registerReplace } from '../replace/registerReplace';
-import { Replace2AnyBlock } from '../processor/ABEditorExtension3';
 
-
+interface CursorSpec{
+  from:number, 
+  to:number
+}
+/** 装饰管理器
+ * 返回一个Decoration
+ * 其中传入r_this的作用主要是为了装饰块可能可以返过来设置光标位置
+ */
 export class ABDecorationManager{
   rangeSpec: RangeSpec
-  cursorSpec: {from:number, to:number}
+  cursorSpec: CursorSpec
   decoration: Decoration
   isBlock: boolean
-  r_this: Replace2AnyBlock
+  r_this: ABStateManager
 
-  constructor(r_this: Replace2AnyBlock, rangeSpec: RangeSpec, cursorSpec:{from:number, to:number}){
+  constructor(r_this: ABStateManager, rangeSpec: RangeSpec, cursorSpec:CursorSpec){
     this.rangeSpec = rangeSpec
     this.cursorSpec = cursorSpec
     this.r_this = r_this

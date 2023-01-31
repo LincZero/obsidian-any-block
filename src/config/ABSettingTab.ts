@@ -3,20 +3,25 @@ import AnyBlockPlugin from "../main"
 
 /** 设置值接口 */
 export interface ABSettingInterface {
-  bool_range_list: boolean
-  bool_range_auto: boolean
-  bool_range_html: boolean
-  bool_range_brace: boolean
-  bool_deco_block: boolean
+  is_range_list: boolean
+  is_range_auto: boolean
+  is_range_html: boolean
+  is_range_brace: boolean
+  is_able_source: boolean
+  is_able_live: boolean
+  is_able_render: boolean
 }
 
 /** 设置值默认项 */
 export const AB_SETTINGS: ABSettingInterface = {
-  bool_range_list: true,
-  bool_range_auto: false,
-  bool_range_html: false,
-  bool_range_brace: true,
-  bool_deco_block: true
+  is_range_list: true,
+  is_range_auto: false,
+  is_range_html: false,
+  is_range_brace: true,
+  is_able_source: false,
+  is_able_live: true,
+  is_able_render: true,
+  
 }
 
 /** 设置值面板 */
@@ -33,15 +38,15 @@ export class ABSettingTab extends PluginSettingTab {
 
 		containerEl.empty();
 
-		containerEl.createEl('h2', {text: '范围选择器'});
+		containerEl.createEl('h1', {text: '范围管理器'});
 
 		new Setting(containerEl)
       .setName('自动列表选择器')
       .setDesc('自动选择列表范围，并将类别识别为list')
 			.addToggle(component=>
         component
-          .setValue(this.plugin.settings.bool_range_list)
-          .onChange(value=>{this.plugin.settings.bool_range_list = value})
+          .setValue(this.plugin.settings.is_range_list)
+          .onChange(value=>{this.plugin.settings.is_range_list = value})
       )
 
     new Setting(containerEl)
@@ -49,8 +54,8 @@ export class ABSettingTab extends PluginSettingTab {
       .setDesc('用`%:`选择开头，自动指定结尾')
 			.addToggle(component=>
         component
-          .setValue(this.plugin.settings.bool_range_auto)
-          .onChange(value=>{this.plugin.settings.bool_range_auto = value})
+          .setValue(this.plugin.settings.is_range_auto)
+          .onChange(value=>{this.plugin.settings.is_range_auto = value})
       )
 
     new Setting(containerEl)
@@ -68,8 +73,8 @@ export class ABSettingTab extends PluginSettingTab {
       )
 			.addToggle(component=>
         component
-          .setValue(this.plugin.settings.bool_range_html)
-          .onChange(value=>{this.plugin.settings.bool_range_html = value})
+          .setValue(this.plugin.settings.is_range_html)
+          .onChange(value=>{this.plugin.settings.is_range_html = value})
           .setDisabled(true)
       )
 
@@ -78,19 +83,53 @@ export class ABSettingTab extends PluginSettingTab {
       .setDesc('用`%{`和`%}`选择范围（渲染模式无法工作）')
 			.addToggle(component=>
         component
-          .setValue(this.plugin.settings.bool_range_brace)
-          .onChange(value=>{this.plugin.settings.bool_range_brace = value})
+          .setValue(this.plugin.settings.is_range_brace)
+          .onChange(value=>{this.plugin.settings.is_range_brace = value})
       )
 
-    containerEl.createEl('h2', {text: '装饰器'});
+    containerEl.createEl('h1', {text: '装饰管理器'});
+    containerEl.createEl('span', {text: '左侧为线装饰、右侧为块装饰'});
 
     new Setting(containerEl)
-      .setName('块装饰器')
-      .setDesc('用块替换范围选择器的选择范围')
+      .setName('源码模式中启用')
+      .setDesc('推荐：关/开、关')
 			.addToggle(component=>
         component
-          .setValue(this.plugin.settings.bool_deco_block)
-          .onChange(value=>{this.plugin.settings.bool_deco_block = value})
+          .setValue(this.plugin.settings.is_able_source)
+          .onChange(value=>{this.plugin.settings.is_able_source = value})
+      )
+      .addToggle(component=>
+        component
+          .setValue(this.plugin.settings.is_able_source)
+          .onChange(value=>{this.plugin.settings.is_able_source = value})
+      )
+
+    new Setting(containerEl)
+      .setName('实时模式中启用')
+      .setDesc('推荐：关/开、关/开')
+			.addToggle(component=>
+        component
+          .setValue(this.plugin.settings.is_able_live)
+          .onChange(value=>{this.plugin.settings.is_able_live = value})
+      )
+      .addToggle(component=>
+        component
+          .setValue(this.plugin.settings.is_able_live)
+          .onChange(value=>{this.plugin.settings.is_able_live = value})
+      )
+
+    new Setting(containerEl)
+      .setName('渲染模式中启用')
+      .setDesc('推荐：关、开')
+			.addToggle(component=>
+        component
+          .setValue(this.plugin.settings.is_able_render)
+          .onChange(value=>{this.plugin.settings.is_able_render = value})
+      )
+      .addToggle(component=>
+        component
+          .setValue(this.plugin.settings.is_able_render)
+          .onChange(value=>{this.plugin.settings.is_able_render = value})
       )
 	}
 }
