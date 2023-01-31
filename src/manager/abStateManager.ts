@@ -3,7 +3,7 @@ import {StateField, StateEffect, EditorState, Transaction} from "@codemirror/sta
 import {MarkdownView, View, Editor, EditorPosition} from 'obsidian';
 
 import AnyBlockPlugin from '../main'
-import { list_ABRangeManager, ABRangeManager, RangeSpec } from "./abRangeManager"
+import { list_ABRangeManager, ABMdSelector, RangeSpec } from "./abMdSelector"
 import { ABDecorationManager } from "./abDecorationManager"
 
 /** 总逻辑梳理
@@ -110,7 +110,7 @@ export class ABStateManager{
       return decorationSet
     }
     const cursorSpec = this.getCursorCh()
-    const list_abRangeManager:ABRangeManager[] = list_ABRangeManager.map(c => {
+    const list_abRangeManager:ABMdSelector[] = list_ABRangeManager.map(c => {
       return new c(this.mdText)
     })
     for (let abManager of list_abRangeManager){     // 遍历多个范围管理器

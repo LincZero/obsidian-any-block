@@ -2,7 +2,7 @@ import {EditorView, Decoration, DecorationSet} from "@codemirror/view"
 import {Extension} from "@codemirror/state"
 
 import { ABStateManager } from './abStateManager';
-import { RangeSpec } from "./abRangeManager"
+import { RangeSpec } from "./abMdSelector"
 import { ABReplaceWidget } from "../replace/replaceWidget"
 
 interface CursorSpec{

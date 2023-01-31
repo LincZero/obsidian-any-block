@@ -1,20 +1,19 @@
 import { Plugin } from "obsidian";
-import { ABCodeBlockProcessor } from "./manager/abCodeblockManager";
+import { ABCodeblockManager } from "./manager/abCodeblockManager";
 import { ABStateManager } from "./manager/abStateManager";
-import { ABPosthtmlManager } from "./manager/abPosthtmlManager";
-import { ABSettingInterface, ABSettingTab, AB_SETTINGS } from "./config/ABSettingTab"
+import { ABPosthtmlManager } from "./manager2/abPosthtmlManager";
+import { ABSettingInterface, ABSettingTab, AB_SETTINGS } from "./config/abSettingTab"
 
 
 export default class AnyBlockPlugin extends Plugin {
   settings: ABSettingInterface
-  renderFromMD = ABCodeBlockProcessor.processor.bind(this); // 不然的话这个方法是没this变量的
 
 	async onload() {
     await this.loadSettings();
     this.addSettingTab(new ABSettingTab(this.app, this));
 
     // 代码块
-    this.registerMarkdownCodeBlockProcessor("ab", this.renderFromMD);
+    this.registerMarkdownCodeBlockProcessor("ab", ABCodeblockManager.processor);
     
     // 非渲染模式 cm扩展 - StateField
     // 刚开插件时和每次打开文件时都运行

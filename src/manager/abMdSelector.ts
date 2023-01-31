@@ -11,7 +11,7 @@ export interface RangeSpec {
  * 一段文字可以生成一个实例，主要负责返回RangeSpec类型
  * 一次性使用
  */
-export class ABRangeManager{
+export class ABMdSelector{
   mdText: string = ""     // 全文文本
   /** 行数 - total_ch 映射表
    * 该表的长度是 行数+1
@@ -42,7 +42,7 @@ export class ABRangeManager{
   }
 }
 
-class ABRangeManager_brace extends ABRangeManager {
+class ABMdSelector_brace extends ABMdSelector {
   reg_front: RegExp
   reg_end: RegExp
   list_reg: RegExp[]
@@ -86,7 +86,7 @@ class ABRangeManager_brace extends ABRangeManager {
   }
 }
 
-class ABRangeManager_list extends ABRangeManager{
+class ABMdSelector_list extends ABMdSelector{
   reg_list: RegExp
 
   protected blockMatch_keyword(): RangeSpec[] {
@@ -171,8 +171,8 @@ class ABRangeManager_list extends ABRangeManager{
 /** 管理器列表。
  * 暂不支持注册的方式扩展添加 */
 export const list_ABRangeManager=[
-  ABRangeManager_brace,
-  ABRangeManager_list
+  ABMdSelector_brace,
+  ABMdSelector_list
 ]
 
 // 旧brace方法（内联用），现在的方法不能搞内联，这些代码先注释着等以后备用

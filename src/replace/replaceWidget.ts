@@ -2,7 +2,7 @@ import {Editor, EditorPosition, MarkdownRenderChild, MarkdownRenderer} from 'obs
 import {EditorView, WidgetType} from "@codemirror/view"
 
 import {list_replace} from "./registerReplace"
-import {RangeSpec} from "../manager/abRangeManager"
+import {RangeSpec} from "../manager/abMdSelector"
 
 export class ABReplaceWidget extends WidgetType {
   rangeSpec: RangeSpec
