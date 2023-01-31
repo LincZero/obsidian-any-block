@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "experimentalDecorators": true,
     "baseUrl": ".",
     "inlineSourceMap": true,
     "inlineSources": true,

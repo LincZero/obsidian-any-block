@@ -2,7 +2,7 @@ import {EditorView, Decoration, DecorationSet} from "@codemirror/view"
 import {Extension} from "@codemirror/state"
 
 import { ABStateManager } from './abStateManager';
-import { RangeSpec } from "./abMdSelector"
+import { MdSelectorSpec } from "./abMdSelector"
 import { ABReplaceWidget } from "../replace/replaceWidget"
 
 interface CursorSpec{
@@ -14,13 +14,13 @@ interface CursorSpec{
  * 其中传入r_this的作用主要是为了装饰块可能可以返过来设置光标位置
  */
 export class ABDecorationManager{
-  rangeSpec: RangeSpec
+  rangeSpec: MdSelectorSpec
   cursorSpec: CursorSpec
   decoration: Decoration
   isBlock: boolean
   r_this: ABStateManager
 
-  constructor(r_this: ABStateManager, rangeSpec: RangeSpec, cursorSpec:CursorSpec){
+  constructor(r_this: ABStateManager, rangeSpec: MdSelectorSpec, cursorSpec:CursorSpec){
     this.rangeSpec = rangeSpec
     this.cursorSpec = cursorSpec
     this.r_this = r_this
@@ -42,10 +42,10 @@ export class ABDecorationManager{
 
   initDecorationSet(): Decoration{
     if (!this.isBlock) {
-      if (this.rangeSpec.match=="brace"){
+      if (this.rangeSpec.selector=="brace"){
         return Decoration.mark({class: "ab-line-brace"})
       }
-      else if (this.rangeSpec.match=="list"){
+      else if (this.rangeSpec.selector=="list"){
         return Decoration.mark({class: "ab-line-list"})
       }
       else{
@@ -53,12 +53,12 @@ export class ABDecorationManager{
       }
     }
     else{ // text:string, item:SpecKeyword, editor:Editor
-      if (this.rangeSpec.match=="brace"){
+      if (this.rangeSpec.selector=="brace"){
         return Decoration.replace({widget: new ABReplaceWidget(
           this.rangeSpec, this.r_this.editor
         )})
       }
-      else if (this.rangeSpec.match=="list"){
+      else if (this.rangeSpec.selector=="list"){
         if (this.rangeSpec.header){
           return Decoration.replace({widget: new ABReplaceWidget(
             this.rangeSpec, this.r_this.editor

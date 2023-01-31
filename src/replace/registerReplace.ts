@@ -20,7 +20,7 @@ registerReplace((processor)=>{
   let dom_note = processor.div.createEl("div", {cls: ["drop-shadow", "ab-note"]});
   const child = new MarkdownRenderChild(dom_note);
   // ctx.addChild(child);
-  MarkdownRenderer.renderMarkdown(processor.rangeSpec.text, dom_note, "", child); // var[2]: Obsidian/插件测试/AnyBlock2.md
+  MarkdownRenderer.renderMarkdown(processor.rangeSpec.content, dom_note, "", child); // var[2]: Obsidian/插件测试/AnyBlock2.md
   return true
 })
 
@@ -31,7 +31,7 @@ registerReplace((processor)=>{
   processor.div.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
   let dom_note = processor.div.createEl("div");
   const child = new MarkdownRenderChild(dom_note);
-  const text = processor.rangeSpec.text.split("\n").map((line)=>{return "> "+line}).join("\n")
+  const text = processor.rangeSpec.content.split("\n").map((line)=>{return "> "+line}).join("\n")
   MarkdownRenderer.renderMarkdown(text, dom_note, "", child);
   return true
 })
@@ -43,7 +43,7 @@ registerReplace((processor)=>{
   processor.div.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
   let dom_note = processor.div.createEl("div");
   const child = new MarkdownRenderChild(dom_note);
-  const text = "```"+processor.rangeSpec.text+"\n```"
+  const text = "```"+processor.rangeSpec.content+"\n```"
   MarkdownRenderer.renderMarkdown(text, dom_note, "", child);
   return true
 })
@@ -54,7 +54,7 @@ registerReplace((processor)=>{
 
   processor.div.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
   let dom_note = processor.div.createEl("div");
-  ListProcess.list2table(processor.rangeSpec.text, dom_note, false)
+  ListProcess.list2table(processor.rangeSpec.content, dom_note, false)
   return true
 })
 registerReplace((processor)=>{
@@ -62,7 +62,7 @@ registerReplace((processor)=>{
 
   processor.div.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
   let dom_note = processor.div.createEl("div");
-  ListProcess.list2table(processor.rangeSpec.text, dom_note, true)
+  ListProcess.list2table(processor.rangeSpec.content, dom_note, true)
   return true
 })
 
@@ -72,7 +72,7 @@ registerReplace((processor)=>{
 
   processor.div.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
   let dom_note = processor.div.createEl("div");
-  ListProcess.list2lt(processor.rangeSpec.text, dom_note)
+  ListProcess.list2lt(processor.rangeSpec.content, dom_note)
   return true
 })
 
@@ -82,7 +82,7 @@ registerReplace((processor)=>{
 
   processor.div.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
   let dom_note = processor.div.createEl("div");
-  ListProcess.list2mermaid(processor.rangeSpec.text, dom_note)
+  ListProcess.list2mermaid(processor.rangeSpec.content, dom_note)
   return true
 })
 
@@ -93,7 +93,7 @@ registerReplace((processor)=>{
   processor.div.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
   let dom_note = processor.div.createEl("div");
   const child = new MarkdownRenderChild(dom_note);
-  const text = "```ad-"+processor.rangeSpec.header.slice(1)+"\n"+processor.rangeSpec.text+"\n```"
+  const text = "```ad-"+processor.rangeSpec.header.slice(1)+"\n"+processor.rangeSpec.content+"\n```"
   MarkdownRenderer.renderMarkdown(text, dom_note, "", child);
   return true
 })
@@ -104,6 +104,6 @@ registerReplace((processor)=>{
   processor.div.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
   let dom_note = processor.div.createEl("div", {cls: ["drop-shadow", "ab-note"]});
   // 文本元素。pre不好用，这里还是得用<br>换行最好
-  dom_note.innerHTML = `<p>${processor.rangeSpec.text.split("\n").join("<br/>")}</p>`
+  dom_note.innerHTML = `<p>${processor.rangeSpec.content.split("\n").join("<br/>")}</p>`
   return true
 })

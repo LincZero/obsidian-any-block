@@ -1,10 +1,20 @@
 /** 匹配关键字接口 */
-export interface RangeSpec {
+export interface MdSelectorSpec {
   from: number,     // 替换范围
   to: number,       // .
   header: string,   // 头不是信息
-  match: string,    // 范围选择方式
-  text: string      // 内容信息
+  selector: string, // 范围选择方式
+  content: string      // 内容信息
+}
+
+/** 管理器列表 */
+export let list_ABMdSelector:any[]=[]
+// 原来ts也有py那样的注册器? 叫类装饰器
+// @warning: https://blog.csdn.net/m0_38082783/article/details/127048237
+function register_list_mdSelector(){
+  return function (target: Function){
+    list_ABMdSelector.push(target)
+  }
 }
 
 /** AnyBlock范围管理器
@@ -19,7 +29,7 @@ export class ABMdSelector{
    * map_line_ch[i+1]-1 = 序列i行最后面的位置
    */
   map_line_ch: number[]  // line-ch 映射表
-  _specKeywords:RangeSpec[]
+  _specKeywords:MdSelectorSpec[]
   public get specKeywords(){
     return this._specKeywords
   }
@@ -37,11 +47,12 @@ export class ABMdSelector{
     this._specKeywords = this.blockMatch_keyword()
   }
 
-  protected blockMatch_keyword(): RangeSpec[]{
+  protected blockMatch_keyword(): MdSelectorSpec[]{
     throw("Error: 没有重载 ABRangeManager::blockMatch_keyword")
   }
 }
 
+@register_list_mdSelector()
 class ABMdSelector_brace extends ABMdSelector {
   reg_front: RegExp
   reg_end: RegExp
@@ -49,7 +60,7 @@ class ABMdSelector_brace extends ABMdSelector {
   reg_total: RegExp
 
   /** 块 - 匹配关键字 */
-  protected blockMatch_keyword(): RangeSpec[] {
+  protected blockMatch_keyword(): MdSelectorSpec[] {
     this.reg_front = /^{\[.*?\]/
     this.reg_end = /^}./
     //this.list_reg = [this.reg_k1, this.reg_k2]
@@ -59,8 +70,8 @@ class ABMdSelector_brace extends ABMdSelector {
   }
 
    /** 行 - 匹配关键字（非内联） */
-   private lineMatch_keyword(): RangeSpec[] {
-    const matchInfo: RangeSpec[] = []
+   private lineMatch_keyword(): MdSelectorSpec[] {
+    const matchInfo: MdSelectorSpec[] = []
     const list_text = this.mdText.split("\n")
     let prev_front_line:number[] = []
     for (let i=0; i<list_text.length; i++){
@@ -76,8 +87,8 @@ class ABMdSelector_brace extends ABMdSelector {
             from: from,
             to: to,
             header: list_text[from_line].slice(2,-1),
-            match: "brace",
-            text: this.mdText.slice(this.map_line_ch[from_line+1], to-3)
+            selector: "brace",
+            content: this.mdText.slice(this.map_line_ch[from_line+1], to-3)
           })
         }
       }
@@ -86,15 +97,16 @@ class ABMdSelector_brace extends ABMdSelector {
   }
 }
 
+@register_list_mdSelector()
 class ABMdSelector_list extends ABMdSelector{
   reg_list: RegExp
 
-  protected blockMatch_keyword(): RangeSpec[] {
+  protected blockMatch_keyword(): MdSelectorSpec[] {
     this.reg_list = /^\s*?-\s(.*)$/
     return  this.lineMatch_keyword()
   }
 
-  private lineMatch_keyword(): RangeSpec[] {
+  private lineMatch_keyword(): MdSelectorSpec[] {
     let matchInfo2:{
       line_from:number, 
       line_to:number,
@@ -149,7 +161,7 @@ class ABMdSelector_list extends ABMdSelector{
       list_header = ""
     }
 
-    const matchInfo: RangeSpec[] = []
+    const matchInfo: MdSelectorSpec[] = []
     for (let item of matchInfo2){
       const from = this.map_line_ch[item.line_from]
       const to = this.map_line_ch[item.line_to]-1
@@ -157,8 +169,8 @@ class ABMdSelector_list extends ABMdSelector{
         from: from,
         to: to,
         header: item.list_header.indexOf("2")==0?"list"+item.list_header:item.list_header, // list选择器语法糖
-        match: "list",
-        text: item.list_header==""?
+        selector: "list",
+        content: item.list_header==""?
           this.mdText.slice(from, to):
           this.mdText.slice(this.map_line_ch[item.line_from+1], to)
       })
@@ -167,13 +179,6 @@ class ABMdSelector_list extends ABMdSelector{
     return matchInfo
   }
 }
-
-/** 管理器列表。
- * 暂不支持注册的方式扩展添加 */
-export const list_ABRangeManager=[
-  ABMdSelector_brace,
-  ABMdSelector_list
-]
 
 // 旧brace方法（内联用），现在的方法不能搞内联，这些代码先注释着等以后备用
 {

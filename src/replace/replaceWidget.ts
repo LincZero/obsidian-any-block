@@ -2,14 +2,14 @@ import {Editor, EditorPosition, MarkdownRenderChild, MarkdownRenderer} from 'obs
 import {EditorView, WidgetType} from "@codemirror/view"
 
 import {list_replace} from "./registerReplace"
-import {RangeSpec} from "../manager/abMdSelector"
+import {MdSelectorSpec} from "../manager/abMdSelector"
 
 export class ABReplaceWidget extends WidgetType {
-  rangeSpec: RangeSpec
+  rangeSpec: MdSelectorSpec
   global_editor: Editor
   div: HTMLDivElement
 
-  constructor(rangeSpec: RangeSpec, editor: Editor){
+  constructor(rangeSpec: MdSelectorSpec, editor: Editor){
     super()
     this.rangeSpec = rangeSpec
     this.global_editor = editor
