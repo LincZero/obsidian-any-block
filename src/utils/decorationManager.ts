@@ -51,16 +51,14 @@ export class ABDecorationManager{
     }
     else{ // text:string, item:SpecKeyword, editor:Editor
       if (this.rangeSpec.match=="brace"){
-        const text = this.r_this.mdText.slice(this.rangeSpec.from+2, this.rangeSpec.to-2)
         return Decoration.replace({widget: new ABReplaceWidget(
-          text, this.rangeSpec.from, this.rangeSpec.to, this.r_this.editor
+          this.rangeSpec, this.r_this.editor
         )})
       }
       else if (this.rangeSpec.match=="list"){
-        const text = this.r_this.mdText.slice(this.rangeSpec.from, this.rangeSpec.to)
-        if (this.rangeSpec.keyword){
+        if (this.rangeSpec.header){
           return Decoration.replace({widget: new ABReplaceWidget(
-            text, this.rangeSpec.from, this.rangeSpec.to, this.r_this.editor
+            this.rangeSpec, this.r_this.editor
           )})
         }
         else {

@@ -2,20 +2,25 @@ import {Editor, EditorPosition, MarkdownRenderChild, MarkdownRenderer} from 'obs
 import {EditorView, WidgetType} from "@codemirror/view"
 
 import {list_replace} from "./registerReplace"
+import {RangeSpec} from "../utils/rangeManager"
 
 export class ABReplaceWidget extends WidgetType {
+  rangeSpec: RangeSpec
+  header: string
   text: string
   from: number
   to: number
   global_editor: Editor
   div: HTMLDivElement
 
-  constructor(text: string, from: number, to: number, ediot: Editor){
+  constructor(rangeSpec: RangeSpec, editor: Editor){
     super()
-    this.text = text
-    this.from = from
-    this.to = to
-    this.global_editor = ediot
+    this.rangeSpec = rangeSpec
+    this.header = rangeSpec.header
+    this.text = rangeSpec.text
+    this.from = rangeSpec.from
+    this.to = rangeSpec.to
+    this.global_editor = editor
   }
 
   toDOM(view: EditorView): HTMLElement {

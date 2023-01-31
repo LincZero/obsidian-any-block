@@ -4,10 +4,11 @@ import { EditorPosition } from 'obsidian'
  * 范围内容 = mdText.text.substring(2, text.length-2).trim()
  */
 export interface RangeSpec {
-  from: number,     // 替换范围1
-  to: number,       // 替换范围2
-  keyword: string,  // 关键字参数
-  match: string,    // 范围选择方式
+  from: number,
+  to: number,
+  header: string,  // 关键字参数
+  match: string,   // 范围选择方式
+  text: string
 }
 
 /** AnyBlock范围管理器
@@ -46,24 +47,51 @@ export class ABRangeManager{
 }
 
 class ABRangeManager_brace extends ABRangeManager {
-  reg_k1: RegExp
-  reg_k2: RegExp
+  reg_front: RegExp
+  reg_end: RegExp
   list_reg: RegExp[]
   reg_total: RegExp
 
   /** 块 - 匹配关键字 */
   protected blockMatch_keyword(): RangeSpec[] {
-    this.reg_k1 = /^%{/gmi
-    this.reg_k2 = /^%}/gmi
-    this.list_reg = [this.reg_k1, this.reg_k2]
-    this.reg_total = new RegExp(this.list_reg.map((pattern) => pattern.source).join("|"), "gmi")
+    this.reg_front = /^{\[.*?\]/
+    this.reg_end = /^}./
+    //this.list_reg = [this.reg_k1, this.reg_k2]
+    //this.reg_total = new RegExp(this.list_reg.map((pattern) => pattern.source).join("|"), "gmi")
 
-    let listSpecKeyword = this.lineMatch_keyword()
-    return this.line2BlockMatch(listSpecKeyword)
+    console.log("this.lineMatch_keyword()",this.lineMatch_keyword())
+    return this.lineMatch_keyword()
   }
 
-  /** 行 - 匹配关键字 */
-  private lineMatch_keyword(): RangeSpec[] {
+   /** 行 - 匹配关键字（非内联） */
+   private lineMatch_keyword(): RangeSpec[] {
+    const matchInfo: RangeSpec[] = []
+    const list_text = this.mdText.split("\n")
+    let prev_front_line:number[] = []
+    for (let i=0; i<list_text.length; i++){
+      if(this.reg_front.test(list_text[i])){       // 前缀
+        prev_front_line.push(i)
+      }
+      else if(this.reg_end.test(list_text[i])){  // 后缀
+        if(prev_front_line && prev_front_line.length>0){
+          const from_line = prev_front_line.pop()??0 // @warning 有可能pop出来undefine?
+          const from = this.map_line_ch[from_line]
+          const to = this.map_line_ch[i+1]-1
+          matchInfo.push({
+            from: from,
+            to: to,
+            header: list_text[from_line].slice(2,-1),
+            match: "brace",
+            text: this.mdText.slice(this.map_line_ch[from_line+1], to-3)
+          })
+        }
+      }
+    }
+    return matchInfo
+  }
+
+  /** 行 - 匹配关键字（内联） */
+  /*private lineMatch_keyword_line(): RangeSpec[] {
     const matchInfo: RangeSpec[] = []
     const matchList: RegExpMatchArray|null= this.mdText.match(this.reg_total);        // 匹配项
 
@@ -78,37 +106,40 @@ class ABRangeManager_brace extends ABRangeManager {
         if (matchItem.match(reg)) {reg_match = reg; break;}
       }
       matchInfo.push({
-        from: from2,
+        from: from2,//////////////////// @bug 还要去除brace模式的头部信息，然后填写text
         to: to2,
-        keyword: matchItem,
-        match: String(reg_match)
+        header: matchItem,
+        match: String(reg_match),
+        text: ""
       })
     }
     return matchInfo
-  }
+  }*/
 
   /** 转化 - 匹配关键字 */
-  private line2BlockMatch(listSpecKeyword: RangeSpec[]): RangeSpec[]{
+  /*private line2BlockMatch(listSpecKeyword: RangeSpec[]): RangeSpec[]{
     let countBracket = 0  // 括号计数
     let prevBracket = []  // 括号栈
-    let listSpecKeyword_new = []
+    let listSpecKeyword_new: RangeSpec[] = []
     for (const matchItem of listSpecKeyword) {
-      if (matchItem.keyword=="%{") {
+      if (matchItem.header=="%{") {
         countBracket++
         prevBracket.push(matchItem.from)
       }
-      else if(matchItem.keyword=="%}" && countBracket>0) {
+      else if(matchItem.header=="%}" && countBracket>0) {
         countBracket--
+        const from = prevBracket.pop() as number
         listSpecKeyword_new.push({
-          from: prevBracket.pop() as number,
+          from: from,
           to: matchItem.to,
-          keyword: "",
-          match: "brace"
+          header: "",
+          match: "brace",
+          text: this.mdText.slice(from+2, matchItem.to-2)
         })
       }
     }
     return listSpecKeyword_new
-  }
+  }*/
 }
 
 class ABRangeManager_list extends ABRangeManager{
@@ -133,9 +164,15 @@ class ABRangeManager_list extends ABRangeManager{
       if (this.reg_list.test(list_text[i])){  // 该行是列表
         if (is_list_mode) continue            // 已经进入列表中
         else{
-          if (i!=0 && list_text[i-1].indexOf("list")==0) { // 如果有列表头则加上这个范围
-            prev_list_from = i-1
-            list_header = list_text[i-1]
+          if (i!=0){
+            const header = list_text[i-1].match(/^\s*\[(.*?)\]/)
+            if (header){
+              prev_list_from = i-1
+              list_header = header[1]
+            }
+            else{
+              prev_list_from = i
+            }
           }
           else { prev_list_from = i }
           is_list_mode = true
@@ -170,11 +207,16 @@ class ABRangeManager_list extends ABRangeManager{
 
     const matchInfo: RangeSpec[] = []
     for (let item of matchInfo2){
+      const from = this.map_line_ch[item.line_from]
+      const to = this.map_line_ch[item.line_to]-1
       matchInfo.push({
-        from: this.map_line_ch[item.line_from],
-        to: this.map_line_ch[item.line_to]-1,
-        keyword: item.list_header,
-        match: "list"
+        from: from,
+        to: to,
+        header: item.list_header,
+        match: "list",
+        text: item.list_header==""?
+          this.mdText.slice(from, to):
+          this.mdText.slice(this.map_line_ch[item.line_from+1], to)
       })
     }
 
