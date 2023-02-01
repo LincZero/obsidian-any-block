@@ -283,7 +283,9 @@ export default class ListProcess{
     }[], 
     div: HTMLDivElement
   ){
-    let list_line_content:string[] = ["```mermaid", "graph LR"]
+    const html_mode = false    // @todo 暂时没有设置来切换这个开关
+
+    let list_line_content:string[] = html_mode?['<pre class="mermaid">', "graph LR"]:["```mermaid", "graph LR"]
     let prev_line_content = ""
     let prev_level = 999
     for (let i=0; i<list_itemInfo.length; i++){
@@ -305,9 +307,7 @@ export default class ListProcess{
       prev_level = list_itemInfo[i].level
     }
     list_line_content.push(prev_line_content)
-    list_line_content.push("```")
-
-    console.log(list_line_content)
+    list_line_content.push(html_mode?"</pre>":"```")
 
     let text = list_line_content.join("\n")
     const child = new MarkdownRenderChild(div);

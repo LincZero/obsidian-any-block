@@ -15,6 +15,11 @@ export class ABReplaceWidget extends WidgetType {
     this.global_editor = editor
   }
 
+  /**
+   *  div.ab-replace.cm-embed-block.markdown-rendered.show-indentation-guide[type_header=`${}`]
+   *      div.drop-shadow.ab-note
+   *      div.ab-button.edit-block-button[aria-label="Edit this block"]
+   */
   toDOM(view: EditorView): HTMLElement {
     // 根元素
     this.div = document.createElement("div");
@@ -22,12 +27,13 @@ export class ABReplaceWidget extends WidgetType {
     this.div.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
 
     // 内容替换元素
-    autoReplaceEl(this.div, this.rangeSpec.header, this.rangeSpec.content)
+    let dom_note = this.div.createEl("div", {cls: ["drop-shadow", "ab-note"]});
+    autoReplaceEl(dom_note, this.rangeSpec.header, this.rangeSpec.content)
 
     // 编辑按钮
     if (this.global_editor){
       let dom_edit = this.div.createEl("div", {
-        cls: ["edit-block-button"], 
+        cls: ["ab-button", "edit-block-button"], 
         attr: {"aria-label": "Edit this block"}
       });
       dom_edit.innerHTML = ABReplaceWidget.str_icon_code2
