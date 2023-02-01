@@ -53,31 +53,25 @@ registerReplace((el, header, content)=>{
 
 // 列表转表格、md表格
 registerReplace((el, header, content)=>{
-  if (header != "list2table") return null
+  if (header != "list2table" && header != "list2mdtable") return null
   let dom_note = el.createEl("div");
-  ListProcess.list2table(content, dom_note, false)
-  return dom_note
-})
-registerReplace((el, header, content)=>{
-  if (header != "list2mdtable") return null
-  let dom_note = el.createEl("div");
-  ListProcess.list2table(content, dom_note, true)
+  ListProcess.list2table(content, dom_note, (header=="list2mdtable"))
   return dom_note
 })
 
 // 列表转列表表格
 registerReplace((el, header, content)=>{
-  if (header != "list2lt") return null
+  if (header != "list2lt" && header != "list2mdlt") return null
   let dom_note = el.createEl("div");
-  ListProcess.list2lt(content, dom_note)
+  ListProcess.list2lt(content, dom_note, (header=="list2mdlt"))
   return dom_note
 })
 
-// 列表转mermaid流程图
+// 列表转二维表格
 registerReplace((el, header, content)=>{
-  if (header != "list2mermaid") return null
+  if (header != "list2ut" && header != "list2mdut") return null
   let dom_note = el.createEl("div");
-  ListProcess.list2mermaid(content, dom_note)
+  ListProcess.list2ut(content, dom_note, (header=="list2mdut"))
   return dom_note
 })
 

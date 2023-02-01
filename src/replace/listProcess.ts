@@ -16,6 +16,12 @@ export default class ListProcess{
     return this.data2table(list_itemInfo, div, modeMD)
   }
 
+  /** 列表转二维表格 */
+  static list2ut(text: string, div: HTMLDivElement, modeMD=false) {
+    let list_itemInfo = this.ulist2data(text)
+    return this.data2table(list_itemInfo, div, modeMD)
+  }
+
   /** 列表转mermaid流程图 */
   static list2mermaid(text: string, div: HTMLDivElement) {
     let list_itemInfo = this.list2data(text)
@@ -76,7 +82,8 @@ export default class ListProcess{
     for (let line of list_text) {                                             // 每行
       if (/^\s*?-\s(.*?)/.test(line)) {
         let list_inline: string[] = line.replace(/^\s*?-\s/, "").split(" | ") // 内联分行
-        let level_inline: number = line.replace(/-\s(.*?)$/, "").length       
+        /** @bug  制表符长度是1而非4 */
+        let level_inline: number = line.replace(/-\s(.*?)$/, "").length
         let inline_comp = update_inline_comp(level_inline, list_inline.length-1)
                                                                               // 不保留缩进（普通树表格）
         for (let index=0; index<list_inline.length; index++){
@@ -96,6 +103,66 @@ export default class ListProcess{
         }
       }
     }
+    return list_itemInfo
+  }
+
+  // 这种类型的列表只有两层
+  private static ulist2data(text: string){
+    // 列表文本转列表数据
+    let list_itemInfo:{
+      content:string,
+      level:number,
+    }[] = []
+
+    let level1 = -1
+    let level2 = -1
+    const list_text = text.split("\n")
+    for (let line of list_text) {                                             // 每行
+      if (/^\s*?-\s(.*?)/.test(line)) {
+        let level_inline: number = line.replace(/-\s(.*?)$/, "").length
+        let this_level: number                                    // 一共三种可能：1、2、3，3表示其他level
+        if (level1<0) {level1=level_inline; this_level = 1}       // 未配置level1
+        else if (level1>=level_inline) this_level = 1             // 是level1
+        else if (level2<0) {level2=level_inline; this_level = 2}  // 未配置level2
+        else if (level2>=level_inline) this_level = 2             // 是level2
+        else {                                                    // 内换行
+          let itemInfo = list_itemInfo.pop()
+          if(itemInfo){
+            list_itemInfo.push({
+              content: itemInfo.content+"\n"+line.trim(),
+              level: itemInfo.level
+            })
+          }
+          continue
+        }
+        list_itemInfo.push({
+          content: line.replace(/^\s*?-\s/, ""),
+          level: this_level
+        })
+      }
+      else{                                                                   // 内换行
+        let itemInfo = list_itemInfo.pop()
+        if(itemInfo){
+          list_itemInfo.push({
+            content: itemInfo.content+"\n"+line.trim(),
+            level: itemInfo.level
+          })
+        }
+      }
+    }
+
+    // 二层树转一叉树
+    let count_level_2 = 0
+    for (let item of list_itemInfo){
+      if (item.level==2){
+        item.level += count_level_2
+        count_level_2++
+      }
+      else {
+        count_level_2 = 0
+      }
+    }
+    
     return list_itemInfo
   }
 
