@@ -139,7 +139,7 @@ export class ABStateManager{
     // @ts-ignore
     editor_dom = this.plugin_this.app.workspace.activeLeaf.containerEl
     if (!editor_dom) {
-      console.log("无法获取dom来得知编辑器模式"); 
+      console.warn("无法获取dom来得知编辑器模式"); 
       return Editor_mode.NONE; 
     }
     editor_dom = editor_dom?.getElementsByClassName("workspace-leaf-content")[0]
@@ -153,7 +153,7 @@ export class ABStateManager{
       return Editor_mode.PREVIEW  // 但其实不会判定，因为实时是不触发update方法的
     }
     else {
-      /*console.log("无法获取编辑器模式，可能会产生BUG");*/ 
+      /*console.warn("无法获取编辑器模式，可能会产生BUG");*/ 
       return Editor_mode.NONE;
     } // 点一下编辑器再点其他布局位置，就会发生
   }

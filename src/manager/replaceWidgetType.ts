@@ -1,8 +1,8 @@
 import {Editor, EditorPosition, MarkdownRenderChild, MarkdownRenderer} from 'obsidian';
 import {EditorView, WidgetType} from "@codemirror/view"
 
-import {list_replace} from "./registerReplace"
-import {MdSelectorSpec} from "../manager/abMdSelector"
+import {autoReplaceEl} from "../replace/registerReplace"
+import {MdSelectorSpec} from "./abMdSelector"
 
 export class ABReplaceWidget extends WidgetType {
   rangeSpec: MdSelectorSpec
@@ -19,12 +19,10 @@ export class ABReplaceWidget extends WidgetType {
     // 根元素
     this.div = document.createElement("div");
     this.div.setAttribute("type_header", this.rangeSpec.header)
+    this.div.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
 
-    let is_been_processor = false
-    for (let abReplaceProcessor of list_replace){
-      if (abReplaceProcessor(this)) {is_been_processor=true; break}
-    }
-    if(!is_been_processor){} /////////////////////////
+    // 内容替换元素
+    autoReplaceEl(this.div, this.rangeSpec.header, this.rangeSpec.content)
 
     // 编辑按钮
     if (this.global_editor){

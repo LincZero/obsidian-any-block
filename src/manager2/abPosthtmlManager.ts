@@ -3,8 +3,8 @@ import {
 } from "obsidian"
 
 // import {list_ABHtmlSelector, ElSelectorSpec} from "./abHtmlSelector"
-import {ABReplaceWidget} from "../replace/replaceWidget"
-import {RelpaceRender} from "./abRenderManager"
+import {ABReplaceWidget} from "../manager/replaceWidgetType"
+import {RelpaceRender} from "./replaceRenderChild"
 
 /** Html处理器
  * 全局html会分为多个块，会被每个块调用一次
@@ -23,23 +23,28 @@ export class ABPosthtmlManager{
     el: HTMLElement, 
     ctx: MarkdownPostProcessorContext
   ) {
-    const mdSrc = getSourceMarkdown(el, ctx)
-    if (!mdSrc) return
+    for (const child of el.children) {
+      // 这一部分是找到根div里的<ul>或<quote><ul>
+      let ul: HTMLUListElement
+      if (child instanceof HTMLUListElement) {
+        ul = child
+      }
+      else if (
+        child instanceof HTMLQuoteElement &&                    // 引用元素
+        child.firstElementChild instanceof HTMLUListElement
+      ) {
+        ul = child.firstElementChild;
+      }
+      else continue
 
-    /*new ABReplaceWidget(
-      {
-        from: 0,
-        to: 0,
-        header: "string",
-        selector: "string",
-        content: "string"
-      },
-      null
-    )*/
-    
-    if (mdSrc.header && /^\s*?-\s(.*?)/.test(mdSrc.content)) {
-      console.log("匹配到一处list-html", mdSrc)
-      // el.replaceWith(RelpaceRender())
+      // 获取el对应的源md
+      const mdSrc = getSourceMarkdown(el, ctx)
+      if (!mdSrc) return
+      
+      if (mdSrc.header && /^\s*?-\s(.*?)/.test(mdSrc.content)) {
+        if (mdSrc.header.indexOf("2")==0) mdSrc.header="list"+mdSrc.header
+        ctx.addChild(new RelpaceRender(ul, mdSrc.header, mdSrc.content));
+      }
     }
   }
 }
@@ -64,6 +69,6 @@ const getSourceMarkdown = (
       content: text_content
     }
   }
-  // console.log("获取MarkdownSectionInformation失败，可能会产生bug") // 其实会return void，应该不会有bug
+  // console.warn("获取MarkdownSectionInformation失败，可能会产生bug") // 其实会return void，应该不会有bug
   return null
 };

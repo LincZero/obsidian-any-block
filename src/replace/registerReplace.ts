@@ -1,109 +1,101 @@
 import {MarkdownRenderChild, MarkdownRenderer} from 'obsidian';
-import {ABReplaceWidget} from "./replaceWidget"
+import {ABReplaceWidget} from "../manager/replaceWidgetType"
 import ListProcess from "./listProcess"
 
-export let list_replace: ABReplaceProcessor[] = []
-
-interface ABReplaceProcessor{
-  (widget: ABReplaceWidget): boolean
+// replaceWidgetType不需要这个返回值，而replaceRenderChild是需要的
+export function autoReplaceEl(el:HTMLElement, header:string, content:string):HTMLElement|null{
+  for (let abReplaceProcessor of list_replace){
+    const result = abReplaceProcessor(el, header, content)
+    if (result) return result
+  }
+  return null
 }
 
-export function registerReplace(processor: ABReplaceProcessor){
+let list_replace: ABReplaceProcessor[] = []
+
+interface ABReplaceProcessor{
+  (el:HTMLElement, header:string, content:string): HTMLElement|null
+}
+
+function registerReplace(processor: ABReplaceProcessor){
   list_replace.push(processor)
 }
 
 // md模式
-registerReplace((processor)=>{
-  if (processor.rangeSpec.header != "md") return false
-
-  processor.div.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
-  let dom_note = processor.div.createEl("div", {cls: ["drop-shadow", "ab-note"]});
+registerReplace((el, header, content)=>{
+  if (header != "md") return null
+  let dom_note = el.createEl("div", {cls: ["drop-shadow", "ab-note"]});
   const child = new MarkdownRenderChild(dom_note);
   // ctx.addChild(child);
-  MarkdownRenderer.renderMarkdown(processor.rangeSpec.content, dom_note, "", child); // var[2]: Obsidian/插件测试/AnyBlock2.md
-  return true
+  MarkdownRenderer.renderMarkdown(content, dom_note, "", child); // var[2]: Obsidian/插件测试/AnyBlock2.md
+  return dom_note
 })
 
 // 引用模式
-registerReplace((processor)=>{
-  if (processor.rangeSpec.header != "quote") return false
-
-  processor.div.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
-  let dom_note = processor.div.createEl("div");
+registerReplace((el, header, content)=>{
+  if (header != "quote") return null
+  let dom_note = el.createEl("div");
   const child = new MarkdownRenderChild(dom_note);
-  const text = processor.rangeSpec.content.split("\n").map((line)=>{return "> "+line}).join("\n")
+  const text = content.split("\n").map((line)=>{return "> "+line}).join("\n")
   MarkdownRenderer.renderMarkdown(text, dom_note, "", child);
-  return true
+  return dom_note
 })
 
 // 代码模
-registerReplace((processor)=>{
-  if (processor.rangeSpec.header != "code") return false
-
-  processor.div.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
-  let dom_note = processor.div.createEl("div");
+registerReplace((el, header, content)=>{
+  if (header != "code") return null
+  let dom_note = el.createEl("div");
   const child = new MarkdownRenderChild(dom_note);
-  const text = "```"+processor.rangeSpec.content+"\n```"
+  const text = "```"+content+"\n```"
   MarkdownRenderer.renderMarkdown(text, dom_note, "", child);
-  return true
+  return dom_note
 })
 
 // 列表转表格、md表格
-registerReplace((processor)=>{
-  if (processor.rangeSpec.header != "list2table") return false
-
-  processor.div.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
-  let dom_note = processor.div.createEl("div");
-  ListProcess.list2table(processor.rangeSpec.content, dom_note, false)
-  return true
+registerReplace((el, header, content)=>{
+  if (header != "list2table") return null
+  let dom_note = el.createEl("div");
+  ListProcess.list2table(content, dom_note, false)
+  return dom_note
 })
-registerReplace((processor)=>{
-  if (processor.rangeSpec.header != "list2mdtable") return false
-
-  processor.div.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
-  let dom_note = processor.div.createEl("div");
-  ListProcess.list2table(processor.rangeSpec.content, dom_note, true)
-  return true
+registerReplace((el, header, content)=>{
+  if (header != "list2mdtable") return null
+  let dom_note = el.createEl("div");
+  ListProcess.list2table(content, dom_note, true)
+  return dom_note
 })
 
 // 列表转列表表格
-registerReplace((processor)=>{
-  if (processor.rangeSpec.header != "list2lt") return false
-
-  processor.div.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
-  let dom_note = processor.div.createEl("div");
-  ListProcess.list2lt(processor.rangeSpec.content, dom_note)
-  return true
+registerReplace((el, header, content)=>{
+  if (header != "list2lt") return null
+  let dom_note = el.createEl("div");
+  ListProcess.list2lt(content, dom_note)
+  return dom_note
 })
 
 // 列表转mermaid流程图
-registerReplace((processor)=>{
-  if (processor.rangeSpec.header != "list2mermaid") return false
-
-  processor.div.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
-  let dom_note = processor.div.createEl("div");
-  ListProcess.list2mermaid(processor.rangeSpec.content, dom_note)
-  return true
+registerReplace((el, header, content)=>{
+  if (header != "list2mermaid") return null
+  let dom_note = el.createEl("div");
+  ListProcess.list2mermaid(content, dom_note)
+  return dom_note
 })
 
 // callout语法糖
-registerReplace((processor)=>{
-  if (processor.rangeSpec.header.indexOf("!")!=0) return false
-
-  processor.div.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
-  let dom_note = processor.div.createEl("div");
+registerReplace((el, header, content)=>{
+  if (header.indexOf("!")!=0) return null
+  let dom_note = el.createEl("div");
   const child = new MarkdownRenderChild(dom_note);
-  const text = "```ad-"+processor.rangeSpec.header.slice(1)+"\n"+processor.rangeSpec.content+"\n```"
+  const text = "```ad-"+header.slice(1)+"\n"+content+"\n```"
   MarkdownRenderer.renderMarkdown(text, dom_note, "", child);
-  return true
+  return dom_note
 })
 
 /** @warning 不采用模式，必须最后入栈 */
-registerReplace((processor)=>{
-
-  processor.div.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
-  let dom_note = processor.div.createEl("div", {cls: ["drop-shadow", "ab-note"]});
+registerReplace((el, header="text", content)=>{
+  el.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
+  let dom_note = el.createEl("div", {cls: ["drop-shadow", "ab-note"]});
   // 文本元素。pre不好用，这里还是得用<br>换行最好
-  dom_note.innerHTML = `<p>${processor.rangeSpec.content.split("\n").join("<br/>")}</p>`
-  return true
+  dom_note.innerHTML = `<p>${content.split("\n").join("<br/>")}</p>`
+  return dom_note
 })

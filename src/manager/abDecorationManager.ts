@@ -3,7 +3,7 @@ import {Extension} from "@codemirror/state"
 
 import { ABStateManager } from './abStateManager';
 import { MdSelectorSpec } from "./abMdSelector"
-import { ABReplaceWidget } from "../replace/replaceWidget"
+import { ABReplaceWidget } from "./replaceWidgetType"
 
 interface CursorSpec{
   from:number, 
