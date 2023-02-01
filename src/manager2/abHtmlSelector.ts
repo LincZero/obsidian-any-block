@@ -30,15 +30,29 @@ export class ABHtmlSelector{
 }
 
 @register_list_mdSelector()
-class Selector_InlineCode extends ABHtmlSelector{
+class Selector_List extends ABHtmlSelector{
   static listSelector(
     el: HTMLElement, 
     ctx: MarkdownPostProcessorContext
   ): ElSelectorSpec {
-    const codeblocks = el.querySelectorAll("code");
+    
     return {
       selector: "code",
-      els: codeblocks
+      els: div_inlineCode
+    }
+  }
+}
+
+// @register_list_mdSelector()
+class Selector_Inlinecode extends ABHtmlSelector{
+  static listSelector(
+    el: HTMLElement, 
+    ctx: MarkdownPostProcessorContext
+  ): ElSelectorSpec {
+    const div_inlineCode = el.querySelectorAll("code");
+    return {
+      selector: "code",
+      els: div_inlineCode
     }
   }
 }

@@ -6,10 +6,10 @@ import {MdSelectorSpec} from "../manager/abMdSelector"
 
 export class ABReplaceWidget extends WidgetType {
   rangeSpec: MdSelectorSpec
-  global_editor: Editor
+  global_editor: Editor|null
   div: HTMLDivElement
 
-  constructor(rangeSpec: MdSelectorSpec, editor: Editor){
+  constructor(rangeSpec: MdSelectorSpec, editor: Editor|null){
     super()
     this.rangeSpec = rangeSpec
     this.global_editor = editor
@@ -27,15 +27,18 @@ export class ABReplaceWidget extends WidgetType {
     if(!is_been_processor){} /////////////////////////
 
     // 编辑按钮
-    let dom_edit = this.div.createEl("div", {
-      cls: ["edit-block-button"], 
-      attr: {"aria-label": "Edit this block"}
-    });
-    dom_edit.innerHTML = ABReplaceWidget.str_icon_code2
-
-    // 通过控制光标移动间接取消显示块
-    this.div.ondblclick = ()=>{this.moveCursorToHead()}
-    dom_edit.onclick = ()=>{this.moveCursorToHead()}
+    if (this.global_editor){
+      let dom_edit = this.div.createEl("div", {
+        cls: ["edit-block-button"], 
+        attr: {"aria-label": "Edit this block"}
+      });
+      dom_edit.innerHTML = ABReplaceWidget.str_icon_code2
+    
+      // 通过控制光标移动间接取消显示块
+      this.div.ondblclick = ()=>{this.moveCursorToHead()}
+      dom_edit.onclick = ()=>{this.moveCursorToHead()}
+    }
+    
     return this.div;
   }
 
@@ -44,9 +47,11 @@ export class ABReplaceWidget extends WidgetType {
        * const editor: Editor = view.editor // @ts-ignore
        * 否则editor是undefined
        */
-      const editor: Editor = this.global_editor
-      let pos = this.getCursorPos(editor, this.rangeSpec.from)
-      if (pos) editor.setCursor(pos)
+      if (this.global_editor){
+        const editor: Editor = this.global_editor
+        let pos = this.getCursorPos(editor, this.rangeSpec.from)
+        if (pos) editor.setCursor(pos)
+      }
   }
 
   private getCursorPos(editor:Editor, total_ch:number): EditorPosition|null{
