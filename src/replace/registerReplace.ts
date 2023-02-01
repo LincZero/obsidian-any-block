@@ -81,6 +81,14 @@ registerReplace((el, header, content)=>{
   return dom_note
 })
 
+// 列表转mermaid流程图
+registerReplace((el, header, content)=>{
+  if (header != "list2mermaid") return null
+  let dom_note = el.createEl("div");
+  ListProcess.list2mermaid(content, dom_note)
+  return dom_note
+})
+
 // callout语法糖
 registerReplace((el, header, content)=>{
   if (header.indexOf("!")!=0) return null

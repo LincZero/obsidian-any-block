@@ -29,35 +29,98 @@ export default class ListProcess{
    *  @param modeG: 识别符号 ` | `（该选项暂时不可用，强制为true）
    */
   private static list2data(text: string, modeT=false, modeG=true){
+    if (modeT) return this.ullist2data(text)
+
+    /** 内联补偿列表。只保留comp>0的项 */
+    let list_inline_comp:{
+      level:number, 
+      inline_comp:number
+    }[] = []
+    /** 更新 list_level_inline 的状态，并返回该项的补偿值 
+     * 流程：先向左溯源，再添加自己进去
+     */
+    function update_inline_comp(
+      level:number, 
+      inline_comp:number
+    ): number{
+      // 完全不用` | `命令就跳过了
+      if (list_inline_comp.length==0 && inline_comp==0) return 0
+
+      // 向左溯源
+      while(list_inline_comp.length && list_inline_comp[list_inline_comp.length-1].level>=level){
+        list_inline_comp.pop()
+      }
+      if (list_inline_comp.length==0 && inline_comp==0) return 0
+
+      // 计算总补偿值（不包括自己）
+      let total_comp
+      if (list_inline_comp.length==0) total_comp = 0
+      else total_comp = list_inline_comp[length-1].inline_comp
+
+      // 添加自己进去
+      if (inline_comp>0) list_inline_comp.push({
+        level: level, 
+        inline_comp: inline_comp+total_comp
+      })
+
+      return total_comp
+    }
+
+    // 列表文本转列表数据
+    let list_itemInfo:{
+      content:string,
+      level:number,
+    }[] = []
+
+    const list_text = text.split("\n")
+    for (let line of list_text) {                                             // 每行
+      if (/^\s*?-\s(.*?)/.test(line)) {
+        let list_inline: string[] = line.replace(/^\s*?-\s/, "").split(" | ") // 内联分行
+        let level_inline: number = line.replace(/-\s(.*?)$/, "").length       
+        let inline_comp = update_inline_comp(level_inline, list_inline.length-1)
+                                                                              // 不保留缩进（普通树表格）
+        for (let index=0; index<list_inline.length; index++){
+          list_itemInfo.push({
+            content: list_inline[index],
+            level: level_inline+index+inline_comp
+          })
+        }
+      }
+      else{                                                                   // 内换行
+        let itemInfo = list_itemInfo.pop()
+        if(itemInfo){
+          list_itemInfo.push({
+            content: itemInfo.content+"\n"+line.trim(),
+            level: itemInfo.level
+          })
+        }
+      }
+    }
+    return list_itemInfo
+  }
+
+  private static ullist2data(text: string){
     // 列表文本转列表数据
     let list_itemInfo:{content:string,level:number}[] = []
+    
     const list_text = text.split("\n")
     for (let line of list_text) {                                             // 每行
       if (/^\s*?-\s(.*?)/.test(line)) {
         let list_inline: string[] = line.replace(/^\s*?-\s/, "").split(" | ") // 内联分行
         let level_inline: number = line.replace(/-\s(.*?)$/, "").length
-        if(modeT) {                                                           // 保留缩进
-          for (let index=0; index<list_inline.length; index++){
-            if(index==0) {                        // level为内联缩进
-              for (let i=0; i<level_inline; i++) list_inline[index] = "__" + list_inline[index]
-              list_itemInfo.push({
-                content: list_inline[index],
-                level: 0
-              })
-            }
-            else{                                 // level为table的列数
-              list_itemInfo.push({
-                content: list_inline[index],
-                level: level_inline+index
-              })
-            }
-          }
-        }
-        else{
-          for (let index=0; index<list_inline.length; index++){
+                                                                              // 保留缩进（列表格）
+        for (let inline_i=0; inline_i<list_inline.length; inline_i++){
+          if(inline_i==0) {                                                   // level为内联缩进
+            for (let i=0; i<level_inline; i++) list_inline[inline_i] = "__" + list_inline[inline_i]
             list_itemInfo.push({
-              content: list_inline[index],
-              level: level_inline+index
+              content: list_inline[inline_i],
+              level: 0
+            })
+          }
+          else{                                 // level为table的列数
+            list_itemInfo.push({
+              content: list_inline[inline_i],
+              level: level_inline+inline_i
             })
           }
         }

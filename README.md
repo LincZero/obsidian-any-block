@@ -2,7 +2,7 @@
  
  A Obsidian Plugin. You can flexibility to create a 'Block' by some means.
  
- ## usage
+ ## Usage
 
  `%{` and `%}` include some content
 
@@ -48,7 +48,7 @@
 %}
 ```
 
-## suport commnad
+## Suport command
 
 - md
 - quote
@@ -58,6 +58,6 @@
 - list2lt
 - list2mermaid
 
-## if bug
+## If bug
 
 try to close `strict line wrapping`
