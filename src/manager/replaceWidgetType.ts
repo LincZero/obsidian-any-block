@@ -34,7 +34,7 @@ export class ABReplaceWidget extends WidgetType {
     if (this.global_editor){
       let dom_edit = this.div.createEl("div", {
         cls: ["ab-button", "edit-block-button"], 
-        attr: {"aria-label": "Edit this block"}
+        attr: {"aria-label": "Edit this block - "+this.rangeSpec.header}
       });
       dom_edit.innerHTML = ABReplaceWidget.str_icon_code2
     

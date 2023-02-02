@@ -1,3 +1,5 @@
+import {ABReg} from "src/config/abReg"
+
 /** 匹配关键字接口 */
 export interface MdSelectorSpec {
   from: number,     // 替换范围
@@ -54,18 +56,8 @@ export class ABMdSelector{
 
 @register_list_mdSelector()
 class ABMdSelector_brace extends ABMdSelector {
-  reg_front: RegExp
-  reg_end: RegExp
-  list_reg: RegExp[]
-  reg_total: RegExp
-
   /** 块 - 匹配关键字 */
   protected blockMatch_keyword(): MdSelectorSpec[] {
-    this.reg_front = /^{\[.*?\]/
-    this.reg_end = /^}./
-    //this.list_reg = [this.reg_k1, this.reg_k2]
-    //this.reg_total = new RegExp(this.list_reg.map((pattern) => pattern.source).join("|"), "gmi")
-
     return this.lineMatch_keyword()
   }
 
@@ -75,10 +67,10 @@ class ABMdSelector_brace extends ABMdSelector {
     const list_text = this.mdText.split("\n")
     let prev_front_line:number[] = []
     for (let i=0; i<list_text.length; i++){
-      if(this.reg_front.test(list_text[i])){       // 前缀
+      if(ABReg.reg_front.test(list_text[i])){       // 前缀
         prev_front_line.push(i)
       }
-      else if(this.reg_end.test(list_text[i])){  // 后缀
+      else if(ABReg.reg_end.test(list_text[i])){  // 后缀
         if(prev_front_line && prev_front_line.length>0){
           const from_line = prev_front_line.pop()??0 // @warning 有可能pop出来undefine?
           const from = this.map_line_ch[from_line]
@@ -99,10 +91,8 @@ class ABMdSelector_brace extends ABMdSelector {
 
 @register_list_mdSelector()
 class ABMdSelector_list extends ABMdSelector{
-  reg_list: RegExp
 
   protected blockMatch_keyword(): MdSelectorSpec[] {
-    this.reg_list = /^\s*?-\s(.*)$/
     return  this.lineMatch_keyword()
   }
 
@@ -117,14 +107,14 @@ class ABMdSelector_list extends ABMdSelector{
     let is_list_mode = false  // 是否在列表中
     let prev_list_from = 0    // 在列表中时，在哪开始
     for (let i=0; i<list_text.length; i++){
-      if (this.reg_list.test(list_text[i])){  // 该行是列表
+      if (ABReg.reg_list.test(list_text[i])){  // 该行是列表
         if (is_list_mode) continue            // 已经进入列表中
         else{
           if (i!=0){
-            const header = list_text[i-1].match(/^\s*\[(.*?)\]/)
+            const header = list_text[i-1].match(ABReg.reg_header)
             if (header){
               prev_list_from = i-1
-              list_header = header[1]
+              list_header = header[2]
             }
             else{
               prev_list_from = i
@@ -176,6 +166,99 @@ class ABMdSelector_list extends ABMdSelector{
       })
     }
 
+    return matchInfo
+  }
+}
+
+@register_list_mdSelector()
+class ABMdSelector_code extends ABMdSelector{
+  protected blockMatch_keyword(): MdSelectorSpec[]{
+    const matchInfo: MdSelectorSpec[] = []
+    const list_text = this.mdText.split("\n")
+    let prev_from = 0
+    let prev_header = ""
+    let code_flag = ""
+    for (let i=0; i<list_text.length; i++){
+      if (!code_flag){                          // 选择头部
+        if (ABReg.reg_code.test(list_text[i])){
+          const match_tmp = list_text[i].match(ABReg.reg_code)
+          if (!match_tmp) continue
+          code_flag = match_tmp[1]
+          if (i!=0) {
+            const header = list_text[i-1].match(ABReg.reg_header)
+            if (header){
+              prev_header = header[2]
+              prev_from = i-1
+            }
+            else{
+              prev_from = i
+            }
+          }
+        }
+      }
+      else {                                    // 选择尾部
+        if (list_text[i].indexOf(code_flag)>=0){
+          const from = this.map_line_ch[prev_from]
+          const to = this.map_line_ch[i+1]-1    // 不包括最后匹配行
+          matchInfo.push({
+            from: from,
+            to: to,
+            header: prev_header,
+            selector: "code",
+            content: prev_header==""?
+              this.mdText.slice(from, to):
+              this.mdText.slice(this.map_line_ch[prev_from+1], to)
+          })
+          prev_header = ""
+          code_flag = ""
+        }
+      }
+    }
+    return matchInfo
+  }
+}
+
+@register_list_mdSelector()
+class ABMdSelector_quote extends ABMdSelector{
+  protected blockMatch_keyword(): MdSelectorSpec[]{
+    const matchInfo: MdSelectorSpec[] = []
+    const list_text = this.mdText.split("\n")
+    let prev_from = 0
+    let prev_header = ""
+    let is_in_quote = false
+    for (let i=0; i<list_text.length; i++){
+      if (!is_in_quote){                          // 选择头部
+        if (ABReg.reg_quote.test(list_text[i])){
+          is_in_quote = true
+          if (i!=0) {
+            const header = list_text[i-1].match(ABReg.reg_header)
+            if (header){
+              prev_header = header[2]
+              prev_from = i-1
+            }
+            else{
+              prev_from = i
+            }
+          }
+        }
+      }
+      else {                                    // 选择尾部
+        if (ABReg.reg_quote.test(list_text[i])) continue
+        const from = this.map_line_ch[prev_from]
+        const to = this.map_line_ch[i+1]-1    // 不包括最后匹配行
+        matchInfo.push({
+          from: from,
+          to: to,
+          header: prev_header,
+          selector: "quote",
+          content: prev_header==""?
+            this.mdText.slice(from, to):
+            this.mdText.slice(this.map_line_ch[prev_from+1], to)
+        })
+        prev_header = ""
+        is_in_quote = false
+      }
+    }
     return matchInfo
   }
 }

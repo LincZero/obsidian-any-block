@@ -2,8 +2,7 @@ import {
   MarkdownPostProcessorContext
 } from "obsidian"
 
-// import {list_ABHtmlSelector, ElSelectorSpec} from "./abHtmlSelector"
-import {ABReplaceWidget} from "../manager/replaceWidgetType"
+import {ABReg} from "src/config/abReg"
 import {RelpaceRender} from "./replaceRenderChild"
 
 /** Html处理器
@@ -23,28 +22,40 @@ export class ABPosthtmlManager{
     el: HTMLElement, 
     ctx: MarkdownPostProcessorContext
   ) {
-    for (const child of el.children) {
+    // 获取el对应的源md
+    const mdSrc = getSourceMarkdown(el, ctx)
+    if (!mdSrc) return
+
+    // 选择器
+    for (const child of el.children) {                          // 这个如果是块的话一般就一层，多层应该是p-br的情况
       // 这一部分是找到根div里的<ul>或<quote><ul>
-      let ul: HTMLUListElement
-      if (child instanceof HTMLUListElement) {
-        ul = child
+      let sub_el: HTMLElement
+      if (child instanceof HTMLUListElement) {                  // 列表
+        sub_el = child
+        if (/^\s*-\s(.*)/.test(mdSrc.content)) {
+          if (mdSrc.header.indexOf("2")==0) mdSrc.header="list"+mdSrc.header
+        }
+        else {
+          console.warn("html选择器: ul格式错误", mdSrc) // 按理说不会
+          continue
+        }
       }
-      else if (
+      else if (child instanceof HTMLQuoteElement){
+        sub_el = child
+      }
+      else if (child instanceof HTMLPreElement){
+        sub_el = child
+      }
+      /*else if (
         child instanceof HTMLQuoteElement &&                    // 引用元素
         child.firstElementChild instanceof HTMLUListElement
       ) {
-        ul = child.firstElementChild;
-      }
+        sub_el = child.firstElementChild;
+      }*/
       else continue
-
-      // 获取el对应的源md
-      const mdSrc = getSourceMarkdown(el, ctx)
-      if (!mdSrc) return
       
-      if (mdSrc.header && /^\s*?-\s(.*?)/.test(mdSrc.content)) {
-        if (mdSrc.header.indexOf("2")==0) mdSrc.header="list"+mdSrc.header
-        ctx.addChild(new RelpaceRender(ul, mdSrc.header, mdSrc.content));
-      }
+      mdSrc.header=mdSrc.header??"md"   // 渲染模式的列表选择器若无header则给md
+      ctx.addChild(new RelpaceRender(sub_el, mdSrc.header, mdSrc.content));
     }
   }
 }
@@ -62,8 +73,8 @@ const getSourceMarkdown = (
     const list_text = text.split("\n")
     const text_content = list_text.slice(lineStart, lineEnd + 1).join("\n");
     let text_header = lineStart==0?"":list_text[lineStart-1]
-    const text_header_match = text_header.match(/^\s*\[(.*?)\]/)
-    text_header = text_header_match?text_header_match[1]:""
+    const text_header_match = text_header.match(ABReg.reg_header)
+    text_header = text_header_match?text_header_match[2]:""
     return {
       header: text_header,
       content: text_content

@@ -1,0 +1,26 @@
+/**
+ * .ab-replace
+ *   .ab-note
+ *   .ab-button
+ */
+ .ab-replace{
+  /*background-color: #272e3a;*/
+  position: relative;
+  border-radius: 4px;
+
+  .ab-note.drop-shadow{
+    position: relative;
+    /*padding: 24px 12px 12px 12px;*/
+  }
+
+  .ab-button{
+    box-sizing: border-box;
+    position: absolute;
+    right: 4px;
+    top: 4px;
+  }
+
+  img.cm-widgetBuffer{
+    height: 2px;
+  }
+}

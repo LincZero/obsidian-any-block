@@ -42,7 +42,8 @@ export class ABDecorationManager{
 
   initDecorationSet(): Decoration{
     if (!this.isBlock) {
-      if (this.rangeSpec.selector=="brace"){
+      return Decoration.mark({class: "ab-line-brace"})
+      /*if (this.rangeSpec.selector=="brace"){
         return Decoration.mark({class: "ab-line-brace"})
       }
       else if (this.rangeSpec.selector=="list"){
@@ -50,10 +51,13 @@ export class ABDecorationManager{
       }
       else{
         return Decoration.mark({class: "ab-line-blue"})
-      }
+      }*/
     }
     else{ // text:string, item:SpecKeyword, editor:Editor
-      if (this.rangeSpec.selector=="brace"){
+      return Decoration.replace({widget: new ABReplaceWidget(
+        this.rangeSpec, this.r_this.editor
+      )})
+      /*if (this.rangeSpec.selector=="brace"){
         return Decoration.replace({widget: new ABReplaceWidget(
           this.rangeSpec, this.r_this.editor
         )})
@@ -70,7 +74,7 @@ export class ABDecorationManager{
       }
       else{
         return Decoration.mark({class: "ab-line-yellow"})
-      }
+      }*/
     }
   }
 

@@ -3,25 +3,34 @@ import AnyBlockPlugin from "../main"
 
 /** 设置值接口 */
 export interface ABSettingInterface {
-  is_range_list: boolean
-  is_range_auto: boolean
-  is_range_html: boolean
-  is_range_brace: boolean
-  is_able_source: boolean
-  is_able_live: boolean
-  is_able_render: boolean
+  select_list: ConfSelect
+  select_quote: ConfSelect
+  select_code: ConfSelect
+  //is_range_html: boolean
+  //is_range_brace: boolean
+  decoration_source: ConfDecoration
+  decoration_live: ConfDecoration
+  decoration_render: ConfDecoration
+}
+export enum ConfSelect{
+  no = "no",
+  ifhead = "ifhead",
+  yes = "yes"
+}
+export enum ConfDecoration{
+  none = "none",
+  inline = "inline",
+  block = "block"
 }
 
 /** 设置值默认项 */
 export const AB_SETTINGS: ABSettingInterface = {
-  is_range_list: true,
-  is_range_auto: false,
-  is_range_html: false,
-  is_range_brace: true,
-  is_able_source: false,
-  is_able_live: true,
-  is_able_render: true,
-  
+  select_list: ConfSelect.yes,
+  select_quote: ConfSelect.ifhead,
+  select_code: ConfSelect.ifhead,
+  decoration_source: ConfDecoration.none,
+  decoration_live: ConfDecoration.block,
+  decoration_render: ConfDecoration.block,
 }
 
 /** 设置值面板 */
@@ -35,21 +44,57 @@ export class ABSettingTab extends PluginSettingTab {
 
 	display(): void {
 		const {containerEl} = this;
-
-		containerEl.empty();
+    containerEl.empty();
+    let settings = this.plugin.settings
 
 		containerEl.createEl('h1', {text: '范围管理器'});
 
 		new Setting(containerEl)
-      .setName('自动列表选择器')
-      .setDesc('自动选择列表范围，并将类别识别为list')
-			.addToggle(component=>
+      .setName('列表选择器')  // 不识别、无头部标签也识别、仅识别有头部标签
+      .setDesc('自动选择所有的列表，并将类别识别为list')
+			.addDropdown((component)=>{
         component
-          .setValue(this.plugin.settings.is_range_list)
-          .onChange(value=>{this.plugin.settings.is_range_list = value})
-      )
+        .addOption(ConfSelect.no, "不识别")
+        .addOption(ConfSelect.ifhead, "仅识别有头部声明")
+        .addOption(ConfSelect.yes, "总是识别")
+        .setValue(settings.select_list)
+        .onChange(v=>{
+          // @ts-ignore 这里ConfSelect必然包含v值的
+          settings.select_list = ConfSelect[v]     
+        })
+      })
 
     new Setting(containerEl)
+      .setName('引用块选择器')
+      .setDesc('')
+      .addDropdown((component)=>{
+        component
+        .addOption(ConfSelect.no, "不识别")
+        .addOption(ConfSelect.ifhead, "仅识别有头部声明")
+        .addOption(ConfSelect.yes, "总是识别")
+        .setValue(settings.select_quote)
+        .onChange(v=>{
+          // @ts-ignore 这里ConfSelect必然包含v值的
+          settings.select_quote = ConfSelect[v]     
+        })
+      })
+
+    new Setting(containerEl)
+      .setName('代码块选择器')
+      .setDesc('')
+			.addDropdown((component)=>{
+        component
+        .addOption(ConfSelect.no, "不识别")
+        .addOption(ConfSelect.ifhead, "仅识别有头部声明")
+        .addOption(ConfSelect.yes, "总是识别")
+        .setValue(settings.select_code)
+        .onChange(v=>{
+          // @ts-ignore 这里ConfSelect必然包含v值的
+          settings.select_code = ConfSelect[v]     
+        })
+      })
+
+    /*new Setting(containerEl)
       .setName('智能选择器')
       .setDesc('用`%:`选择开头，自动指定结尾')
 			.addToggle(component=>
@@ -85,51 +130,53 @@ export class ABSettingTab extends PluginSettingTab {
         component
           .setValue(this.plugin.settings.is_range_brace)
           .onChange(value=>{this.plugin.settings.is_range_brace = value})
-      )
+      )*/
 
     containerEl.createEl('h1', {text: '装饰管理器'});
-    containerEl.createEl('span', {text: '左侧为线装饰、右侧为块装饰'});
 
     new Setting(containerEl)
       .setName('源码模式中启用')
-      .setDesc('推荐：关/开、关')
-			.addToggle(component=>
+      .setDesc('推荐：不启用')
+			.addDropdown((component)=>{
         component
-          .setValue(this.plugin.settings.is_able_source)
-          .onChange(value=>{this.plugin.settings.is_able_source = value})
-      )
-      .addToggle(component=>
-        component
-          .setValue(this.plugin.settings.is_able_source)
-          .onChange(value=>{this.plugin.settings.is_able_source = value})
-      )
+        .addOption(ConfDecoration.none, "不启用")
+        .addOption(ConfDecoration.inline, "仅启用线装饰")
+        .addOption(ConfDecoration.block, "启用块装饰")
+        .setValue(settings.decoration_source)
+        .onChange(v=>{
+          // @ts-ignore 这里枚举必然包含v值的
+          settings.decoration_source = ConfDecoration[v]     
+        })
+      })
 
     new Setting(containerEl)
       .setName('实时模式中启用')
-      .setDesc('推荐：关/开、关/开')
-			.addToggle(component=>
+      .setDesc('推荐：启用块装饰')
+			.addDropdown((component)=>{
         component
-          .setValue(this.plugin.settings.is_able_live)
-          .onChange(value=>{this.plugin.settings.is_able_live = value})
-      )
-      .addToggle(component=>
-        component
-          .setValue(this.plugin.settings.is_able_live)
-          .onChange(value=>{this.plugin.settings.is_able_live = value})
-      )
+        .addOption(ConfDecoration.none, "不启用")
+        .addOption(ConfDecoration.inline, "仅启用线装饰")
+        .addOption(ConfDecoration.block, "启用块装饰")
+        .setValue(settings.decoration_live)
+        .onChange(v=>{
+          // @ts-ignore 这里枚举必然包含v值的
+          settings.decoration_live = ConfDecoration[v]     
+        })
+      })
 
     new Setting(containerEl)
       .setName('渲染模式中启用')
-      .setDesc('推荐：关、开')
-			.addToggle(component=>
+      .setDesc('推荐：启用块装饰')
+			.addDropdown((component)=>{
         component
-          .setValue(this.plugin.settings.is_able_render)
-          .onChange(value=>{this.plugin.settings.is_able_render = value})
-      )
-      .addToggle(component=>
-        component
-          .setValue(this.plugin.settings.is_able_render)
-          .onChange(value=>{this.plugin.settings.is_able_render = value})
-      )
+        .addOption(ConfDecoration.none, "不启用")
+        .addOption(ConfDecoration.inline, "仅启用线装饰")
+        .addOption(ConfDecoration.block, "启用块装饰")
+        .setValue(settings.decoration_render)
+        .onChange(v=>{
+          // @ts-ignore 这里枚举必然包含v值的
+          settings.decoration_render = ConfDecoration[v]     
+        })
+      })
 	}
 }
