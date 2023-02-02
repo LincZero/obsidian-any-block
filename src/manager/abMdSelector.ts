@@ -25,6 +25,7 @@ export function get_selectors(setting: ABSettingInterface){
   // if (setting.select_list!=ConfSelect.no) list_ABMdSelector.push(map_ABMdSelector.get("list"))
   // if (setting.select_quote!=ConfSelect.no) list_ABMdSelector.push(map_ABMdSelector.get("quote"))
   // if (setting.select_code!=ConfSelect.no) list_ABMdSelector.push(map_ABMdSelector.get("code"))
+  if (setting.select_brace!=ConfSelect.no) list_ABMdSelector.push(ABMdSelector_brace)
   if (setting.select_list!=ConfSelect.no) list_ABMdSelector.push(ABMdSelector_list)
   if (setting.select_quote!=ConfSelect.no) list_ABMdSelector.push(ABMdSelector_quote)
   if (setting.select_code!=ConfSelect.no) list_ABMdSelector.push(ABMdSelector_code)
@@ -84,7 +85,7 @@ class ABMdSelector_brace extends ABMdSelector {
       if(ABReg.reg_front.test(list_text[i])){       // 前缀
         prev_front_line.push(i)
       }
-      else if(ABReg.reg_end.test(list_text[i])){  // 后缀
+      else if(ABReg.reg_end.test(list_text[i])){    // 后缀
         if(prev_front_line && prev_front_line.length>0){
           const from_line = prev_front_line.pop()??0 // @warning 有可能pop出来undefine?
           const from = this.map_line_ch[from_line]

@@ -1,22 +1,5 @@
 import { MarkdownRenderChild } from "obsidian";
-import { autoReplaceEl } from "../replace/registerReplace"
-
-const list_option = {
-  "list2table": "表格",
-  "list2mdtable": "表格(md)",
-  "list2lt": "列表格",
-  "list2mdlt": "列表格(md)",
-  "list2ut": "ul表格",
-  "list2mdut": "ul表格(md)",
-  "list2mermaid": "流程图",
-  "md": "原格式",
-  "text": "纯文本",
-  "Xcode": "消除代码块",
-  "Xquote": "消除引用块",
-  "code": "代码块",
-  "quote": "引用块",
-  "other": "其他格式",
-}
+import { autoReplaceEl, list_option } from "../replace/registerReplace"
 
 export class RelpaceRender extends MarkdownRenderChild {
   content: string;
@@ -70,7 +53,6 @@ export class RelpaceRender extends MarkdownRenderChild {
       if (key==this.header) dom_option.selected=true
     }
     dom_edit.onchange = ()=>{
-      console.log("切换", dom_note)
       const new_header = dom_edit.options[dom_edit.selectedIndex].value
       const new_dom_replaceEl = dom_note.createDiv({
         cls: ["ab-replaceEl"]

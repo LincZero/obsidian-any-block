@@ -6,6 +6,8 @@ export interface ABSettingInterface {
   select_list: ConfSelect
   select_quote: ConfSelect
   select_code: ConfSelect
+  select_level: ConfSelect
+  select_brace: ConfSelect
   //is_range_html: boolean
   //is_range_brace: boolean
   decoration_source: ConfDecoration
@@ -28,6 +30,8 @@ export const AB_SETTINGS: ABSettingInterface = {
   select_list: ConfSelect.yes,
   select_quote: ConfSelect.ifhead,
   select_code: ConfSelect.ifhead,
+  select_level: ConfSelect.ifhead,
+  select_brace: ConfSelect.yes,
   decoration_source: ConfDecoration.none,
   decoration_live: ConfDecoration.block,
   decoration_render: ConfDecoration.block,
@@ -58,9 +62,10 @@ export class ABSettingTab extends PluginSettingTab {
         .addOption(ConfSelect.ifhead, "仅识别有头部声明")
         .addOption(ConfSelect.yes, "总是识别")
         .setValue(settings.select_list)
-        .onChange(v=>{
+        .onChange(async v=>{
           // @ts-ignore 这里ConfSelect必然包含v值的
           settings.select_list = ConfSelect[v]     
+          await this.plugin.saveSettings(); 
         })
       })
 
@@ -73,9 +78,10 @@ export class ABSettingTab extends PluginSettingTab {
         .addOption(ConfSelect.ifhead, "仅识别有头部声明")
         .addOption(ConfSelect.yes, "总是识别")
         .setValue(settings.select_quote)
-        .onChange(v=>{
+        .onChange(async v=>{
           // @ts-ignore 这里ConfSelect必然包含v值的
-          settings.select_quote = ConfSelect[v]     
+          settings.select_quote = ConfSelect[v]    
+          await this.plugin.saveSettings();  
         })
       })
 
@@ -88,9 +94,44 @@ export class ABSettingTab extends PluginSettingTab {
         .addOption(ConfSelect.ifhead, "仅识别有头部声明")
         .addOption(ConfSelect.yes, "总是识别")
         .setValue(settings.select_code)
-        .onChange(v=>{
+        .onChange(async v=>{
           // @ts-ignore 这里ConfSelect必然包含v值的
           settings.select_code = ConfSelect[v]     
+          await this.plugin.saveSettings(); 
+        })
+      })
+
+    new Setting(containerEl)
+      .setName('自动层级选择器')
+      .setDesc(createFragment(el => {
+        el.createEl("strong", {
+          text: "实验性功能，选择标题层级、嵌套层级等，但未开发"
+        });
+      }))
+			.addDropdown((component)=>{
+        component
+        .addOption(ConfSelect.no, "不识别")
+        .addOption(ConfSelect.ifhead, "仅识别有头部声明")
+        .setValue(settings.select_level)
+      })
+      .setDisabled(true)
+      
+    new Setting(containerEl)
+      .setName('范围选择器')
+      .setDesc(createFragment(el => {
+        el.createEl("strong", {
+          text: "实验性功能，实时模式生效"
+        });
+      }))
+			.addDropdown((component)=>{
+        component
+        .addOption(ConfSelect.no, "不识别")
+        .addOption(ConfSelect.yes, "总是识别")
+        .setValue(settings.select_brace)
+        .onChange(async v=>{
+          // @ts-ignore 这里ConfSelect必然包含v值的
+          settings.select_brace = ConfSelect[v]   
+          await this.plugin.saveSettings();   
         })
       })
 
@@ -143,9 +184,10 @@ export class ABSettingTab extends PluginSettingTab {
         .addOption(ConfDecoration.inline, "仅启用线装饰")
         .addOption(ConfDecoration.block, "启用块装饰")
         .setValue(settings.decoration_source)
-        .onChange(v=>{
+        .onChange(async v=>{
           // @ts-ignore 这里枚举必然包含v值的
-          settings.decoration_source = ConfDecoration[v]     
+          settings.decoration_source = ConfDecoration[v]  
+          await this.plugin.saveSettings();    
         })
       })
 
@@ -158,9 +200,10 @@ export class ABSettingTab extends PluginSettingTab {
         .addOption(ConfDecoration.inline, "仅启用线装饰")
         .addOption(ConfDecoration.block, "启用块装饰")
         .setValue(settings.decoration_live)
-        .onChange(v=>{
+        .onChange(async v=>{
           // @ts-ignore 这里枚举必然包含v值的
-          settings.decoration_live = ConfDecoration[v]     
+          settings.decoration_live = ConfDecoration[v]
+          await this.plugin.saveSettings(); 
         })
       })
 
@@ -172,9 +215,10 @@ export class ABSettingTab extends PluginSettingTab {
         .addOption(ConfDecoration.none, "不启用")
         .addOption(ConfDecoration.block, "启用块装饰")
         .setValue(settings.decoration_render)
-        .onChange(v=>{
+        .onChange(async v=>{
           // @ts-ignore 这里枚举必然包含v值的
-          settings.decoration_render = ConfDecoration[v]     
+          settings.decoration_render = ConfDecoration[v]    
+          await this.plugin.saveSettings(); 
         })
       })
 	}

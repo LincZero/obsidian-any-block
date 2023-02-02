@@ -2,6 +2,23 @@ import {MarkdownRenderChild, MarkdownRenderer} from 'obsidian';
 import {ABReg} from "src/config/abReg"
 import ListProcess from "./listProcess"
 
+export const list_option = {
+  "other": "其他格式",
+  "list2table": "表格",
+  "list2mdtable": "表格(md)",
+  "list2lt": "列表格",
+  "list2mdlt": "列表格(md)",
+  "list2ut": "ul表格",
+  "list2mdut": "ul表格(md)",
+  "list2mermaid": "流程图",
+  "md": "原格式",
+  "text": "纯文本",
+  "Xcode": "消除代码块",
+  "Xquote": "消除引用块",
+  "code": "代码块",
+  "quote": "引用块",
+}
+
 // replaceWidgetType 和 replaceRenderChild 其实都不需要这个返回值的El元素
 // 其实这里应该返回 true false 的
 export function autoReplaceEl(el:HTMLDivElement, header:string, content:string):HTMLElement|null{
