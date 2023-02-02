@@ -4,7 +4,7 @@ import {MarkdownView, View, Editor, EditorPosition} from 'obsidian';
 
 import AnyBlockPlugin from '../main'
 import { ConfDecoration } from "src/config/abSettingTab"
-import { list_ABMdSelector, ABMdSelector, MdSelectorSpec } from "./abMdSelector"
+import { get_selectors, /*list_ABMdSelector,*/ ABMdSelector, MdSelectorSpec } from "./abMdSelector"
 import { ABDecorationManager } from "./abDecorationManager"
 import { ABReplaceWidget } from "./replaceWidgetType"
 
@@ -96,7 +96,7 @@ export class ABStateManager{
 
   // private
   private updateStateField (decorationSet:DecorationSet, tr:Transaction){    
-    // 获取 - 编辑器模式、装饰选项
+    // 获取 - 编辑器模式、装饰选项、选择器选项
     let editor_mode: Editor_mode = this.getEditorMode()
     let decoration_mode:ConfDecoration
     if(editor_mode==Editor_mode.SOURCE) {
@@ -118,8 +118,8 @@ export class ABStateManager{
 
     // 装饰调整 - 增
     if (decoration_mode==ConfDecoration.none) return decorationSet
-    const list_abRangeManager:ABMdSelector[] = list_ABMdSelector.map(c => {
-      return new c(this.mdText)
+    const list_abRangeManager:ABMdSelector[] = get_selectors(this.plugin_this.settings).map(c => {
+      return new c(this.mdText, this.plugin_this.settings)
     })
     if(decoration_mode==ConfDecoration.inline){
       for (let abManager of list_abRangeManager){     // 遍历多个范围管理器

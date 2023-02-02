@@ -3,7 +3,7 @@ import {
 } from "obsidian"
 
 import {ABReg} from "src/config/abReg"
-import {ConfDecoration} from "src/config/abSettingTab"
+import {ConfDecoration, ConfSelect} from "src/config/abSettingTab"
 import AnyBlockPlugin from "../main"
 import {RelpaceRender} from "./replaceRenderChild"
 
@@ -32,11 +32,16 @@ export class ABPosthtmlManager{
     const mdSrc = getSourceMarkdown(el, ctx)
     if (!mdSrc) return
 
+    // 设置开关
+    const able_list:boolean = ((this.settings.select_list == ConfSelect.ifhead) && mdSrc.header!="") || (this.settings.select_list == ConfSelect.yes)
+    const able_quote:boolean = ((this.settings.select_quote == ConfSelect.ifhead) && mdSrc.header!="") || (this.settings.select_quote == ConfSelect.yes)
+    const able_code:boolean = ((this.settings.select_code == ConfSelect.ifhead) && mdSrc.header!="") || (this.settings.select_code == ConfSelect.yes)
+
     // 选择器
     for (const child of el.children) {                          // 这个如果是块的话一般就一层，多层应该是p-br的情况
       // 这一部分是找到根div里的<ul>或<quote><ul>
       let sub_el: HTMLElement
-      if (child instanceof HTMLUListElement) {                  // 列表
+      if (able_list && child instanceof HTMLUListElement) {                  // 列表
         sub_el = child
         if (/^\s*-\s(.*)/.test(mdSrc.content)) {
           if (mdSrc.header.indexOf("2")==0) mdSrc.header="list"+mdSrc.header
@@ -46,14 +51,14 @@ export class ABPosthtmlManager{
           continue
         }
       }
-      else if (child instanceof HTMLQuoteElement){
+      else if (able_quote && child instanceof HTMLQuoteElement){
         sub_el = child
       }
-      else if (child instanceof HTMLPreElement){
+      else if (able_code && child instanceof HTMLPreElement){
         sub_el = child
       }
       /*else if (
-        child instanceof HTMLQuoteElement &&                    // 引用元素
+        child instanceof HTMLQuoteElement &&
         child.firstElementChild instanceof HTMLUListElement
       ) {
         sub_el = child.firstElementChild;

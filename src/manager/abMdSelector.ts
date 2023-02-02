@@ -1,4 +1,5 @@
 import {ABReg} from "src/config/abReg"
+import {ConfSelect, ABSettingInterface} from "src/config/abSettingTab"
 
 /** 匹配关键字接口 */
 export interface MdSelectorSpec {
@@ -10,13 +11,24 @@ export interface MdSelectorSpec {
 }
 
 /** 管理器列表 */
-export let list_ABMdSelector:any[]=[]
-// 原来ts也有py那样的注册器? 叫类装饰器
+// let map_ABMdSelector:Map<string, any>
+// 原来ts也有py那样的注册器? 叫类装饰器，但使用这个功能要开一点选项：
 // @warning: https://blog.csdn.net/m0_38082783/article/details/127048237
-function register_list_mdSelector(){
+function register_list_mdSelector(name: string){
   return function (target: Function){
-    list_ABMdSelector.push(target)
+    // map_ABMdSelector.set(name, target)
   }
+}
+// 配置返回列表
+export function get_selectors(setting: ABSettingInterface){
+  let list_ABMdSelector:any[]=[]
+  // if (setting.select_list!=ConfSelect.no) list_ABMdSelector.push(map_ABMdSelector.get("list"))
+  // if (setting.select_quote!=ConfSelect.no) list_ABMdSelector.push(map_ABMdSelector.get("quote"))
+  // if (setting.select_code!=ConfSelect.no) list_ABMdSelector.push(map_ABMdSelector.get("code"))
+  if (setting.select_list!=ConfSelect.no) list_ABMdSelector.push(ABMdSelector_list)
+  if (setting.select_quote!=ConfSelect.no) list_ABMdSelector.push(ABMdSelector_quote)
+  if (setting.select_code!=ConfSelect.no) list_ABMdSelector.push(ABMdSelector_code)
+  return list_ABMdSelector
 }
 
 /** AnyBlock范围管理器
@@ -30,14 +42,16 @@ export class ABMdSelector{
    * map_line_ch[i] = 序列i行最前面的位置
    * map_line_ch[i+1]-1 = 序列i行最后面的位置
    */
+  settings: ABSettingInterface
   map_line_ch: number[]  // line-ch 映射表
   _specKeywords:MdSelectorSpec[]
   public get specKeywords(){
     return this._specKeywords
   }
 
-  constructor(mdText: string){
+  constructor(mdText: string, settings: ABSettingInterface){
     this.mdText = mdText
+    this.settings = settings
 
     this.map_line_ch = [0]
     let count_ch = 0
@@ -54,7 +68,7 @@ export class ABMdSelector{
   }
 }
 
-@register_list_mdSelector()
+@register_list_mdSelector("brace")
 class ABMdSelector_brace extends ABMdSelector {
   /** 块 - 匹配关键字 */
   protected blockMatch_keyword(): MdSelectorSpec[] {
@@ -89,7 +103,7 @@ class ABMdSelector_brace extends ABMdSelector {
   }
 }
 
-@register_list_mdSelector()
+@register_list_mdSelector("list")
 class ABMdSelector_list extends ABMdSelector{
 
   protected blockMatch_keyword(): MdSelectorSpec[] {
@@ -107,38 +121,36 @@ class ABMdSelector_list extends ABMdSelector{
     let is_list_mode = false  // 是否在列表中
     let prev_list_from = 0    // 在列表中时，在哪开始
     for (let i=0; i<list_text.length; i++){
-      if (ABReg.reg_list.test(list_text[i])){  // 该行是列表
-        if (is_list_mode) continue            // 已经进入列表中
-        else{
-          if (i!=0){
-            const header = list_text[i-1].match(ABReg.reg_header)
-            if (header){
-              prev_list_from = i-1
-              list_header = header[2]
-            }
-            else{
-              prev_list_from = i
-            }
+      if (!is_list_mode){                     // 选择开始标志
+        if (!ABReg.reg_list.test(list_text[i])) continue
+        // 尝试找headers
+        if (i!=0){
+          const header = list_text[i-1].match(ABReg.reg_header)
+          if (header){
+            prev_list_from = i-1
+            list_header = header[2]
+            is_list_mode = true
+            continue
           }
-          else { prev_list_from = i }
-          is_list_mode = true
-          continue
         }
-      }
-      else if (/^\s+?\S/.test(list_text[i])){ // 开头有缩进
+        // 没有header 不选
+        if (this.settings.select_list==ConfSelect.ifhead) continue
+        // 没有header 也选
+        prev_list_from = i
+        list_header = ""
+        is_list_mode = true
         continue
       }
-      else {                                  // 该行不是列表
-        if (is_list_mode) {                   // 已经进入列表中
-          matchInfo2.push({
-            line_from: prev_list_from,
-            line_to: i,
-            list_header: list_header
-          })
-          is_list_mode = false
-          list_header = ""
-        }
-        continue
+      else {                                  // 选择结束标志
+        if (ABReg.reg_list.test(list_text[i])) continue
+        if (/^\s+?\S/.test(list_text[i])) continue // 开头有缩进
+        matchInfo2.push({
+          line_from: prev_list_from,
+          line_to: i,
+          list_header: list_header
+        })
+        is_list_mode = false
+        list_header = ""
       }
     }
     if (is_list_mode){                        // 结束循环收尾
@@ -165,12 +177,11 @@ class ABMdSelector_list extends ABMdSelector{
           this.mdText.slice(this.map_line_ch[item.line_from+1], to)
       })
     }
-
     return matchInfo
   }
 }
 
-@register_list_mdSelector()
+@register_list_mdSelector("code")
 class ABMdSelector_code extends ABMdSelector{
   protected blockMatch_keyword(): MdSelectorSpec[]{
     const matchInfo: MdSelectorSpec[] = []
@@ -179,46 +190,50 @@ class ABMdSelector_code extends ABMdSelector{
     let prev_header = ""
     let code_flag = ""
     for (let i=0; i<list_text.length; i++){
-      if (!code_flag){                          // 选择头部
-        if (ABReg.reg_code.test(list_text[i])){
-          const match_tmp = list_text[i].match(ABReg.reg_code)
-          if (!match_tmp) continue
-          code_flag = match_tmp[1]
-          if (i!=0) {
-            const header = list_text[i-1].match(ABReg.reg_header)
-            if (header){
-              prev_header = header[2]
-              prev_from = i-1
-            }
-            else{
-              prev_from = i
-            }
+      if (!code_flag){                          // 选择开始标志
+        // 找开始标志
+        const match_tmp = list_text[i].match(ABReg.reg_code)
+        if (!match_tmp) continue
+        // 尝试找header
+        if (i!=0) {
+          const header = list_text[i-1].match(ABReg.reg_header)
+          if (header){
+            code_flag = match_tmp[1]
+            prev_header = header[2]
+            prev_from = i-1
+            continue
           }
         }
+        // 没有header 不选
+        if (this.settings.select_code==ConfSelect.ifhead) continue
+        // 没有header 也选
+        prev_from = i
+        code_flag = match_tmp[1]
+        prev_header = ""
+        continue
       }
-      else {                                    // 选择尾部
-        if (list_text[i].indexOf(code_flag)>=0){
-          const from = this.map_line_ch[prev_from]
-          const to = this.map_line_ch[i+1]-1    // 不包括最后匹配行
-          matchInfo.push({
-            from: from,
-            to: to,
-            header: prev_header,
-            selector: "code",
-            content: prev_header==""?
-              this.mdText.slice(from, to):
-              this.mdText.slice(this.map_line_ch[prev_from+1], to)
-          })
-          prev_header = ""
-          code_flag = ""
-        }
+      else {                                    // 选择结束标志
+        if (list_text[i].indexOf(code_flag)==-1) continue
+        const from = this.map_line_ch[prev_from]
+        const to = this.map_line_ch[i+1]-1    // 不包括最后匹配行
+        matchInfo.push({
+          from: from,
+          to: to,
+          header: prev_header,
+          selector: "code",
+          content: prev_header==""?
+            this.mdText.slice(from, to):
+            this.mdText.slice(this.map_line_ch[prev_from+1], to)
+        })
+        prev_header = ""
+        code_flag = ""
       }
     }
     return matchInfo
   }
 }
 
-@register_list_mdSelector()
+@register_list_mdSelector("quote")
 class ABMdSelector_quote extends ABMdSelector{
   protected blockMatch_keyword(): MdSelectorSpec[]{
     const matchInfo: MdSelectorSpec[] = []
@@ -227,22 +242,28 @@ class ABMdSelector_quote extends ABMdSelector{
     let prev_header = ""
     let is_in_quote = false
     for (let i=0; i<list_text.length; i++){
-      if (!is_in_quote){                          // 选择头部
+      if (!is_in_quote){                          // 选择开始标志
         if (ABReg.reg_quote.test(list_text[i])){
-          is_in_quote = true
+          // 尝试找header
           if (i!=0) {
             const header = list_text[i-1].match(ABReg.reg_header)
             if (header){
               prev_header = header[2]
               prev_from = i-1
-            }
-            else{
-              prev_from = i
+              is_in_quote = true
+              continue
             }
           }
+          // 没有header 不选
+          if (this.settings.select_quote==ConfSelect.ifhead) continue
+          // 没有header 也选
+          prev_header = ""
+          prev_from = i
+          is_in_quote = true
+          continue
         }
       }
-      else {                                    // 选择尾部
+      else {                                      // 选择结束标志
         if (ABReg.reg_quote.test(list_text[i])) continue
         const from = this.map_line_ch[prev_from]
         const to = this.map_line_ch[i+1]-1    // 不包括最后匹配行
