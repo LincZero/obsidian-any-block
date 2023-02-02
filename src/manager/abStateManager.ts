@@ -3,8 +3,10 @@ import {StateField, StateEffect, EditorState, Transaction} from "@codemirror/sta
 import {MarkdownView, View, Editor, EditorPosition} from 'obsidian';
 
 import AnyBlockPlugin from '../main'
+import { ConfDecoration } from "src/config/abSettingTab"
 import { list_ABMdSelector, ABMdSelector, MdSelectorSpec } from "./abMdSelector"
 import { ABDecorationManager } from "./abDecorationManager"
+import { ABReplaceWidget } from "./replaceWidgetType"
 
 /** 总逻辑梳理
  * mermaid
@@ -94,8 +96,18 @@ export class ABStateManager{
 
   // private
   private updateStateField (decorationSet:DecorationSet, tr:Transaction){    
-    // 获取 - 编辑器模式
+    // 获取 - 编辑器模式、装饰选项
     let editor_mode: Editor_mode = this.getEditorMode()
+    let decoration_mode:ConfDecoration
+    if(editor_mode==Editor_mode.SOURCE) {
+      decoration_mode = this.plugin_this.settings.decoration_source
+    }
+    else if(editor_mode==Editor_mode.SOURCE_LIVE) {
+      decoration_mode = this.plugin_this.settings.decoration_live
+    }
+    else {
+      decoration_mode = this.plugin_this.settings.decoration_render
+    }
 
     // 装饰调整（删增改）
     // 装饰调整 - 删
@@ -105,21 +117,40 @@ export class ABStateManager{
     })
 
     // 装饰调整 - 增
-    // 如果不在实时模式，则不启用
-    if(editor_mode!=Editor_mode.SOURCE_LIVE) {
-      return decorationSet
-    }
-    const cursorSpec = this.getCursorCh()
+    if (decoration_mode==ConfDecoration.none) return decorationSet
     const list_abRangeManager:ABMdSelector[] = list_ABMdSelector.map(c => {
       return new c(this.mdText)
     })
-    for (let abManager of list_abRangeManager){     // 遍历多个范围管理器
-      let listRangeSpec: MdSelectorSpec[] = abManager.specKeywords
-      for(let rangeSpec of listRangeSpec){             // 遍历每个范围管理器里的多个范围集
-        decorationSet = decorationSet.update({
-          add: [new ABDecorationManager(this, rangeSpec, cursorSpec)
-            .decoration.range(rangeSpec.from, rangeSpec.to)] // @bug
-        })
+    if(decoration_mode==ConfDecoration.inline){
+      for (let abManager of list_abRangeManager){     // 遍历多个范围管理器
+        let listRangeSpec: MdSelectorSpec[] = abManager.specKeywords
+        for(let rangeSpec of listRangeSpec){          // 遍历每个范围管理器里的多个范围集
+          const decoration: Decoration = Decoration.mark({class: "ab-line-brace"})
+          decorationSet = decorationSet.update({
+            add: [decoration.range(rangeSpec.from, rangeSpec.to)]
+          })
+        }
+      }
+    }
+    else{
+      const cursorSpec = this.getCursorCh()
+      for (let abManager of list_abRangeManager){     // 遍历多个范围管理器
+        let listRangeSpec: MdSelectorSpec[] = abManager.specKeywords
+        for(let rangeSpec of listRangeSpec){          // 遍历每个范围管理器里的多个范围集
+          let decoration: Decoration
+          if (cursorSpec.from>=rangeSpec.from && cursorSpec.from<=rangeSpec.to 
+              || cursorSpec.to>=rangeSpec.from && cursorSpec.to<=rangeSpec.to) {
+            decoration = Decoration.mark({class: "ab-line-yellow"})
+          }
+          else{
+            decoration = Decoration.replace({widget: new ABReplaceWidget(
+              rangeSpec, this.editor
+            )})
+          }
+          decorationSet = decorationSet.update({
+            add: [decoration.range(rangeSpec.from, rangeSpec.to)]
+          })
+        }
       }
     }
 

@@ -9,6 +9,7 @@ interface CursorSpec{
   from:number, 
   to:number
 }
+/** @todo: 现在这个文件和类没什么用了，基本可以优化掉了 */
 /** 装饰管理器
  * 返回一个Decoration
  * 其中传入r_this的作用主要是为了装饰块可能可以返过来设置光标位置
@@ -43,38 +44,11 @@ export class ABDecorationManager{
   initDecorationSet(): Decoration{
     if (!this.isBlock) {
       return Decoration.mark({class: "ab-line-brace"})
-      /*if (this.rangeSpec.selector=="brace"){
-        return Decoration.mark({class: "ab-line-brace"})
-      }
-      else if (this.rangeSpec.selector=="list"){
-        return Decoration.mark({class: "ab-line-list"})
-      }
-      else{
-        return Decoration.mark({class: "ab-line-blue"})
-      }*/
     }
     else{ // text:string, item:SpecKeyword, editor:Editor
       return Decoration.replace({widget: new ABReplaceWidget(
         this.rangeSpec, this.r_this.editor
       )})
-      /*if (this.rangeSpec.selector=="brace"){
-        return Decoration.replace({widget: new ABReplaceWidget(
-          this.rangeSpec, this.r_this.editor
-        )})
-      }
-      else if (this.rangeSpec.selector=="list"){
-        if (this.rangeSpec.header){
-          return Decoration.replace({widget: new ABReplaceWidget(
-            this.rangeSpec, this.r_this.editor
-          )})
-        }
-        else {
-          return Decoration.mark({class: "ab-line-list"})
-        }
-      }
-      else{
-        return Decoration.mark({class: "ab-line-yellow"})
-      }*/
     }
   }
 

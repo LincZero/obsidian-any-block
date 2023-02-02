@@ -3,6 +3,8 @@ import {
 } from "obsidian"
 
 import {ABReg} from "src/config/abReg"
+import {ConfDecoration} from "src/config/abSettingTab"
+import AnyBlockPlugin from "../main"
 import {RelpaceRender} from "./replaceRenderChild"
 
 /** Html处理器
@@ -19,9 +21,13 @@ import {RelpaceRender} from "./replaceRenderChild"
  */
 export class ABPosthtmlManager{
   static processor(
+    this: AnyBlockPlugin,
     el: HTMLElement, 
     ctx: MarkdownPostProcessorContext
   ) {
+    // 设置里不启用，直接关了
+    if (this.settings.decoration_render==ConfDecoration.none) return
+
     // 获取el对应的源md
     const mdSrc = getSourceMarkdown(el, ctx)
     if (!mdSrc) return

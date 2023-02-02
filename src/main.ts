@@ -27,7 +27,8 @@ export default class AnyBlockPlugin extends Plugin {
     );
 
     // 渲染模式 后处理器
-    this.registerMarkdownPostProcessor(ABPosthtmlManager.processor);
+    const htmlProcessor = ABPosthtmlManager.processor.bind(this)
+    this.registerMarkdownPostProcessor(htmlProcessor);
   }
 
   async loadSettings() {

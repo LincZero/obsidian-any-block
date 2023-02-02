@@ -51,7 +51,7 @@ export class ABSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
       .setName('列表选择器')  // 不识别、无头部标签也识别、仅识别有头部标签
-      .setDesc('自动选择所有的列表，并将类别识别为list')
+      .setDesc('')
 			.addDropdown((component)=>{
         component
         .addOption(ConfSelect.no, "不识别")
@@ -151,7 +151,7 @@ export class ABSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName('实时模式中启用')
-      .setDesc('推荐：启用块装饰')
+      .setDesc('推荐：启用块装饰/线装饰')
 			.addDropdown((component)=>{
         component
         .addOption(ConfDecoration.none, "不启用")
@@ -170,7 +170,6 @@ export class ABSettingTab extends PluginSettingTab {
 			.addDropdown((component)=>{
         component
         .addOption(ConfDecoration.none, "不启用")
-        .addOption(ConfDecoration.inline, "仅启用线装饰")
         .addOption(ConfDecoration.block, "启用块装饰")
         .setValue(settings.decoration_render)
         .onChange(v=>{

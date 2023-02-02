@@ -51,7 +51,6 @@ registerReplace(function Xquote(el, header, content){
   content = content.split("\n").map(line=>{
     return line.replace(/^>\s/, "")
   }).join("\n")
-  console.log(content)
   const child = new MarkdownRenderChild(el);
   MarkdownRenderer.renderMarkdown(content, el, "", child);
   return el
