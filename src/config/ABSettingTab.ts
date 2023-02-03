@@ -6,7 +6,7 @@ export interface ABSettingInterface {
   select_list: ConfSelect
   select_quote: ConfSelect
   select_code: ConfSelect
-  select_level: ConfSelect
+  select_heading: ConfSelect
   select_brace: ConfSelect
   //is_range_html: boolean
   //is_range_brace: boolean
@@ -31,7 +31,7 @@ export const AB_SETTINGS: ABSettingInterface = {
   select_list: ConfSelect.yes,
   select_quote: ConfSelect.ifhead,
   select_code: ConfSelect.ifhead,
-  select_level: ConfSelect.ifhead,
+  select_heading: ConfSelect.ifhead,
   select_brace: ConfSelect.yes,
   decoration_source: ConfDecoration.none,
   decoration_live: ConfDecoration.block,
@@ -104,24 +104,24 @@ export class ABSettingTab extends PluginSettingTab {
       })
 
     new Setting(containerEl)
-      .setName('自动层级选择器')
+      .setName('标题层级选择器')
       .setDesc(createFragment(el => {
         el.createEl("strong", {
-          text: "实验性功能，选择标题层级、嵌套层级等，但未开发"
+          text: "全局选择器"
         });
       }))
 			.addDropdown((component)=>{
         component
         .addOption(ConfSelect.no, "不识别")
         .addOption(ConfSelect.ifhead, "仅识别有头部声明")
-        .setValue(settings.select_level)
+        .setValue(settings.select_heading)
       })
       
     new Setting(containerEl)
       .setName('范围选择器')
       .setDesc(createFragment(el => {
         el.createEl("strong", {
-          text: "实验性功能，实时模式生效"
+          text: "全局选择器"
         });
       }))
 			.addDropdown((component)=>{

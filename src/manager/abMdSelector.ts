@@ -29,6 +29,7 @@ export function get_selectors(setting: ABSettingInterface){
   if (setting.select_list!=ConfSelect.no) list_ABMdSelector.push(ABMdSelector_list)
   if (setting.select_quote!=ConfSelect.no) list_ABMdSelector.push(ABMdSelector_quote)
   if (setting.select_code!=ConfSelect.no) list_ABMdSelector.push(ABMdSelector_code)
+  if (setting.select_heading!=ConfSelect.no) list_ABMdSelector.push(ABMdSelector_heading)
   return list_ABMdSelector
 }
 
@@ -217,7 +218,7 @@ class ABMdSelector_code extends ABMdSelector{
       else {                                    // 选择结束标志
         if (list_text[i].indexOf(code_flag)==-1) continue
         const from = this.map_line_ch[prev_from]
-        const to = this.map_line_ch[i+1]-1    // 不包括最后匹配行
+        const to = this.map_line_ch[i+1]-1  // 包括这一行
         matchInfo.push({
           from: from,
           to: to,
@@ -231,6 +232,7 @@ class ABMdSelector_code extends ABMdSelector{
         code_flag = ""
       }
     }
+    // 这个不需要尾处理
     return matchInfo
   }
 }
@@ -268,7 +270,7 @@ class ABMdSelector_quote extends ABMdSelector{
       else {                                      // 选择结束标志
         if (ABReg.reg_quote.test(list_text[i])) continue
         const from = this.map_line_ch[prev_from]
-        const to = this.map_line_ch[i+1]-1    // 不包括最后匹配行
+        const to = this.map_line_ch[i]-1          // 不包括这一行
         matchInfo.push({
           from: from,
           to: to,
@@ -281,6 +283,92 @@ class ABMdSelector_quote extends ABMdSelector{
         prev_header = ""
         is_in_quote = false
       }
+    }
+    if (is_in_quote){                        // 结束循环收尾
+      const i = list_text.length-1
+      const from = this.map_line_ch[prev_from]
+      const to = this.map_line_ch[i+1]-1   // 包括这一行
+      matchInfo.push({
+        from: from,
+        to: to,
+        header: prev_header,
+        selector: "quote",
+        content: prev_header==""?
+          this.mdText.slice(from, to):
+          this.mdText.slice(this.map_line_ch[prev_from+1], to)
+      })
+      prev_header = ""
+      is_in_quote = false
+    }
+    return matchInfo
+  }
+}
+
+@register_list_mdSelector("heading")
+class ABMdSelector_heading extends ABMdSelector{
+  protected blockMatch_keyword(): MdSelectorSpec[]{
+    const matchInfo: MdSelectorSpec[] = []
+    const list_text = this.mdText.split("\n")
+    let prev_from = 0
+    let prev_header = ""
+    let prev_heading_level = 0
+    for (let i=0; i<list_text.length; i++){
+      if (prev_heading_level==0){             // 选择开始标志
+        const match_tmp = list_text[i].match(ABReg.reg_heading)
+        if (!match_tmp) continue
+        // 尝试找header
+        if (i!=0) {
+          const header = list_text[i-1].match(ABReg.reg_header)
+          if (header){
+            prev_heading_level = match_tmp[1].length
+            prev_header = header[2]
+            prev_from = i-1
+            continue
+          }
+        }
+        // 没有header 不选
+        if (this.settings.select_code==ConfSelect.ifhead) continue
+        // 没有header 也选
+        prev_from = i
+        prev_heading_level = match_tmp[1].length
+        prev_header = ""
+        continue
+      }
+      else {                                   // 选择结束标志
+        const match_tmp = list_text[i].match(ABReg.reg_heading)
+        if (!match_tmp) continue
+        if (match_tmp[1].length > prev_heading_level) continue
+        const from = this.map_line_ch[prev_from]
+        const to = this.map_line_ch[i]-1  // 不包括这一行
+        matchInfo.push({
+          from: from,
+          to: to,
+          header: prev_header,
+          selector: "heading",
+          content: prev_header==""?
+            this.mdText.slice(from, to):
+            this.mdText.slice(this.map_line_ch[prev_from+1], to)
+        })
+        
+        // 需要向上回溯一行
+        prev_header = ""
+        prev_heading_level = 0
+        i--
+      }
+    }
+    if(prev_heading_level>0){
+      const i = list_text.length-1
+      const from = this.map_line_ch[prev_from]
+      const to = this.map_line_ch[i+1]-1  // 包括这一行
+      matchInfo.push({
+        from: from,
+        to: to,
+        header: prev_header,
+        selector: "heading",
+        content: prev_header==""?
+          this.mdText.slice(from, to):
+          this.mdText.slice(this.map_line_ch[prev_from+1], to)
+      })
     }
     return matchInfo
   }

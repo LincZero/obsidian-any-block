@@ -178,7 +178,7 @@ export default class ListProcess{
                                                                               // 保留缩进（列表格）
         for (let inline_i=0; inline_i<list_inline.length; inline_i++){
           if(inline_i==0) {                                                   // level为内联缩进
-            for (let i=0; i<level_inline; i++) list_inline[inline_i] = "__" + list_inline[inline_i]
+            for (let i=0; i<level_inline; i++) list_inline[inline_i] = "____" + list_inline[inline_i]
             list_itemInfo.push({
               content: list_inline[inline_i],
               level: 0
