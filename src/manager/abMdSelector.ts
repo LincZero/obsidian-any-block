@@ -143,8 +143,9 @@ class ABMdSelector_list extends ABMdSelector{
         continue
       }
       else {                                  // 选择结束标志
-        if (ABReg.reg_list.test(list_text[i])) continue
-        if (/^\s+?\S/.test(list_text[i])) continue // 开头有缩进
+        if (ABReg.reg_list.test(list_text[i])) continue // 列表
+        if (/^\s+?\S/.test(list_text[i])) continue      // 开头有缩进
+        if (/^\s*$/.test(list_text[i])) continue        // 空行
         matchInfo2.push({
           line_from: prev_list_from,
           line_to: i,

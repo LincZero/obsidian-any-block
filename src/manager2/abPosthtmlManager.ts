@@ -8,10 +8,12 @@ import AnyBlockPlugin from "../main"
 import {RelpaceRender} from "./replaceRenderChild"
 
 /** Html处理器
- * 全局html会分为多个块，会被每个块调用一次
- * 局部渲染时，也会被每个渲染项调用一次 (MarkdownRenderer.renderMarkdown方法，感觉tableextend插件也是这个原因)
- *   多换行会切分块、块类型不同也会切分（哪怕之间没有空行）
- *   状态会缓存，如果切换回编辑模式没更改再切回来，不会再次运行
+ * 被调用的可能：
+ *   1. 全局html会分为多个块，会被每个块调用一次
+ *      多换行会切分块、块类型不同也会切分（哪怕之间没有空行）
+ *   2. 局部渲染时，也会被每个渲染项调用一次 (MarkdownRenderer.renderMarkdown方法，感觉tableextend插件也是这个原因)
+ *   3. 用根节点createEl时也会被调用一次（.replaceEl）
+  *  4. 状态会缓存，如果切换回编辑模式没更改再切回来，不会再次被调用
  * 
  * 总逻辑
  * - 后处理器，附带还原成md的功能
@@ -30,14 +32,71 @@ export class ABPosthtmlManager{
 
     // 获取el对应的源md
     const mdSrc = getSourceMarkdown(el, ctx)
+    // console.log("el ctx", el, ctx, mdSrc)
     if (!mdSrc) return
 
     // 设置开关
-    const able_list:boolean = ((this.settings.select_list == ConfSelect.ifhead) && mdSrc.header!="") || (this.settings.select_list == ConfSelect.yes)
-    const able_quote:boolean = ((this.settings.select_quote == ConfSelect.ifhead) && mdSrc.header!="") || (this.settings.select_quote == ConfSelect.yes)
-    const able_code:boolean = ((this.settings.select_code == ConfSelect.ifhead) && mdSrc.header!="") || (this.settings.select_code == ConfSelect.yes)
+    const able_list:boolean = (this.settings.select_list == ConfSelect.yes) || ((this.settings.select_list == ConfSelect.ifhead) && mdSrc.header!="")
+    const able_quote:boolean = (this.settings.select_list == ConfSelect.yes) || ((this.settings.select_quote == ConfSelect.ifhead) && mdSrc.header!="")
+    const able_code:boolean = (this.settings.select_list == ConfSelect.yes) || ((this.settings.select_code == ConfSelect.ifhead) && mdSrc.header!="")
+    const able_brace:boolean = this.settings.select_brace == ConfSelect.yes
+    const able_level:boolean = this.settings.select_level == ConfSelect.ifhead
 
-    // 选择器
+    // 全局选择器
+    ;(()=>{
+      if (!able_level) return
+      // @ts-ignore 类型“HTMLElement”上不存在属性“parent”
+      // const pEl = el.parent
+      const pEl = el.parentElement
+      if (!pEl) return
+      if (pEl.getAttribute("ab-title-flag")=="true")
+      pEl.setAttribute("ab-title-flag", "true")
+      if (pEl.querySelectorAll("div>h2").length==0) return
+      let prev_header_level:number = 0
+      for (let i=0; i<pEl.children.length; i++){
+        const cEl = pEl.children[i]
+        if (cEl.classList.contains("mod-header") 
+          || cEl.classList.contains("markdown-preview-pusher")) continue
+        if (cEl.classList.contains("mod-footer")) break
+        if (prev_header_level == 0) {      // 寻找开始标志
+          if (!cEl.children[0] || !(cEl.children[0] instanceof HTMLHeadingElement)) continue
+          const mdSrc = getSourceMarkdown(cEl as HTMLElement, ctx)
+          if (!mdSrc) continue
+          console.log("test3")
+          if (mdSrc.header=="") continue
+          console.log("test4")
+          const match = mdSrc.content.match(ABReg.reg_heading)
+          if (!match) continue
+          console.log("test5")
+          prev_header_level = match[1].length
+          console.log("prev_header_level",prev_header_level)
+        }
+        else {                            // 寻找结束标志
+          if (!cEl.children[0] || !(cEl.children[0] instanceof HTMLHeadingElement)){
+            cEl.setAttribute("style", "display: none")
+            continue
+          }
+          const mdSrc = getSourceMarkdown(cEl as HTMLElement, ctx)
+          if (!mdSrc) {
+            cEl.setAttribute("style", "display: none")
+            continue
+          }
+          const match = mdSrc.content.match(ABReg.reg_heading)
+          if (!match){
+            cEl.setAttribute("style", "display: none")
+            continue
+          }
+          if (match[1].length > prev_header_level){
+            cEl.setAttribute("style", "display: none")
+            continue
+          }
+          prev_header_level = 0
+          i-- /** 回溯一步，@bug header行会被意外隐藏 */
+        }
+      }
+    })()
+
+    // 局部选择器
     for (const child of el.children) {                          // 这个如果是块的话一般就一层，多层应该是p-br的情况
       // 这一部分是找到根div里的<ul>或<quote><ul>
       let sub_el: HTMLElement

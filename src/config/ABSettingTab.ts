@@ -13,6 +13,7 @@ export interface ABSettingInterface {
   decoration_source: ConfDecoration
   decoration_live: ConfDecoration
   decoration_render: ConfDecoration
+  is_neg_level: boolean
 }
 export enum ConfSelect{
   no = "no",
@@ -35,6 +36,7 @@ export const AB_SETTINGS: ABSettingInterface = {
   decoration_source: ConfDecoration.none,
   decoration_live: ConfDecoration.block,
   decoration_render: ConfDecoration.block,
+  is_neg_level: false,
 }
 
 /** 设置值面板 */
@@ -114,7 +116,6 @@ export class ABSettingTab extends PluginSettingTab {
         .addOption(ConfSelect.ifhead, "仅识别有头部声明")
         .setValue(settings.select_level)
       })
-      .setDisabled(true)
       
     new Setting(containerEl)
       .setName('范围选择器')
@@ -221,5 +222,20 @@ export class ABSettingTab extends PluginSettingTab {
           await this.plugin.saveSettings(); 
         })
       })
+
+    containerEl.createEl('h1', {text: '实验性功能'});
+    new Setting(containerEl)
+      .setName('启用负级列表')
+      .setDesc(createFragment(div => {
+        div.createSpan({text: "用"});
+        div.createEl("code", {text: "< "});
+        div.createSpan({text: "来表示负级列表。重复则叠加层级"});
+      }))
+			.addToggle(component=>
+        component
+          .setValue(this.plugin.settings.is_neg_level)
+          .onChange(value=>{this.plugin.settings.is_neg_level = value})
+      )
+      .setDisabled(true)
 	}
 }
