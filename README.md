@@ -4,7 +4,7 @@
  
  ## Usage
 
- [Usage Tutorial & Sample Library](./0.%20基础教程.md)
+[Usage Tutorial & Sample Library](demo/0.%20基础教程.md)
 
 ## Todo 
 
@@ -27,8 +27,6 @@
 	- 复选框列表的兼容、有序列表的兼容
 	- 引用块内的列表/列表内的引用块 无法识别
 	- mermaid的闪烁bug
-
-
 
 ## Suport command
 
