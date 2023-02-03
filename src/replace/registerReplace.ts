@@ -57,7 +57,7 @@ registerReplace(function md(el, header, content){
 registerReplace(function quote(el, header, content){
   if (header != "quote") return null
   const child = new MarkdownRenderChild(el);
-  content = content.split("\n").map((line)=>{return "> "+line}).join("\n")
+  content = text_quote(content)
   MarkdownRenderer.renderMarkdown(content, el, "", child);
   return el
 })
@@ -65,9 +65,7 @@ registerReplace(function quote(el, header, content){
 // 去除引用模式
 registerReplace(function Xquote(el, header, content){
   if (header != "Xquote") return null
-  content = content.split("\n").map(line=>{
-    return line.replace(/^>\s/, "")
-  }).join("\n")
+  content = text_Xquote(content)
   const child = new MarkdownRenderChild(el);
   MarkdownRenderer.renderMarkdown(content, el, "", child);
   return el
@@ -77,7 +75,26 @@ registerReplace(function Xquote(el, header, content){
 registerReplace(function code(el, header, content){
   if (header != "code") return null
   const child = new MarkdownRenderChild(el);
-  content = "```"+content+"\n```"
+  content = text_code(content)
+  MarkdownRenderer.renderMarkdown(content, el, "", child);
+  return el
+})
+
+// 两个转化模式
+registerReplace(function code2quote(el, header, content){
+  if (header != "code2quote") return null
+  const child = new MarkdownRenderChild(el);
+  content = text_Xcode(content)
+  content = text_quote(content)
+  MarkdownRenderer.renderMarkdown(content, el, "", child);
+  return el
+})
+
+registerReplace(function quote2code(el, header, content){
+  if (header != "quote2code") return null
+  const child = new MarkdownRenderChild(el);
+  content = text_Xquote(content)
+  content = text_code(content)
   MarkdownRenderer.renderMarkdown(content, el, "", child);
   return el
 })
@@ -85,30 +102,7 @@ registerReplace(function code(el, header, content){
 // 去除代码模式（仅去除第一组）
 registerReplace(function Xcode(el, header, content){
   if (header != "Xcode") return null
-  let list_content = content.split("\n")
-  let code_flag = ""
-  let line_start = -1
-  let line_end = -1
-  for (let i=0; i<list_content.length; i++){
-    if (code_flag==""){
-      const match_tmp = list_content[i].match(ABReg.reg_code)
-      if(match_tmp){
-        code_flag = match_tmp[1]
-        line_start = i
-      }
-    }
-    else {
-      if(list_content[i].indexOf(code_flag)>=0){
-        line_end = i
-        break
-      }
-    }
-  }
-  if(line_start>=0 && line_end>0) { // 避免有头无尾的情况
-    list_content[line_start] = list_content[line_start].replace(/^```|^~~~/, "")
-    list_content[line_start] = list_content[line_end].replace(/^```|^~~~/, "")
-    content = list_content.join("\n")
-  }
+  content = text_Xcode(content)
   const child = new MarkdownRenderChild(el);
   MarkdownRenderer.renderMarkdown(content, el, "", child);
   return el
@@ -167,3 +161,47 @@ registerReplace(function other(el, header="md", content){
   MarkdownRenderer.renderMarkdown(content, el, "", child); // var[2]: Obsidian/插件测试/AnyBlock2.md
   return el
 })
+
+/** 4个文本处理脚本 */
+
+function text_quote(content:string): string{
+  return content.split("\n").map((line)=>{return "> "+line}).join("\n")
+}
+
+function text_Xquote(content:string): string{
+  return content.split("\n").map(line=>{
+    return line.replace(/^>\s/, "")
+  }).join("\n")
+}
+
+function text_code(content:string): string{
+  return "```"+content+"\n```"
+}
+
+function text_Xcode(content:string): string{
+  let list_content = content.split("\n")
+  let code_flag = ""
+  let line_start = -1
+  let line_end = -1
+  for (let i=0; i<list_content.length; i++){
+    if (code_flag==""){
+      const match_tmp = list_content[i].match(ABReg.reg_code)
+      if(match_tmp){
+        code_flag = match_tmp[1]
+        line_start = i
+      }
+    }
+    else {
+      if(list_content[i].indexOf(code_flag)>=0){
+        line_end = i
+        break
+      }
+    }
+  }
+  if(line_start>=0 && line_end>0) { // 避免有头无尾的情况
+    list_content[line_start] = list_content[line_start].replace(/^```|^~~~/, "")
+    list_content[line_start] = list_content[line_end].replace(/^```|^~~~/, "")
+    content = list_content.join("\n")
+  }
+  return content
+}

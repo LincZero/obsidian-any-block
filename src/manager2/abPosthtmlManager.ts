@@ -129,17 +129,17 @@ const getSourceMarkdown = (
  *      最后想到用mod-footer作为结束标志，再来启用全局选择器
  *      但好像不一定会有mod-footer和mod-header走这里，有时走有时不走，很烦。还有缓存机制也很烦
  *      话说我之前弄display:none怎么好像没bug，不过那个是高性能消耗运行多次，而非全局运行一次的……可能bug会少些
- * 经验4：
+ * 失败经验4：
  *      用getSourceMarkdown的end来判断是否可行，好像还可以，比用mod-footer作为标志稳定
  *      但后来又发现这样的话末尾有空格时会有bug，要去除尾部空格（头部不要去除，会错位）
  *      然后还有一个坑：好像有的能选pertent有的不行，用document直接筛会更稳定
+ * 后来基于经验4改了下终于成功了
  */
 function global_selector(
   el: HTMLElement, 
   ctx: MarkdownPostProcessorContext,
   able_heading:boolean
 ){
-  console.log("开始全局")
   if (!able_heading) return
   // const pEl = el.parentElement    // 这里无法获取parentElement
   const pEl = document.querySelectorAll(".workspace-leaf.mod-active .markdown-preview-section")[0]
@@ -148,7 +148,6 @@ function global_selector(
   let prev_el:HTMLElement|null = null
   let prev_from_line:number = 0
   let prev_heading_level:number = 0
-  console.log("开始循环")
   for (let i=0; i<pEl.children.length; i++){
     const cEl = pEl.children[i] as HTMLElement
     if (cEl.classList.contains("mod-header") 

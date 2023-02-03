@@ -55,16 +55,16 @@ export class ABDecorationManager{
   static decoration_theme():Extension{
     return [
       EditorView.baseTheme({
-        ".ab-line-brace": { textDecoration: "underline 2px red" }
+        ".ab-line-brace": { textDecoration: "underline 1px red" }
       }),
       EditorView.baseTheme({
-        ".ab-line-list": { textDecoration: "underline 2px cyan" }
+        ".ab-line-list": { textDecoration: "underline 1px cyan" }
       }),
       EditorView.baseTheme({
-        ".ab-line-yellow": { textDecoration: "underline 3px yellow" }
+        ".ab-line-yellow": { textDecoration: "underline 1px yellow" }
       }),
       EditorView.baseTheme({
-        ".ab-line-blue": { textDecoration: "underline 3px blue" }
+        ".ab-line-blue": { textDecoration: "underline 1px blue" }
       })
     ]
   }
