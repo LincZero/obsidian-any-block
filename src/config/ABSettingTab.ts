@@ -28,7 +28,7 @@ export enum ConfDecoration{
 
 /** 设置值默认项 */
 export const AB_SETTINGS: ABSettingInterface = {
-  select_list: ConfSelect.yes,
+  select_list: ConfSelect.ifhead,
   select_quote: ConfSelect.ifhead,
   select_code: ConfSelect.ifhead,
   select_heading: ConfSelect.ifhead,
@@ -56,7 +56,7 @@ export class ABSettingTab extends PluginSettingTab {
 		containerEl.createEl('h1', {text: '范围管理器'});
 
 		new Setting(containerEl)
-      .setName('列表选择器')  // 不识别、无头部标签也识别、仅识别有头部标签
+      .setName('列表选择器')
       .setDesc('')
 			.addDropdown((component)=>{
         component

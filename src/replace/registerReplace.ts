@@ -53,6 +53,24 @@ registerReplace(function md(el, header, content){
   return el
 })
 
+// 隐藏折叠（借callout）
+registerReplace(function quote(el, header, content){
+  if (header != "hide") return null
+  const child = new MarkdownRenderChild(el);
+  content = text_quote("[!note]-\n"+content)
+  MarkdownRenderer.renderMarkdown(content, el, "", child);
+  return el
+})
+
+// 可折叠（借callout）
+registerReplace(function quote(el, header, content){
+  if (header != "flod") return null
+  const child = new MarkdownRenderChild(el);
+  content = text_quote("[!note]+\n"+content)
+  MarkdownRenderer.renderMarkdown(content, el, "", child);
+  return el
+})
+
 // 引用模式
 registerReplace(function quote(el, header, content){
   if (header != "quote") return null

@@ -1,4 +1,5 @@
 import { MarkdownRenderer, MarkdownRenderChild } from 'obsidian'
+import { isNull } from 'util'
 
 export default class ListProcess{
 
@@ -39,7 +40,7 @@ export default class ListProcess{
 
     /** 内联补偿列表。只保留comp>0的项 */
     let list_inline_comp:{
-      level:number, 
+      level:number,
       inline_comp:number
     }[] = []
     /** 更新 list_level_inline 的状态，并返回该项的补偿值 
@@ -52,16 +53,16 @@ export default class ListProcess{
       // 完全不用` | `命令就跳过了
       if (list_inline_comp.length==0 && inline_comp==0) return 0
 
-      // 向左溯源
+      // 向左溯源（在左侧时）直到自己在补偿列表的右侧
       while(list_inline_comp.length && list_inline_comp[list_inline_comp.length-1].level>=level){
         list_inline_comp.pop()
       }
-      if (list_inline_comp.length==0 && inline_comp==0) return 0
+      if (list_inline_comp.length==0 && inline_comp==0) return 0 // 提前跳出
 
       // 计算总补偿值（不包括自己）
       let total_comp
       if (list_inline_comp.length==0) total_comp = 0
-      else total_comp = list_inline_comp[length-1].inline_comp
+      else total_comp = list_inline_comp[list_inline_comp.length-1].inline_comp
 
       // 添加自己进去
       if (inline_comp>0) list_inline_comp.push({
@@ -81,7 +82,7 @@ export default class ListProcess{
     const list_text = text.split("\n")
     for (let line of list_text) {                                             // 每行
       if (/^\s*?-\s(.*?)/.test(line)) {
-        let list_inline: string[] = line.replace(/^\s*?-\s/, "").split(" | ") // 内联分行
+        let list_inline: string[] = line.replace(/^\s*?-\s/, "").split("| ") // 内联分行
         /** @bug  制表符长度是1而非4 */
         let level_inline: number = line.replace(/-\s(.*?)$/, "").length
         let inline_comp = update_inline_comp(level_inline, list_inline.length-1)
@@ -173,7 +174,7 @@ export default class ListProcess{
     const list_text = text.split("\n")
     for (let line of list_text) {                                             // 每行
       if (/^\s*?-\s(.*?)/.test(line)) {
-        let list_inline: string[] = line.replace(/^\s*?-\s/, "").split(" | ") // 内联分行
+        let list_inline: string[] = line.replace(/^\s*?-\s/, "").split("| ") // 内联分行
         let level_inline: number = line.replace(/-\s(.*?)$/, "").length
                                                                               // 保留缩进（列表格）
         for (let inline_i=0; inline_i<list_inline.length; inline_i++){
@@ -216,8 +217,8 @@ export default class ListProcess{
   ){
     // 组装成表格数据 (列表是深度优先)
     let list_itemInfo2 = []
-    let prev_line = 0 // 并存储最高行数
-    let prev_level = -1
+    let prev_line = -1   // 并存储后一行的序列!
+    let prev_level = 999 // 上一行的等级
     for (let i=0; i<list_itemInfo.length; i++){
       let item = list_itemInfo[i]
       
@@ -235,7 +236,7 @@ export default class ListProcess{
         else break                                                // 换item项的行
       }
 
-      // 获取所在行数。分换行和不换行
+      // 获取所在行数。分换行（创建新行）和不换行，第一行总是创建新行
       if (item.level <= prev_level) {
         prev_line++
       }
@@ -246,29 +247,43 @@ export default class ListProcess{
         content: item.content,  // 内容
         level: item.level,      // 级别
         tableRow: tableRow,     // 跨行数
-        tableLine: prev_line    // 对应首行
+        tableLine: prev_line    // 对应首行序列
       })
     }
 
     // 表格数据 组装成表格
-    div = div.createEl("table").createEl("tbody")
-    for (let index_line=0; index_line<prev_line+1; index_line++){
-      let tr = div.createEl("tr")
-      for (let item of list_itemInfo2){
-        if (item.tableLine==index_line) {
-          if (modeMD) {   // md版
-            let td = tr.createEl("td", {
-              attr:{"rowspan": item.tableRow}
-            })
-            const child = new MarkdownRenderChild(td);
-            MarkdownRenderer.renderMarkdown(item.content, td, "", child);
-          }
-          else{           // 非md版
-            tr.createEl("td", {
-              text: item.content, 
-              attr:{"rowspan": item.tableRow}
-            })
-          }
+    div = div.createEl("table")
+    let thead
+    if(list_itemInfo2[0].content.indexOf("< ")==0){ // 判断是否有表头
+      thead = div.createEl("thead")
+      list_itemInfo2[0].content=list_itemInfo2[0].content.replace(/^\<\s/,"")
+    }
+    const tbody = div.createEl("tbody")
+    for (let index_line=0; index_line<prev_line+1; index_line++){ // 遍历表格行，创建tr……
+      let is_head
+      let tr
+      if (index_line==0 && thead){ // 判断是否第一行&&是否有表头
+        tr = thead.createEl("tr")
+        is_head = true
+      }
+      else{
+        is_head = false
+        tr = tbody.createEl("tr")
+      }
+      for (let item of list_itemInfo2){                           // 遍历表格列，创建td
+        if (item.tableLine!=index_line) continue
+        if (modeMD) {   // md版
+          let td = tr.createEl(is_head?"th":"td", {
+            attr:{"rowspan": item.tableRow}
+          })
+          const child = new MarkdownRenderChild(td);
+          MarkdownRenderer.renderMarkdown(item.content, td, "", child);
+        }
+        else{           // 非md版
+          tr.createEl(is_head?"th":"td", {
+            text: item.content, 
+            attr:{"rowspan": item.tableRow}
+          })
         }
       }
     }

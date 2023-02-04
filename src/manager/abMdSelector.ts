@@ -7,7 +7,7 @@ export interface MdSelectorSpec {
   to: number,       // .
   header: string,   // 头不是信息
   selector: string, // 范围选择方式
-  content: string      // 内容信息
+  content: string   // 内容信息
 }
 
 /** 管理器列表 */
