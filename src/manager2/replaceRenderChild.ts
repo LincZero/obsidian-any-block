@@ -30,6 +30,7 @@ export class RelpaceRender extends MarkdownRenderChild {
       cls: ["ab-replace"]
     });
 
+    // 主体部分
     const dom_note = div.createDiv({
       cls: ["ab-note"]
     })
@@ -37,20 +38,33 @@ export class RelpaceRender extends MarkdownRenderChild {
       cls: ["ab-replaceEl"]
     })
     autoABProcessor(dom_replaceEl, this.header, this.content)
-
-    // 区分Decoration.replace RangeReplace replaceWith，分别是替换装饰、替换文字、HTML元素替换
     this.containerEl.replaceWith(div);
     
+    // 下拉框格式部分
     const dom_edit = div.createEl("select", {
       cls: ["ab-button"], 
       attr: {"aria-label": "Edit this block - "+this.header}
     });
+    const first_dom_option = dom_edit.createEl("option",{ // 这个需要在首选
+      text:"复合格式:"+this.header,
+      attr:{"value":this.header},
+    })
+    first_dom_option.selected=true
+    let header_name_flag = ""   // 当前填写的处理器是否标准处理器，如过则隐藏第一个option改用标准的那个
     for (let item of getProcessorOptions()){
       const dom_option = dom_edit.createEl("option",{
         text:item.name,
         attr:{"value":item.id},
       })
-      if (this.header==item.id) dom_option.selected=true
+      if (this.header==item.id) {
+        header_name_flag = item.name
+        // dom_option.selected=true
+      }
+    }
+    if (header_name_flag!=""){ // 这里可选一种处理方式：销毁/隐藏/不处理 保留两个相同规则的选项
+      // first_dom_option.setAttribute("style", "display:none") 
+      // dom_edit.removeChild(first_dom_option)
+      first_dom_option.setText(header_name_flag)
     }
     dom_edit.onchange = ()=>{
       const new_header = dom_edit.options[dom_edit.selectedIndex].value
