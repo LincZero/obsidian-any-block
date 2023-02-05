@@ -326,11 +326,11 @@ registerABProcessor({
   }
 })
 
-/** 4个文本处理脚本 */
+/** 5个文本处理脚本 */
 
 function text_X(content:string): string{
   let flag = ""
-  for (let line of content){
+  for (let line of content.split("\n")){
     if (ABReg.reg_code.test(line)) {flag="code";break}
     else if (ABReg.reg_quote.test(line)) {flag="quote";break}
   }
