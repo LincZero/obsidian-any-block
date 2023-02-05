@@ -118,7 +118,7 @@ export class ABSettingTab extends PluginSettingTab {
       })
       
     new Setting(containerEl)
-      .setName('范围选择器')
+      .setName('首尾范围选择器')
       .setDesc(createFragment(el => {
         el.createEl("strong", {
           text: "全局选择器"

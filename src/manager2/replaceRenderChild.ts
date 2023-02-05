@@ -1,5 +1,5 @@
 import { MarkdownRenderChild } from "obsidian";
-import { autoReplaceEl, list_option } from "../replace/registerReplace"
+import { autoABProcessor, getProcessorOptions } from "../replace/abProcessor"
 
 export class RelpaceRender extends MarkdownRenderChild {
   content: string;
@@ -36,7 +36,7 @@ export class RelpaceRender extends MarkdownRenderChild {
     let dom_replaceEl = dom_note.createDiv({
       cls: ["ab-replaceEl"]
     })
-    autoReplaceEl(dom_replaceEl, this.header, this.content)
+    autoABProcessor(dom_replaceEl, this.header, this.content)
 
     // 区分Decoration.replace RangeReplace replaceWith，分别是替换装饰、替换文字、HTML元素替换
     this.containerEl.replaceWith(div);
@@ -45,19 +45,19 @@ export class RelpaceRender extends MarkdownRenderChild {
       cls: ["ab-button"], 
       attr: {"aria-label": "Edit this block - "+this.header}
     });
-    for (let [key, value] of Object.entries(list_option)){
+    for (let item of getProcessorOptions()){
       const dom_option = dom_edit.createEl("option",{
-        text:value,
-        attr:{"value":key},
+        text:item.name,
+        attr:{"value":item.id},
       })
-      if (key==this.header) dom_option.selected=true
+      if (this.header==item.id) dom_option.selected=true
     }
     dom_edit.onchange = ()=>{
       const new_header = dom_edit.options[dom_edit.selectedIndex].value
       const new_dom_replaceEl = dom_note.createDiv({
         cls: ["ab-replaceEl"]
       })
-      autoReplaceEl(new_dom_replaceEl, new_header, this.content)
+      autoABProcessor(new_dom_replaceEl, new_header, this.content)
       dom_replaceEl.replaceWith(new_dom_replaceEl);
       dom_replaceEl = new_dom_replaceEl
     }

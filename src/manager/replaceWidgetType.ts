@@ -1,7 +1,7 @@
 import {Editor, EditorPosition, MarkdownRenderChild, MarkdownRenderer} from 'obsidian';
 import {EditorView, WidgetType} from "@codemirror/view"
 
-import {autoReplaceEl} from "../replace/registerReplace"
+import {autoABProcessor} from "../replace/abProcessor"
 import {MdSelectorSpec} from "./abMdSelector"
 
 export class ABReplaceWidget extends WidgetType {
@@ -28,7 +28,7 @@ export class ABReplaceWidget extends WidgetType {
 
     // 内容替换元素
     let dom_note = this.div.createEl("div", {cls: ["drop-shadow", "ab-note"]});
-    autoReplaceEl(dom_note, this.rangeSpec.header, this.rangeSpec.content)
+    autoABProcessor(dom_note, this.rangeSpec.header, this.rangeSpec.content)
 
     // 编辑按钮
     if (this.global_editor){
