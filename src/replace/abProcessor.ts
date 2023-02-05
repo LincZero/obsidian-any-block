@@ -65,8 +65,15 @@ export function autoABProcessor(el:HTMLDivElement, header:string, content:string
   }
   return result
 }
+/** 获取id-name对，以创建下拉框
+ * 注意如果有正则的话，不能给
+ */
 export function getProcessorOptions(){
-  return list_abProcessor.map(item=>{
+  return list_abProcessor
+  .filter(item=>{
+    return typeof(item.match)=="string"
+  })
+  .map(item=>{
     return {id:item.id, name:item.name}
   })
 }
@@ -153,15 +160,6 @@ registerABProcessor({
 })
 
 registerABProcessor({
-  id: "Xquote",
-  name: "去除引用块",
-  is_render: false,
-  process: (el, header, content)=>{
-    return text_Xquote(content)
-  }
-})
-
-registerABProcessor({
   id: "code",
   name: "增加代码块",
   is_render: false,
@@ -171,11 +169,29 @@ registerABProcessor({
 })
 
 registerABProcessor({
+  id: "Xquote",
+  name: "去除引用块",
+  is_render: false,
+  process: (el, header, content)=>{
+    return text_Xquote(content)
+  }
+})
+
+registerABProcessor({
   id: "Xcode",
   name: "去除代码块",
   is_render: false,
   process: (el, header, content)=>{
     return text_Xcode(content)
+  }
+})
+
+registerABProcessor({
+  id: "X",
+  name: "去除代码或引用块",
+  is_render: false,
+  process: (el, header, content)=>{
+    return text_X(content)
   }
 })
 
@@ -202,10 +218,32 @@ registerABProcessor({
 })
 
 registerABProcessor({
+  id: "slice",
+  name: "切片",
+  match: /^slice\((\s*\d+\s*)(,\s*-?\d+\s*)?\)$/,
+  is_render: false,
+  process: (el, header, content)=>{
+    // slice好像不怕溢出或交错，会自动变空数组。就很省心，不用判断太多的东西
+    const list_match = header.match(/^slice\((\s*\d+\s*)(,\s*-?\d+\s*)?\)$/)
+    if (!list_match) return content
+    const arg1 = Number(list_match[1].trim())
+    if (isNaN(arg1)) return content
+    const arg2 = Number(list_match[2].replace(",","").trim())
+    // 单参数
+    if (isNaN(arg2)) {
+      return content.split("\n").slice(arg1).join("\n")
+    }
+    // 双参数
+    else {
+      return content.split("\n").slice(arg1, arg2).join("\n")
+    }
+  }
+})
+
+registerABProcessor({
   id: "list2table",
   name: "列表转表格",
   process: (el, header, content)=>{
-    console.log("this is list2table")
     ListProcess.list2table(content, el, false)
     return el
   }
@@ -290,6 +328,17 @@ registerABProcessor({
 
 /** 4个文本处理脚本 */
 
+function text_X(content:string): string{
+  let flag = ""
+  for (let line of content){
+    if (ABReg.reg_code.test(line)) {flag="code";break}
+    else if (ABReg.reg_quote.test(line)) {flag="quote";break}
+  }
+  if (flag=="code") return text_Xcode(content)
+  else if (flag=="quote") return text_Xquote(content)
+  return content
+}
+
 function text_quote(content:string): string{
   return content.split("\n").map((line)=>{return "> "+line}).join("\n")
 }
@@ -311,14 +360,14 @@ function text_Xcode(content:string): string{
   let line_start = -1
   let line_end = -1
   for (let i=0; i<list_content.length; i++){
-    if (code_flag==""){
+    if (code_flag==""){     // 寻找开始标志
       const match_tmp = list_content[i].match(ABReg.reg_code)
       if(match_tmp){
         code_flag = match_tmp[1]
         line_start = i
       }
     }
-    else {
+    else {                  // 寻找结束标志
       if(list_content[i].indexOf(code_flag)>=0){
         line_end = i
         break
@@ -327,7 +376,7 @@ function text_Xcode(content:string): string{
   }
   if(line_start>=0 && line_end>0) { // 避免有头无尾的情况
     list_content[line_start] = list_content[line_start].replace(/^```|^~~~/, "")
-    list_content[line_start] = list_content[line_end].replace(/^```|^~~~/, "")
+    list_content[line_end] = list_content[line_end].replace(/^```|^~~~/, "")
     content = list_content.join("\n")
   }
   return content
