@@ -96,6 +96,9 @@ export class ABStateManager{
 
   // private
   private updateStateField (decorationSet:DecorationSet, tr:Transaction){    
+    // 如果没有修改就不管了（点击编辑块的按钮除外）
+    // if(tr.changes.empty) return decorationSet
+
     // 获取 - 编辑器模式、装饰选项、选择器选项
     let editor_mode: Editor_mode = this.getEditorMode()
     let decoration_mode:ConfDecoration

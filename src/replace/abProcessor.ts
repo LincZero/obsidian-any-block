@@ -421,9 +421,9 @@ function text_Xcode(content:string): string{
     }
   }
   if(line_start>=0 && line_end>0) { // 避免有头无尾的情况
-    list_content[line_start] = list_content[line_start].replace(/^```|^~~~/, "")
+    list_content[line_start] = list_content[line_start].replace(/^```(.*)$|^~~~(.*)$/, "")  // 还是把代码符给删了吧
     list_content[line_end] = list_content[line_end].replace(/^```|^~~~/, "")
-    content = list_content.join("\n")
+    content = list_content.join("\n")//.trim()
   }
   return content
 }
