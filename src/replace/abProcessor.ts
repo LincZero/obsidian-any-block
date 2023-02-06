@@ -5,7 +5,13 @@
 import {MarkdownRenderChild, MarkdownRenderer} from 'obsidian';
 import {ABReg} from "src/config/abReg"
 import ListProcess from "./listProcess"
-import { match } from 'assert';
+
+import mermaid from "mermaid"
+import mindmap from '@mermaid-js/mermaid-mindmap';
+const initialize = mermaid.registerExternalDiagrams([mindmap]);
+export const mermaid_init = async () => {
+  await initialize;
+};
 
 /*export const list_option = {
   "other": "其他格式",
@@ -99,9 +105,9 @@ let list_abProcessor: ABProcessorSpec[] = []
 interface ABProcessorSpecSimp{
   id: string            // 唯一标识
   name: string          // 处理器名字
-  match?: RegExp|string // 处理器匹配正则（不填则为id，而不是name！name可以被翻译或是重复的）
+  match?: RegExp|string // 处理器匹配正则（不填则为id，而不是name！name可以被翻译或是重复的）如果填写了且为正则类型，不会显示在下拉框中
   detail?: string       // 处理器描述
-  is_render?: boolean   // 是否渲染，默认为true
+  is_render?: boolean   // 是否渲染处理器，默认为true。false则为文本处理器
   process: (el:HTMLDivElement, header:string, content:string)=> HTMLElement|string
                         // 处理器
 }
@@ -304,7 +310,7 @@ registerABProcessor({
 })
 
 registerABProcessor({
-  id: "list2mermaid",
+  id: "callout",
   name: "callout语法糖",
   match: /^\!/,
   process: (el, header, content)=>{
@@ -314,6 +320,25 @@ registerABProcessor({
     return el
   }
 })
+
+registerABProcessor({
+  id: "mermaid",
+  name: "新mermaid",
+  process: (el, header, content)=>{
+    // mermaid.initialize()
+    
+    // const s_svg = mermaid.render("ab-mermaid", content)
+    // el.innerHTML = s_svg
+    asyncMermaid(el, header, content)
+    return el
+  }
+})
+async function asyncMermaid(el:HTMLDivElement, header:string, content:string){
+  await mermaid_init()
+  await mermaid.mermaidAPI.renderAsync("ab-mermaid", content, (svgCode: string)=>{
+    el.innerHTML = svgCode
+  });
+}
 
 registerABProcessor({
   id: "text",

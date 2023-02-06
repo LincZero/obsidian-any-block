@@ -55,7 +55,8 @@ export class AnyBlockPluginValue implements PluginValue {
       )
     })*/
 
-    matchInfo.forEach(item => {
+    if (!matchInfo) return builder.finish();
+    matchInfo.forEach(item => { // @bug 不能找到forEach属性
       builder.add(
         item.from,
         item.to,

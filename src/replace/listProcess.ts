@@ -1,5 +1,6 @@
 import { MarkdownRenderer, MarkdownRenderChild } from 'obsidian'
 import { isNull } from 'util'
+import mermaid from "mermaid"
 
 export default class ListProcess{
 
@@ -290,7 +291,8 @@ export default class ListProcess{
     return div
   }
 
-  /** 列表数据转mermaid流程图 */
+  /** 列表数据转mermaid流程图
+   * @bug 会闪一下 */
   private static data2mermaid(
     list_itemInfo: {
       content: string;
@@ -300,7 +302,8 @@ export default class ListProcess{
   ){
     const html_mode = false    // @todo 暂时没有设置来切换这个开关
 
-    let list_line_content:string[] = html_mode?['<pre class="mermaid">', "graph LR"]:["```mermaid", "graph LR"]
+    let list_line_content:string[] = ["graph LR"]
+    // let list_line_content:string[] = html_mode?['<pre class="mermaid">', "graph LR"]:["```mermaid", "graph LR"]
     let prev_line_content = ""
     let prev_level = 999
     for (let i=0; i<list_itemInfo.length; i++){
@@ -322,10 +325,15 @@ export default class ListProcess{
       prev_level = list_itemInfo[i].level
     }
     list_line_content.push(prev_line_content)
-    list_line_content.push(html_mode?"</pre>":"```")
+    // list_line_content.push(html_mode?"</pre>":"```")
 
     let text = list_line_content.join("\n")
-    const child = new MarkdownRenderChild(div);
-    return MarkdownRenderer.renderMarkdown(text, div, "", child);
+
+    //const child = new MarkdownRenderChild(div);
+    //MarkdownRenderer.renderMarkdown(text, div, "", child);
+    
+    const s_svg = mermaid.render("ab-mermaid", text)
+    div.innerHTML = s_svg
+    return div
   }
 }
