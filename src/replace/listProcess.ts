@@ -1,6 +1,7 @@
 import { MarkdownRenderer, MarkdownRenderChild } from 'obsidian'
 import { isNull } from 'util'
 import mermaid from "mermaid"
+import {getID} from "src/utils/utils"
 
 export default class ListProcess{
 
@@ -28,6 +29,12 @@ export default class ListProcess{
   static list2mermaid(text: string, div: HTMLDivElement) {
     let list_itemInfo = this.list2data(text)
     return this.data2mermaid(list_itemInfo, div)
+  }
+
+  /** 列表转mermaid思维导图 */
+  static list2mindmap(text: string, div: HTMLDivElement) {
+    let list_itemInfo = this.list2data(text)
+    return this.data2mindmap(list_itemInfo, div)
   }
 
   /** 列表文本转列表数据 
@@ -292,7 +299,7 @@ export default class ListProcess{
   }
 
   /** 列表数据转mermaid流程图
-   * @bug 会闪一下 */
+   * ~~@bug 旧版bug（未内置mermaid）会闪一下~~ */
   private static data2mermaid(
     list_itemInfo: {
       content: string;
@@ -332,8 +339,31 @@ export default class ListProcess{
     //const child = new MarkdownRenderChild(div);
     //MarkdownRenderer.renderMarkdown(text, div, "", child);
     
-    const s_svg = mermaid.render("ab-mermaid", text)
-    div.innerHTML = s_svg
+    mermaid.mermaidAPI.renderAsync("ab-mermaid-"+getID(), text, (svgCode:string)=>{
+      div.innerHTML = svgCode
+    })
+    
     return div
+  }
+
+  /** 列表数据转mermaid思维导图 */
+  private static data2mindmap(
+    list_itemInfo: {
+      content: string;
+      level: number;
+    }[], 
+    div: HTMLDivElement
+  ){
+    let list_newcontent:string[] = []
+    for (let item of list_itemInfo){
+      // 等级转缩进，以及"\n" 转化 <br/>
+      let str_indent = ""
+      for(let i=0; i<item.level; i++) str_indent+= " "
+      list_newcontent.push(str_indent+item.content.replace("\n","<br/>"))
+    }
+    const newcontent = "mindmap\n"+list_newcontent.join("\n")
+    mermaid.mermaidAPI.renderAsync("ab-mermaid-"+getID(), newcontent, (svgCode:string)=>{
+      div.innerHTML = svgCode
+    })
   }
 }

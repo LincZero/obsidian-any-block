@@ -5,6 +5,7 @@
 import {MarkdownRenderChild, MarkdownRenderer} from 'obsidian';
 import {ABReg} from "src/config/abReg"
 import ListProcess from "./listProcess"
+import {getID} from "src/utils/utils"
 
 import mermaid from "mermaid"
 import mindmap from '@mermaid-js/mermaid-mindmap';
@@ -247,6 +248,21 @@ registerABProcessor({
 })
 
 registerABProcessor({
+  id: "listroot",
+  name: "增加列表根",
+  match: /^listroot\((.*)\)$/,
+  is_render: false,
+  process: (el, header, content)=>{
+    const list_match = header.match(/^listroot\((.*)\)$/)
+    if (!list_match) return content
+    const arg1 = list_match[1].trim()
+    content = content.split("\n").map(line=>{return "  "+line}).join("\n")
+    content = "- "+arg1+"\n"+content
+    return content
+  }
+})
+
+registerABProcessor({
   id: "list2table",
   name: "列表转表格",
   process: (el, header, content)=>{
@@ -310,6 +326,15 @@ registerABProcessor({
 })
 
 registerABProcessor({
+  id: "list2mindmap",
+  name: "列表转mermaid思维导图",
+  process: (el, header, content)=>{
+    ListProcess.list2mindmap(content, el)
+    return el
+  }
+})
+
+registerABProcessor({
   id: "callout",
   name: "callout语法糖",
   match: /^\!/,
@@ -325,20 +350,16 @@ registerABProcessor({
   id: "mermaid",
   name: "新mermaid",
   process: (el, header, content)=>{
-    // mermaid.initialize()
-    
-    // const s_svg = mermaid.render("ab-mermaid", content)
-    // el.innerHTML = s_svg
-    asyncMermaid(el, header, content)
+    // asyncMermaid(el, header, content)
+    (async (el:HTMLDivElement, header:string, content:string)=>{
+      await mermaid_init()
+      await mermaid.mermaidAPI.renderAsync("ab-mermaid-"+getID(), content, (svgCode: string)=>{
+        el.innerHTML = svgCode
+      });
+    })(el, header, content)
     return el
   }
 })
-async function asyncMermaid(el:HTMLDivElement, header:string, content:string){
-  await mermaid_init()
-  await mermaid.mermaidAPI.renderAsync("ab-mermaid", content, (svgCode: string)=>{
-    el.innerHTML = svgCode
-  });
-}
 
 registerABProcessor({
   id: "text",
