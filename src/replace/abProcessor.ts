@@ -248,6 +248,36 @@ registerABProcessor({
 })
 
 registerABProcessor({
+  id: "title2list",
+  name: "标题到列表",
+  is_render: false,
+  process: (el, header, content)=>{
+    ListProcess.title2list(content, el)
+    return content
+  }
+})
+
+registerABProcessor({
+  id: "title2table",
+  name: "标题到表格",
+  is_render: false,
+  process: (el, header, content)=>{
+    ListProcess.title2table(content, el)
+    return content
+  }
+})
+
+registerABProcessor({
+  id: "title2mindmap",
+  name: "标题到脑图",
+  is_render: false,
+  process: (el, header, content)=>{
+    ListProcess.title2mindmap(content, el)
+    return content
+  }
+})
+
+registerABProcessor({
   id: "listroot",
   name: "增加列表根",
   match: /^listroot\((.*)\)$/,

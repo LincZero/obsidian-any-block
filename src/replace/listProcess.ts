@@ -2,8 +2,26 @@ import { MarkdownRenderer, MarkdownRenderChild } from 'obsidian'
 import { isNull } from 'util'
 import mermaid from "mermaid"
 import {getID} from "src/utils/utils"
+import { ABReg } from 'src/config/abReg'
 
 export default class ListProcess{
+  /** title转列表 */
+  static title2list(text: string, div: HTMLDivElement, modeMD=false) {
+    let list_itemInfo = this.title2data(text)
+    return this.data2list(list_itemInfo, div)
+  }
+
+  /** title转表格 */
+  static title2table(text: string, div: HTMLDivElement, modeMD=false) {
+    let list_itemInfo = this.title2data(text)
+    return this.data2table(list_itemInfo, div, true)
+  }
+
+  /** title转脑图 */
+   static title2mindmap(text: string, div: HTMLDivElement, modeMD=false) {
+    let list_itemInfo = this.title2data(text)
+    return this.data2mindmap(list_itemInfo, div)
+  }
 
   /** 列表转表格
    * @param modeMD: md（使用md嵌套功能）功耗可能较大
@@ -12,6 +30,12 @@ export default class ListProcess{
     let list_itemInfo = this.list2data(text)
     return this.data2table(list_itemInfo, div, modeMD)
   }
+
+  /** 列表转列表 */
+  /*static list2l(text: string, div: HTMLDivElement) {
+    let list_itemInfo = this.list2data(text, true)
+    return this.data2list(list_itemInfo, div)
+  }*/
 
   /** 列表转列表格 */
   static list2lt(text: string, div: HTMLDivElement, modeMD=false) {
@@ -111,6 +135,45 @@ export default class ListProcess{
           })
         }
       }
+    }
+    return list_itemInfo
+  }
+
+  // 标题大纲转列表数据（@todo 正文的level+10，要减掉）
+  private static title2data(text: string){
+    let list_itemInfo:{
+      content:string,
+      level:number,
+    }[] = []
+
+    const list_text = text.split("\n")
+    const list_prev_header:number[] = []
+    let mul_line:string[] = []    // 多行内容，一起放入一个层级
+    for (let line of list_text) {
+      const matchs = line.match(ABReg.reg_heading)
+      if (matchs){                          // 标题层级
+        if (mul_line.length){
+          list_itemInfo.push({
+            content: mul_line.join("\n"),
+            level: 10
+          })
+          mul_line = []
+        }
+        list_prev_header.push(matchs[1].length)
+        list_itemInfo.push({
+          content: matchs[2],
+          level: matchs[1].length
+        })
+      }
+      else {                                // 非标题层级
+        mul_line.push(line)
+      }
+    }
+    if (mul_line.length){                   // 循环尾判断
+      list_itemInfo.push({
+        content: mul_line.join("\n"),
+        level: 10
+      })
     }
     return list_itemInfo
   }
@@ -296,6 +359,31 @@ export default class ListProcess{
       }
     }
     return div
+  }
+
+  /** 列表数据转列表（看起来脱屁股放屁，但有时调试会需要） */
+  private static data2list(
+    list_itemInfo: {
+      content: string;
+      level: number;
+    }[], 
+    div: HTMLDivElement
+  ){
+    let list_newcontent:string[] = []
+    // 每一个level里的content处理
+    for (let item of list_itemInfo){
+      // 等级转缩进，以及"\n" 转化（这里像mindmap语法那样用<br>，要进行换行转缩进）
+      let str_indent = ""
+      for(let i=0; i<item.level; i++) str_indent+= " "
+      let list_content = item.content.split("\n")
+      for (let i=0; i<list_content.length; i++) {
+        if(i==0) list_newcontent.push(str_indent+"- "+list_content[i])
+        else list_newcontent.push(str_indent+"  "+list_content[i])
+      }
+    }
+    const newcontent = list_newcontent.join("\n")
+    console.log("title2list", list_itemInfo, list_newcontent, newcontent)
+    return newcontent
   }
 
   /** 列表数据转mermaid流程图
