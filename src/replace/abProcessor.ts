@@ -78,10 +78,10 @@ export function autoABProcessor(el:HTMLDivElement, header:string, content:string
 export function getProcessorOptions(){
   return list_abProcessor
   .filter(item=>{
-    return typeof(item.match)=="string"
+    return item.default
   })
   .map(item=>{
-    return {id:item.id, name:item.name}
+    return {id:item.id, name:item.default}
   })
 }
 
@@ -92,7 +92,8 @@ function registerABProcessor(sim: ABProcessorSpecSimp){
   const abProcessorSpec:ABProcessorSpec = {
     id: sim.id,
     name: sim.name,
-    match: sim.match?sim.match:sim.id,
+    match: sim.match??sim.id,
+    default: sim.default??typeof(sim.match)=="string"?sim.id:null,
     detail: sim.detail??"",
     is_render: sim.is_render??true,
     process: sim.process,
@@ -104,9 +105,10 @@ function registerABProcessor(sim: ABProcessorSpecSimp){
 let list_abProcessor: ABProcessorSpec[] = []
 /** ab处理器接口 - 语法糖版 */
 interface ABProcessorSpecSimp{
-  id: string            // 唯一标识
+  id: string            // 唯一标识（当不填match时也会作为匹配项）
   name: string          // 处理器名字
   match?: RegExp|string // 处理器匹配正则（不填则为id，而不是name！name可以被翻译或是重复的）如果填写了且为正则类型，不会显示在下拉框中
+  default?: string|null // 下拉选择的默认规则，不填的话：非正则默认为id，有正则则为空
   detail?: string       // 处理器描述
   is_render?: boolean   // 是否渲染处理器，默认为true。false则为文本处理器
   process: (el:HTMLDivElement, header:string, content:string)=> HTMLElement|string
@@ -117,6 +119,7 @@ interface ABProcessorSpec{
   id: string
   name: string
   match: RegExp|string
+  default: string|null
   detail: string
   is_render: boolean
   process: (el:HTMLDivElement, header:string, content:string)=> HTMLElement|string
@@ -169,8 +172,13 @@ registerABProcessor({
 registerABProcessor({
   id: "code",
   name: "增加代码块",
+  match: /^code(\((.*)\))?$/,
+  default: "code()",
   is_render: false,
   process: (el, header, content)=>{
+    let matchs = content.match(/^code(\((.*)\))?$/)
+    if (!matchs) return content
+    if (matchs[1]) content = matchs[2]+"\n"+content
     return text_code(content)
   }
 })
@@ -187,9 +195,16 @@ registerABProcessor({
 registerABProcessor({
   id: "Xcode",
   name: "去除代码块",
+  match: /^Xcode(\((true|false)\))?$/,
+  default: "Xcode(true)",
   is_render: false,
   process: (el, header, content)=>{
-    return text_Xcode(content)
+    let matchs = content.match(/^Xcode(\((true|false)\))?$/)
+    if (!matchs) return content
+    let remove_flag:boolean
+    if (matchs[1]=="") remove_flag=false
+    else remove_flag= (matchs[2]=="true")
+    return text_Xcode(content, remove_flag)
   }
 })
 
@@ -281,6 +296,7 @@ registerABProcessor({
   id: "listroot",
   name: "增加列表根",
   match: /^listroot\((.*)\)$/,
+  default: "listroot(root)",
   is_render: false,
   process: (el, header, content)=>{
     const list_match = header.match(/^listroot\((.*)\)$/)
@@ -368,6 +384,7 @@ registerABProcessor({
   id: "callout",
   name: "callout语法糖",
   match: /^\!/,
+  default: "!note",
   process: (el, header, content)=>{
     const child = new MarkdownRenderChild(el);
     const text = "```ad-"+header.slice(1)+"\n"+content+"\n```"
@@ -379,9 +396,14 @@ registerABProcessor({
 registerABProcessor({
   id: "mermaid",
   name: "新mermaid",
+  match: /^mermaid(\((.*)\))?$/,
+  default: "mermaid(graph TB)",
   process: (el, header, content)=>{
-    // asyncMermaid(el, header, content)
-    (async (el:HTMLDivElement, header:string, content:string)=>{
+    let matchs = content.match(/^mermaid(\((.*)\))?$/)
+    if (!matchs) return el
+    if (matchs[1]) content = matchs[2]+"\n"+content
+
+    ;(async (el:HTMLDivElement, header:string, content:string)=>{
       await mermaid_init()
       await mermaid.mermaidAPI.renderAsync("ab-mermaid-"+getID(), content, (svgCode: string)=>{
         el.innerHTML = svgCode
@@ -426,13 +448,12 @@ function text_Xquote(content:string): string{
   }).join("\n")
 }
 
-// （第一行不加入代码符） @todo
 function text_code(content:string): string{
-  return "```\n"+content+"\n```"
+  return "```"+content+"\n```"
 }
 
-// （仅去除第一组，且会去掉代码符，后续更新加入可以保留代码符的选项）
-function text_Xcode(content:string): string{
+// @param remove_flag：是否去除code的类型，默认为true
+function text_Xcode(content:string, remove_flag=true): string{
   let list_content = content.split("\n")
   let code_flag = ""
   let line_start = -1
@@ -453,7 +474,8 @@ function text_Xcode(content:string): string{
     }
   }
   if(line_start>=0 && line_end>0) { // 避免有头无尾的情况
-    list_content[line_start] = list_content[line_start].replace(/^```(.*)$|^~~~(.*)$/, "")  // 还是把代码符给删了吧
+    if(remove_flag) list_content[line_start] = list_content[line_start].replace(/^```(.*)$|^~~~(.*)$/, "")
+    else list_content[line_start] = list_content[line_start].replace(/^```|^~~~/, "")
     list_content[line_end] = list_content[line_end].replace(/^```|^~~~/, "")
     content = list_content.join("\n")//.trim()
   }
