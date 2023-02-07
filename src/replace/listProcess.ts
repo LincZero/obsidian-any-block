@@ -150,35 +150,53 @@ export default class ListProcess{
     }[] = []
 
     const list_text = text.split("\n")
-    const list_prev_header:number[] = []
-    let mul_line:string[] = []    // 多行内容，一起放入一个层级
+    let mul_mode:string = ""      // 多行模式，para或list或title或空
     for (let line of list_text) {
-      const matchs = line.match(ABReg.reg_heading)
-      if (matchs){                          // 标题层级
-        if (mul_line.length>0){
-          list_itemInfo.push({
-            content: mul_line.join("\n"),
-            level: 10
-          })
-          mul_line = []
-        }
-        list_prev_header.push(matchs[1].length)
+      const match_heading = line.match(ABReg.reg_heading)
+      const match_list = line.match(ABReg.reg_list2)
+      if (match_heading){                                     // 1. 标题层级
+        removeTailBlank()
         list_itemInfo.push({
-          content: matchs[2],
-          level: matchs[1].length
+          content: match_heading[2],
+          level: match_heading[1].length-10
         })
+        mul_mode = "title"
       }
-      else {                                // 非标题层级
-        mul_line.push(line)
+      else if (match_list){                                   // 2. 列表层级
+        removeTailBlank()
+        list_itemInfo.push({
+          content: match_list[2],
+          level: match_list[1].length+1//+10
+        })
+        mul_mode = "list"
+      }
+      else if (/^\S/.test(line) && mul_mode=="list"){         // 3. 带缩进且在列表层级中
+        list_itemInfo[list_itemInfo.length-1].content = list_itemInfo[list_itemInfo.length-1].content+"\n"+line
+      }
+      else {                                                  // 4. 正文层级
+        if (mul_mode=="para") {
+          list_itemInfo[list_itemInfo.length-1].content = list_itemInfo[list_itemInfo.length-1].content+"\n"+line
+        }
+        else if(/^\s*$/.test(line)){
+          continue
+        }
+        else{
+          list_itemInfo.push({
+            content: line,
+            level: 0//+10
+          })
+          mul_mode = "para"
+        }
       }
     }
-    if (mul_line.length){                   // 循环尾判断
-      list_itemInfo.push({
-        content: mul_line.join("\n"),
-        level: 10
-      })
-    }
+    removeTailBlank()
     return list_itemInfo
+
+    function removeTailBlank(){
+      if (mul_mode=="para"||mul_mode=="list"){
+        list_itemInfo[list_itemInfo.length-1].content = list_itemInfo[list_itemInfo.length-1].content.replace(/\s*$/, "")
+      }
+    }
   }
 
   // 这种类型的列表只有两层

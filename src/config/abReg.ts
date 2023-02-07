@@ -5,6 +5,7 @@ export const ABReg = {
   reg_front: /^{\[.*?\]/,
   reg_end: /^}./,
   reg_list: /^\s*-\s(.*)/, //: /^\s*(>\s)*-\s(.*)$/
+  reg_list2: /^(\s*)-\s(.*)/,
   reg_code: /^\s*(```|~~~)(.*)/, //: /^\s*(>\s|-\s)*(```|~~~)(.*)$/
   reg_quote: /^\s*>\s(.*)/,  // `- > ` 不匹配，要认为这种是列表
   reg_heading: /^(\#+)\s(.*)/,
