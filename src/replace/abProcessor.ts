@@ -252,7 +252,7 @@ registerABProcessor({
   name: "标题到列表",
   is_render: false,
   process: (el, header, content)=>{
-    ListProcess.title2list(content, el)
+    content = ListProcess.title2list(content, el)
     return content
   }
 })
@@ -397,7 +397,8 @@ registerABProcessor({
   process: (el, header, content)=>{
     el.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
     // 文本元素。pre不好用，这里还是得用<br>换行最好
-    el.innerHTML = `<p>${content.split("\n").join("<br/>")}</p>`
+    // `<p>${content.split("\n").map(line=>{return "<span>"+line+"</span>"}).join("<br/>")}</p>`
+    el.innerHTML = `<p>${content.replace(/ /g, "&nbsp;").split("\n").join("<br/>")}</p>`
     return el
   }
 })
@@ -425,11 +426,12 @@ function text_Xquote(content:string): string{
   }).join("\n")
 }
 
+// （第一行不加入代码符） @todo
 function text_code(content:string): string{
-  return "```"+content+"\n```"
+  return "```\n"+content+"\n```"
 }
 
-// （仅去除第一组）
+// （仅去除第一组，且会去掉代码符，后续更新加入可以保留代码符的选项）
 function text_Xcode(content:string): string{
   let list_content = content.split("\n")
   let code_flag = ""

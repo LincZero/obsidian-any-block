@@ -8,18 +8,21 @@ export default class ListProcess{
   /** title转列表 */
   static title2list(text: string, div: HTMLDivElement, modeMD=false) {
     let list_itemInfo = this.title2data(text)
+    list_itemInfo = this.data2strict(list_itemInfo)
     return this.data2list(list_itemInfo, div)
   }
 
   /** title转表格 */
   static title2table(text: string, div: HTMLDivElement, modeMD=false) {
     let list_itemInfo = this.title2data(text)
+    list_itemInfo = this.data2strict(list_itemInfo)
     return this.data2table(list_itemInfo, div, true)
   }
 
   /** title转脑图 */
    static title2mindmap(text: string, div: HTMLDivElement, modeMD=false) {
     let list_itemInfo = this.title2data(text)
+    list_itemInfo = this.data2strict(list_itemInfo)
     return this.data2mindmap(list_itemInfo, div)
   }
 
@@ -152,7 +155,7 @@ export default class ListProcess{
     for (let line of list_text) {
       const matchs = line.match(ABReg.reg_heading)
       if (matchs){                          // 标题层级
-        if (mul_line.length){
+        if (mul_line.length>0){
           list_itemInfo.push({
             content: mul_line.join("\n"),
             level: 10
@@ -277,6 +280,45 @@ export default class ListProcess{
     return list_itemInfo
   }
 
+  /** 列表数据严格化 */
+  private static data2strict(
+    list_itemInfo: {
+      content: string;
+      level: number;
+    }[]
+  ){
+    let list_prev_level:number[] = [-999]
+    let list_itemInfo2:{content:string, level:number}[] = []
+    for (let itemInfo of list_itemInfo){
+      // 找到在list_prev_level的位置，用new_level保存
+      let new_level = 0
+      for (let i=0; i<list_prev_level.length; i++){
+        if (list_prev_level[i]<itemInfo.level) continue // 右移
+        else if(list_prev_level[i]==itemInfo.level){    // 停止并剔除旧的右侧数据
+          list_prev_level=list_prev_level.slice(0,i+1)
+          new_level = i
+          break
+        }
+        else {                                          // 在两个之间，则将该等级视为右侧的那个，且剔除旧的右侧数据
+          list_prev_level=list_prev_level.slice(0,i)
+          list_prev_level.push(itemInfo.level)
+          new_level = i
+          break
+        }
+      }
+      if (new_level == 0) { // 循环尾调用
+        list_prev_level.push(itemInfo.level)
+        new_level = list_prev_level.length-1
+      }
+      // 更新列表数据。这里需要深拷贝而非直接修改原数组，方便调试和避免错误
+      list_itemInfo2.push({
+        content: itemInfo.content,
+        level: (new_level-1)*2 // 记得要算等级要减去序列为0这个占位元素
+      })
+    }
+    return list_itemInfo2
+  }
+
   /** 列表数据转表格 */
   private static data2table(
     list_itemInfo: {
@@ -382,7 +424,6 @@ export default class ListProcess{
       }
     }
     const newcontent = list_newcontent.join("\n")
-    console.log("title2list", list_itemInfo, list_newcontent, newcontent)
     return newcontent
   }
 
