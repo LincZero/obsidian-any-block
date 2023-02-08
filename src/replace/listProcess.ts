@@ -360,7 +360,7 @@ export default class ListProcess{
         if (list_itemInfo[j].level > row_level){                  // 在右侧，不换行
           row_level = list_itemInfo[j].level
         }
-        else if (list_itemInfo[j].level > list_itemInfo[i].level){ // 换行但是不换item项的行
+        else if (list_itemInfo[j].level > list_itemInfo[i].level){// 换行但是不换item项的行
           row_level = list_itemInfo[j].level
           tableRow++
         }
@@ -412,9 +412,9 @@ export default class ListProcess{
         }
         else{           // 非md版
           tr.createEl(is_head?"th":"td", {
-            text: item.content, 
+            // text: item.content, //.replace("\n","<br/>"),
             attr:{"rowspan": item.tableRow}
-          })
+          }).innerHTML = item.content.replace(/\n/g,"<br/>")
         }
       }
     }

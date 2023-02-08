@@ -1,5 +1,6 @@
 import {App, PluginSettingTab, Setting} from "obsidian"
 import AnyBlockPlugin from "../main"
+import {generateInfoTable} from "src/replace/abProcessor"
 
 /** 设置值接口 */
 export interface ABSettingInterface {
@@ -237,5 +238,8 @@ export class ABSettingTab extends PluginSettingTab {
           .onChange(value=>{this.plugin.settings.is_neg_level = value})
       )
       .setDisabled(true)
+
+    containerEl.createEl('h1', {text: '查看所有注册指令'});
+    generateInfoTable(containerEl)
 	}
 }

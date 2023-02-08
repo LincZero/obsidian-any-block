@@ -14,38 +14,6 @@ export const mermaid_init = async () => {
   await initialize;
 };
 
-/*export const list_option = {
-  "other": "其他格式",
-  "list2table": "表格",
-  "list2mdtable": "表格(md)",
-  "list2lt": "列表格",
-  "list2mdlt": "列表格(md)",
-  "list2ut": "ul表格",
-  "list2mdut": "ul表格(md)",
-  "list2mermaid": "流程图",
-  "md": "原格式",
-  "text": "纯文本",
-  "Xcode": "消除代码块",
-  "Xquote": "消除引用块",
-  "code": "代码块",
-  "quote": "引用块",
-}*/
-
-// 可以从设置中刷新，然后看到内部加外部所有的注册项
-// id
-// name
-// detail?: 简单效果描述
-// match: Reg|string（string区分大小写）
-// is_render
-//
-// 非手写项：
-// ~~is_inner：这个不可设置，用来区分是内部还是外部给的~~
-// from: 自带、其他插件、面板设置，如果是其他插件，则需要提供插件的名称（不知道能不能自动识别）
-// is_enable: 加载后能禁用这个项
-
-
-
-
 /** 自动寻找相匹配的ab处理器进行处理
  * ab处理器能根据header和content来转化文本或生成dom元素
  */
@@ -72,6 +40,7 @@ export function autoABProcessor(el:HTMLDivElement, header:string, content:string
   }
   return result
 }
+
 /** 获取id-name对，以创建下拉框
  * 注意如果有正则的话，不能给
  */
@@ -85,6 +54,38 @@ export function getProcessorOptions(){
   })
 }
 
+/** */
+export function generateInfoTable(el: HTMLElement){
+  const table_p = el.createEl("div",{
+    cls: ["ab-setting","md-table-fig"],
+    attr: {"style": "overflow-x:scroll; transform:scaleY(-1)"}
+  })
+  const table = table_p.createEl("table",{
+    cls: ["ab-setting","setting-table"],
+    attr: {"style": "overflow-x:scroll; transform:scaleY(-1); white-space: nowrap"}
+  })
+  {
+    const thead = table.createEl("thead")
+    const tr = thead.createEl("tr")
+    tr.createEl("td", {text: "处理器名"})
+    tr.createEl("td", {text: "下拉框默认项"})
+    tr.createEl("td", {text: "用途描述"})
+    tr.createEl("td", {text: "处理器类型"})
+    tr.createEl("td", {text: "是否启用"})
+    tr.createEl("td", {text: "正则"})
+  }
+  const tbody = table.createEl("tbody")
+  for (let item of list_abProcessor){
+    const tr = tbody.createEl("tr")
+    tr.createEl("td", {text: item.name})
+    tr.createEl("td", {text: String(item.default)})
+    tr.createEl("td", {text: item.detail, attr:{"style":"max-width:240px;overflow-x:auto"}})
+    tr.createEl("td", {text: item.is_render?"渲染":"文本"})
+    tr.createEl("td", {text: item.is_disable?"禁用":"启用"})
+    tr.createEl("td", {text: String(item.match)})
+  }
+}
+
 /** 注册ab处理器。
  * 不允许直接写严格版的，有些参数不能让用户填
  */
@@ -93,7 +94,7 @@ function registerABProcessor(sim: ABProcessorSpecSimp){
     id: sim.id,
     name: sim.name,
     match: sim.match??sim.id,
-    default: sim.default??typeof(sim.match)=="string"?sim.id:null,
+    default: sim.default??(!sim.match||typeof(sim.match)=="string")?sim.id:null,
     detail: sim.detail??"",
     is_render: sim.is_render??true,
     process: sim.process,
@@ -124,6 +125,10 @@ interface ABProcessorSpec{
   is_render: boolean
   process: (el:HTMLDivElement, header:string, content:string)=> HTMLElement|string
   is_disable: boolean   // 是否禁用，默认false
+  // 非注册项：
+  // ~~is_inner：这个不可设置，用来区分是内部还是外部给的~~
+  // from: 自带、其他插件、面板设置，如果是其他插件，则需要提供插件的名称（不知道能不能自动识别）
+  // is_enable: 加载后能禁用这个项
 }
 
 registerABProcessor({
@@ -174,6 +179,7 @@ registerABProcessor({
   name: "增加代码块",
   match: /^code(\((.*)\))?$/,
   default: "code()",
+  detail: "不加`()`表示用原文本的第一行作为代码类型，括号类型为空表示代码类型为空",
   is_render: false,
   process: (el, header, content)=>{
     let matchs = content.match(/^code(\((.*)\))?$/)
@@ -197,6 +203,7 @@ registerABProcessor({
   name: "去除代码块",
   match: /^Xcode(\((true|false)\))?$/,
   default: "Xcode(true)",
+  detail: "参数为是否移除代码类型，默认为false。记法：code|Xcode或code()|Xcode(true)内容不变",
   is_render: false,
   process: (el, header, content)=>{
     let matchs = content.match(/^Xcode(\((true|false)\))?$/)
@@ -243,6 +250,7 @@ registerABProcessor({
   id: "slice",
   name: "切片",
   match: /^slice\((\s*\d+\s*)(,\s*-?\d+\s*)?\)$/,
+  detail: "和js的slice方法是一样的",
   is_render: false,
   process: (el, header, content)=>{
     // slice好像不怕溢出或交错，会自动变空数组。就很省心，不用判断太多的东西
@@ -266,6 +274,7 @@ registerABProcessor({
   id: "title2list",
   name: "标题到列表",
   is_render: false,
+  detail: "也可以当作是更强大的列表解析器",
   process: (el, header, content)=>{
     content = ListProcess.title2list(content, el)
     return content
@@ -385,6 +394,7 @@ registerABProcessor({
   name: "callout语法糖",
   match: /^\!/,
   default: "!note",
+  detail: "需要obsidian 0.14版本以上来支持callout语法",
   process: (el, header, content)=>{
     const child = new MarkdownRenderChild(el);
     const text = "```ad-"+header.slice(1)+"\n"+content+"\n```"
@@ -398,6 +408,7 @@ registerABProcessor({
   name: "新mermaid",
   match: /^mermaid(\((.*)\))?$/,
   default: "mermaid(graph TB)",
+  detail: "由于需要兼容脑图，这里会使用插件内置的最新版mermaid",
   process: (el, header, content)=>{
     let matchs = content.match(/^mermaid(\((.*)\))?$/)
     if (!matchs) return el
@@ -416,6 +427,7 @@ registerABProcessor({
 registerABProcessor({
   id: "text",
   name: "纯文本",
+  detail: "其实一般会更推荐用code()代替，那个更精确",
   process: (el, header, content)=>{
     el.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
     // 文本元素。pre不好用，这里还是得用<br>换行最好
