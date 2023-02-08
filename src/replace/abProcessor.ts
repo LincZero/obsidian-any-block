@@ -50,7 +50,7 @@ export function getProcessorOptions(){
     return item.default
   })
   .map(item=>{
-    return {id:item.id, name:item.default}
+    return {id:item.default, name:item.name}
   })
 }
 
@@ -238,9 +238,15 @@ registerABProcessor({
 registerABProcessor({
   id: "quote2code",
   name: "引用转代码块",
+  match: /^quote2code(\((.*)\))?$/,
+  default: "quote2code()",
   is_render: false,
   process: (el, header, content)=>{
+    let matchs = header.match(/^quote2code(\((.*)\))?$/)
+    if (!matchs) return content
+
     content = text_Xquote(content)
+    if (matchs[1]) content = matchs[2]+"\n"+content
     content = text_code(content)
     return content
   }
@@ -284,20 +290,20 @@ registerABProcessor({
 registerABProcessor({
   id: "title2table",
   name: "标题到表格",
-  is_render: false,
   process: (el, header, content)=>{
-    ListProcess.title2table(content, el)
-    return content
+    content = ListProcess.title2list(content, el)
+    ListProcess.list2table(content, el)
+    return el
   }
 })
 
 registerABProcessor({
   id: "title2mindmap",
   name: "标题到脑图",
-  is_render: false,
   process: (el, header, content)=>{
-    ListProcess.title2mindmap(content, el)
-    return content
+    content = ListProcess.title2list(content, el)
+    ListProcess.list2mindmap(content, el)
+    return el
   }
 })
 

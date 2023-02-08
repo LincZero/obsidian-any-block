@@ -12,20 +12,6 @@ export default class ListProcess{
     return this.data2list(list_itemInfo, div)
   }
 
-  /** title转表格 */
-  static title2table(text: string, div: HTMLDivElement, modeMD=false) {
-    let list_itemInfo = this.title2data(text)
-    list_itemInfo = this.data2strict(list_itemInfo)
-    return this.data2table(list_itemInfo, div, true)
-  }
-
-  /** title转脑图 */
-   static title2mindmap(text: string, div: HTMLDivElement, modeMD=false) {
-    let list_itemInfo = this.title2data(text)
-    list_itemInfo = this.data2strict(list_itemInfo)
-    return this.data2mindmap(list_itemInfo, div)
-  }
-
   /** 列表转表格
    * @param modeMD: md（使用md嵌套功能）功耗可能较大
    */
@@ -446,7 +432,9 @@ export default class ListProcess{
   }
 
   /** 列表数据转mermaid流程图
-   * ~~@bug 旧版bug（未内置mermaid）会闪一下~~ */
+   * ~~@bug 旧版bug（未内置mermaid）会闪一下~~ 
+   * 然后注意一下mermaid的(项)不能有空格，或非法字符。空格我处理掉了，字符我先不管
+   */
   private static data2mermaid(
     list_itemInfo: {
       content: string;
@@ -462,19 +450,19 @@ export default class ListProcess{
     let prev_level = 999
     for (let i=0; i<list_itemInfo.length; i++){
       if (list_itemInfo[i].level>prev_level){ // 向右正常加箭头
-        prev_line_content = prev_line_content+" --> "+list_itemInfo[i].content
+        prev_line_content = prev_line_content+" --> "+list_itemInfo[i].content.replace(/ /g, "_")
       } else {                                // 换行，并……
         list_line_content.push(prev_line_content)
         prev_line_content = ""
 
         for (let j=i; j>=0; j--){             // 回退到上一个比自己大的
           if(list_itemInfo[j].level<list_itemInfo[i].level) {
-            prev_line_content = list_itemInfo[j].content
+            prev_line_content = list_itemInfo[j].content.replace(/ /g, "_")
             break
           }
         }
         if (prev_line_content) prev_line_content=prev_line_content+" --> "  // 如果有比自己大的
-        prev_line_content=prev_line_content+list_itemInfo[i].content
+        prev_line_content=prev_line_content+list_itemInfo[i].content.replace(/ /g, "_")
       }
       prev_level = list_itemInfo[i].level
     }
