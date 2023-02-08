@@ -324,6 +324,15 @@ registerABProcessor({
 })
 
 registerABProcessor({
+  id: "listXinline",
+  name: "列表消除内联换行",
+  is_render: false,
+  process: (el, header, content)=>{
+    return ListProcess.listXinline(content)
+  }
+})
+
+registerABProcessor({
   id: "list2table",
   name: "列表转表格",
   process: (el, header, content)=>{

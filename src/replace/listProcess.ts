@@ -9,7 +9,7 @@ export default class ListProcess{
   static title2list(text: string, div: HTMLDivElement, modeMD=false) {
     let list_itemInfo = this.title2data(text)
     list_itemInfo = this.data2strict(list_itemInfo)
-    return this.data2list(list_itemInfo, div)
+    return this.data2list(list_itemInfo)
   }
 
   /** 列表转表格
@@ -23,7 +23,7 @@ export default class ListProcess{
   /** 列表转列表 */
   /*static list2l(text: string, div: HTMLDivElement) {
     let list_itemInfo = this.list2data(text, true)
-    return this.data2list(list_itemInfo, div)
+    return this.data2list(list_itemInfo)
   }*/
 
   /** 列表转列表格 */
@@ -34,8 +34,14 @@ export default class ListProcess{
 
   /** 列表转二维表格 */
   static list2ut(text: string, div: HTMLDivElement, modeMD=false) {
-    let list_itemInfo = this.ulist2data(text)
+    //【old】
+    let list_itemInfo = this.old_ulist2data(text)
     return this.data2table(list_itemInfo, div, modeMD)
+    //【new】
+    /* let data = this.list2data(text)
+    data = this.data_mullevel2twolevel(data)
+    data = this.data_twolevel2onebrach(data)
+    return this.data2table(data, div, modeMD)*/
   }
 
   /** 列表转mermaid流程图 */
@@ -50,11 +56,17 @@ export default class ListProcess{
     return this.data2mindmap(list_itemInfo, div)
   }
 
+  /** 去除列表的inline */
+  static listXinline(text: string){
+    const data = this.list2data(text)
+    return this.data2list(data)
+  }
+
   /** 列表文本转列表数据 
    *  @bug 不能跨缩进，后面再对异常缩进进行修复
    *  @bug 内换行` | `可能有bug
    *  @param modeT: 保留缩进模式
-   *  @param modeG: 识别符号 ` | `（该选项暂时不可用，强制为true）
+   *  @param modeG: 识别符号 ` | `（该选项暂时不可用，0为不识别，1为识别为下一级，2为识别为同一级，转ultable时会用到选项2）
    */
   private static list2data(text: string, modeT=false, modeG=true){
     if (modeT) return this.ullist2data(text)
@@ -186,7 +198,7 @@ export default class ListProcess{
   }
 
   // 这种类型的列表只有两层
-  private static ulist2data(text: string){
+  private static old_ulist2data(text: string){
     // 列表文本转列表数据
     let list_itemInfo:{
       content:string,
@@ -323,6 +335,72 @@ export default class ListProcess{
     return list_itemInfo2
   }
 
+  /** 多层树转二层树 */
+  private static data_mullevel2twolevel(
+    list_itemInfo: {
+      content: string;
+      level: number;
+    }[]
+  ){
+    let list_itemInfo2: {content: string;level: number;}[] = []
+    let level1 = -1
+    let level2 = -1
+    for (let itemInfo of list_itemInfo) {
+      let this_level: number                                      // 一共三种可能：1、2、3，3表示其他level
+      if (level1<0) {level1=itemInfo.level; this_level = 1}       // 未配置level1
+      else if (level1>=itemInfo.level) this_level = 1             // 是level1
+      else if (level2<0) {level2=itemInfo.level; this_level = 2}  // 未配置level2
+      else if (level2>=itemInfo.level) this_level = 2             // 是level2
+      else { // (level2<itemInfo.level)                           // 是level3，进行内换行，并把列表符和缩进给加回去？
+        let old_itemInfo = list_itemInfo2.pop()
+        if(old_itemInfo){
+          let new_content = "- "+itemInfo.content.trim()
+          for (let i=0; i<(itemInfo.level-level2); i++) new_content = " "+new_content;
+          new_content = old_itemInfo.content+"\n"+new_content
+          list_itemInfo2.push({
+            content: new_content,
+            level: itemInfo.level
+          })
+        }
+        continue
+      }
+      list_itemInfo2.push({
+        content: itemInfo.content.trim(),
+        level: this_level
+      })
+    }
+    return list_itemInfo2
+  }
+
+  /** 二层树转一叉树 */
+  private static data_twolevel2onebrach(
+    list_itemInfo: {
+      content: string;
+      level: number;
+    }[]
+  ){
+    let list_itemInfo2:{content: string;level: number;}[] = []
+    let count_level_2 = 0
+    for (let item of list_itemInfo){
+      if (item.level==2){
+        // item.level += count_level_2
+        list_itemInfo2.push({
+          content: item.content,
+          level: item.level+count_level_2
+        })
+        count_level_2++
+      }
+      else {
+        list_itemInfo2.push({
+          content: item.content,
+          level: item.level
+        })
+        count_level_2 = 0
+      }
+    }
+    return list_itemInfo2
+  }
+
   /** 列表数据转表格 */
   private static data2table(
     list_itemInfo: {
@@ -407,13 +485,14 @@ export default class ListProcess{
     return div
   }
 
-  /** 列表数据转列表（看起来脱屁股放屁，但有时调试会需要） */
+  /** 列表数据转列表（看起来脱屁股放屁，但有时调试会需要）
+   * 另外还有个妙用：list2data + data2list = listXinline
+   */
   private static data2list(
     list_itemInfo: {
       content: string;
       level: number;
-    }[], 
-    div: HTMLDivElement
+    }[]
   ){
     let list_newcontent:string[] = []
     // 每一个level里的content处理
@@ -500,5 +579,6 @@ export default class ListProcess{
     mermaid.mermaidAPI.renderAsync("ab-mermaid-"+getID(), newcontent, (svgCode:string)=>{
       div.innerHTML = svgCode
     })
+    return div
   }
 }
