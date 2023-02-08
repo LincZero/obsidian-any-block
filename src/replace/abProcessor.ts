@@ -182,7 +182,7 @@ registerABProcessor({
   detail: "不加`()`表示用原文本的第一行作为代码类型，括号类型为空表示代码类型为空",
   is_render: false,
   process: (el, header, content)=>{
-    let matchs = content.match(/^code(\((.*)\))?$/)
+    let matchs = header.match(/^code(\((.*)\))?$/)
     if (!matchs) return content
     if (matchs[1]) content = matchs[2]+"\n"+content
     return text_code(content)
@@ -206,7 +206,7 @@ registerABProcessor({
   detail: "参数为是否移除代码类型，默认为false。记法：code|Xcode或code()|Xcode(true)内容不变",
   is_render: false,
   process: (el, header, content)=>{
-    let matchs = content.match(/^Xcode(\((true|false)\))?$/)
+    let matchs = header.match(/^Xcode(\((true|false)\))?$/)
     if (!matchs) return content
     let remove_flag:boolean
     if (matchs[1]=="") remove_flag=false
