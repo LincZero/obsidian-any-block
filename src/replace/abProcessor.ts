@@ -335,17 +335,12 @@ registerABProcessor({
 registerABProcessor({
   id: "list2table",
   name: "列表转表格",
+  match: /list2(md)?table(T)?/,
+  default: "list2table",
   process: (el, header, content)=>{
-    ListProcess.list2table(content, el, false)
-    return el
-  }
-})
-
-registerABProcessor({
-  id: "list2mdtable",
-  name: "列表转表格(md)",
-  process: (el, header, content)=>{
-    ListProcess.list2table(content, el, true)
+    const matchs = header.match(/list2(md)?table(T)?/)
+    if (!matchs) return el
+    ListProcess.list2table(content, el, matchs[1]=="md", matchs[2]=="T")
     return el
   }
 })
@@ -353,17 +348,12 @@ registerABProcessor({
 registerABProcessor({
   id: "list2lt",
   name: "列表转列表表格",
+  match: /list2(md)?lt(T)?/,
+  default: "list2lt",
   process: (el, header, content)=>{
-    ListProcess.list2lt(content, el, false)
-    return el
-  }
-})
-
-registerABProcessor({
-  id: "list2mdlt",
-  name: "列表转列表表格(md)",
-  process: (el, header, content)=>{
-    ListProcess.list2lt(content, el, true)
+    const matchs = header.match(/list2(md)?lt(T)?/)
+    if (!matchs) return el
+    ListProcess.list2lt(content, el, matchs[1]=="md", matchs[2]=="T")
     return el
   }
 })
@@ -371,17 +361,11 @@ registerABProcessor({
 registerABProcessor({
   id: "list2ut",
   name: "列表转二维表格",
+  match: /list2(md)?ut(T)?/,
   process: (el, header, content)=>{
-    ListProcess.list2ut(content, el, false)
-    return el
-  }
-})
-
-registerABProcessor({
-  id: "list2mdut",
-  name: "列表转二维表格(md)",
-  process: (el, header, content)=>{
-    ListProcess.list2ut(content, el, true)
+    const matchs = header.match(/list2(md)?ut(T)?/)
+    if (!matchs) return el
+    ListProcess.list2ut(content, el, matchs[1]=="md", matchs[2]=="T")
     return el
   }
 })

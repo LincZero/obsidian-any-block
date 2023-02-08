@@ -15,9 +15,9 @@ export default class ListProcess{
   /** 列表转表格
    * @param modeMD: md（使用md嵌套功能）功耗可能较大
    */
-  static list2table(text: string, div: HTMLDivElement, modeMD=false) {
+  static list2table(text: string, div: HTMLDivElement, modeMD=false, modeT=false) {
     let list_itemInfo = this.list2data(text)
-    return this.data2table(list_itemInfo, div, modeMD)
+    return this.data2table(list_itemInfo, div, modeMD, modeT)
   }
 
   /** 列表转列表 */
@@ -27,21 +27,21 @@ export default class ListProcess{
   }*/
 
   /** 列表转列表格 */
-  static list2lt(text: string, div: HTMLDivElement, modeMD=false) {
+  static list2lt(text: string, div: HTMLDivElement, modeMD=false, modeT=false) {
     let list_itemInfo = this.list2data(text, true)
-    return this.data2table(list_itemInfo, div, modeMD)
+    return this.data2table(list_itemInfo, div, modeMD, modeT)
   }
 
   /** 列表转二维表格 */
-  static list2ut(text: string, div: HTMLDivElement, modeMD=false) {
+  static list2ut(text: string, div: HTMLDivElement, modeMD=false, modeT=false) {
     //【old】
-    let list_itemInfo = this.old_ulist2data(text)
-    return this.data2table(list_itemInfo, div, modeMD)
+    /*let list_itemInfo = this.old_ulist2data(text)
+    return this.data2table(list_itemInfo, div, modeMD)*/
     //【new】
-    /* let data = this.list2data(text)
-    data = this.data_mullevel2twolevel(data)
-    data = this.data_twolevel2onebrach(data)
-    return this.data2table(data, div, modeMD)*/
+    let data = this.list2data(text)
+    data = this.data_mL_2_2L(data)
+    data = this.data_2L_2_mL1B(data)
+    return this.data2table(data, div, modeMD, modeT)
   }
 
   /** 列表转mermaid流程图 */
@@ -336,7 +336,7 @@ export default class ListProcess{
   }
 
   /** 多层树转二层树 */
-  private static data_mullevel2twolevel(
+  private static data_mL_2_2L(
     list_itemInfo: {
       content: string;
       level: number;
@@ -359,7 +359,7 @@ export default class ListProcess{
           new_content = old_itemInfo.content+"\n"+new_content
           list_itemInfo2.push({
             content: new_content,
-            level: itemInfo.level
+            level: old_itemInfo.level
           })
         }
         continue
@@ -372,8 +372,8 @@ export default class ListProcess{
     return list_itemInfo2
   }
 
-  /** 二层树转一叉树 */
-  private static data_twolevel2onebrach(
+  /** 二层树转多层一叉树 */
+  private static data_2L_2_mL1B(
     list_itemInfo: {
       content: string;
       level: number;
@@ -401,6 +401,21 @@ export default class ListProcess{
     return list_itemInfo2
   }
 
+  /** 多层树转二层一叉树 */
+  private static data_mL_2_2L1B(
+    list_itemInfo: {
+      content: string;
+      level: number;
+    }[]
+  ){
+    let list_itemInfo2:{content: string;level: number;}[] = []
+    for (let item of list_itemInfo){
+      
+
+    }
+    return list_itemInfo2
+  }
+
   /** 列表数据转表格 */
   private static data2table(
     list_itemInfo: {
@@ -409,6 +424,7 @@ export default class ListProcess{
     }[], 
     div: HTMLDivElement,
     modeMD: boolean,
+    modeT: boolean        // 是否转置
   ){
     // 组装成表格数据 (列表是深度优先)
     let list_itemInfo2 = []
@@ -448,6 +464,7 @@ export default class ListProcess{
 
     // 表格数据 组装成表格
     div = div.createEl("table")
+    if (modeT) div.setAttribute("modeT", "true")
     let thead
     if(list_itemInfo2[0].content.indexOf("< ")==0){ // 判断是否有表头
       thead = div.createEl("thead")

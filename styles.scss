@@ -11,6 +11,11 @@
   .ab-note.drop-shadow{
     position: relative;
     /*padding: 24px 12px 12px 12px;*/
+
+    table[modeT="true"]{  // 表格转置
+      tr { display: block; float: left; }
+      th, td { display: block; }
+    }
   }
 
   .ab-button{
