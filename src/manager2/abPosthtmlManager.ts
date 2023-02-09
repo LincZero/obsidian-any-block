@@ -184,7 +184,7 @@ function global_selector(
         cEl.setAttribute("style", "display: none")
         continue
       }
-      if (match[1].length > prev_heading_level){
+      if (match[1].length >= prev_heading_level){  // 【改】可选同级
         cEl.setAttribute("style", "display: none")
         continue
       }

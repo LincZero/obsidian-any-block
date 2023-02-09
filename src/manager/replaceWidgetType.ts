@@ -39,7 +39,7 @@ export class ABReplaceWidget extends WidgetType {
       dom_edit.innerHTML = ABReplaceWidget.str_icon_code2
     
       // 通过控制光标移动间接取消显示块
-      this.div.ondblclick = ()=>{this.moveCursorToHead()}
+      // this.div.ondblclick = ()=>{this.moveCursorToHead()}
       dom_edit.onclick = ()=>{this.moveCursorToHead()}
     }
     

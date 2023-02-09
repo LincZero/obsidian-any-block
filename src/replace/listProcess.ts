@@ -29,7 +29,7 @@ export default class ListProcess{
   /** 列表转列表格 */
   static list2lt(text: string, div: HTMLDivElement, modeMD=false, modeT=false) {
     let list_itemInfo = this.list2data(text, true)
-    return this.data2table(list_itemInfo, div, modeMD, modeT)
+    return this.uldata2ultable(list_itemInfo, div, modeMD, modeT)
   }
 
   /** 列表转二维表格 */
@@ -271,8 +271,13 @@ export default class ListProcess{
     return list_itemInfo
   }
 
+  /** 列表文本转列表表格数据
+   * 只能通过“|”符号实现跨列
+   * 所以这种是没有合并单元格
+   * 
+   * 第一列的level总为0
+   */
   private static ullist2data(text: string){
-    // 列表文本转列表数据
     let list_itemInfo:{content:string,level:number}[] = []
     
     const list_text = text.split("\n")
@@ -283,7 +288,7 @@ export default class ListProcess{
                                                                               // 保留缩进（列表格）
         for (let inline_i=0; inline_i<list_inline.length; inline_i++){
           if(inline_i==0) {                                                   // level为内联缩进
-            for (let i=0; i<level_inline; i++) list_inline[inline_i] = "____" + list_inline[inline_i]
+            for (let i=0; i<level_inline; i++) list_inline[inline_i] = "&nbsp;&nbsp;" + list_inline[inline_i]
             list_itemInfo.push({
               content: list_inline[inline_i],
               level: 0
@@ -570,6 +575,7 @@ export default class ListProcess{
       }
 
       // 获取所在行数。分换行（创建新行）和不换行，第一行总是创建新行
+      // 这里的if表示该换行了
       if (item.level <= prev_level) {
         prev_line++
       }
@@ -621,6 +627,126 @@ export default class ListProcess{
         }
       }
     }
+    return div
+  }
+
+  /** 列表格数据转列表格
+   * 注意传入的列表数据应该符合：
+   * 第一列等级为0、没有分叉
+   */
+  private static uldata2ultable(
+    list_itemInfo: {
+      content: string;
+      level: number;
+    }[], 
+    div: HTMLDivElement,
+    modeMD: boolean,
+    modeT: boolean
+  ){
+    let tr_line_level = [] // 表格行等级
+
+    // 组装成表格数据 (列表是深度优先)
+    let list_itemInfo2 = []
+    let prev_line = -1   // 并存储后一行的序列!
+    let prev_level = 999 // 上一行的等级
+    for (let i=0; i<list_itemInfo.length; i++){
+      let item = list_itemInfo[i]
+
+      // 获取所在行数。分换行（创建新行）和不换行，第一行总是创建新行
+      // 这里的if表示该换行了
+      if (item.level <= prev_level) {
+        prev_line++
+        if (item.level==0) {
+          const matchs = item.content.match(/^((&nbsp;)*)/)
+          if (!matchs) return div
+          if (!matchs[1]) tr_line_level.push(0)
+          else tr_line_level.push(Math.round(matchs[1].length/6))
+        }
+        else {
+          tr_line_level.push(0)
+          console.warn("数据错误：列表格中跨行数据")
+        }
+      }
+      prev_level = item.level
+
+      // 填写
+      list_itemInfo2.push({
+        content: item.content,  // 内容
+        level: item.level,      // 级别
+        tableRow: 1,            // 跨行数
+        tableLine: prev_line    // 对应首行序列
+      })
+    }
+
+    // 表格数据 组装成表格
+    const table = div.createEl("table")
+    if (modeT) table.setAttribute("modeT", "true")
+    let thead
+    if(list_itemInfo2[0].content.indexOf("< ")==0){ // 判断是否有表头
+      thead = table.createEl("thead")
+      list_itemInfo2[0].content=list_itemInfo2[0].content.replace(/^\<\s/,"")
+    }
+    const tbody = table.createEl("tbody")
+    for (let index_line=0; index_line<prev_line+1; index_line++){ // 遍历表格行，创建tr……
+      let is_head
+      let tr
+      if (index_line==0 && thead){ // 判断是否第一行&&是否有表头
+        tr = thead.createEl("tr", {
+          // attr: {"tr_level": tr_line_level[index_line]}
+        })
+        is_head = true
+      }
+      else{
+        is_head = false
+        tr = tbody.createEl("tr", {
+          cls: ["ab-flodable-tr"],
+          attr: {"tr_level": tr_line_level[index_line], "is_flod": "false"}
+        })
+      }
+      for (let item of list_itemInfo2){                           // 遍历表格列，创建td
+        if (item.tableLine!=index_line) continue
+        if (modeMD) {   // md版
+          let td = tr.createEl(is_head?"th":"td", {
+            attr:{"rowspan": item.tableRow}
+          })
+          const child = new MarkdownRenderChild(td);
+          MarkdownRenderer.renderMarkdown(item.content, td, "", child);
+        }
+        else{           // 非md版
+          tr.createEl(is_head?"th":"td", {
+            // text: item.content, //.replace("\n","<br/>"),
+            attr:{"rowspan": item.tableRow}
+          }).innerHTML = item.content.replace(/\n/g,"<br/>")
+        }
+      }
+    }
+
+    // 折叠列表格 事件绑定
+    const l_tr:NodeListOf<HTMLElement> = tbody.querySelectorAll("tr")
+    for (let i=0; i<l_tr.length; i++){
+      const tr = l_tr[i]
+      /*const tr_level = Number(tr.getAttribute("tr_level"))
+      if (isNaN(tr_level)) continue
+      const tr_isfold = tr.getAttribute("is_flod")
+      if (!tr_isfold) continue*/
+      tr.onclick = ()=>{
+        const tr_level = Number(tr.getAttribute("tr_level"))
+        if (isNaN(tr_level)) return
+        const tr_isfold = tr.getAttribute("is_flod")
+        if (!tr_isfold) return
+        let flag_do_fold = false  // 防止折叠最小层
+        for (let j=i+1; j<l_tr.length; j++){
+          const tr2 = l_tr[j]
+          const tr_level2 = Number(tr2.getAttribute("tr_level"))
+          if (isNaN(tr_level2)) break
+          if (tr_level2<=tr_level) break
+          tr2.setAttribute("style", "display:"+(tr_isfold=="true"?"block":"none"))
+          flag_do_fold = true
+        }
+        if (flag_do_fold) tr.setAttribute("is_flod", tr_isfold=="true"?"false":"true")
+      }
+    }
+
     return div
   }
 

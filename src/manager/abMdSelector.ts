@@ -337,7 +337,7 @@ class ABMdSelector_heading extends ABMdSelector{
       else {                                   // 选择结束标志
         const match_tmp = list_text[i].match(ABReg.reg_heading)
         if (!match_tmp) continue
-        if (match_tmp[1].length > prev_heading_level) continue
+        if (match_tmp[1].length >= prev_heading_level) continue // 【改】可选同级
         const from = this.map_line_ch[prev_from]
         const to = this.map_line_ch[i]-1  // 不包括这一行
         matchInfo.push({

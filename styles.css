@@ -35,6 +35,7 @@
 }
 
 .ab-note .ab-tab-root > ul {
+  height: 30px;
   margin-bottom: 6px;
 }
 
@@ -50,4 +51,8 @@
 
 .ab-note .ab-tab-root > div {
   clear: both;
+}
+
+.ab-note .ab-flodable-tr[is_flod="true"] {
+  color: royalblue;
 }

@@ -33,6 +33,7 @@
 
   .ab-tab-root{
     >ul {
+      height: 30px;;
       margin-bottom: 6px;
     }
     >ul li.ab-tab-tab {
@@ -48,5 +49,9 @@
     >div {
       clear: both;
     }
+  }
+
+  .ab-flodable-tr[is_flod="true"]{
+    color: royalblue
   }
 }
