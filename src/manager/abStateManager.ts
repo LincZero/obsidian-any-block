@@ -275,7 +275,7 @@ export class ABStateManager{
   }
 
   /** 防抖器（可复用） */
-  debouncedFn = this.debounce(this.refreshStrong2, 1000, false)
+  /*debouncedFn = this.debounce(this.refreshStrong2, 1000, false)
   private debounce(
     method:any,       // 防抖方法
     wait:number,      // 等待
@@ -322,11 +322,11 @@ export class ABStateManager{
     }
   
     // 在返回的debounced函数上添加取消方法
-    /*debounced.cancel = function() {
-      clearTimeout(timeout)
-      timeout = null
-    }*/
+    //debounced.cancel = function() {
+    //  clearTimeout(timeout)
+    //  timeout = null
+    //}
   
     return debounced
-  }
+  }*/
 }

@@ -757,7 +757,8 @@ export default class ListProcess{
           const tr_level2 = Number(tr2.getAttribute("tr_level"))
           if (isNaN(tr_level2)) break
           if (tr_level2<=tr_level) break
-          tr2.setAttribute("style", "display:"+(tr_isfold=="true"?"block":"none"))
+          // tr2.setAttribute("style", "display:"+(tr_isfold=="true"?"block":"none"))
+          tr_isfold=="true"?tr2.show():tr2.hide()
           flag_do_fold = true
         }
         if (flag_do_fold) tr.setAttribute("is_fold", tr_isfold=="true"?"false":"true")
