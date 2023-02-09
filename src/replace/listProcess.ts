@@ -44,6 +44,20 @@ export default class ListProcess{
     return this.data2table(data, div, modeMD, modeT)
   }
 
+  /** 一级列表转时间线 */
+  static list2timeline(text: string, div: HTMLDivElement, modeMD=false, modeT=false) {
+    let data = this.list2data(text)
+    data = this.data_mL_2_2L(data)
+    return this.data2table(data, div, modeMD, modeT)
+  }
+
+  /** 一级列表转标签栏 */
+  static list2tab(text: string, div: HTMLDivElement, modeMD=false, modeT=false) {
+    let data = this.list2data(text)
+    data = this.data_mL_2_2L1B(data)
+    return this.data2tab(data, div, modeMD, modeT)
+  }
+
   /** 列表转mermaid流程图 */
   static list2mermaid(text: string, div: HTMLDivElement) {
     let list_itemInfo = this.list2data(text)
@@ -335,7 +349,79 @@ export default class ListProcess{
     return list_itemInfo2
   }
 
-  /** 多层树转二层树 */
+  /** 多层树转二层一叉树
+   * example:
+   * - 1
+   *  - 2
+   *   - 3
+   *  - 2
+   * to:
+   * - 1
+   *  - 2\n   - 3\n  - 2
+   */
+  private static data_mL_2_2L1B(
+    list_itemInfo: {
+      content: string;
+      level: number;
+    }[]
+  ){
+    let list_itemInfo2: {content: string;level: number;}[] = []
+    let level1 = -1
+    let level2 = -1
+    let flag_leve2 = false  // 表示触发过level2，当遇到level1会重置
+    for (let itemInfo of list_itemInfo) {
+      if (level1<0) {                                             // 未配置level1
+        level1=0//itemInfo.level;
+      }
+      if (level1>=itemInfo.level){                                // 是level1
+        list_itemInfo2.push({
+          content: itemInfo.content.trim(),
+          level: level1
+        })
+        flag_leve2 = false
+        continue
+      }
+      if (level2<0) {                                             // 未配置level2
+        level2=1//itemInfo.level;
+      }
+      if (true){                                                  // 是level2/level2+/level2-
+        if (!flag_leve2){                                           // 新建
+          list_itemInfo2.push({
+            content: itemInfo.content.trim(),
+            level: level2
+          })
+          flag_leve2 = true
+          continue
+        }
+        else {                                                      // 内换行
+          let old_itemInfo = list_itemInfo2.pop()
+          if(old_itemInfo){
+            let new_content = itemInfo.content.trim()
+            if (itemInfo.level>level2) new_content = "- "+new_content
+            for (let i=0; i<(itemInfo.level-level2); i++) new_content = " "+new_content;
+            new_content = old_itemInfo.content+"\n"+new_content
+            list_itemInfo2.push({
+              content: new_content,
+              level: level2
+            })
+          }
+        }
+      }
+    }
+    return list_itemInfo2
+  }
+
+  /** 多层树转二层树
+   * example:
+   * - 1
+   *  - 2
+   *   - 3
+   *  - 2
+   * to:
+   * - 1
+   *  - 2\n   - 3
+   *  - 2
+   */
   private static data_mL_2_2L(
     list_itemInfo: {
       content: string;
@@ -346,12 +432,53 @@ export default class ListProcess{
     let level1 = -1
     let level2 = -1
     for (let itemInfo of list_itemInfo) {
-      let this_level: number                                      // 一共三种可能：1、2、3，3表示其他level
-      if (level1<0) {level1=itemInfo.level; this_level = 1}       // 未配置level1
-      else if (level1>=itemInfo.level) this_level = 1             // 是level1
-      else if (level2<0) {level2=itemInfo.level; this_level = 2}  // 未配置level2
-      else if (level2>=itemInfo.level) this_level = 2             // 是level2
-      else { // (level2<itemInfo.level)                           // 是level3，进行内换行，并把列表符和缩进给加回去？
+      if (level1<0) {                                             // 未配置level1
+        level1=0//itemInfo.level;
+      }
+      if (level1>=itemInfo.level){                                // 是level1
+        list_itemInfo2.push({
+          content: itemInfo.content.trim(),
+          level: level1
+        })
+        continue
+      }
+      if (level2<0) {                                             // 未配置level2
+        level2=1//itemInfo.level;
+      }
+      if (level2>=itemInfo.level){                                // 是level2/level2-
+        list_itemInfo2.push({
+          content: itemInfo.content.trim(),
+          level: level2
+        })
+        continue
+      }
+      else{                                                       // level2+，内换行                                                     // 
+        let old_itemInfo = list_itemInfo2.pop()
+        if(old_itemInfo){
+          let new_content = itemInfo.content.trim()
+          if (itemInfo.level>level2) new_content = "- "+new_content
+          for (let i=0; i<(itemInfo.level-level2); i++) new_content = " "+new_content;
+          new_content = old_itemInfo.content+"\n"+new_content
+          list_itemInfo2.push({
+            content: new_content,
+            level: level2
+          })
+        }
+      }
+    }
+    return list_itemInfo2
+
+    /*
+    let list_itemInfo2: {content: string;level: number;}[] = []
+    let level1 = -1
+    let level2 = -1
+    for (let itemInfo of list_itemInfo) {
+      let this_level: number                                      // 一共三种可能：0、1、(1+)表
+      if (level1<0) {level1=itemInfo.level; this_level = level1}  // 未配置level1
+      else if (level1>=itemInfo.level) this_level = level1        // 是level1
+      else if (level2<0) {level2=itemInfo.level; this_level = level2}  // 未配置level2
+      else if (level2>=itemInfo.level) this_level = level2             // 是level2
+      else { // (level2<itemInfo.level)                           // 依然是level2，但进行内换行，并把列表符和缩进给加回去
         let old_itemInfo = list_itemInfo2.pop()
         if(old_itemInfo){
           let new_content = "- "+itemInfo.content.trim()
@@ -359,20 +486,30 @@ export default class ListProcess{
           new_content = old_itemInfo.content+"\n"+new_content
           list_itemInfo2.push({
             content: new_content,
-            level: old_itemInfo.level
+            level: level2
           })
         }
         continue
       }
       list_itemInfo2.push({
         content: itemInfo.content.trim(),
-        level: this_level
+        level: level2
       })
     }
-    return list_itemInfo2
+    console.log("前后数据", list_itemInfo, list_itemInfo2)
+    return list_itemInfo2*/
   }
 
-  /** 二层树转多层一叉树 */
+  /** 二层树转多层一叉树 
+   * example:
+   * - 1
+   *  - 2
+   *  - 3
+   * to:
+   * - 1
+   *  - 2
+   *   - 3
+   */
   private static data_2L_2_mL1B(
     list_itemInfo: {
       content: string;
@@ -382,7 +519,7 @@ export default class ListProcess{
     let list_itemInfo2:{content: string;level: number;}[] = []
     let count_level_2 = 0
     for (let item of list_itemInfo){
-      if (item.level==2){
+      if (item.level!=0){                     // 在二层，依次增加层数
         // item.level += count_level_2
         list_itemInfo2.push({
           content: item.content,
@@ -390,28 +527,13 @@ export default class ListProcess{
         })
         count_level_2++
       }
-      else {
+      else {                                  // 在一层
         list_itemInfo2.push({
           content: item.content,
           level: item.level
         })
         count_level_2 = 0
       }
-    }
-    return list_itemInfo2
-  }
-
-  /** 多层树转二层一叉树 */
-  private static data_mL_2_2L1B(
-    list_itemInfo: {
-      content: string;
-      level: number;
-    }[]
-  ){
-    let list_itemInfo2:{content: string;level: number;}[] = []
-    for (let item of list_itemInfo){
-      
-
     }
     return list_itemInfo2
   }
@@ -463,14 +585,14 @@ export default class ListProcess{
     }
 
     // 表格数据 组装成表格
-    div = div.createEl("table")
-    if (modeT) div.setAttribute("modeT", "true")
+    const table = div.createEl("table")
+    if (modeT) table.setAttribute("modeT", "true")
     let thead
     if(list_itemInfo2[0].content.indexOf("< ")==0){ // 判断是否有表头
-      thead = div.createEl("thead")
+      thead = table.createEl("thead")
       list_itemInfo2[0].content=list_itemInfo2[0].content.replace(/^\<\s/,"")
     }
-    const tbody = div.createEl("tbody")
+    const tbody = table.createEl("tbody")
     for (let index_line=0; index_line<prev_line+1; index_line++){ // 遍历表格行，创建tr……
       let is_head
       let tr
@@ -525,6 +647,61 @@ export default class ListProcess{
     }
     const newcontent = list_newcontent.join("\n")
     return newcontent
+  }
+
+  /** 列表数据转标签栏 */
+  private static data2tab(
+    list_itemInfo: {
+      content: string;
+      level: number;
+    }[], 
+    div: HTMLDivElement,
+    modeMD: boolean,
+    modeT: boolean
+  ){
+    const tab = div.createEl("div", {
+      cls: "ab-tab-root"
+    })
+    const ul = tab.createEl("ul")
+    const content = tab.createDiv()
+    let current_dom:HTMLElement|null = null
+    for (let i=0; i<list_itemInfo.length; i++){
+      const itemInfo = list_itemInfo[i]
+      if (!current_dom){            // 找开始标志
+        if (itemInfo.level==0){
+          ul.createEl("li", {
+            cls: ["ab-tab-tab"],
+            text: itemInfo.content.slice(0,20)
+          })
+          current_dom = content.createDiv({
+            cls: ["ab-tab-content"],
+            attr: {"style": i==0?"display:block":"display:none"}
+          })
+        }
+      }
+      else{                         // 找结束，不需要找标志，因为传过来的是二层一叉树
+        if (modeMD) {
+          const child = new MarkdownRenderChild(current_dom);
+          MarkdownRenderer.renderMarkdown(itemInfo.content, current_dom, "", child);
+        }
+        else{
+          current_dom.innerHTML = itemInfo.content.replace(/\n/g, "<br/>")
+        }
+        current_dom = null
+      }
+    }
+    // 元素全部创建完再来绑按钮事件，不然有可能有问题
+    const lis:NodeListOf<HTMLLIElement> = tab.querySelectorAll(".ab-tab-tab")
+    const contents = tab.querySelectorAll(".ab-tab-content")
+    for (let i=0; i<lis.length; i++){
+      lis[i].onclick = ()=>{
+        for (let contentItem of contents){
+          contentItem.setAttribute("style", "display:none")
+        }
+        contents[i].setAttribute("style", "display:block")
+      }
+    }
+    return div
   }
 
   /** 列表数据转mermaid流程图
@@ -598,4 +775,15 @@ export default class ListProcess{
     })
     return div
   }
+
+  /** 列表数据转时间线 */
+  /*private static data2timeline(
+    list_itemInfo: {
+      content: string;
+      level: number;
+    }[], 
+    div: HTMLDivElement
+  ){
+    
+  }*/
 }

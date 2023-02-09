@@ -9,18 +9,9 @@
   border-radius: 4px;
 }
 
-.ab-replace .ab-note.drop-shadow {
+.ab-replace .ab-note {
   position: relative;
   /*padding: 24px 12px 12px 12px;*/
-}
-
-.ab-replace .ab-note.drop-shadow table[modeT="true"] tr {
-  display: block;
-  float: left;
-}
-
-.ab-replace .ab-note.drop-shadow table[modeT="true"] th, .ab-replace .ab-note.drop-shadow table[modeT="true"] td {
-  display: block;
 }
 
 .ab-replace .ab-button {
@@ -32,4 +23,31 @@
 
 .ab-replace img.cm-widgetBuffer {
   height: 2px;
+}
+
+.ab-note table[modeT="true"] tr {
+  display: block;
+  float: left;
+}
+
+.ab-note table[modeT="true"] th, .ab-note table[modeT="true"] td {
+  display: block;
+}
+
+.ab-note .ab-tab-root > ul {
+  margin-bottom: 6px;
+}
+
+.ab-note .ab-tab-root > ul li.ab-tab-tab {
+  float: left;
+  list-style: none;
+  height: 30px;
+  line-height: 30px;
+  padding: 0 5px;
+  text-align: center;
+  border: solid royalblue 1px;
+}
+
+.ab-note .ab-tab-root > div {
+  clear: both;
 }

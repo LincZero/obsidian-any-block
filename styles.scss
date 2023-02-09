@@ -8,14 +8,9 @@
   position: relative;
   border-radius: 4px;
 
-  .ab-note.drop-shadow{
+  .ab-note{
     position: relative;
     /*padding: 24px 12px 12px 12px;*/
-
-    table[modeT="true"]{  // 表格转置
-      tr { display: block; float: left; }
-      th, td { display: block; }
-    }
   }
 
   .ab-button{
@@ -27,5 +22,31 @@
 
   img.cm-widgetBuffer{
     height: 2px;
+  }
+}
+
+.ab-note{
+  table[modeT="true"]{  // 表格转置
+    tr { display: block; float: left; }
+    th, td { display: block; }
+  }
+
+  .ab-tab-root{
+    >ul {
+      margin-bottom: 6px;
+    }
+    >ul li.ab-tab-tab {
+      float: left;
+      list-style: none;
+      height: 30px;
+      // width: 80px;
+      line-height: 30px;
+      padding: 0 5px;
+      text-align: center;
+      border: solid royalblue 1px;
+    }
+    >div {
+      clear: both;
+    }
   }
 }

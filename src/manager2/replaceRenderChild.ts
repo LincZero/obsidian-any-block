@@ -29,6 +29,7 @@ export class RelpaceRender extends MarkdownRenderChild {
     const div:HTMLDivElement = this.containerEl.createDiv({
       cls: ["ab-replace"]
     });
+    div.setAttribute("type_header", this.header)
 
     // 主体部分
     const dom_note = div.createDiv({

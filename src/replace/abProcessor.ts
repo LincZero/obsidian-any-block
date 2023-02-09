@@ -362,10 +362,37 @@ registerABProcessor({
   id: "list2ut",
   name: "列表转二维表格",
   match: /list2(md)?ut(T)?/,
+  default: "list2ut",
   process: (el, header, content)=>{
     const matchs = header.match(/list2(md)?ut(T)?/)
     if (!matchs) return el
     ListProcess.list2ut(content, el, matchs[1]=="md", matchs[2]=="T")
+    return el
+  }
+})
+
+registerABProcessor({
+  id: "list2timeline",
+  name: "一级列表转时间线",
+  match: /list2(md)?timeline(T)?/,
+  default: "list2mdtimeline",
+  process: (el, header, content)=>{
+    const matchs = header.match(/list2(md)?timeline(T)?/)
+    if (!matchs) return el
+    ListProcess.list2timeline(content, el, matchs[1]=="md", matchs[2]=="T")
+    return el
+  }
+})
+
+registerABProcessor({
+  id: "list2tab",
+  name: "一级列表转标签栏",
+  match: /list2(md)?tab(T)?$/,
+  default: "list2mdtab",
+  process: (el, header, content)=>{
+    const matchs = header.match(/list2(md)?tab(T)?$/)
+    if (!matchs) return el
+    ListProcess.list2tab(content, el, matchs[1]=="md", matchs[2]=="T")
     return el
   }
 })
