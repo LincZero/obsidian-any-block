@@ -112,54 +112,97 @@ export class ABStateManager{
       decoration_mode = this.plugin_this.settings.decoration_render
     }
 
-    // 装饰调整（删增改）
-    // 装饰调整 - 删
-    /** @bug 这里的mdText是未修改前的mdText，光标的位置也是 会延迟一拍 */
-    decorationSet = decorationSet.update({            // 减少，全部删掉
-      filter: (from, to, value)=>{return false}
-    })
+    //let refreshStrong = refreshStrong2.bind(this)
+    //function refreshStrong2(){
+      // 装饰调整（删增改）
+      // 装饰调整 - 删
+      /** @bug 这里的mdText是未修改前的mdText，光标的位置也是 会延迟一拍 */
+      decorationSet = decorationSet.update({            // 减少，全部删掉
+        filter: (from, to, value)=>{return false}
+      })
 
-    // 装饰调整 - 增
-    if (decoration_mode==ConfDecoration.none) return decorationSet
-    const list_abRangeManager:ABMdSelector[] = get_selectors(this.plugin_this.settings).map(c => {
-      return new c(this.mdText, this.plugin_this.settings)
-    })
-    if(decoration_mode==ConfDecoration.inline){
-      for (let abManager of list_abRangeManager){     // 遍历多个范围管理器
-        let listRangeSpec: MdSelectorSpec[] = abManager.specKeywords
-        for(let rangeSpec of listRangeSpec){          // 遍历每个范围管理器里的多个范围集
-          const decoration: Decoration = Decoration.mark({class: "ab-line-brace"})
-          decorationSet = decorationSet.update({
-            add: [decoration.range(rangeSpec.from, rangeSpec.to)]
-          })
+      // 装饰调整 - 增
+      if (decoration_mode==ConfDecoration.none) return decorationSet
+      const list_abRangeManager:ABMdSelector[] = get_selectors(this.plugin_this.settings).map(c => {
+        return new c(this.mdText, this.plugin_this.settings)
+      })
+      if(decoration_mode==ConfDecoration.inline){
+        for (let abManager of list_abRangeManager){     // 遍历多个范围管理器
+          let listRangeSpec: MdSelectorSpec[] = abManager.specKeywords
+          for(let rangeSpec of listRangeSpec){          // 遍历每个范围管理器里的多个范围集
+            const decoration: Decoration = Decoration.mark({class: "ab-line-brace"})
+            decorationSet = decorationSet.update({
+              add: [decoration.range(rangeSpec.from, rangeSpec.to)]
+            })
+          }
         }
       }
-    }
-    else{
-      const cursorSpec = this.getCursorCh()
-      for (let abManager of list_abRangeManager){     // 遍历多个范围管理器
-        let listRangeSpec: MdSelectorSpec[] = abManager.specKeywords
-        for(let rangeSpec of listRangeSpec){          // 遍历每个范围管理器里的多个范围集
-          let decoration: Decoration
-          if (cursorSpec.from>=rangeSpec.from && cursorSpec.from<=rangeSpec.to 
-              || cursorSpec.to>=rangeSpec.from && cursorSpec.to<=rangeSpec.to) {
-            decoration = Decoration.mark({class: "ab-line-yellow"})
+      else{
+        const cursorSpec = this.getCursorCh()
+        for (let abManager of list_abRangeManager){     // 遍历多个范围管理器
+          let listRangeSpec: MdSelectorSpec[] = abManager.specKeywords
+          for(let rangeSpec of listRangeSpec){          // 遍历每个范围管理器里的多个范围集
+            let decoration: Decoration
+            if (cursorSpec.from>=rangeSpec.from && cursorSpec.from<=rangeSpec.to 
+                || cursorSpec.to>=rangeSpec.from && cursorSpec.to<=rangeSpec.to) {
+              decoration = Decoration.mark({class: "ab-line-yellow"})
+            }
+            else{
+              decoration = Decoration.replace({widget: new ABReplaceWidget(
+                rangeSpec, this.editor
+              )})
+            }
+            decorationSet = decorationSet.update({
+              add: [decoration.range(rangeSpec.from, rangeSpec.to)]
+            })
           }
-          else{
-            decoration = Decoration.replace({widget: new ABReplaceWidget(
-              rangeSpec, this.editor
-            )})
-          }
-          decorationSet = decorationSet.update({
-            add: [decoration.range(rangeSpec.from, rangeSpec.to)]
-          })
         }
       }
-    }
+
+      // 装饰调整 - 改 (映射)
+      decorationSet = decorationSet.map(tr.changes)
+      return decorationSet
+    //}
 
     // 装饰调整 - 改 (映射)
-    decorationSet = decorationSet.map(tr.changes)
-    return decorationSet
+    /*decorationSet = decorationSet.map(tr.changes)
+    return decorationSet*/
+
+    // 防抖，设置定时器
+    /*return (()=>{
+      console.log("准备做")
+      let timer;
+      clearTimeout(timer);
+      timer = setTimeout(()=>{
+        console.log("做了做了")
+        refreshStrong();
+      },200);
+    })()*/
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   }
 
   /** 获取编辑器模式 */
