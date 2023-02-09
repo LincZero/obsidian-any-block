@@ -1,9 +1,9 @@
-/**
+/** 替换内容
  * .ab-replace
  *   .ab-note
  *   .ab-button
  */
- .ab-replace{
+.ab-replace{
   /*background-color: #272e3a;*/
   position: relative;
   border-radius: 4px;
@@ -31,12 +31,13 @@
     th, td { display: block; }
   }
 
+  // 标签栏
   .ab-tab-root{
+    border: solid royalblue 1px;
     >ul {
-      height: 30px;;
-      margin-bottom: 6px;
+      height: 30px;
     }
-    >ul li.ab-tab-tab {
+    .ab-tab-tab {
       float: left;
       list-style: none;
       height: 30px;
@@ -46,12 +47,53 @@
       text-align: center;
       border: solid royalblue 1px;
     }
-    >div {
+    .ab-tab-tab[is_activate="true"]{
+      background-color: slateblue;
+    }
+    .ab-tab-content {
       clear: both;
+      padding: 8px 10px;
     }
   }
 
-  .ab-flodable-tr[is_flod="true"]{
-    color: royalblue
+  // 列表格
+  .ab-list-table{
+    .ab-foldable-tr[able_fold="true"]>td:first-child{
+      >div{
+        padding-left: 15px;
+        position: relative;
+      }
+      >div::before{
+        content: "";
+        position: absolute;
+        width: 0;
+        height: 0;
+      }
+    }
+    .ab-foldable-tr[able_fold="true"][is_fold="true"]>td:first-child{
+      >div::before{
+        top: 5px;
+        left: 2px;
+        border: 6px solid transparent;
+        border-left-color: #d9d9d9;
+      }
+    }
+    .ab-foldable-tr[able_fold="true"][is_fold="false"]>td:first-child{
+      >div::before{
+        top: 9px;
+        left: -1px;
+        border: 6px solid transparent;
+        border-top-color: #d9d9d9;
+      }
+    }
+    // 缩进
+    .ab-foldable-tr[tr_level="1"]>td:first-child{padding-left: calc(1*12px);}
+    .ab-foldable-tr[tr_level="2"]>td:first-child{padding-left: calc(2*12px);}
+    .ab-foldable-tr[tr_level="3"]>td:first-child{padding-left: calc(3*12px);}
+    .ab-foldable-tr[tr_level="4"]>td:first-child{padding-left: calc(4*12px);}
+    .ab-foldable-tr[tr_level="5"]>td:first-child{padding-left: calc(5*12px);}
+    .ab-foldable-tr[tr_level="6"]>td:first-child{padding-left: calc(6*12px);}
+    .ab-foldable-tr[tr_level="7"]>td:first-child{padding-left: calc(7*12px);}
+    .ab-foldable-tr[tr_level="8"]>td:first-child{padding-left: calc(8*12px);}
   }
 }

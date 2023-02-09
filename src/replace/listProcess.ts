@@ -1,4 +1,4 @@
-import { MarkdownRenderer, MarkdownRenderChild } from 'obsidian'
+import { MarkdownRenderer, MarkdownRenderChild, TAbstractFile } from 'obsidian'
 import { isNull } from 'util'
 import mermaid from "mermaid"
 import {getID} from "src/utils/utils"
@@ -661,6 +661,7 @@ export default class ListProcess{
           if (!matchs) return div
           if (!matchs[1]) tr_line_level.push(0)
           else tr_line_level.push(Math.round(matchs[1].length/6))
+          item.content = item.content.replace(/^((&nbsp;)*)/, "")
         }
         else {
           tr_line_level.push(0)
@@ -679,7 +680,9 @@ export default class ListProcess{
     }
 
     // 表格数据 组装成表格
-    const table = div.createEl("table")
+    const table = div.createEl("table", {
+      cls: ["ab-list-table"]
+    })
     if (modeT) table.setAttribute("modeT", "true")
     let thead
     if(list_itemInfo2[0].content.indexOf("< ")==0){ // 判断是否有表头
@@ -687,6 +690,7 @@ export default class ListProcess{
       list_itemInfo2[0].content=list_itemInfo2[0].content.replace(/^\<\s/,"")
     }
     const tbody = table.createEl("tbody")
+    let prev_tr = null   // 用来判断是否可以折叠
     for (let index_line=0; index_line<prev_line+1; index_line++){ // 遍历表格行，创建tr……
       let is_head
       let tr
@@ -699,24 +703,37 @@ export default class ListProcess{
       else{
         is_head = false
         tr = tbody.createEl("tr", {
-          cls: ["ab-flodable-tr"],
-          attr: {"tr_level": tr_line_level[index_line], "is_flod": "false"}
+          cls: ["ab-foldable-tr"],
+          attr: {
+            "tr_level": tr_line_level[index_line], 
+            "is_fold": "false",
+            "able_fold": "false"
+          }
         })
+        // 判断上一个是否可折叠。不需要尾判断，最后一个肯定不能折叠
+        if (prev_tr 
+          && !isNaN(Number(prev_tr.getAttribute("tr_level"))) 
+          && Number(prev_tr.getAttribute("tr_level"))<tr_line_level[index_line]
+        ){
+          prev_tr.setAttribute("able_fold", "true")
+        }
+        prev_tr = tr
       }
       for (let item of list_itemInfo2){                           // 遍历表格列，创建td
         if (item.tableLine!=index_line) continue
         if (modeMD) {   // md版
           let td = tr.createEl(is_head?"th":"td", {
             attr:{"rowspan": item.tableRow}
-          })
+          }).createDiv()
           const child = new MarkdownRenderChild(td);
           MarkdownRenderer.renderMarkdown(item.content, td, "", child);
         }
         else{           // 非md版
-          tr.createEl(is_head?"th":"td", {
+          let td = tr.createEl(is_head?"th":"td", {
             // text: item.content, //.replace("\n","<br/>"),
             attr:{"rowspan": item.tableRow}
-          }).innerHTML = item.content.replace(/\n/g,"<br/>")
+          }).createDiv()
+          td.innerHTML = item.content.replace(/\n/g,"<br/>")
         }
       }
     }
@@ -727,12 +744,12 @@ export default class ListProcess{
       const tr = l_tr[i]
       /*const tr_level = Number(tr.getAttribute("tr_level"))
       if (isNaN(tr_level)) continue
-      const tr_isfold = tr.getAttribute("is_flod")
+      const tr_isfold = tr.getAttribute("is_fold")
       if (!tr_isfold) continue*/
       tr.onclick = ()=>{
         const tr_level = Number(tr.getAttribute("tr_level"))
         if (isNaN(tr_level)) return
-        const tr_isfold = tr.getAttribute("is_flod")
+        const tr_isfold = tr.getAttribute("is_fold")
         if (!tr_isfold) return
         let flag_do_fold = false  // 防止折叠最小层
         for (let j=i+1; j<l_tr.length; j++){
@@ -743,7 +760,7 @@ export default class ListProcess{
           tr2.setAttribute("style", "display:"+(tr_isfold=="true"?"block":"none"))
           flag_do_fold = true
         }
-        if (flag_do_fold) tr.setAttribute("is_flod", tr_isfold=="true"?"false":"true")
+        if (flag_do_fold) tr.setAttribute("is_fold", tr_isfold=="true"?"false":"true")
       }
     }
 
@@ -797,11 +814,12 @@ export default class ListProcess{
         if (itemInfo.level==0){
           ul.createEl("li", {
             cls: ["ab-tab-tab"],
-            text: itemInfo.content.slice(0,20)
+            text: itemInfo.content.slice(0,20),
+            attr: {"is_activate":i==0?"true":"false"}
           })
           current_dom = content.createDiv({
             cls: ["ab-tab-content"],
-            attr: {"style": i==0?"display:block":"display:none"}
+            attr: {"style": i==0?"display:block":"display:none", "is_activate":i==0?"true":"false"}
           })
         }
       }
@@ -819,11 +837,16 @@ export default class ListProcess{
     // 元素全部创建完再来绑按钮事件，不然有可能有问题
     const lis:NodeListOf<HTMLLIElement> = tab.querySelectorAll(".ab-tab-tab")
     const contents = tab.querySelectorAll(".ab-tab-content")
+    if (lis.length!=contents.length) console.warn("ab-tab-tab和ab-tab-content的数量不一致")
     for (let i=0; i<lis.length; i++){
       lis[i].onclick = ()=>{
-        for (let contentItem of contents){
-          contentItem.setAttribute("style", "display:none")
+        for (let j=0; j<contents.length; j++){
+          lis[j].setAttribute("is_activate", "false")
+          contents[j].setAttribute("is_activate", "false")
+          contents[j].setAttribute("style", "display:none")
         }
+        lis[i].setAttribute("is_activate", "true")
+        contents[i].setAttribute("is_activate", "true")
         contents[i].setAttribute("style", "display:block")
       }
     }
