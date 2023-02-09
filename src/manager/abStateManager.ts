@@ -1,5 +1,5 @@
 import {EditorView, Decoration, DecorationSet} from "@codemirror/view"
-import {StateField, StateEffect, EditorState, Transaction} from "@codemirror/state"
+import {StateField, StateEffect, EditorState, Transaction, Range} from "@codemirror/state"
 import {MarkdownView, View, Editor, EditorPosition} from 'obsidian';
 
 import AnyBlockPlugin from '../main'
@@ -37,6 +37,12 @@ export class ABStateManager{
   editor: Editor
   editorView: EditorView
   editorState: EditorState
+
+  // 用于防止频繁刷新，true->true/false->false，不大刷新，false->true/true->false，大刷新
+  is_prev_cursor_in:boolean
+  prev_decoration_mode:ConfDecoration
+  prev_editor_mode:Editor_mode
+
   get cursor(): EditorPosition {return this.editor.getCursor();}
   get state(): any {return this.view.getState()}
   get mdText(): string {return this.editor.getValue()}
@@ -57,6 +63,10 @@ export class ABStateManager{
     // @ts-ignore 这里会说Editor没有cm属性
     this.editorView = this.editor.cm
     this.editorState = this.editorView.state
+
+    this.is_prev_cursor_in = true
+    this.prev_decoration_mode = ConfDecoration.none
+    this.prev_editor_mode = Editor_mode.NONE
     return true
   }
 
@@ -85,7 +95,7 @@ export class ABStateManager{
 
   /** 一个类成员。StateField，该状态管理Decoration */
   private decorationField = StateField.define<DecorationSet>({
-    create: (editorState)=>{ return Decoration.none },
+    create: (editorState)=>{return Decoration.none},
     // create好像不用管，update无论如何都能触发的
     // 函数的根本作用，是为了修改decorationSet的范围，间接修改StateField的管理范围
     update: (decorationSet, tr)=>{
@@ -112,97 +122,10 @@ export class ABStateManager{
       decoration_mode = this.plugin_this.settings.decoration_render
     }
 
-    //let refreshStrong = refreshStrong2.bind(this)
-    //function refreshStrong2(){
-      // 装饰调整（删增改）
-      // 装饰调整 - 删
-      /** @bug 这里的mdText是未修改前的mdText，光标的位置也是 会延迟一拍 */
-      decorationSet = decorationSet.update({            // 减少，全部删掉
-        filter: (from, to, value)=>{return false}
-      })
-
-      // 装饰调整 - 增
-      if (decoration_mode==ConfDecoration.none) return decorationSet
-      const list_abRangeManager:ABMdSelector[] = get_selectors(this.plugin_this.settings).map(c => {
-        return new c(this.mdText, this.plugin_this.settings)
-      })
-      if(decoration_mode==ConfDecoration.inline){
-        for (let abManager of list_abRangeManager){     // 遍历多个范围管理器
-          let listRangeSpec: MdSelectorSpec[] = abManager.specKeywords
-          for(let rangeSpec of listRangeSpec){          // 遍历每个范围管理器里的多个范围集
-            const decoration: Decoration = Decoration.mark({class: "ab-line-brace"})
-            decorationSet = decorationSet.update({
-              add: [decoration.range(rangeSpec.from, rangeSpec.to)]
-            })
-          }
-        }
-      }
-      else{
-        const cursorSpec = this.getCursorCh()
-        for (let abManager of list_abRangeManager){     // 遍历多个范围管理器
-          let listRangeSpec: MdSelectorSpec[] = abManager.specKeywords
-          for(let rangeSpec of listRangeSpec){          // 遍历每个范围管理器里的多个范围集
-            let decoration: Decoration
-            if (cursorSpec.from>=rangeSpec.from && cursorSpec.from<=rangeSpec.to 
-                || cursorSpec.to>=rangeSpec.from && cursorSpec.to<=rangeSpec.to) {
-              decoration = Decoration.mark({class: "ab-line-yellow"})
-            }
-            else{
-              decoration = Decoration.replace({widget: new ABReplaceWidget(
-                rangeSpec, this.editor
-              )})
-            }
-            decorationSet = decorationSet.update({
-              add: [decoration.range(rangeSpec.from, rangeSpec.to)]
-            })
-          }
-        }
-      }
-
-      // 装饰调整 - 改 (映射)
-      decorationSet = decorationSet.map(tr.changes)
-      return decorationSet
-    //}
-
-    // 装饰调整 - 改 (映射)
-    /*decorationSet = decorationSet.map(tr.changes)
-    return decorationSet*/
-
-    // 防抖，设置定时器
-    /*return (()=>{
-      console.log("准备做")
-      let timer;
-      clearTimeout(timer);
-      timer = setTimeout(()=>{
-        console.log("做了做了")
-        refreshStrong();
-      },200);
-    })()*/
-
-
+    // 装饰调整（删增改），包起来准备防抖（未防抖）
+    // let refreshStrong = this.refreshStrong2.bind(this)
     
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    return this.refreshStrong2(decorationSet, tr, decoration_mode, editor_mode)
   }
 
   /** 获取编辑器模式 */
@@ -249,5 +172,161 @@ export class ABStateManager{
       from: cursor_from_ch, 
       to: cursor_to_ch
     }
+  }
+
+  /** 装饰调整（删增改），包起来准备防抖 
+   * 小刷新：位置映射（每次都会刷新）
+   * 大刷新：全部元素删掉再重新创建（避免频繁大刷新）
+   * _
+   * 大刷新的条件：
+   *   - 当鼠标进出范围时
+   *   - 当装饰类型改变时
+   *   - 当切换编辑模式时
+   */
+  private refreshStrong2(decorationSet:DecorationSet, tr:Transaction, decoration_mode:ConfDecoration, editor_mode:Editor_mode){
+    let is_current_cursor_in = false
+
+    // 装饰调整 - 不查了，直接全清了
+    if (decoration_mode==ConfDecoration.none) {
+      if (decoration_mode!=this.prev_decoration_mode){
+        decorationSet = decorationSet.update({
+          filter: (from, to, value)=>{return false}
+        })
+        this.is_prev_cursor_in = true
+        this.prev_decoration_mode = decoration_mode
+        this.prev_editor_mode = editor_mode
+        return decorationSet
+      }
+      else {
+        return decorationSet
+      }
+    }
+
+    // 装饰调整 - 查
+    let list_add_decoration:Range<Decoration>[] = []
+    const list_abRangeManager:ABMdSelector[] = get_selectors(this.plugin_this.settings).map(c => {
+      return new c(this.mdText, this.plugin_this.settings)
+    })
+    if(decoration_mode==ConfDecoration.inline){       // 线装饰
+      for (let abManager of list_abRangeManager){     // 遍历多个范围管理器
+        let listRangeSpec: MdSelectorSpec[] = abManager.specKeywords
+        for(let rangeSpec of listRangeSpec){          // 遍历每个范围管理器里的多个范围集
+          const decoration: Decoration = Decoration.mark({class: "ab-line-brace"})
+          list_add_decoration.push(decoration.range(rangeSpec.from, rangeSpec.to))
+        }
+      }
+    }
+    else{                                             // 块装饰
+      const cursorSpec = this.getCursorCh()
+      for (let abManager of list_abRangeManager){     // 遍历多个范围管理器
+        let listRangeSpec: MdSelectorSpec[] = abManager.specKeywords
+        for(let rangeSpec of listRangeSpec){          // 遍历每个范围管理器里的多个范围集
+          let decoration: Decoration
+          if (cursorSpec.from>=rangeSpec.from && cursorSpec.from<=rangeSpec.to 
+              || cursorSpec.to>=rangeSpec.from && cursorSpec.to<=rangeSpec.to) {
+            decoration = Decoration.mark({class: "ab-line-yellow"})
+            is_current_cursor_in = true
+          }
+          else{
+            decoration = Decoration.replace({widget: new ABReplaceWidget(
+              rangeSpec, this.editor
+            )})
+          }
+          list_add_decoration.push(decoration.range(rangeSpec.from, rangeSpec.to))
+        }
+      }
+    }
+
+    /*console.log("状态比较", 
+      (is_current_cursor_in!=this.is_prev_cursor_in
+        ||decoration_mode!=this.prev_decoration_mode
+        ||editor_mode!=this.prev_editor_mode
+      )?"大刷新":"不刷新"
+      ,is_current_cursor_in,this.is_prev_cursor_in
+      ,decoration_mode,this.prev_decoration_mode
+      ,editor_mode,this.prev_editor_mode
+    )*/
+    if (is_current_cursor_in!=this.is_prev_cursor_in
+      ||decoration_mode!=this.prev_decoration_mode
+      ||editor_mode!=this.prev_editor_mode
+    ){
+      this.is_prev_cursor_in = is_current_cursor_in
+      this.prev_decoration_mode = decoration_mode
+      this.prev_editor_mode = editor_mode
+
+      // 装饰调整 - 删
+      /** @bug 这里的mdText是未修改前的mdText，光标的位置也是 会延迟一拍 */
+      decorationSet = decorationSet.update({            // 减少，全部删掉
+        filter: (from, to, value)=>{return false}
+      })
+      // 装饰调整 - 增
+      // 这里有点脱屁股放屁，但好像因为范围重叠的原因，直接传列表会报错：
+      // Ranges must be added sorted by `from` position and `startSide`
+      for(let item of list_add_decoration){
+        decorationSet = decorationSet.update({
+          add: [item]
+        })
+      }
+    }
+
+    // 装饰调整 - 改 (映射)
+    decorationSet = decorationSet.map(tr.changes)
+    return decorationSet
+  }
+
+  /** 防抖器（可复用） */
+  debouncedFn = this.debounce(this.refreshStrong2, 1000, false)
+  private debounce(
+    method:any,       // 防抖方法
+    wait:number,      // 等待
+    immediate:boolean // 是否立即执行
+  ) {
+    let timeout:NodeJS.Timeout|null
+    // debounced函数为返回值
+    // 使用Async/Await处理异步，如果函数异步执行，等待setTimeout执行完，拿到原函数返回值后将其返回
+    // args为返回函数调用时传入的参数，传给method
+    let debounced = function(...args: any[]) {
+      return new Promise (resolve => {
+        // 用于记录原函数执行结果
+        let result
+        // 将method执行时this的指向设为debounce返回的函数被调用时的this指向
+        let context = this
+        // 如果存在定时器则将其清除
+        if (timeout) {
+          clearTimeout(timeout)
+        }
+        // 立即执行需要两个条件，一是immediate为true，二是timeout未被赋值或被置为null
+        if (immediate) {
+          // 如果定时器不存在，则立即执行，并设置一个定时器，wait毫秒后将定时器置为null
+          // 这样确保立即执行后wait毫秒内不会被再次触发
+          let callNow = !timeout
+          timeout = setTimeout(() => {
+            timeout = null
+          }, wait)
+          // 如果满足上述两个条件，则立即执行并记录其执行结果
+          if (callNow) {
+            result = method.apply(context, args)
+            resolve(result)
+          }
+        } else {
+          // 如果immediate为false，则等待函数执行并记录其执行结果
+          // 并将Promise状态置为fullfilled，以使函数继续执行
+          timeout = setTimeout(() => {
+            // args是一个数组，所以使用fn.apply
+            // 也可写作method.call(context, ...args)
+            result = method.apply(context, args)
+            resolve(result)
+          }, wait)
+        }
+      })
+    }
+  
+    // 在返回的debounced函数上添加取消方法
+    /*debounced.cancel = function() {
+      clearTimeout(timeout)
+      timeout = null
+    }*/
+  
+    return debounced
   }
 }

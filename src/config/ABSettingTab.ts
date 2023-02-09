@@ -54,7 +54,7 @@ export class ABSettingTab extends PluginSettingTab {
     containerEl.empty();
     let settings = this.plugin.settings
 
-		containerEl.createEl('h1', {text: '范围管理器'});
+		containerEl.createEl('h2', {text: '范围管理器'});
 
 		new Setting(containerEl)
       .setName('列表选择器')
@@ -175,7 +175,7 @@ export class ABSettingTab extends PluginSettingTab {
           .onChange(value=>{this.plugin.settings.is_range_brace = value})
       )*/
 
-    containerEl.createEl('h1', {text: '装饰管理器'});
+    containerEl.createEl('h2', {text: '装饰管理器'});
 
     new Setting(containerEl)
       .setName('源码模式中启用')
@@ -224,7 +224,7 @@ export class ABSettingTab extends PluginSettingTab {
         })
       })
 
-    containerEl.createEl('h1', {text: '实验性功能'});
+    containerEl.createEl('h2', {text: '实验性功能'});
     new Setting(containerEl)
       .setName('启用负级列表')
       .setDesc(createFragment(div => {
@@ -239,7 +239,7 @@ export class ABSettingTab extends PluginSettingTab {
       )
       .setDisabled(true)
 
-    containerEl.createEl('h1', {text: '查看所有注册指令'});
+    containerEl.createEl('h2', {text: '查看所有注册指令'});
     generateInfoTable(containerEl)
 	}
 }
