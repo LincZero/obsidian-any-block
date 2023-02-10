@@ -39,10 +39,38 @@ Function：Block conversion、list to table or other tree graph，See the `demo`
 	- **表格转置与表头符号冲突、转置模式目前是纯css实现的 如果大家的行高不相同，会出现不匹配的情况。**
 	  后续会将css实现改进为转化table元素实现
 
+## If bug
+
+try to close `strict line wrapping`
+
 ## Suport command
 
 Look the setup panel or [Usage Tutorial & Sample Library](./demo)
 
-## If bug
+说其中一些比较常用的处理器：
+- 列表转表格
+- 列表转列表格
+- 列表转流程图
+- 列表转思维导图
+- 列表转标签栏
+- 列表转时间线
+- 标题转列表从而转其他
 
-try to close `strict line wrapping`
+![](demo/png/Pasted%20image%2020230210091218.png)
+
+![](demo/png/Pasted%20image%2020230210091427.png)
+
+![](demo/png/Pasted%20image%2020230210091728.png)
+
+![](demo/png/GIF%202023-02-10%2009-21-20.gif)
+
+![](demo/png/GIF%202023-02-10%2009-26-36.gif)
+
+![](demo/png/Pasted%20image%2020230210093002.png)
+
+![](demo/png/Pasted%20image%2020230210093202.png)
+
+
+
+
+

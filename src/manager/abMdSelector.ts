@@ -115,13 +115,14 @@ class ABMdSelector_list extends ABMdSelector{
   private lineMatch_keyword(): MdSelectorSpec[] {
     let matchInfo2:{
       line_from:number, 
-      line_to:number,
+      line_to:number,     // 不包含
       list_header:string
     }[] = []
     const list_text = this.mdText.split("\n")
-    let list_header = ""
-    let is_list_mode = false  // 是否在列表中
-    let prev_list_from = 0    // 在列表中时，在哪开始
+    let list_header = ""      // 1. 头部信息
+    let is_list_mode = false  // 2. 是否在列表中
+    let prev_list_from = 0    // 3. 在列表中时，在哪开始
+    let record_last_line = 0  // 4. 用于清除最后的空行
     for (let i=0; i<list_text.length; i++){
       if (!is_list_mode){                     // 选择开始标志
         if (!ABReg.reg_list.test(list_text[i])) continue
@@ -132,6 +133,7 @@ class ABMdSelector_list extends ABMdSelector{
             prev_list_from = i-1
             list_header = header[2]
             is_list_mode = true
+            record_last_line=i
             continue
           }
         }
@@ -141,15 +143,24 @@ class ABMdSelector_list extends ABMdSelector{
         prev_list_from = i
         list_header = ""
         is_list_mode = true
+        record_last_line=i
         continue
       }
       else {                                  // 选择结束标志
-        if (ABReg.reg_list.test(list_text[i])) continue // 列表
-        if (/^\s+?\S/.test(list_text[i])) continue      // 开头有缩进
-        if (/^\s*$/.test(list_text[i])) continue        // 空行
+        if (ABReg.reg_list.test(list_text[i])) {        // 列表
+          record_last_line=i
+          continue 
+        }
+        if (/^\s+?\S/.test(list_text[i])) {             // 开头有缩进
+          record_last_line=i
+          continue
+        }
+        if (/^\s*$/.test(list_text[i])) {               // 空行
+          continue
+        }
         matchInfo2.push({
           line_from: prev_list_from,
-          line_to: i,
+          line_to: record_last_line+1,
           list_header: list_header
         })
         is_list_mode = false
@@ -159,7 +170,7 @@ class ABMdSelector_list extends ABMdSelector{
     if (is_list_mode){                        // 结束循环收尾
       matchInfo2.push({
         line_from: prev_list_from,
-        line_to: list_text.length,
+        line_to: record_last_line+1,
         list_header: list_header
       })
       is_list_mode = false
