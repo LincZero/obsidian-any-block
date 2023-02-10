@@ -8,7 +8,7 @@ Function：Block conversion、list to table or other tree graph，See the `demo`
 
 [Usage Tutorial & Sample Library](./demo)
 
-## Todo 
+## Todo
 
 **(Don't repet it in issue)**
 
@@ -54,23 +54,23 @@ Look the setup panel or [Usage Tutorial & Sample Library](./demo)
 - 列表转思维导图
 - 列表转标签栏
 - 列表转时间线
-- 标题转列表从而转其他
+- 标题转列表从而转其他（Because you can trun ）
 
-![](demo/png/Pasted%20image%2020230210091218.png)
+![](demo/png/list2table.png)
 
-![](demo/png/Pasted%20image%2020230210091427.png)
+![](demo/png/list2mdtable.png)
 
-![](demo/png/Pasted%20image%2020230210091728.png)
+![](demo/png/list2tableT.png)
 
-![](demo/png/GIF%202023-02-10%2009-21-20.gif)
+![](demo/png/list2ut.gif)
 
-![](demo/png/GIF%202023-02-10%2009-26-36.gif)
+![](demo/png/list2tab.gif)
 
-![](demo/png/Pasted%20image%2020230210093002.png)
+![](demo/png/list2mermaid.png)
 
-![](demo/png/Pasted%20image%2020230210093202.png)
+![](demo/png/list2mindmap.png)
 
-
+![](demo/png/titleSelector.png)
 
 
 
