@@ -58,11 +58,13 @@
 
   // 列表格
   .ab-list-table{
-    .ab-foldable-tr[able_fold="true"]>td:first-child{
+    .ab-foldable-tr>td:first-child{
       >div{
         padding-left: 15px;
         position: relative;
       }
+    }
+    .ab-foldable-tr[able_fold="true"]>td:first-child{
       >div::before{
         content: "";
         position: absolute;

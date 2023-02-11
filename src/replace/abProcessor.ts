@@ -133,8 +133,8 @@ interface ABProcessorSpec{
 }
 
 registerABProcessor({
-  id: "svelt",
-  name: "svelt(实验)",
+  id: "svelte",
+  name: "svelte(实验)",
   process: (el, header, content)=>{
     new Component({
       target: el,

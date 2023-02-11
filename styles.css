@@ -62,7 +62,7 @@
   padding: 8px 10px;
 }
 
-.ab-note .ab-list-table .ab-foldable-tr[able_fold="true"] > td:first-child > div {
+.ab-note .ab-list-table .ab-foldable-tr > td:first-child > div {
   padding-left: 15px;
   position: relative;
 }
