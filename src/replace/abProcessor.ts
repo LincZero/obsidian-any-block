@@ -6,6 +6,7 @@ import {MarkdownRenderChild, MarkdownRenderer} from 'obsidian';
 import {ABReg} from "src/config/abReg"
 import ListProcess from "./listProcess"
 import {getID} from "src/utils/utils"
+// import test from "src/svelte/Test.svelt"
 
 import mermaid from "mermaid"
 import mindmap from '@mermaid-js/mermaid-mindmap';
@@ -130,6 +131,20 @@ interface ABProcessorSpec{
   // from: 自带、其他插件、面板设置，如果是其他插件，则需要提供插件的名称（不知道能不能自动识别）
   // is_enable: 加载后能禁用这个项
 }
+
+registerABProcessor({
+  id: "svelt",
+  name: "svelt(实验)",
+  process: (el, header, content)=>{
+    /*new Test({
+      target: el,
+      props: {
+        variable: 1
+      }
+    });*/
+    return el
+  }
+})
 
 registerABProcessor({
   id: "md",

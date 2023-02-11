@@ -1,8 +1,8 @@
-import {EditorView, Decoration, DecorationSet} from "@codemirror/view"
-import {Extension} from "@codemirror/state"
+import {EditorView, Decoration} from "@codemirror/view"
+import type {Extension} from "@codemirror/state"
 
-import { ABStateManager } from './abStateManager';
-import { MdSelectorSpec } from "./abMdSelector"
+import type { ABStateManager } from './abStateManager';
+import type { MdSelectorSpec } from "./abMdSelector"
 import { ABReplaceWidget } from "./replaceWidgetType"
 
 interface CursorSpec{

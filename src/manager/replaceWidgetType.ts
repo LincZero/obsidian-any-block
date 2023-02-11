@@ -1,8 +1,8 @@
-import {Editor, EditorPosition, MarkdownRenderChild, MarkdownRenderer} from 'obsidian';
+import type {Editor, EditorPosition} from 'obsidian';
 import {EditorView, WidgetType} from "@codemirror/view"
 
 import {autoABProcessor} from "../replace/abProcessor"
-import {MdSelectorSpec} from "./abMdSelector"
+import type {MdSelectorSpec} from "./abMdSelector"
 
 export class ABReplaceWidget extends WidgetType {
   rangeSpec: MdSelectorSpec

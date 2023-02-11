@@ -1,5 +1,5 @@
-import {
-  MarkdownPostProcessorContext,
+import type {MarkdownPostProcessorContext} from "obsidian"
+import{
   MarkdownRenderChild,
   MarkdownRenderer,
 } from "obsidian";

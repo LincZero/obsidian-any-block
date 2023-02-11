@@ -1,6 +1,7 @@
 # obsidian-any-block
  
  A Obsidian Plugin. You can flexibility to create a 'Block' by some means.
+ It also provides some useful features, like `list to table`.
  
  ## Usage
 
@@ -12,14 +13,21 @@ Function：Block conversion、list to table or other tree graph，See the `demo`
 
 **(Don't repet it in issue)**
 
+坏消息：插件bug有点多、好消息：作者更新很频繁
+
+- first todo
+  - 完善选择器内核、和插件二次开发的接口
 - reinforce
 	- 性能
-		- 优化刷新频率，现在的刷新频率太高了
+		- ~~优化刷新频率，现在的刷新频率太高了~~
 	- 选择器
 		- **嵌套选择器**
 		  没有嵌套的程序是没有灵魂的 !!!
 		  （但问题在于，例如说第一层是tree，可能会破坏结构，有歧义。因为现在的tree格式是number-str的，那需要number-dom才行）
 		  （或者说：列表选择器不能嵌套列表选择器有歧义，需要嵌套引用选择器，在此基础上你解除引用选择器间接嵌套）
+		- 最近发现一个东西：VuePress的md拓展，[插件容器](https://vuepress-community.netlify.app/en/plugins/container/#vuepress-plugin-container)
+			里面的`:::`首尾选择器语法感觉不错，和我的首尾选择器感觉理念是相同的。
+			里面的`::: code-group`感觉可以，和我的2tab处理器的功能相似。xx{}高亮行和xx[]标题 感觉也可以加
 	- 处理器
 		- QA处理器
 		- 优化2ultable，在这个模式中让内联换行变成同级换行而非下级换行的意思
@@ -54,7 +62,7 @@ Look the setup panel or [Usage Tutorial & Sample Library](./demo)
 - 列表转思维导图
 - 列表转标签栏
 - 列表转时间线
-- 标题转列表从而转其他（Because you can trun ）
+- 标题转列表从而转其他
 
 ![](demo/png/list2table.png)
 

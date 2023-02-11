@@ -1,11 +1,11 @@
-import {
+import type {
   MarkdownPostProcessorContext,
   MarkdownSectionInformation
 } from "obsidian"
 
 import {ABReg} from "src/config/abReg"
 import {ConfDecoration, ConfSelect} from "src/config/abSettingTab"
-import AnyBlockPlugin from "../main"
+import type AnyBlockPlugin from "../main"
 import {RelpaceRender} from "./replaceRenderChild"
 
 /** Html处理器

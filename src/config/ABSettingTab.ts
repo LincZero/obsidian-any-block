@@ -1,5 +1,5 @@
 import {App, PluginSettingTab, Setting} from "obsidian"
-import AnyBlockPlugin from "../main"
+import type AnyBlockPlugin from "../main"
 import {generateInfoTable} from "src/replace/abProcessor"
 
 /** 设置值接口 */

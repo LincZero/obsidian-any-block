@@ -2,7 +2,8 @@ import { Plugin } from "obsidian";
 import { ABCodeblockManager } from "./manager3/abCodeblockManager";
 import { ABStateManager } from "./manager/abStateManager";
 import { ABPosthtmlManager } from "./manager2/abPosthtmlManager";
-import { ABSettingInterface, ABSettingTab, AB_SETTINGS } from "./config/abSettingTab"
+import type { ABSettingInterface } from "./config/abSettingTab"
+import { ABSettingTab, AB_SETTINGS } from "./config/abSettingTab"
 
 
 export default class AnyBlockPlugin extends Plugin {
