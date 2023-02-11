@@ -1,32 +1,41 @@
 {
-	"name": "obsidian-sample-plugin",
-	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"name": "obsidian-any-block",
+	"version": "1.2.5",
+	"description": "You can flexibility to create a 'Block' by some means.",
+	"author": "LincZero",
+	"authorUrl": "https://github.com/LincZero",
+	"license": "GNU Affero General Public License v3.0",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
+		"dev2": "vite build --watch --mode=development",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
-		"version": "node version-bump.mjs && git add manifest.json versions.json"
+		"build2": "npx svelte-check && vite build --mode=production",
+		"version": "node version-bump.mjs && git add manifest.json versions.json",
+		"bumpversion": "node version-bump.mjs && git add manifest.json versions.json"
 	},
 	"keywords": [],
-	"author": "",
-	"license": "MIT",
 	"devDependencies": {
 		"@codemirror/language": "^6.3.2",
+		"@sveltejs/vite-plugin-svelte": "^2.0.2",
+		"@tsconfig/svelte": "^3.0.0",
 		"@types/node": "^16.11.6",
 		"@typescript-eslint/eslint-plugin": "5.29.0",
 		"@typescript-eslint/parser": "5.29.0",
 		"builtin-modules": "3.3.0",
-		"esbuild": "0.14.47",
+		"esbuild": "^0.14.47",
+		"esbuild-svelte": "^0.7.3",
+		"eslint-plugin-svelte3": "^4.0.0",
 		"obsidian": "latest",
+		"svelte": "^3.55.1",
+		"svelte-check": "^3.0.3",
+		"svelte-preprocess": "^5.0.1",
 		"tslib": "2.4.0",
-		"typescript": "4.7.4"
+		"typescript": "4.7.4",
+		"vite": "^4.1.1"
 	},
 	"dependencies": {
 		"@mermaid-js/mermaid-mindmap": "^9.3.0",
-		"@types/markdown-it": "^12.2.3",
-		"markdown-it": "^13.0.1",
-		"markdown-it-multimd-table": "^4.2.0",
 		"mermaid": "^9.3.0"
 	}
 }

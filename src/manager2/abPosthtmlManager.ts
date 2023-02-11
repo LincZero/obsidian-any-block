@@ -44,7 +44,8 @@ export class ABPosthtmlManager{
     const able_heading:boolean = this.settings.select_heading == ConfSelect.ifhead
 
     // 局部选择器
-    for (const child of el.children) {                          // 这个如果是块的话一般就一层，多层应该是p-br的情况
+    const els:any = el  // @fixing error：“HTML Collection”类型必须具有在指令中返回迭代器的“[Symbol.iterator]()”方法
+    for (const child of els.children) {                          // 这个如果是块的话一般就一层，多层应该是p-br的情况
       // 这一部分是找到根div里的<ul>或<quote><ul>
       let sub_el: HTMLElement
       if (able_list && child instanceof HTMLUListElement) {     // 列表

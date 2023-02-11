@@ -6,7 +6,7 @@ import {MarkdownRenderChild, MarkdownRenderer} from 'obsidian';
 import {ABReg} from "src/config/abReg"
 import ListProcess from "./listProcess"
 import {getID} from "src/utils/utils"
-// import test from "src/svelte/Test.svelt"
+import Component from "../svelte/Component.svelte"
 
 import mermaid from "mermaid"
 import mindmap from '@mermaid-js/mermaid-mindmap';
@@ -136,12 +136,12 @@ registerABProcessor({
   id: "svelt",
   name: "svelt(实验)",
   process: (el, header, content)=>{
-    /*new Test({
+    new Component({
       target: el,
       props: {
         variable: 1
       }
-    });*/
+    });
     return el
   }
 })

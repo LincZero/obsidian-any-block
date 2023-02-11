@@ -1,10 +1,10 @@
 {
-  //"extends": "@tsconfig/svelte/tsconfig.json",
+  "extends": "@tsconfig/svelte/tsconfig.json",
   "compilerOptions": {
-    //"types": ["svelte", "node"],
+    "types": ["svelte", "node"],
     "experimentalDecorators": true,
     "baseUrl": ".",
-    "inlineSourceMap": true,
+    // "inlineSourceMap": true, // 否则svelete文件报错：[svelte-preprocess] Encountered type error
     "inlineSources": true,
     "module": "ESNext",
     "target": "ES6",
@@ -12,19 +12,18 @@
     "noImplicitAny": true,
     "moduleResolution": "node",
     "importHelpers": true,
-    "allowSyntheticDefaultImports": true, // markdown-it模块要加这个
+    // "allowSyntheticDefaultImports": true, // markdown-it模块要加这个
     "isolatedModules": true,
-	"strictNullChecks": true,
+	  "strictNullChecks": true,
     "lib": [
       "DOM",
       "ES5",
       "ES6",
       "ES7",
-      "dom.iterable"  // 并重新启动项目，不然该代码报错：for (let el of blockEl.querySelectorAll("[id^=TX_]"))
-    ]
+      //"dom.iterable"  // 并重新启动项目，不然该代码报错：for (let el of blockEl.querySelectorAll("[id^=TX_]"))
+    ],
   },
   "include": [
-    "**/*.ts",
-    "**/*.svelte",
+    "**/*.ts"
   ]
 }

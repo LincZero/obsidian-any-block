@@ -1,7 +1,7 @@
 {
 	"id": "obsidian-any-block",
 	"name": "Any Block",
-	"version": "1.2.3",
+	"version": "1.2.5",
 	"minAppVersion": "0.15.0",
 	"description": "You can flexibility to create a 'Block' by some means.",
 	"author": "LincZero",
