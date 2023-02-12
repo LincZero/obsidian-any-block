@@ -1,12 +1,10 @@
-/** 基于接口写的扩展处理器的文件
- * 
- */
+/** 基于接口写的扩展处理器的文件 */
 
 import {MarkdownRenderChild, MarkdownRenderer} from 'obsidian';
 import {ABReg} from "src/config/abReg"
-import ListProcess from "./listProcess"
+import type {List_ListInfo} from "./listProcess"
+import {ListProcess} from "./listProcess"
 import {getID} from "src/utils/utils"
-import Component from "../svelte/Component.svelte"
 
 import mermaid from "mermaid"
 import mindmap from '@mermaid-js/mermaid-mindmap';
@@ -55,8 +53,11 @@ export function getProcessorOptions(){
   })
 }
 
-/** */
+/** 处理器一览表 - 生成器 */
 export function generateInfoTable(el: HTMLElement){
+
+
+
   const table_p = el.createEl("div",{
     cls: ["ab-setting","md-table-fig"],
     attr: {"style": "overflow-x:scroll; transform:scaleY(-1)"}
@@ -131,20 +132,6 @@ interface ABProcessorSpec{
   // from: 自带、其他插件、面板设置，如果是其他插件，则需要提供插件的名称（不知道能不能自动识别）
   // is_enable: 加载后能禁用这个项
 }
-
-registerABProcessor({
-  id: "svelte",
-  name: "svelte(实验)",
-  process: (el, header, content)=>{
-    new Component({
-      target: el,
-      props: {
-        variable: 1
-      }
-    });
-    return el
-  }
-})
 
 registerABProcessor({
   id: "md",
