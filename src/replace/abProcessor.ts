@@ -1,5 +1,4 @@
 /** 基于接口写的扩展处理器的文件 */
-
 import {MarkdownRenderChild, MarkdownRenderer} from 'obsidian';
 import {ABReg} from "src/config/abReg"
 import type {List_ListInfo} from "./listProcess"
@@ -19,30 +18,39 @@ export const mermaid_init = async () => {
 export function autoABProcessor(el:HTMLDivElement, header:string, content:string):HTMLElement{
   // 用新变量代替 header 和 content
   const list_header = header.split("|")
-  let result:HTMLElement|string = content
+  let prev_result:any = content
+  let prev_type: ProcessDataType = ProcessDataType.text
+
   // 循环header组，直到遍历完文本处理器或遇到渲染处理器
   for (let item_header of list_header){
-    if (typeof(result)!="string") break
-    const str_result:string = result
     for (let abReplaceProcessor of list_abProcessor){
-      // 如果不匹配则跳过
+      // 通过header寻找处理器
       if (typeof(abReplaceProcessor.match)=='string'){if (abReplaceProcessor.match!=item_header) continue}
       else {if (!abReplaceProcessor.match.test(item_header)) continue}
-      result = abReplaceProcessor.process(el, item_header, str_result)
+      // 找到处理器后，先检查输入类型
+      if(abReplaceProcessor.process_param != prev_type){
+        console.warn("处理器参数类型错误", abReplaceProcessor.process_param, prev_type);
+        break
+      }
+      // 执行处理器
+      prev_result = abReplaceProcessor.process(el, item_header, prev_result)
+      // 检查输出类型
+      if(prev_result instanceof HTMLElement){prev_type = ProcessDataType.el}
+      else if(typeof(prev_result) == "string"){prev_type = ProcessDataType.text}
+      else {
+        console.warn("处理器输出类型错误", abReplaceProcessor.process_param, prev_type);
+        break
+      }
     }
   }
-  // 如果header组里没用渲染处理器，那么给一个md处理器
-  if (typeof(result)=="string") {
-    const child = new MarkdownRenderChild(el);
-    MarkdownRenderer.renderMarkdown(result, el, "", child);
-    result = el
+  // 循环尾处理。如果还是text内容，则给一个md渲染器
+  if (prev_type==ProcessDataType.text) {
+    prev_result = process_md.process(el, header, prev_result)
   }
-  return result
+  return prev_result
 }
 
-/** 获取id-name对，以创建下拉框
- * 注意如果有正则的话，不能给
- */
+/** 获取id-name对，以创建下拉框 */
 export function getProcessorOptions(){
   return list_abProcessor
   .filter(item=>{
@@ -55,9 +63,6 @@ export function getProcessorOptions(){
 
 /** 处理器一览表 - 生成器 */
 export function generateInfoTable(el: HTMLElement){
-
-
-
   const table_p = el.createEl("div",{
     cls: ["ab-setting","md-table-fig"],
     attr: {"style": "overflow-x:scroll; transform:scaleY(-1)"}
@@ -72,7 +77,8 @@ export function generateInfoTable(el: HTMLElement){
     tr.createEl("td", {text: "处理器名"})
     tr.createEl("td", {text: "下拉框默认项"})
     tr.createEl("td", {text: "用途描述"})
-    tr.createEl("td", {text: "处理器类型"})
+    tr.createEl("td", {text: "处理器类型_处理"})
+    tr.createEl("td", {text: "处理器类型_输出"})
     tr.createEl("td", {text: "是否启用"})
     tr.createEl("td", {text: "正则"})
   }
@@ -82,7 +88,9 @@ export function generateInfoTable(el: HTMLElement){
     tr.createEl("td", {text: item.name})
     tr.createEl("td", {text: String(item.default)})
     tr.createEl("td", {text: item.detail, attr:{"style":"max-width:240px;overflow-x:auto"}})
-    tr.createEl("td", {text: item.is_render?"渲染":"文本"})
+    // tr.createEl("td", {text: item.is_render?"渲染":"文本"})
+    tr.createEl("td", {text: item.process_param})
+    tr.createEl("td", {text: item.process_return})
     tr.createEl("td", {text: item.is_disable?"禁用":"启用"})
     tr.createEl("td", {text: String(item.match)})
   }
@@ -91,14 +99,17 @@ export function generateInfoTable(el: HTMLElement){
 /** 注册ab处理器。
  * 不允许直接写严格版的，有些参数不能让用户填
  */
-function registerABProcessor(sim: ABProcessorSpecSimp){
+export function registerABProcessor(sim: ABProcessorSpecSimp){
+  //type t_param = Parameters<typeof sim.process>
+  //type t_return = ReturnType<typeof sim.process>
   const abProcessorSpec:ABProcessorSpec = {
     id: sim.id,
     name: sim.name,
     match: sim.match??sim.id,
     default: sim.default??(!sim.match||typeof(sim.match)=="string")?sim.id:null,
     detail: sim.detail??"",
-    is_render: sim.is_render??true,
+    process_param: sim.process_param,
+    process_return: sim.process_return,
     process: sim.process,
     is_disable: false
   }
@@ -113,14 +124,23 @@ function decorationABProcessor() {
 
 /** ab处理器列表 */
 let list_abProcessor: ABProcessorSpec[] = []
+/** ab处理器子接口
+ * @warn 暂时不允许扩展，处理器的参数和返回值目前还是使用的手动一个一个来检查的
+ */
+export enum ProcessDataType {
+  text= "string",
+  el= "HTMLElement"
+}
 /** ab处理器接口 - 语法糖版 */
-interface ABProcessorSpecSimp{
+export interface ABProcessorSpecSimp{
   id: string            // 唯一标识（当不填match时也会作为匹配项）
   name: string          // 处理器名字
   match?: RegExp|string // 处理器匹配正则（不填则为id，而不是name！name可以被翻译或是重复的）如果填写了且为正则类型，不会显示在下拉框中
   default?: string|null // 下拉选择的默认规则，不填的话：非正则默认为id，有正则则为空
   detail?: string       // 处理器描述
-  is_render?: boolean   // 是否渲染处理器，默认为true。false则为文本处理器
+  // is_render?: boolean   // 是否渲染处理器，默认为true。false则为文本处理器
+  process_param: ProcessDataType
+  process_return: ProcessDataType
   process: (el:HTMLDivElement, header:string, content:string)=> HTMLElement|string
                         // 处理器
 }
@@ -131,7 +151,8 @@ interface ABProcessorSpec{
   match: RegExp|string
   default: string|null
   detail: string
-  is_render: boolean
+  process_param: ProcessDataType,
+  process_return: ProcessDataType,
   process: (el:HTMLDivElement, header:string, content:string)=> HTMLElement|string
   is_disable: boolean   // 是否禁用，默认false
   // 非注册项：
@@ -148,6 +169,8 @@ interface ABProcessorSpec{
 const process_md:ABProcessorSpecSimp = {
   id: "md",
   name: "md",
+  process_param: ProcessDataType.text,
+  process_return: ProcessDataType.el,
   process: (el, header, content)=>{
     const child = new MarkdownRenderChild(el);
     // ctx.addChild(child);
@@ -160,6 +183,8 @@ registerABProcessor(process_md)
 const process_hide:ABProcessorSpecSimp = {
   id: "hide",
   name: "默认折叠",
+  process_param: ProcessDataType.text,
+  process_return: ProcessDataType.el,
   process: (el, header, content)=>{
     const child = new MarkdownRenderChild(el);
     content = text_quote("[!note]-\n"+content)
@@ -172,6 +197,8 @@ registerABProcessor(process_hide)
 const process_flod:ABProcessorSpecSimp = {
   id: "flod",
   name: "可折叠的（借callout）",
+  process_param: ProcessDataType.text,
+  process_return: ProcessDataType.el,
   process: (el, header, content)=>{
     const child = new MarkdownRenderChild(el);
     content = text_quote("[!note]+\n"+content)
@@ -184,7 +211,8 @@ registerABProcessor(process_flod)
 const process_quote:ABProcessorSpecSimp = {
   id: "quote",
   name: "增加引用块",
-  is_render: false,
+  process_param: ProcessDataType.text,
+  process_return: ProcessDataType.text,
   process: (el, header, content)=>{
     return text_quote(content)
   }
@@ -197,7 +225,8 @@ const process_code:ABProcessorSpecSimp = {
   match: /^code(\((.*)\))?$/,
   default: "code()",
   detail: "不加`()`表示用原文本的第一行作为代码类型，括号类型为空表示代码类型为空",
-  is_render: false,
+  process_param: ProcessDataType.text,
+  process_return: ProcessDataType.text,
   process: (el, header, content)=>{
     let matchs = header.match(/^code(\((.*)\))?$/)
     if (!matchs) return content
@@ -210,7 +239,8 @@ registerABProcessor(process_code)
 const process_Xquote:ABProcessorSpecSimp = {
   id: "Xquote",
   name: "去除引用块",
-  is_render: false,
+  process_param: ProcessDataType.text,
+  process_return: ProcessDataType.text,
   process: (el, header, content)=>{
     return text_Xquote(content)
   }
@@ -223,7 +253,8 @@ const process_Xcode:ABProcessorSpecSimp = {
   match: /^Xcode(\((true|false)\))?$/,
   default: "Xcode(true)",
   detail: "参数为是否移除代码类型，默认为false。记法：code|Xcode或code()|Xcode(true)内容不变",
-  is_render: false,
+  process_param: ProcessDataType.text,
+  process_return: ProcessDataType.text,
   process: (el, header, content)=>{
     let matchs = header.match(/^Xcode(\((true|false)\))?$/)
     if (!matchs) return content
@@ -238,7 +269,8 @@ registerABProcessor(process_Xcode)
 const process_X:ABProcessorSpecSimp = {
   id: "X",
   name: "去除代码或引用块",
-  is_render: false,
+  process_param: ProcessDataType.text,
+  process_return: ProcessDataType.text,
   process: (el, header, content)=>{
     return text_X(content)
   }
@@ -248,7 +280,8 @@ registerABProcessor(process_X)
 const process_code2quote:ABProcessorSpecSimp = {
   id: "code2quote",
   name: "代码转引用块",
-  is_render: false,
+  process_param: ProcessDataType.text,
+  process_return: ProcessDataType.text,
   process: (el, header, content)=>{
     content = text_Xcode(content)
     content = text_quote(content)
@@ -262,7 +295,8 @@ const process_quote2code:ABProcessorSpecSimp = {
   name: "引用转代码块",
   match: /^quote2code(\((.*)\))?$/,
   default: "quote2code()",
-  is_render: false,
+  process_param: ProcessDataType.text,
+  process_return: ProcessDataType.text,
   process: (el, header, content)=>{
     let matchs = header.match(/^quote2code(\((.*)\))?$/)
     if (!matchs) return content
@@ -280,7 +314,8 @@ const process_slice:ABProcessorSpecSimp = {
   name: "切片",
   match: /^slice\((\s*\d+\s*)(,\s*-?\d+\s*)?\)$/,
   detail: "和js的slice方法是一样的",
-  is_render: false,
+  process_param: ProcessDataType.text,
+  process_return: ProcessDataType.text,
   process: (el, header, content)=>{
     // slice好像不怕溢出或交错，会自动变空数组。就很省心，不用判断太多的东西
     const list_match = header.match(/^slice\((\s*\d+\s*)(,\s*-?\d+\s*)?\)$/)
@@ -303,7 +338,8 @@ registerABProcessor(process_slice)
 const process_title2list:ABProcessorSpecSimp = {
   id: "title2list",
   name: "标题到列表",
-  is_render: false,
+  process_param: ProcessDataType.text,
+  process_return: ProcessDataType.text,
   detail: "也可以当作是更强大的列表解析器",
   process: (el, header, content)=>{
     content = ListProcess.title2list(content, el)
@@ -315,6 +351,8 @@ registerABProcessor(process_title2list)
 const process_title2table:ABProcessorSpecSimp = {
   id: "title2table",
   name: "标题到表格",
+  process_param: ProcessDataType.text,
+  process_return: ProcessDataType.el,
   process: (el, header, content)=>{
     content = ListProcess.title2list(content, el)
     ListProcess.list2table(content, el)
@@ -326,6 +364,8 @@ registerABProcessor(process_title2table)
 const process_title2mindmap:ABProcessorSpecSimp = {
   id: "title2mindmap",
   name: "标题到脑图",
+  process_param: ProcessDataType.text,
+  process_return: ProcessDataType.el,
   process: (el, header, content)=>{
     content = ListProcess.title2list(content, el)
     ListProcess.list2mindmap(content, el)
@@ -339,7 +379,8 @@ const process_listroot:ABProcessorSpecSimp = {
   name: "增加列表根",
   match: /^listroot\((.*)\)$/,
   default: "listroot(root)",
-  is_render: false,
+  process_param: ProcessDataType.text,
+  process_return: ProcessDataType.text,
   process: (el, header, content)=>{
     const list_match = header.match(/^listroot\((.*)\)$/)
     if (!list_match) return content
@@ -354,7 +395,8 @@ registerABProcessor(process_listroot)
 const process_listXinline:ABProcessorSpecSimp = {
   id: "listXinline",
   name: "列表消除内联换行",
-  is_render: false,
+  process_param: ProcessDataType.text,
+  process_return: ProcessDataType.text,
   process: (el, header, content)=>{
     return ListProcess.listXinline(content)
   }
@@ -366,6 +408,8 @@ const process_list2table:ABProcessorSpecSimp = {
   name: "列表转表格",
   match: /list2(md)?table(T)?/,
   default: "list2table",
+  process_param: ProcessDataType.text,
+  process_return: ProcessDataType.el,
   process: (el, header, content)=>{
     const matchs = header.match(/list2(md)?table(T)?/)
     if (!matchs) return el
@@ -380,6 +424,8 @@ const process_list2lt:ABProcessorSpecSimp = {
   name: "列表转列表表格",
   match: /list2(md)?lt(T)?/,
   default: "list2lt",
+  process_param: ProcessDataType.text,
+  process_return: ProcessDataType.el,
   process: (el, header, content)=>{
     const matchs = header.match(/list2(md)?lt(T)?/)
     if (!matchs) return el
@@ -394,6 +440,8 @@ const process_list2ut:ABProcessorSpecSimp = {
   name: "列表转二维表格",
   match: /list2(md)?ut(T)?/,
   default: "list2ut",
+  process_param: ProcessDataType.text,
+  process_return: ProcessDataType.el,
   process: (el, header, content)=>{
     const matchs = header.match(/list2(md)?ut(T)?/)
     if (!matchs) return el
@@ -408,6 +456,8 @@ const process_list2timeline:ABProcessorSpecSimp = {
   name: "一级列表转时间线",
   match: /list2(md)?timeline(T)?/,
   default: "list2mdtimeline",
+  process_param: ProcessDataType.text,
+  process_return: ProcessDataType.el,
   process: (el, header, content)=>{
     const matchs = header.match(/list2(md)?timeline(T)?/)
     if (!matchs) return el
@@ -422,6 +472,8 @@ const process_list2tab:ABProcessorSpecSimp = {
   name: "一级列表转标签栏",
   match: /list2(md)?tab(T)?$/,
   default: "list2mdtab",
+  process_param: ProcessDataType.text,
+  process_return: ProcessDataType.el,
   process: (el, header, content)=>{
     const matchs = header.match(/list2(md)?tab(T)?$/)
     if (!matchs) return el
@@ -434,6 +486,8 @@ registerABProcessor(process_list2tab)
 const process_list2mermaid:ABProcessorSpecSimp = {
   id: "list2mermaid",
   name: "列表转mermaid流程图",
+  process_param: ProcessDataType.text,
+  process_return: ProcessDataType.el,
   process: (el, header, content)=>{
     ListProcess.list2mermaid(content, el)
     return el
@@ -444,6 +498,8 @@ registerABProcessor(process_list2mermaid)
 const process_list2mindmap:ABProcessorSpecSimp = {
   id: "list2mindmap",
   name: "列表转mermaid思维导图",
+  process_param: ProcessDataType.text,
+  process_return: ProcessDataType.el,
   process: (el, header, content)=>{
     ListProcess.list2mindmap(content, el)
     return el
@@ -457,11 +513,10 @@ const process_callout:ABProcessorSpecSimp = {
   match: /^\!/,
   default: "!note",
   detail: "需要obsidian 0.14版本以上来支持callout语法",
+  process_param: ProcessDataType.text,
+  process_return: ProcessDataType.text,
   process: (el, header, content)=>{
-    const child = new MarkdownRenderChild(el);
-    const text = "```ad-"+header.slice(1)+"\n"+content+"\n```"
-    MarkdownRenderer.renderMarkdown(text, el, "", child);
-    return el
+    return "```ad-"+header.slice(1)+"\n"+content+"\n```"
   }
 }
 registerABProcessor(process_callout)
@@ -472,6 +527,8 @@ const process_mermaid:ABProcessorSpecSimp = {
   match: /^mermaid(\((.*)\))?$/,
   default: "mermaid(graph TB)",
   detail: "由于需要兼容脑图，这里会使用插件内置的最新版mermaid",
+  process_param: ProcessDataType.text,
+  process_return: ProcessDataType.el,
   process: (el, header, content)=>{
     let matchs = content.match(/^mermaid(\((.*)\))?$/)
     if (!matchs) return el
@@ -492,6 +549,8 @@ const process_text:ABProcessorSpecSimp = {
   id: "text",
   name: "纯文本",
   detail: "其实一般会更推荐用code()代替，那个更精确",
+  process_param: ProcessDataType.text,
+  process_return: ProcessDataType.el,
   process: (el, header, content)=>{
     el.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
     // 文本元素。pre不好用，这里还是得用<br>换行最好
