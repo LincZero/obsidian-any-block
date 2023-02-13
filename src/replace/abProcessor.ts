@@ -104,6 +104,13 @@ function registerABProcessor(sim: ABProcessorSpecSimp){
   }
   list_abProcessor.push(abProcessorSpec)
 }
+/** 注册ab处理器（装饰器语法糖） */
+function decorationABProcessor() {
+  return function decorationABProcessor(target: any){
+    registerABProcessor(target)
+  }
+}
+
 /** ab处理器列表 */
 let list_abProcessor: ABProcessorSpec[] = []
 /** ab处理器接口 - 语法糖版 */
@@ -133,7 +140,12 @@ interface ABProcessorSpec{
   // is_enable: 加载后能禁用这个项
 }
 
-registerABProcessor({
+/**
+ * 将registerABProcessor的调用分成两步是因为：
+ * 1. 能方便在大纲里快速找到想要的处理器
+ * 2. 让处理器能互相调用
+ */
+const process_md:ABProcessorSpecSimp = {
   id: "md",
   name: "md",
   process: (el, header, content)=>{
@@ -142,9 +154,10 @@ registerABProcessor({
     MarkdownRenderer.renderMarkdown(content, el, "", child);
     return el
   }
-})
+}
+registerABProcessor(process_md)
 
-registerABProcessor({
+const process_hide:ABProcessorSpecSimp = {
   id: "hide",
   name: "默认折叠",
   process: (el, header, content)=>{
@@ -153,30 +166,32 @@ registerABProcessor({
     MarkdownRenderer.renderMarkdown(content, el, "", child);
     return el
   }
-})
+}
+registerABProcessor(process_hide)
 
-// 可折叠（借callout）
-registerABProcessor({
+const process_flod:ABProcessorSpecSimp = {
   id: "flod",
-  name: "可折叠的",
+  name: "可折叠的（借callout）",
   process: (el, header, content)=>{
     const child = new MarkdownRenderChild(el);
     content = text_quote("[!note]+\n"+content)
     MarkdownRenderer.renderMarkdown(content, el, "", child);
     return el
   }
-})
+}
+registerABProcessor(process_flod)
 
-registerABProcessor({
+const process_quote:ABProcessorSpecSimp = {
   id: "quote",
   name: "增加引用块",
   is_render: false,
   process: (el, header, content)=>{
     return text_quote(content)
   }
-})
+}
+registerABProcessor(process_quote)
 
-registerABProcessor({
+const process_code:ABProcessorSpecSimp = {
   id: "code",
   name: "增加代码块",
   match: /^code(\((.*)\))?$/,
@@ -189,18 +204,20 @@ registerABProcessor({
     if (matchs[1]) content = matchs[2]+"\n"+content
     return text_code(content)
   }
-})
+}
+registerABProcessor(process_code)
 
-registerABProcessor({
+const process_Xquote:ABProcessorSpecSimp = {
   id: "Xquote",
   name: "去除引用块",
   is_render: false,
   process: (el, header, content)=>{
     return text_Xquote(content)
   }
-})
+}
+registerABProcessor(process_Xquote)
 
-registerABProcessor({
+const process_Xcode:ABProcessorSpecSimp = {
   id: "Xcode",
   name: "去除代码块",
   match: /^Xcode(\((true|false)\))?$/,
@@ -215,18 +232,20 @@ registerABProcessor({
     else remove_flag= (matchs[2]=="true")
     return text_Xcode(content, remove_flag)
   }
-})
+}
+registerABProcessor(process_Xcode)
 
-registerABProcessor({
+const process_X:ABProcessorSpecSimp = {
   id: "X",
   name: "去除代码或引用块",
   is_render: false,
   process: (el, header, content)=>{
     return text_X(content)
   }
-})
+}
+registerABProcessor(process_X)
 
-registerABProcessor({
+const process_code2quote:ABProcessorSpecSimp = {
   id: "code2quote",
   name: "代码转引用块",
   is_render: false,
@@ -235,9 +254,10 @@ registerABProcessor({
     content = text_quote(content)
     return content
   }
-})
+}
+registerABProcessor(process_code2quote)
 
-registerABProcessor({
+const process_quote2code:ABProcessorSpecSimp = {
   id: "quote2code",
   name: "引用转代码块",
   match: /^quote2code(\((.*)\))?$/,
@@ -252,9 +272,10 @@ registerABProcessor({
     content = text_code(content)
     return content
   }
-})
+}
+registerABProcessor(process_quote2code)
 
-registerABProcessor({
+const process_slice:ABProcessorSpecSimp = {
   id: "slice",
   name: "切片",
   match: /^slice\((\s*\d+\s*)(,\s*-?\d+\s*)?\)$/,
@@ -276,9 +297,10 @@ registerABProcessor({
       return content.split("\n").slice(arg1, arg2).join("\n")
     }
   }
-})
+}
+registerABProcessor(process_slice)
 
-registerABProcessor({
+const process_title2list:ABProcessorSpecSimp = {
   id: "title2list",
   name: "标题到列表",
   is_render: false,
@@ -287,9 +309,10 @@ registerABProcessor({
     content = ListProcess.title2list(content, el)
     return content
   }
-})
+}
+registerABProcessor(process_title2list)
 
-registerABProcessor({
+const process_title2table:ABProcessorSpecSimp = {
   id: "title2table",
   name: "标题到表格",
   process: (el, header, content)=>{
@@ -297,9 +320,10 @@ registerABProcessor({
     ListProcess.list2table(content, el)
     return el
   }
-})
+}
+registerABProcessor(process_title2table)
 
-registerABProcessor({
+const process_title2mindmap:ABProcessorSpecSimp = {
   id: "title2mindmap",
   name: "标题到脑图",
   process: (el, header, content)=>{
@@ -307,9 +331,10 @@ registerABProcessor({
     ListProcess.list2mindmap(content, el)
     return el
   }
-})
+}
+registerABProcessor(process_title2mindmap)
 
-registerABProcessor({
+const process_listroot:ABProcessorSpecSimp = {
   id: "listroot",
   name: "增加列表根",
   match: /^listroot\((.*)\)$/,
@@ -323,18 +348,20 @@ registerABProcessor({
     content = "- "+arg1+"\n"+content
     return content
   }
-})
+}
+registerABProcessor(process_listroot)
 
-registerABProcessor({
+const process_listXinline:ABProcessorSpecSimp = {
   id: "listXinline",
   name: "列表消除内联换行",
   is_render: false,
   process: (el, header, content)=>{
     return ListProcess.listXinline(content)
   }
-})
+}
+registerABProcessor(process_listXinline)
 
-registerABProcessor({
+const process_list2table:ABProcessorSpecSimp = {
   id: "list2table",
   name: "列表转表格",
   match: /list2(md)?table(T)?/,
@@ -345,9 +372,10 @@ registerABProcessor({
     ListProcess.list2table(content, el, matchs[1]=="md", matchs[2]=="T")
     return el
   }
-})
+}
+registerABProcessor(process_list2table)
 
-registerABProcessor({
+const process_list2lt:ABProcessorSpecSimp = {
   id: "list2lt",
   name: "列表转列表表格",
   match: /list2(md)?lt(T)?/,
@@ -358,9 +386,10 @@ registerABProcessor({
     ListProcess.list2lt(content, el, matchs[1]=="md", matchs[2]=="T")
     return el
   }
-})
+}
+registerABProcessor(process_list2lt)
 
-registerABProcessor({
+const process_list2ut:ABProcessorSpecSimp = {
   id: "list2ut",
   name: "列表转二维表格",
   match: /list2(md)?ut(T)?/,
@@ -371,9 +400,10 @@ registerABProcessor({
     ListProcess.list2ut(content, el, matchs[1]=="md", matchs[2]=="T")
     return el
   }
-})
+}
+registerABProcessor(process_list2ut)
 
-registerABProcessor({
+const process_list2timeline:ABProcessorSpecSimp = {
   id: "list2timeline",
   name: "一级列表转时间线",
   match: /list2(md)?timeline(T)?/,
@@ -384,9 +414,10 @@ registerABProcessor({
     ListProcess.list2timeline(content, el, matchs[1]=="md", matchs[2]=="T")
     return el
   }
-})
+}
+registerABProcessor(process_list2timeline)
 
-registerABProcessor({
+const process_list2tab:ABProcessorSpecSimp = {
   id: "list2tab",
   name: "一级列表转标签栏",
   match: /list2(md)?tab(T)?$/,
@@ -397,27 +428,30 @@ registerABProcessor({
     ListProcess.list2tab(content, el, matchs[1]=="md", matchs[2]=="T")
     return el
   }
-})
+}
+registerABProcessor(process_list2tab)
 
-registerABProcessor({
+const process_list2mermaid:ABProcessorSpecSimp = {
   id: "list2mermaid",
   name: "列表转mermaid流程图",
   process: (el, header, content)=>{
     ListProcess.list2mermaid(content, el)
     return el
   }
-})
+}
+registerABProcessor(process_list2mermaid)
 
-registerABProcessor({
+const process_list2mindmap:ABProcessorSpecSimp = {
   id: "list2mindmap",
   name: "列表转mermaid思维导图",
   process: (el, header, content)=>{
     ListProcess.list2mindmap(content, el)
     return el
   }
-})
+}
+registerABProcessor(process_list2mindmap)
 
-registerABProcessor({
+const process_callout:ABProcessorSpecSimp = {
   id: "callout",
   name: "callout语法糖",
   match: /^\!/,
@@ -429,9 +463,10 @@ registerABProcessor({
     MarkdownRenderer.renderMarkdown(text, el, "", child);
     return el
   }
-})
+}
+registerABProcessor(process_callout)
 
-registerABProcessor({
+const process_mermaid:ABProcessorSpecSimp = {
   id: "mermaid",
   name: "新mermaid",
   match: /^mermaid(\((.*)\))?$/,
@@ -450,9 +485,10 @@ registerABProcessor({
     })(el, header, content)
     return el
   }
-})
+}
+registerABProcessor(process_mermaid)
 
-registerABProcessor({
+const process_text:ABProcessorSpecSimp = {
   id: "text",
   name: "纯文本",
   detail: "其实一般会更推荐用code()代替，那个更精确",
@@ -463,7 +499,8 @@ registerABProcessor({
     el.innerHTML = `<p>${content.replace(/ /g, "&nbsp;").split("\n").join("<br/>")}</p>`
     return el
   }
-})
+}
+registerABProcessor(process_text)
 
 /** 5个文本处理脚本 */
 
