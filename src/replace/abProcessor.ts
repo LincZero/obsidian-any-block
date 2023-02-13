@@ -16,39 +16,72 @@ export const mermaid_init = async () => {
  * ab处理器能根据header和content来转化文本或生成dom元素
  */
 export function autoABProcessor(el:HTMLDivElement, header:string, content:string):HTMLElement{
-  // 用新变量代替 header 和 content
-  const list_header = header.split("|")
   let prev_result:any = content
+  let list_header = header.split("|")
   let prev_type: ProcessDataType = ProcessDataType.text
-
-  // 循环header组，直到遍历完文本处理器或遇到渲染处理器
-  for (let item_header of list_header){
-    for (let abReplaceProcessor of list_abProcessor){
-      // 通过header寻找处理器
-      if (typeof(abReplaceProcessor.match)=='string'){if (abReplaceProcessor.match!=item_header) continue}
-      else {if (!abReplaceProcessor.match.test(item_header)) continue}
-      // 找到处理器后，先检查输入类型
-      if(abReplaceProcessor.process_param != prev_type){
-        console.warn("处理器参数类型错误", abReplaceProcessor.process_param, prev_type);
-        break
-      }
-      // 执行处理器
-      prev_result = abReplaceProcessor.process(el, item_header, prev_result)
-      // 检查输出类型
-      if(prev_result instanceof HTMLElement){prev_type = ProcessDataType.el}
-      else if(typeof(prev_result) == "string"){prev_type = ProcessDataType.text}
-      else {
-        console.warn("处理器输出类型错误", abReplaceProcessor.process_param, prev_type);
-        break
-      }
-    }
-  }
-  // 循环尾处理。如果还是text内容，则给一个md渲染器
+  prev_result = run_processor(el, list_header, prev_result, prev_type)
+  
+  // 尾处理。如果还是text内容，则给一个md渲染器
   if (prev_type==ProcessDataType.text) {
-    prev_result = process_md.process(el, header, prev_result)
+    const child = new MarkdownRenderChild(el);
+    MarkdownRenderer.renderMarkdown(prev_result, el, "", child);
+    prev_result = el
   }
   return prev_result
+
+  // iterable function
+  function run_processor(el:HTMLDivElement, list_header:string[], prev_result:any, prev_type:ProcessDataType):any{
+    // 循环header组，直到遍历完文本处理器或遇到渲染处理器
+    for (let item_header of list_header){
+      for (let abReplaceProcessor of list_abProcessor){
+        // 通过header寻找处理器
+        if (typeof(abReplaceProcessor.match)=='string'){if (abReplaceProcessor.match!=item_header) continue}
+        else {if (!abReplaceProcessor.match.test(item_header)) continue}
+        // 检查是否有别名。若是，递归
+        if(abReplaceProcessor.process_alias){
+          // 别名支持引用正则参数
+          let alias = abReplaceProcessor.process_alias
+          ;(()=>{
+            if (abReplaceProcessor.process_alias.indexOf("%")<0) return
+            if (typeof(abReplaceProcessor.match)=="string") return
+            const matchs = item_header.match(abReplaceProcessor.match)
+            if (!matchs) return
+            const len = matchs.length
+            if (len==1) return
+            // replaceAlias
+            for (let i=1; i<len; i++){
+              if (!matchs[i]) continue
+              alias = alias.replace(RegExp(`%${i}`), matchs[i]) /** @bug 按理应该用`(?<!\\)%${i}`，但ob不支持正则的向前查找 */
+            }
+          })()
+          prev_result = run_processor(el, alias.split("|"), prev_result, prev_type)
+        }
+        // 若不是，使用process方法
+        else if(abReplaceProcessor.process){
+          // 检查输入类型
+          if(abReplaceProcessor.process_param != prev_type){
+            console.warn("处理器参数类型错误", abReplaceProcessor.process_param, prev_type);
+            break
+          }
+          // 执行处理器
+          prev_result = abReplaceProcessor.process(el, item_header, prev_result)
+          // 检查输出类型
+          if(prev_result instanceof HTMLElement){prev_type = ProcessDataType.el}
+          else if(typeof(prev_result) == "string"){prev_type = ProcessDataType.text}
+          else {
+            console.warn("处理器输出类型错误", abReplaceProcessor.process_param, prev_type);
+            break
+          }
+        }
+        else{
+          console.warn("处理器必须实现process或process_alias方法")
+        }
+      }
+    }
+    return prev_result
+  }
 }
+
 
 /** 获取id-name对，以创建下拉框 */
 export function getProcessorOptions(){
@@ -77,10 +110,11 @@ export function generateInfoTable(el: HTMLElement){
     tr.createEl("td", {text: "处理器名"})
     tr.createEl("td", {text: "下拉框默认项"})
     tr.createEl("td", {text: "用途描述"})
-    tr.createEl("td", {text: "处理器类型_处理"})
-    tr.createEl("td", {text: "处理器类型_输出"})
+    tr.createEl("td", {text: "处理类型"})
+    tr.createEl("td", {text: "输出类型"})
     tr.createEl("td", {text: "是否启用"})
     tr.createEl("td", {text: "正则"})
+    tr.createEl("td", {text: "别名替换"})
   }
   const tbody = table.createEl("tbody")
   for (let item of list_abProcessor){
@@ -93,6 +127,7 @@ export function generateInfoTable(el: HTMLElement){
     tr.createEl("td", {text: item.process_return})
     tr.createEl("td", {text: item.is_disable?"禁用":"启用"})
     tr.createEl("td", {text: String(item.match)})
+    tr.createEl("td", {text: item.process_alias})
   }
 }
 
@@ -108,6 +143,7 @@ export function registerABProcessor(sim: ABProcessorSpecSimp){
     match: sim.match??sim.id,
     default: sim.default??(!sim.match||typeof(sim.match)=="string")?sim.id:null,
     detail: sim.detail??"",
+    process_alias: sim.process_alias??"",
     process_param: sim.process_param,
     process_return: sim.process_return,
     process: sim.process,
@@ -139,9 +175,10 @@ export interface ABProcessorSpecSimp{
   default?: string|null // 下拉选择的默认规则，不填的话：非正则默认为id，有正则则为空
   detail?: string       // 处理器描述
   // is_render?: boolean   // 是否渲染处理器，默认为true。false则为文本处理器
+  process_alias?: string    // 组装，如果不为空串则会覆盖process方法，但扔需要给process一个空实现
   process_param: ProcessDataType
   process_return: ProcessDataType
-  process: (el:HTMLDivElement, header:string, content:string)=> HTMLElement|string
+  process: (el:HTMLDivElement, header:string, content:string)=> any
                         // 处理器
 }
 /** ab处理器接口 - 严格版 */
@@ -151,9 +188,10 @@ interface ABProcessorSpec{
   match: RegExp|string
   default: string|null
   detail: string
+  process_alias: string,
   process_param: ProcessDataType,
   process_return: ProcessDataType,
-  process: (el:HTMLDivElement, header:string, content:string)=> HTMLElement|string
+  process: (el:HTMLDivElement, header:string, content:string)=> any
   is_disable: boolean   // 是否禁用，默认false
   // 非注册项：
   // ~~is_inner：这个不可设置，用来区分是内部还是外部给的~~
@@ -166,6 +204,7 @@ interface ABProcessorSpec{
  * 1. 能方便在大纲里快速找到想要的处理器
  * 2. 让处理器能互相调用
  */
+
 const process_md:ABProcessorSpecSimp = {
   id: "md",
   name: "md",
@@ -180,7 +219,7 @@ const process_md:ABProcessorSpecSimp = {
 }
 registerABProcessor(process_md)
 
-const process_hide:ABProcessorSpecSimp = {
+/*const process_hide:ABProcessorSpecSimp = {
   id: "hide",
   name: "默认折叠",
   process_param: ProcessDataType.text,
@@ -192,9 +231,9 @@ const process_hide:ABProcessorSpecSimp = {
     return el
   }
 }
-registerABProcessor(process_hide)
+registerABProcessor(process_hide)*/
 
-const process_flod:ABProcessorSpecSimp = {
+/*const process_flod:ABProcessorSpecSimp = {
   id: "flod",
   name: "可折叠的（借callout）",
   process_param: ProcessDataType.text,
@@ -206,7 +245,7 @@ const process_flod:ABProcessorSpecSimp = {
     return el
   }
 }
-registerABProcessor(process_flod)
+registerABProcessor(process_flod)*/
 
 const process_quote:ABProcessorSpecSimp = {
   id: "quote",
@@ -214,7 +253,7 @@ const process_quote:ABProcessorSpecSimp = {
   process_param: ProcessDataType.text,
   process_return: ProcessDataType.text,
   process: (el, header, content)=>{
-    return text_quote(content)
+    return content.split("\n").map((line)=>{return "> "+line}).join("\n")
   }
 }
 registerABProcessor(process_quote)
@@ -231,7 +270,7 @@ const process_code:ABProcessorSpecSimp = {
     let matchs = header.match(/^code(\((.*)\))?$/)
     if (!matchs) return content
     if (matchs[1]) content = matchs[2]+"\n"+content
-    return text_code(content)
+    return "```"+content+"\n```"
   }
 }
 registerABProcessor(process_code)
@@ -242,7 +281,9 @@ const process_Xquote:ABProcessorSpecSimp = {
   process_param: ProcessDataType.text,
   process_return: ProcessDataType.text,
   process: (el, header, content)=>{
-    return text_Xquote(content)
+    return content.split("\n").map(line=>{
+      return line.replace(/^>\s/, "")
+    }).join("\n")
   }
 }
 registerABProcessor(process_Xquote)
@@ -252,7 +293,7 @@ const process_Xcode:ABProcessorSpecSimp = {
   name: "去除代码块",
   match: /^Xcode(\((true|false)\))?$/,
   default: "Xcode(true)",
-  detail: "参数为是否移除代码类型，默认为false。记法：code|Xcode或code()|Xcode(true)内容不变",
+  detail: "参数为是否移除代码类型, 默认为false。记法: code|Xcode或code()|Xcode(true)内容不变",
   process_param: ProcessDataType.text,
   process_return: ProcessDataType.text,
   process: (el, header, content)=>{
@@ -261,7 +302,33 @@ const process_Xcode:ABProcessorSpecSimp = {
     let remove_flag:boolean
     if (matchs[1]=="") remove_flag=false
     else remove_flag= (matchs[2]=="true")
-    return text_Xcode(content, remove_flag)
+    let list_content = content.split("\n")
+    // 开始去除
+    let code_flag = ""
+    let line_start = -1
+    let line_end = -1
+    for (let i=0; i<list_content.length; i++){
+      if (code_flag==""){     // 寻找开始标志
+        const match_tmp = list_content[i].match(ABReg.reg_code)
+        if(match_tmp){
+          code_flag = match_tmp[1]
+          line_start = i
+        }
+      }
+      else {                  // 寻找结束标志
+        if(list_content[i].indexOf(code_flag)>=0){
+          line_end = i
+          break
+        }
+      }
+    }
+    if(line_start>=0 && line_end>0) { // 避免有头无尾的情况
+      if(remove_flag) list_content[line_start] = list_content[line_start].replace(/^```(.*)$|^~~~(.*)$/, "")
+      else list_content[line_start] = list_content[line_start].replace(/^```|^~~~/, "")
+      list_content[line_end] = list_content[line_end].replace(/^```|^~~~/, "")
+      content = list_content.join("\n")//.trim()
+    }
+    return content
   }
 }
 registerABProcessor(process_Xcode)
@@ -272,7 +339,14 @@ const process_X:ABProcessorSpecSimp = {
   process_param: ProcessDataType.text,
   process_return: ProcessDataType.text,
   process: (el, header, content)=>{
-    return text_X(content)
+    let flag = ""
+    for (let line of content.split("\n")){
+      if (ABReg.reg_code.test(line)) {flag="code";break}
+      else if (ABReg.reg_quote.test(line)) {flag="quote";break}
+    }
+    if (flag=="code") return process_Xcode.process(el, header, content)
+    else if (flag=="quote") return process_Xquote.process(el, header, content)
+    return content
   }
 }
 registerABProcessor(process_X)
@@ -282,11 +356,8 @@ const process_code2quote:ABProcessorSpecSimp = {
   name: "代码转引用块",
   process_param: ProcessDataType.text,
   process_return: ProcessDataType.text,
-  process: (el, header, content)=>{
-    content = text_Xcode(content)
-    content = text_quote(content)
-    return content
-  }
+  process_alias: "Xcode|quote",
+  process: (el, header, content)=>{}
 }
 registerABProcessor(process_code2quote)
 
@@ -297,14 +368,14 @@ const process_quote2code:ABProcessorSpecSimp = {
   default: "quote2code()",
   process_param: ProcessDataType.text,
   process_return: ProcessDataType.text,
+  process_alias: "Xquote|code%1",
   process: (el, header, content)=>{
-    let matchs = header.match(/^quote2code(\((.*)\))?$/)
+    /*let matchs = header.match(/^quote2code(\((.*)\))?$/)
     if (!matchs) return content
-
     content = text_Xquote(content)
     if (matchs[1]) content = matchs[2]+"\n"+content
     content = text_code(content)
-    return content
+    return content*/
   }
 }
 registerABProcessor(process_quote2code)
@@ -334,6 +405,33 @@ const process_slice:ABProcessorSpecSimp = {
   }
 }
 registerABProcessor(process_slice)
+
+const process_add:ABProcessorSpecSimp = {
+  id: "add",
+  name: "增添内容",
+  match: /^add\((.*)(,\s*-?\d+\s*)?\)$/,
+  detail: "增添. 参数2为行序, 默认0, 行尾-1。会插行增添",
+  process_param: ProcessDataType.text,
+  process_return: ProcessDataType.text,
+  process: (el, header, content)=>{
+    const list_match = header.match(/^slice\((\s*\d+\s*)(,\s*-?\d+\s*)?\)$/)
+    if (!list_match) return content
+    const arg1 = Number(list_match[1].trim())
+    if (isNaN(arg1)) return content
+    let arg2 = Number(list_match[2].replace(",","").trim())
+    if (isNaN(arg2)) {
+      arg2 = 0
+    }
+    const list_content = content.split("\n")
+    if (arg2>=0 && arg2<list_content.length) list_content[arg2] = arg1+"\n"+list_content[arg2]
+    else if(arg2<0 && (arg2*-1)<=list_content.length) {
+      arg2 = list_content.length+arg2
+      list_content[arg2] = arg1+"\n"+list_content[arg2]
+    }
+    return list_content.join("\n")
+  }
+}
+registerABProcessor(process_add)
 
 const process_title2list:ABProcessorSpecSimp = {
   id: "title2list",
@@ -560,60 +658,3 @@ const process_text:ABProcessorSpecSimp = {
   }
 }
 registerABProcessor(process_text)
-
-/** 5个文本处理脚本 */
-
-function text_X(content:string): string{
-  let flag = ""
-  for (let line of content.split("\n")){
-    if (ABReg.reg_code.test(line)) {flag="code";break}
-    else if (ABReg.reg_quote.test(line)) {flag="quote";break}
-  }
-  if (flag=="code") return text_Xcode(content)
-  else if (flag=="quote") return text_Xquote(content)
-  return content
-}
-
-function text_quote(content:string): string{
-  return content.split("\n").map((line)=>{return "> "+line}).join("\n")
-}
-
-function text_Xquote(content:string): string{
-  return content.split("\n").map(line=>{
-    return line.replace(/^>\s/, "")
-  }).join("\n")
-}
-
-function text_code(content:string): string{
-  return "```"+content+"\n```"
-}
-
-// @param remove_flag：是否去除code的类型，默认为true
-function text_Xcode(content:string, remove_flag=true): string{
-  let list_content = content.split("\n")
-  let code_flag = ""
-  let line_start = -1
-  let line_end = -1
-  for (let i=0; i<list_content.length; i++){
-    if (code_flag==""){     // 寻找开始标志
-      const match_tmp = list_content[i].match(ABReg.reg_code)
-      if(match_tmp){
-        code_flag = match_tmp[1]
-        line_start = i
-      }
-    }
-    else {                  // 寻找结束标志
-      if(list_content[i].indexOf(code_flag)>=0){
-        line_end = i
-        break
-      }
-    }
-  }
-  if(line_start>=0 && line_end>0) { // 避免有头无尾的情况
-    if(remove_flag) list_content[line_start] = list_content[line_start].replace(/^```(.*)$|^~~~(.*)$/, "")
-    else list_content[line_start] = list_content[line_start].replace(/^```|^~~~/, "")
-    list_content[line_end] = list_content[line_end].replace(/^```|^~~~/, "")
-    content = list_content.join("\n")//.trim()
-  }
-  return content
-}
