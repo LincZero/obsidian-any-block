@@ -6,20 +6,19 @@ import { ABReg } from 'src/config/abReg'
 import GeneratorBranchTable from "src/svelte/GeneratorBranchTable.svelte"
 import GeneratorListTable from "src/svelte/GeneratorListTable.svelte"
 import GeneratorTab from "src/svelte/GeneratorTab.svelte"
-import { generateInfoTable } from './abProcessor'
 
 // 通用列表数据，一个元素等于是一个列表项
-interface ListInfo {
+interface ListItem {
   content: string;        // 内容
   level: number;          // 级别
 }[]
-export type List_ListInfo = ListInfo[]
+export type List_ListItem = ListItem[]
 // 通用表格数据，一个元素等于是一个单元格项
-interface TableInfo extends ListInfo{
+interface TableItem extends ListItem{
   tableRow: number,       // 跨行数
   tableLine: number       // 对应首行序列
 }
-export type List_TableInfo = TableInfo[]
+export type List_TableItem = TableItem[]
 
 export class ListProcess{
 
@@ -139,7 +138,7 @@ export class ListProcess{
     }
 
     // 列表文本转列表数据
-    let list_itemInfo:List_ListInfo = []
+    let list_itemInfo:List_ListItem = []
 
     const list_text = text.split("\n")
     for (let line of list_text) {                                             // 每行
@@ -171,7 +170,7 @@ export class ListProcess{
 
   // 标题大纲转列表数据（@todo 正文的level+10，要减掉）
   private static title2data(text: string){
-    let list_itemInfo:List_ListInfo = []
+    let list_itemInfo:List_ListItem = []
 
     const list_text = text.split("\n")
     let mul_mode:string = ""      // 多行模式，para或list或title或空
@@ -226,7 +225,7 @@ export class ListProcess{
   // 这种类型的列表只有两层
   private static old_ulist2data(text: string){
     // 列表文本转列表数据
-    let list_itemInfo:List_ListInfo = []
+    let list_itemInfo:List_ListItem = []
 
     let level1 = -1
     let level2 = -1
@@ -287,7 +286,7 @@ export class ListProcess{
    * 第一列的level总为0
    */
   private static ullist2data(text: string){
-    let list_itemInfo:List_ListInfo = []
+    let list_itemInfo:List_ListItem = []
     
     const list_text = text.split("\n")
     for (let line of list_text) {                                             // 每行
@@ -326,7 +325,7 @@ export class ListProcess{
 
   /** 列表数据严格化 */
   private static data2strict(
-    list_itemInfo: List_ListInfo
+    list_itemInfo: List_ListItem
   ){
     let list_prev_level:number[] = [-999]
     let list_itemInfo2:{content:string, level:number}[] = []
@@ -371,9 +370,9 @@ export class ListProcess{
    *  - 2\n   - 3\n  - 2
    */
   private static data_mL_2_2L1B(
-    list_itemInfo: List_ListInfo
+    list_itemInfo: List_ListItem
   ){
-    let list_itemInfo2: List_ListInfo = []
+    let list_itemInfo2: List_ListItem = []
     let level1 = -1
     let level2 = -1
     let flag_leve2 = false  // 表示触发过level2，当遇到level1会重置
@@ -431,9 +430,9 @@ export class ListProcess{
    *  - 2
    */
   private static data_mL_2_2L(
-    list_itemInfo: List_ListInfo
+    list_itemInfo: List_ListItem
   ){
-    let list_itemInfo2: List_ListInfo = []
+    let list_itemInfo2: List_ListItem = []
     let level1 = -1
     let level2 = -1
     for (let itemInfo of list_itemInfo) {
@@ -516,9 +515,9 @@ export class ListProcess{
    *   - 3
    */
   private static data_2L_2_mL1B(
-    list_itemInfo: List_ListInfo
+    list_itemInfo: List_ListItem
   ){
-    let list_itemInfo2:List_ListInfo = []
+    let list_itemInfo2:List_ListItem = []
     let count_level_2 = 0
     for (let item of list_itemInfo){
       if (item.level!=0){                     // 在二层，依次增加层数
@@ -542,13 +541,13 @@ export class ListProcess{
 
   /** 列表数据转表格 */
   private static data2table(
-    list_itemInfo: List_ListInfo, 
+    list_itemInfo: List_ListItem, 
     div: HTMLDivElement,
     modeMD: boolean,
     modeT: boolean        // 是否转置
   ){
     // 组装成表格数据 (列表是深度优先)
-    let list_tableInfo:List_TableInfo = []
+    let list_tableInfo:List_TableItem = []
     let prev_line = -1   // 并存储后一行的序列!
     let prev_level = 999 // 上一行的等级
     for (let i=0; i<list_itemInfo.length; i++){
@@ -600,14 +599,14 @@ export class ListProcess{
    * 第一列等级为0、没有分叉
    */
   private static uldata2ultable(
-    list_itemInfo: List_ListInfo, 
+    list_itemInfo: List_ListItem, 
     div: HTMLDivElement,
     modeMD: boolean,
     modeT: boolean
   ){
     // 组装成表格数据 (列表是深度优先)
     let tr_line_level = [] // 表格行等级（树形表格独有）
-    let list_tableInfo:List_TableInfo = []
+    let list_tableInfo:List_TableItem = []
     let prev_line = -1   // 并存储后一行的序列!
     let prev_level = 999 // 上一行的等级
     for (let i=0; i<list_itemInfo.length; i++){
@@ -657,7 +656,7 @@ export class ListProcess{
    * 另外还有个妙用：list2data + data2list = listXinline
    */
   private static data2list(
-    list_itemInfo: List_ListInfo
+    list_itemInfo: List_ListItem
   ){
     let list_newcontent:string[] = []
     // 每一个level里的content处理
@@ -677,7 +676,7 @@ export class ListProcess{
 
   /** 列表数据转标签栏 */
   private static data2tab(
-    list_itemInfo: List_ListInfo, 
+    list_itemInfo: List_ListItem, 
     div: HTMLDivElement,
     modeMD: boolean,
     modeT: boolean
@@ -698,7 +697,7 @@ export class ListProcess{
    * 然后注意一下mermaid的(项)不能有空格，或非法字符。空格我处理掉了，字符我先不管
    */
   private static data2mermaid(
-    list_itemInfo: List_ListInfo, 
+    list_itemInfo: List_ListItem, 
     div: HTMLDivElement
   ){
     const html_mode = false    // @todo 暂时没有设置来切换这个开关
@@ -742,7 +741,7 @@ export class ListProcess{
 
   /** 列表数据转mermaid思维导图 */
   private static data2mindmap(
-    list_itemInfo: List_ListInfo, 
+    list_itemInfo: List_ListItem, 
     div: HTMLDivElement
   ){
     let list_newcontent:string[] = []

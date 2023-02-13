@@ -1,6 +1,8 @@
-import {App, PluginSettingTab, Setting} from "obsidian"
+import {App, PluginSettingTab, Setting, Modal} from "obsidian"
 import type AnyBlockPlugin from "../main"
-import {generateInfoTable} from "src/replace/abProcessor"
+import {generateInfoTable, registerABProcessor2} from "src/replace/abProcessor"
+import {} from "src/replace/baseProcessor"  // 加载所有处理器
+import {} from "src/replace/listProcessor"  // ^
 
 /** 设置值接口 */
 export interface ABSettingInterface {
@@ -240,6 +242,101 @@ export class ABSettingTab extends PluginSettingTab {
       .setDisabled(true)
 
     containerEl.createEl('h2', {text: '查看所有注册指令'});
+    new Setting(containerEl)
+      .setName('添加新的注册指令')
+      .addButton(component => {
+        component
+        .setIcon("plus-circle")
+        .onClick(e => {
+          new ABProcessorModal(this.app, (result)=>{
+            console.log("对话框结果", result)
+            // 
+          }).open()
+        })
+      })
     generateInfoTable(containerEl)
 	}
+}
+
+class ABProcessorModal extends Modal {
+  args: {
+    id:string
+    name:string
+    match:string
+    alias:string
+  }
+  onSubmit: (args: {
+    id:string
+    name:string
+    match:string
+    alias:string
+  })=>void
+
+  constructor(
+    app: App, 
+    onSubmit: (args: {
+      id:string
+      name:string
+      match:string
+      alias:string
+    })=>void
+  ) {
+    super(app);
+    this.onSubmit = onSubmit
+  }
+
+  onOpen() {	// onOpen() 方法在对话框打开时被调用，它负责创建对话框中的内容。想要获取更多信息，可以查阅 HTML elements。
+    let { contentEl } = this;
+    contentEl.setText("自定义处理器");
+    new Setting(contentEl)
+      .setName("处理器唯一id")
+      .setDesc("不与其他处理器冲突即可")
+      .addText((text)=>{
+        text.onChange((value) => {
+          this.args.id = value
+        })
+      })
+
+    new Setting(contentEl)
+      .setName("注册器名字")
+      .addText((text)=>{
+        text.onChange((value) => {
+        this.args.name = value
+      })
+    })
+
+    new Setting(contentEl)
+      .setName("注册器匹配名")
+      .setDesc("用/包括起来则表示正则")
+      .addText((text)=>{
+        text.onChange((value) => {
+        this.args.match = value
+      })
+    })
+
+    new Setting(contentEl)
+      .setName("注册器替换为")
+      .setDesc("用/包括起来则判断为正则")
+      .addText((text)=>{
+        text.onChange((value) => {
+        this.args.alias = value
+      })
+    })
+
+    new Setting(contentEl)
+      .addButton(btn => {
+        btn
+        .setButtonText("提交")
+        .setCta() // 这个不知道什么意思
+        .onClick(() => {
+          this.close();
+          this.onSubmit(this.args);
+        })
+      })
+  }
+
+  onClose() {	// onClose() 方法在对话框被关闭时调用，它负责清理对话框所占用的资源。
+    let { contentEl } = this;
+    contentEl.empty();
+  }
 }
