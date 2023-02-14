@@ -136,6 +136,7 @@
       font-size: 17px;
       line-height: 17px;
       margin: 0;
+      margin-bottom: 10px;
     }
     .ab-deco-title-title[title-type="table"]>p{
       font-weight: bold;
@@ -150,14 +151,14 @@
       background-color: var(--pre-background-color);
       padding: 8px 16px 11px 16px;
       border-radius: 8px 8px 0 0;
+      margin: 0;
     }
     .ab-deco-title-title[title-type="quote"]>p{
       font-weight: bold;
-      padding-bottom: 5px;
+      margin-bottom: 5px;
     }
     .ab-deco-title-title[title-type="ul"]>p{
       font-weight: bold;
-      padding-bottom: 10px;
     }
   }
 }

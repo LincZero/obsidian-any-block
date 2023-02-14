@@ -156,6 +156,7 @@
   font-size: 17px;
   line-height: 17px;
   margin: 0;
+  margin-bottom: 10px;
 }
 
 .ab-note .ab-deco-title .ab-deco-title-title[title-type="table"] > p {
@@ -172,14 +173,14 @@
   background-color: var(--pre-background-color);
   padding: 8px 16px 11px 16px;
   border-radius: 8px 8px 0 0;
+  margin: 0;
 }
 
 .ab-note .ab-deco-title .ab-deco-title-title[title-type="quote"] > p {
   font-weight: bold;
-  padding-bottom: 5px;
+  margin-bottom: 5px;
 }
 
 .ab-note .ab-deco-title .ab-deco-title-title[title-type="ul"] > p {
   font-weight: bold;
-  padding-bottom: 10px;
 }
