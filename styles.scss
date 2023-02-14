@@ -1,3 +1,8 @@
+:root{
+  // --pre-background-color: rgb(36,36,36)
+  --pre-background-color: #1b1b1b // 作者的样式
+}
+
 /** 替换内容
  * .ab-replace
  *   .ab-note
@@ -100,11 +105,59 @@
   }
 
   // 折叠
-  .ab-deco-fold-button{
-    background-color: slateblue;
-    height: 30px;
-    line-height: 30px;
-    padding-left: 6px;
-    border-radius: 5px;
+  .ab-deco-fold{
+    .ab-deco-fold-button{
+      background-color: slateblue;
+      height: 30px;
+      line-height: 30px;
+      padding-left: 6px;
+      border-radius: 5px;
+    }
+  }
+
+  // 黑幕
+  .ab-deco-heimu, .ab-deco-heimu a{
+    background-color: #252525;
+    color:#252525;
+    text-shadow: none;
+  }::selection{
+    background:#9ab0c0;
+    color:#fff;
+  }
+  .ab-deco-heimu:hover, .ab-deco-heimu:hover a{
+    transition:color .13s linear;
+    color:#fff;
+  }
+
+  // 标题
+  .ab-deco-title{
+    width: 100%;
+    p{
+      font-size: 17px;
+      line-height: 17px;
+      margin: 0;
+    }
+    .ab-deco-title-title[title-type="table"]>p{
+      font-weight: bold;
+      text-align: center;
+      margin-top: 10px;
+      margin-bottom: 16px;
+    }
+    .ab-deco-title-title[title-type="pre"]>p{
+      display: inline;
+      font-size: 16px;
+      font-weight: 400;
+      background-color: var(--pre-background-color);
+      padding: 8px 16px 11px 16px;
+      border-radius: 8px 8px 0 0;
+    }
+    .ab-deco-title-title[title-type="quote"]>p{
+      font-weight: bold;
+      padding-bottom: 5px;
+    }
+    .ab-deco-title-title[title-type="ul"]>p{
+      font-weight: bold;
+      padding-bottom: 10px;
+    }
   }
 }
