@@ -159,6 +159,10 @@
   margin-bottom: 10px;
 }
 
+.ab-note .ab-deco-title .ab-deco-title-title {
+  height: auto;
+}
+
 .ab-note .ab-deco-title .ab-deco-title-title[title-type="table"] > p {
   font-weight: bold;
   text-align: center;
