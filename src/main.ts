@@ -38,4 +38,7 @@ export default class AnyBlockPlugin extends Plugin {
 	async saveSettings() {
 		await this.saveData(this.settings);
 	}
+
+  onunload() {
+  }
 }

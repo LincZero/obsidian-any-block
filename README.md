@@ -1,8 +1,8 @@
 # obsidian-any-block
+
+A Obsidian Plugin. You can flexibility to create a 'Block' by some means.
  
- A Obsidian Plugin. You can flexibility to create a 'Block' by some means.
- 
- ## Usage
+## Usage
 
 Function：Block conversion、list to table or other tree graph，See the `demo` sample folder for details
 
@@ -76,7 +76,7 @@ Look the setup panel or [Usage Tutorial & Sample Library](./demo)
 	- 用户层面的修改不多，但对代码处理器部分**重构了一遍**，以便后续的开发
 		- 使用了SVELTE框架辅助开发
 		- 扩展了处理器接口，能够接受更多种类的处理器、且处理器的组合会更加多样
-	- 提供了处理器的简单自定义
+	- 提供了处理器的简单自定义（通过设置面板设置 `别名` 的方式）
 	- 提供了众多新的处理器，与新的处理器类型——装饰处理器
 		- 标题& 黑幕& 折叠& 滚动& 动态增加class
 - v1.3.0 之前
@@ -87,4 +87,7 @@ Look the setup panel or [Usage Tutorial & Sample Library](./demo)
 
 开发不易，赞助入口（可备注：OB插件support）
 
-![](assets/${fileBaseName}/Pasted%20image%2020230214131908.png)![](assets/${fileBaseName}/Pasted%20image%2020230214131912.png)
+![](demo/png/support_zfb.png)![](demo/png/support_wechat.png)
+
+
+![Obsidian Downloads](https://img.shields.io/badge/dynamic/json?logo=obsidian&color=%23483699&label=downloads&query=%24%5B%22obsidian-any-block%22%5D.downloads&url=https%3A%2F%2Fraw.githubusercontent.com%2Fobsidianmd%2Fobsidian-releases%2Fmaster%2Fcommunity-plugin-stats.json)

@@ -136,6 +136,7 @@ export class ABStateManager{
      * 用document的话不知道为什么总是有属性is-live-preview的，总是认为是实时模式 
      */
     // 类型“WorkspaceLeaf”上不存在属性“containerEl”
+    // 这里不能用getActiveViewOfType(MarkdownView)，好像那个无法判断编辑器模式是源还是实时
     // @ts-ignore
     editor_dom = this.plugin_this.app.workspace.activeLeaf.containerEl
     if (!editor_dom) {
