@@ -1,6 +1,7 @@
 import {App, PluginSettingTab, Setting, Modal} from "obsidian"
 import type AnyBlockPlugin from "../main"
-import {generateInfoTable, registerABProcessor2} from "src/replace/abProcessor"
+import type {ABProcessorSpecSimp} from "src/replace/abProcessor"
+import {generateInfoTable, registerABProcessor} from "src/replace/abProcessor"
 import {} from "src/replace/baseProcessor"  // 加载所有处理器
 import {} from "src/replace/listProcessor"  // ^
 
@@ -16,7 +17,8 @@ export interface ABSettingInterface {
   decoration_source: ConfDecoration
   decoration_live: ConfDecoration
   decoration_render: ConfDecoration
-  is_neg_level: boolean
+  is_neg_level: boolean,
+  user_processor: ABProcessorSpecUser[]
 }
 export enum ConfSelect{
   no = "no",
@@ -27,6 +29,12 @@ export enum ConfDecoration{
   none = "none",
   inline = "inline",
   block = "block"
+}
+interface ABProcessorSpecUser{
+  id:string
+  name:string
+  match:string
+  alias:string
 }
 
 /** 设置值默认项 */
@@ -40,6 +48,7 @@ export const AB_SETTINGS: ABSettingInterface = {
   decoration_live: ConfDecoration.block,
   decoration_render: ConfDecoration.block,
   is_neg_level: false,
+  user_processor: []
 }
 
 /** 设置值面板 */
@@ -244,44 +253,44 @@ export class ABSettingTab extends PluginSettingTab {
     containerEl.createEl('h2', {text: '查看所有注册指令'});
     new Setting(containerEl)
       .setName('添加新的注册指令')
+      .setDesc('@todo: 添加后要删除或修改请打开data.json文件夹')
       .addButton(component => {
         component
         .setIcon("plus-circle")
         .onClick(e => {
-          new ABProcessorModal(this.app, (result)=>{
-            console.log("对话框结果", result)
-            // 
+          new ABProcessorModal(this.app, async (result)=>{
+            const sim:ABProcessorSpecSimp = {
+              id: result.id,
+              name: result.name,
+              match: /^\//.test(result.match)?RegExp(result.match):result.match,
+              process_alias: result.match,
+              process: ()=>{}
+            }
+            registerABProcessor(sim, "user")
+            settings.user_processor.push(result)
+            await this.plugin.saveSettings();
           }).open()
         })
       })
-    generateInfoTable(containerEl)
+    let p_table = generateInfoTable(containerEl)
 	}
 }
 
 class ABProcessorModal extends Modal {
-  args: {
-    id:string
-    name:string
-    match:string
-    alias:string
-  }
-  onSubmit: (args: {
-    id:string
-    name:string
-    match:string
-    alias:string
-  })=>void
+  args: ABProcessorSpecUser
+  onSubmit: (args: ABProcessorSpecUser)=>void
 
   constructor(
     app: App, 
-    onSubmit: (args: {
-      id:string
-      name:string
-      match:string
-      alias:string
-    })=>void
+    onSubmit: (args: ABProcessorSpecUser)=>void
   ) {
     super(app);
+    this.args = {
+      id: "",
+      name: "",
+      match: "",
+      alias: ""
+    }
     this.onSubmit = onSubmit
   }
 
@@ -329,8 +338,10 @@ class ABProcessorModal extends Modal {
         .setButtonText("提交")
         .setCta() // 这个不知道什么意思
         .onClick(() => {
-          this.close();
-          this.onSubmit(this.args);
+          if(this.args.id && this.args.name && this.args.match && this.args.alias){
+            this.close();
+            this.onSubmit(this.args);
+          }
         })
       })
   }

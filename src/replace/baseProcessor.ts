@@ -169,8 +169,6 @@ registerABProcessor(process_X)
 const process_code2quote:ABProcessorSpecSimp = {
   id: "code2quote",
   name: "代码转引用块",
-  process_param: ProcessDataType.text,
-  process_return: ProcessDataType.text,
   process_alias: "Xcode|quote",
   process: (el, header, content)=>{}
 }
@@ -181,8 +179,6 @@ const process_quote2code:ABProcessorSpecSimp = {
   name: "引用转代码块",
   match: /^quote2code(\((.*)\))?$/,
   default: "quote2code()",
-  process_param: ProcessDataType.text,
-  process_return: ProcessDataType.text,
   process_alias: "Xquote|code%1",
   process: (el, header, content)=>{
     /*let matchs = header.match(/^quote2code(\((.*)\))?$/)
@@ -198,7 +194,7 @@ registerABProcessor(process_quote2code)
 const process_slice:ABProcessorSpecSimp = {
   id: "slice",
   name: "切片",
-  match: /^slice\((\s*\d+\s*)(,\s*-?\d+\s*)?\)$/,
+  match: /^slice\((\s*\d+\s*?)(,\s*-?\d+\s*)?\)$/,
   detail: "和js的slice方法是一样的",
   process_param: ProcessDataType.text,
   process_return: ProcessDataType.text,
@@ -224,18 +220,24 @@ registerABProcessor(process_slice)
 const process_add:ABProcessorSpecSimp = {
   id: "add",
   name: "增添内容",
-  match: /^add\((.*)(,\s*-?\d+\s*)?\)$/,
+  match: /^add\((.*?)(,\s*-?\d+\s*)?\)$/,
   detail: "增添. 参数2为行序, 默认0, 行尾-1。会插行增添",
   process_param: ProcessDataType.text,
   process_return: ProcessDataType.text,
   process: (el, header, content)=>{
-    const list_match = header.match(/^slice\((\s*\d+\s*)(,\s*-?\d+\s*)?\)$/)
+    const list_match = header.match(/^add\((.*?)(,\s*-?\d+\s*)?\)$/)
     if (!list_match) return content
-    const arg1 = Number(list_match[1].trim())
-    if (isNaN(arg1)) return content
-    let arg2 = Number(list_match[2].replace(",","").trim())
-    if (isNaN(arg2)) {
-      arg2 = 0
+    if (!list_match[1]) return content
+    const arg1 = (list_match[1].trim())
+    if (!arg1) return content
+    console.log("tttttt", list_match)
+    let arg2:number
+    if (!list_match[2]) arg2 = 0
+    else{
+      arg2 = Number(list_match[2].replace(",","").trim())
+      if (isNaN(arg2)) {
+        arg2 = 0
+      }
     }
     const list_content = content.split("\n")
     if (arg2>=0 && arg2<list_content.length) list_content[arg2] = arg1+"\n"+list_content[arg2]

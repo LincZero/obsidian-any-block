@@ -117,12 +117,13 @@ export function generateInfoTable(el: HTMLElement){
     tr.createEl("td", {text: String(item.match)})
     tr.createEl("td", {text: item.process_alias})
   }
+  return table_p
 }
 
 /** 注册ab处理器。
  * 不允许直接写严格版的，有些参数不能让用户填
  */
-export function registerABProcessor(sim: ABProcessorSpecSimp){
+export function registerABProcessor(sim: ABProcessorSpecSimp, from="ab"){
   //type t_param = Parameters<typeof sim.process>
   //type t_return = ReturnType<typeof sim.process>
   const abProcessorSpec:ABProcessorSpec = {
@@ -135,7 +136,8 @@ export function registerABProcessor(sim: ABProcessorSpecSimp){
     process_param: sim.process_param??null,
     process_return: sim.process_return??null,
     process: sim.process,
-    is_disable: false
+    is_disable: false,
+    register_from: from,
   }
   list_abProcessor.push(abProcessorSpec)
   /** 注册ab处理器（装饰器语法糖） */
@@ -144,13 +146,6 @@ export function registerABProcessor(sim: ABProcessorSpecSimp){
       registerABProcessor(target)
     }
   }*/
-}
-
-/** 注册ab处理器。
- * 用户版本
- */
-export function registerABProcessor2(name: string, alias: string){
-
 }
 
 /** ab处理器列表 */
@@ -188,8 +183,8 @@ interface ABProcessorSpec{
   process_return: ProcessDataType|null,
   process: (el:HTMLDivElement, header:string, content:string)=> any
   is_disable: boolean   // 是否禁用，默认false
+  register_from: string // 自带、其他插件、面板设置，如果是其他插件，则需要提供插件的名称（不知道能不能自动识别）
   // 非注册项：
   // ~~is_inner：这个不可设置，用来区分是内部还是外部给的~~
-  // from: 自带、其他插件、面板设置，如果是其他插件，则需要提供插件的名称（不知道能不能自动识别）
   // is_enable: 加载后能禁用这个项
 }
