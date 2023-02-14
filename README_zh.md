@@ -1,4 +1,4 @@
-[中文](README_zh.md) | 英语
+中文 | [英语](README.md)
 
 # obsidian-any-block
 
@@ -18,14 +18,14 @@ try to close `strict line wrapping`
 
 Look the setup panel or [Usage Tutorial & Sample Library](./demo)
 
-Here are some of the more common processors:
-- list2table  (2datatable)
-- list2listtable
-- list2mermaid  (graph LR)
-- list2mindmad  (mermaid v9.3.0 mindmap)
-- list2tab
-- list2timeline
-- title2list + list2somthing
+说其中一些比较常用的处理器：
+- 列表转表格
+- 列表转列表格
+- 列表转流程图
+- 列表转思维导图
+- 列表转标签栏
+- 列表转时间线
+- 标题转列表从而转其他（can use title2list processor）
 
 ![](demo/png/list2table.png)
 
