@@ -44,12 +44,12 @@ export class ABPosthtmlManager{
     const able_heading:boolean = this.settings.select_heading == ConfSelect.ifhead
 
     // 局部选择器
-    const els:any = el  // @fixing error：“HTML Collection”类型必须具有在指令中返回迭代器的“[Symbol.iterator]()”方法
-    for (const child of els.children) {                          // 这个如果是块的话一般就一层，多层应该是p-br的情况
+    const divEl:any = el  // @fixing error：“HTML Collection”类型必须具有在指令中返回迭代器的“[Symbol.iterator]()”方法
+    for (const subEl of divEl.children) {                          // 这个如果是块的话一般就一层，多层应该是p-br的情况
       // 这一部分是找到根div里的<ul>或<quote><ul>
-      let sub_el: HTMLElement
-      if (able_list && child instanceof HTMLUListElement) {     // 列表
-        sub_el = child
+      let targetEl: HTMLElement
+      if (able_list && subEl instanceof HTMLUListElement) {     // 列表
+        targetEl = subEl
         if (/^\s*-\s(.*)/.test(mdSrc.content)) {
           if (mdSrc.header.indexOf("2")==0) mdSrc.header="list"+mdSrc.header
         }
@@ -58,11 +58,11 @@ export class ABPosthtmlManager{
           continue
         }
       }
-      else if (able_quote && child instanceof HTMLQuoteElement){
-        sub_el = child
+      else if (able_quote && subEl instanceof HTMLQuoteElement){
+        targetEl = subEl
       }
-      else if (able_code && child instanceof HTMLPreElement){
-        sub_el = child
+      else if (able_code && subEl instanceof HTMLPreElement){
+        targetEl = subEl
       }
       /*else if (
         child instanceof HTMLQuoteElement &&
@@ -73,7 +73,7 @@ export class ABPosthtmlManager{
       else continue
       
       mdSrc.header=mdSrc.header??"md"   // 渲染模式的列表选择器若无header则给md
-      ctx.addChild(new RelpaceRender(sub_el, mdSrc.header, mdSrc.content));
+      ctx.addChild(new RelpaceRender(targetEl, mdSrc.header, mdSrc.content));
     }
 
     // 结束，开启全局选择器
@@ -135,6 +135,11 @@ const getSourceMarkdown = (
  *      但后来又发现这样的话末尾有空格时会有bug，要去除尾部空格（头部不要去除，会错位）
  *      然后还有一个坑：好像有的能选pertent有的不行，用document直接筛会更稳定
  * 后来基于经验4改了下终于成功了
+ * 
+ * 备注
+ * page/pEl是整个文档
+ * div/cEl是文档的根div，类型总为div
+ * content/sub/(cEl.children)是有可能为p table这些元素的东西
  */
 function global_selector(
   el: HTMLElement, 
@@ -143,20 +148,36 @@ function global_selector(
 ){
   if (!able_heading) return
   // const pEl = el.parentElement    // 这里无法获取parentElement
-  const pEl = document.querySelectorAll(".workspace-leaf.mod-active .markdown-preview-section")[0]
-  if (!pEl) return
-  let prev_header = ""
-  let prev_el:HTMLElement|null = null
-  let prev_from_line:number = 0
-  let prev_heading_level:number = 0
-  for (let i=0; i<pEl.children.length; i++){
-    const cEl = pEl.children[i] as HTMLElement
-    if (cEl.classList.contains("mod-header") 
-      || cEl.classList.contains("markdown-preview-pusher")) continue
-    if (cEl.classList.contains("mod-footer")) break
+  const pageEl = document.querySelectorAll(".workspace-leaf.mod-active .markdown-preview-section")[0]
+  if (!pageEl) return
+  let prev_header = ""                // 头部信息
+  let prev_el:HTMLElement|null = null // 选中第一个标题，作用是用来替换为repalce块
+  let prev_from_line:number = 0       // 开始行
+  let prev_heading_level:number = 0   // 上一个标题的等级
+  for (let i=0; i<pageEl.children.length; i++){
+    const divEl = pageEl.children[i] as HTMLElement
+    if (divEl.classList.contains("mod-header") 
+      || divEl.classList.contains("markdown-preview-pusher")) continue
+    if (divEl.classList.contains("mod-footer")) break
+    // 寻找已经处理过的局部选择器，并……
+    (()=>{
+      if (!divEl.children[0]) return
+      const subEl:any = divEl.children[0]
+      if (!(subEl instanceof HTMLElement) || !subEl.classList.contains("ab-replace")) return
+      // 隐藏局部选择器的header块
+      const divEl_last = pageEl.children[i-1] as HTMLElement
+      if (divEl_last.children.length != 1) return
+      const subEl_last = divEl_last.children[0]
+      if (subEl_last
+        && subEl_last instanceof HTMLParagraphElement
+        && ABReg.reg_header.test(subEl_last.getText())
+      ){
+        divEl_last.setAttribute("style", "display: none")
+      }
+    })()
     if (prev_heading_level == 0) {      // 寻找开始标志
-      if (!cEl.children[0] || !(cEl.children[0] instanceof HTMLHeadingElement)) continue
-      const mdSrc = getSourceMarkdown(cEl, ctx)
+      if (!divEl.children[0] || !(divEl.children[0] instanceof HTMLHeadingElement)) continue
+      const mdSrc = getSourceMarkdown(divEl, ctx)
       if (!mdSrc) continue
       if (mdSrc.header=="") continue
       const match = mdSrc.content.match(ABReg.reg_heading)
@@ -164,39 +185,51 @@ function global_selector(
       prev_heading_level = match[1].length
       prev_header = mdSrc.header
       prev_from_line = mdSrc.info.lineStart
-      prev_el = cEl.children[0] // 就是标题那级
+      prev_el = divEl.children[0] // 就是标题那级
+      // 隐藏全局选择器的header块
+      const divEl_last = pageEl.children[i-1] as HTMLElement
+        if (divEl_last.children.length == 1){
+        const contentEl_last = divEl_last.children[0]
+        if (contentEl_last
+          && contentEl_last instanceof HTMLParagraphElement
+          && ABReg.reg_header.test(contentEl_last.getText())
+        ){
+          divEl_last.setAttribute("style", "display: none")
+        }
+      }
     }
     else {                            // 寻找结束标志
-      if (!cEl.children[0]){  // .mod-footer会触发这一层
-        cEl.setAttribute("style", "display: none")
+      if (!divEl.children[0]){  // .mod-footer会触发这一层
+        divEl.setAttribute("style", "display: none")
         continue
       }
-      if (!(cEl.children[0] instanceof HTMLHeadingElement)){
-        cEl.setAttribute("style", "display: none")
+      if (!(divEl.children[0] instanceof HTMLHeadingElement)){
+        divEl.setAttribute("style", "display: none")
         continue
       }
-      const mdSrc = getSourceMarkdown(cEl, ctx)
+      const mdSrc = getSourceMarkdown(divEl, ctx)
       if (!mdSrc) {
-        cEl.setAttribute("style", "display: none")
+        divEl.setAttribute("style", "display: none")
         continue
       }
       const match = mdSrc.content.match(ABReg.reg_heading)
       if (!match){
-        cEl.setAttribute("style", "display: none")
+        divEl.setAttribute("style", "display: none")
         continue
       }
       if (match[1].length >= prev_heading_level){  // 【改】可选同级
-        cEl.setAttribute("style", "display: none")
+        divEl.setAttribute("style", "display: none")
         continue
       }
 
       // 渲染
-      const cEl_last = pEl.children[i-1] as HTMLElement   // 回溯到上一个
+      const cEl_last = pageEl.children[i-1] as HTMLElement   // 回溯到上一个
       const mdSrc_last = getSourceMarkdown(cEl_last, ctx)
       if (!mdSrc_last) {
         console.warn("标题选择器结束时发生意外情况")
         return
       }
+      
       const header = prev_header??"md"
       const content = mdSrc_last.info.text.split("\n")
         .slice(prev_from_line, mdSrc_last.info.lineEnd+1).join("\n");
@@ -210,9 +243,9 @@ function global_selector(
     }
   }
   if (prev_heading_level > 0){ /** 循环尾调用（@attention 注意：有个.mod-footer，所以不能用最后一个!）*/
-    const i = pEl.children.length-1
+    const i = pageEl.children.length-1
     // 渲染
-    const cEl_last = pEl.children[i-1] as HTMLElement /** @bug 可能有bug，这里直接猜使用倒数第二个 */
+    const cEl_last = pageEl.children[i-1] as HTMLElement /** @bug 可能有bug，这里直接猜使用倒数第二个 */
     const mdSrc_last = getSourceMarkdown(cEl_last, ctx)
     if (!mdSrc_last) {
       console.warn("标题选择器结束时发生意外情况")
