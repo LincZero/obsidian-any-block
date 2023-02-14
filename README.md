@@ -13,8 +13,6 @@ Function：Block conversion、list to table or other tree graph，See the `demo`
 **(Don't repet it in issue)**
 
 - reinforce
-	- 性能
-		- 优化刷新频率，现在的刷新频率太高了
 	- 选择器
 		- **嵌套选择器**
 		  没有嵌套的程序是没有灵魂的 !!!
@@ -30,7 +28,6 @@ Function：Block conversion、list to table or other tree graph，See the `demo`
 		- 树表格的间隔着色样式获取可以优化
 		  方案1：例如多行的格可以视情况使用渐变（单数不用，复数需要，但会不会有不统一的问题）？
 		  方案2：仿mindmap的着色，后面的列就不要隔行着色了
-		- 列表格的可折叠样式
 	- 转化
 		- 右键选择转化为：md原生(表格)/html格式/图片
 - fixing bug
@@ -75,11 +72,19 @@ Look the setup panel or [Usage Tutorial & Sample Library](./demo)
 
 ## Update log
 
-[2timeline]
 - v1.3.0
 	- 用户层面的修改不多，但对代码处理器部分**重构了一遍**，以便后续的开发
 		- 使用了SVELTE框架辅助开发
 		- 扩展了处理器接口，能够接受更多种类的处理器、且处理器的组合会更加多样
-	- 提供了自定义处理器
+	- 提供了处理器的简单自定义
+	- 提供了众多新的处理器，与新的处理器类型——装饰处理器
+		- 标题& 黑幕& 折叠& 滚动& 动态增加class
 - v1.3.0 之前
 	- 不记录，详见commits
+	- 增加了标题选择器
+
+## support
+
+开发不易，赞助入口（可备注：OB插件support）
+
+![](assets/${fileBaseName}/Pasted%20image%2020230214131908.png)![](assets/${fileBaseName}/Pasted%20image%2020230214131912.png)
