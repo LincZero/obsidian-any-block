@@ -1,8 +1,6 @@
 import {MarkdownRenderChild, MarkdownRenderer} from 'obsidian';
 
-import type {ABProcessorSpecSimp} from "./abProcessor"
-import {ProcessDataType, registerABProcessor} from "./abProcessor"
-
+import {ProcessDataType, registerABProcessor, type ABProcessorSpecSimp} from "./abProcessor"
 import {ABReg} from "src/config/abReg"
 import {ListProcess} from "./listProcessor"
 import {getID} from "src/utils/utils"
@@ -230,7 +228,6 @@ const process_add:ABProcessorSpecSimp = {
     if (!list_match[1]) return content
     const arg1 = (list_match[1].trim())
     if (!arg1) return content
-    console.log("tttttt", list_match)
     let arg2:number
     if (!list_match[2]) arg2 = 0
     else{

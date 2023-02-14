@@ -1,6 +1,5 @@
 import {ABReg} from "src/config/abReg"
-import type {ABSettingInterface} from "src/config/abSettingTab"
-import {ConfSelect} from "src/config/abSettingTab"
+import {ConfSelect, type ABSettingInterface} from "src/config/abSettingTab"
 
 /** 匹配关键字接口 */
 export interface MdSelectorSpec {

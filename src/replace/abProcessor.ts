@@ -100,9 +100,10 @@ export function generateInfoTable(el: HTMLElement){
     tr.createEl("td", {text: "用途描述"})
     tr.createEl("td", {text: "处理类型"})
     tr.createEl("td", {text: "输出类型"})
-    tr.createEl("td", {text: "是否启用"})
     tr.createEl("td", {text: "正则"})
     tr.createEl("td", {text: "别名替换"})
+    tr.createEl("td", {text: "是否启用"})
+    tr.createEl("td", {text: "定义来源"})
   }
   const tbody = table.createEl("tbody")
   for (let item of list_abProcessor){
@@ -113,17 +114,32 @@ export function generateInfoTable(el: HTMLElement){
     // tr.createEl("td", {text: item.is_render?"渲染":"文本"})
     tr.createEl("td", {text: String(item.process_param)})
     tr.createEl("td", {text: String(item.process_return)})
-    tr.createEl("td", {text: item.is_disable?"禁用":"启用"})
     tr.createEl("td", {text: String(item.match)})
     tr.createEl("td", {text: item.process_alias})
+    tr.createEl("td", {text: item.is_disable?"禁用":"启用"})
+    tr.createEl("td", {text: item.register_from})
   }
   return table_p
 }
 
 /** 注册ab处理器。
+ * 使用 ab处理器接口 - 语法糖版
  * 不允许直接写严格版的，有些参数不能让用户填
  */
-export function registerABProcessor(sim: ABProcessorSpecSimp, from="ab"){
+export interface ABProcessorSpecSimp{
+  id: string            // 唯一标识（当不填match时也会作为匹配项）
+  name: string          // 处理器名字
+  match?: RegExp|string // 处理器匹配正则（不填则为id，而不是name！name可以被翻译或是重复的）如果填写了且为正则类型，不会显示在下拉框中
+  default?: string|null // 下拉选择的默认规则，不填的话：非正则默认为id，有正则则为空
+  detail?: string       // 处理器描述
+  // is_render?: boolean   // 是否渲染处理器，默认为true。false则为文本处理器
+  process_alias?: string    // 组装，如果不为空串则会覆盖process方法，但扔需要给process一个空实现
+  process_param?: ProcessDataType
+  process_return?: ProcessDataType
+  process: (el:HTMLDivElement, header:string, content:string)=> any
+                        // 处理器
+}
+export function registerABProcessor(sim: ABProcessorSpecSimp){
   //type t_param = Parameters<typeof sim.process>
   //type t_return = ReturnType<typeof sim.process>
   const abProcessorSpec:ABProcessorSpec = {
@@ -137,15 +153,36 @@ export function registerABProcessor(sim: ABProcessorSpecSimp, from="ab"){
     process_return: sim.process_return??null,
     process: sim.process,
     is_disable: false,
-    register_from: from,
+    register_from: "内置",
   }
   list_abProcessor.push(abProcessorSpec)
-  /** 注册ab处理器（装饰器语法糖） */
-  /*function decorationABProcessor() {
-    return function decorationABProcessor(target: any){
-      registerABProcessor(target)
-    }
-  }*/
+}
+
+/** 注册ab处理器 - 用户版
+ * 使用 ab处理器接口 - 用户版（都是字符串存储）
+ * 特点：不能注册process（无法存储在txt中），只能注册别名
+ */
+export interface ABProcessorSpecUser{
+  id:string
+  name:string
+  match:string
+  process_alias:string
+}
+export function registerABProcessorUser(sim: ABProcessorSpecUser){
+  const abProcessorSpec:ABProcessorSpec = {
+    id: sim.id,
+    name: sim.name,
+    match: /^\//.test(sim.match)?RegExp(sim.match):sim.match,
+    default: null,
+    detail: "",
+    process_alias: sim.process_alias,
+    process_param: null,
+    process_return: null,
+    process: ()=>{},
+    is_disable: false,
+    register_from: "用户",
+  }
+  list_abProcessor.push(abProcessorSpec)
 }
 
 /** ab处理器列表 */
@@ -156,20 +193,6 @@ let list_abProcessor: ABProcessorSpec[] = []
 export enum ProcessDataType {
   text= "string",
   el= "HTMLElement"
-}
-/** ab处理器接口 - 语法糖版 */
-export interface ABProcessorSpecSimp{
-  id: string            // 唯一标识（当不填match时也会作为匹配项）
-  name: string          // 处理器名字
-  match?: RegExp|string // 处理器匹配正则（不填则为id，而不是name！name可以被翻译或是重复的）如果填写了且为正则类型，不会显示在下拉框中
-  default?: string|null // 下拉选择的默认规则，不填的话：非正则默认为id，有正则则为空
-  detail?: string       // 处理器描述
-  // is_render?: boolean   // 是否渲染处理器，默认为true。false则为文本处理器
-  process_alias?: string    // 组装，如果不为空串则会覆盖process方法，但扔需要给process一个空实现
-  process_param?: ProcessDataType
-  process_return?: ProcessDataType
-  process: (el:HTMLDivElement, header:string, content:string)=> any
-                        // 处理器
 }
 /** ab处理器接口 - 严格版 */
 interface ABProcessorSpec{

@@ -9,7 +9,7 @@
 
   let tab:HTMLDivElement;
   onMount(async()=>{
-    tab.addClass(["ab-tab-root"])
+    tab.addClass("ab-tab-root")
     if (modeT) tab.setAttribute("modeT", "true")
     const ul = tab.createEl("ul")
     const content = tab.createDiv()

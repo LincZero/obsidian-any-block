@@ -12,7 +12,7 @@
   let table:HTMLDivElement;
   onMount(async()=>{
     // 表格数据 组装成表格
-    table.addClass(["ab-list-table"])
+    table.addClass("ab-list-table")
     if (modeT) table.setAttribute("modeT", "true")
     let thead
     if(list_tableInfo[0].content.indexOf("< ")==0){ // 判断是否有表头

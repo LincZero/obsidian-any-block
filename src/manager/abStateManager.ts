@@ -1,13 +1,10 @@
-import type {DecorationSet} from "@codemirror/view"
-import {EditorView, Decoration} from "@codemirror/view"
+import {EditorView, Decoration, type DecorationSet} from "@codemirror/view"
 import {StateField, StateEffect, EditorState, Transaction, Range} from "@codemirror/state"
-import type {View, Editor, EditorPosition} from 'obsidian';
-import {MarkdownView} from 'obsidian';
+import  {MarkdownView, type View, type Editor, type EditorPosition} from 'obsidian';
 
 import type AnyBlockPlugin from '../main'
 import { ConfDecoration } from "src/config/abSettingTab"
-import type { MdSelectorSpec} from "./abMdSelector"
-import { get_selectors, /*list_ABMdSelector,*/ ABMdSelector} from "./abMdSelector"
+import { get_selectors, /*list_ABMdSelector,*/ ABMdSelector, type MdSelectorSpec} from "./abMdSelector"
 import { ABDecorationManager } from "./abDecorationManager"
 import { ABReplaceWidget } from "./replaceWidgetType"
 

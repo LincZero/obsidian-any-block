@@ -1,7 +1,6 @@
 import {App, PluginSettingTab, Setting, Modal} from "obsidian"
 import type AnyBlockPlugin from "../main"
-import type {ABProcessorSpecSimp} from "src/replace/abProcessor"
-import {generateInfoTable, registerABProcessor} from "src/replace/abProcessor"
+import {generateInfoTable, registerABProcessorUser, type ABProcessorSpecUser} from "src/replace/abProcessor"
 import {} from "src/replace/baseProcessor"  // 加载所有处理器
 import {} from "src/replace/listProcessor"  // ^
 
@@ -30,12 +29,6 @@ export enum ConfDecoration{
   inline = "inline",
   block = "block"
 }
-interface ABProcessorSpecUser{
-  id:string
-  name:string
-  match:string
-  alias:string
-}
 
 /** 设置值默认项 */
 export const AB_SETTINGS: ABSettingInterface = {
@@ -54,10 +47,14 @@ export const AB_SETTINGS: ABSettingInterface = {
 /** 设置值面板 */
 export class ABSettingTab extends PluginSettingTab {
 	plugin: AnyBlockPlugin;
+  processorPanel: HTMLElement
 
 	constructor(app: App, plugin: AnyBlockPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
+    for (let item of plugin.settings.user_processor){
+      registerABProcessorUser(item)
+    }
 	}
 
 	display(): void {
@@ -259,20 +256,15 @@ export class ABSettingTab extends PluginSettingTab {
         .setIcon("plus-circle")
         .onClick(e => {
           new ABProcessorModal(this.app, async (result)=>{
-            const sim:ABProcessorSpecSimp = {
-              id: result.id,
-              name: result.name,
-              match: /^\//.test(result.match)?RegExp(result.match):result.match,
-              process_alias: result.match,
-              process: ()=>{}
-            }
-            registerABProcessor(sim, "user")
+            registerABProcessorUser(result)
             settings.user_processor.push(result)
             await this.plugin.saveSettings();
+            this.processorPanel.remove()
+            this.processorPanel = generateInfoTable(containerEl)
           }).open()
         })
       })
-    let p_table = generateInfoTable(containerEl)
+    this.processorPanel = generateInfoTable(containerEl)
 	}
 }
 
@@ -289,7 +281,7 @@ class ABProcessorModal extends Modal {
       id: "",
       name: "",
       match: "",
-      alias: ""
+      process_alias: ""
     }
     this.onSubmit = onSubmit
   }
@@ -328,7 +320,7 @@ class ABProcessorModal extends Modal {
       .setDesc("用/包括起来则判断为正则")
       .addText((text)=>{
         text.onChange((value) => {
-        this.args.alias = value
+        this.args.process_alias = value
       })
     })
 
@@ -338,7 +330,7 @@ class ABProcessorModal extends Modal {
         .setButtonText("提交")
         .setCta() // 这个不知道什么意思
         .onClick(() => {
-          if(this.args.id && this.args.name && this.args.match && this.args.alias){
+          if(this.args.id && this.args.name && this.args.match && this.args.process_alias){
             this.close();
             this.onSubmit(this.args);
           }
