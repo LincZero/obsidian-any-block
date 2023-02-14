@@ -98,4 +98,13 @@
     .ab-foldable-tr[tr_level="7"]>td:first-child{padding-left: calc(7*12px);}
     .ab-foldable-tr[tr_level="8"]>td:first-child{padding-left: calc(8*12px);}
   }
+
+  // 折叠
+  .ab-deco-fold-button{
+    background-color: slateblue;
+    height: 30px;
+    line-height: 30px;
+    padding-left: 6px;
+    border-radius: 5px;
+  }
 }

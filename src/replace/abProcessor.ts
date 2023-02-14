@@ -14,6 +14,7 @@ export function autoABProcessor(el:HTMLDivElement, header:string, content:string
   if (prev_type==ProcessDataType.text) {
     const child = new MarkdownRenderChild(el);
     MarkdownRenderer.renderMarkdown(prev_result, el, "", child);
+    prev_type = ProcessDataType.el
     prev_result = el
   }
   return prev_result
@@ -49,8 +50,16 @@ export function autoABProcessor(el:HTMLDivElement, header:string, content:string
         else if(abReplaceProcessor.process){
           // 检查输入类型
           if(abReplaceProcessor.process_param != prev_type){
-            console.warn("处理器参数类型错误", abReplaceProcessor.process_param, prev_type);
-            break
+            if (abReplaceProcessor.process_param==ProcessDataType.el && prev_type==ProcessDataType.text){
+              const child = new MarkdownRenderChild(el);
+              MarkdownRenderer.renderMarkdown(prev_result, el, "", child);
+              prev_type = ProcessDataType.el
+              prev_result = el
+            }
+            else{
+              console.warn("处理器参数类型错误", abReplaceProcessor.process_param, prev_type);
+              break
+            }
           }
           // 执行处理器
           prev_result = abReplaceProcessor.process(el, item_header, prev_result)

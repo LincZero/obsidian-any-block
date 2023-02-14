@@ -119,3 +119,11 @@
 .ab-note .ab-list-table .ab-foldable-tr[tr_level="8"] > td:first-child {
   padding-left: calc(8*12px);
 }
+
+.ab-note .ab-deco-fold-button {
+  background-color: slateblue;
+  height: 30px;
+  line-height: 30px;
+  padding-left: 6px;
+  border-radius: 5px;
+}

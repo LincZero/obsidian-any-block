@@ -34,29 +34,17 @@ registerABProcessor(process_md)
 
 /*const process_hide:ABProcessorSpecSimp = {
   id: "hide",
-  name: "默认折叠",
-  process_param: ProcessDataType.text,
-  process_return: ProcessDataType.el,
-  process: (el, header, content)=>{
-    const child = new MarkdownRenderChild(el);
-    content = text_quote("[!note]-\n"+content)
-    MarkdownRenderer.renderMarkdown(content, el, "", child);
-    return el
-  }
+  name: "默认折叠(借callout)",
+  process_alias: "add([!note]-)|quote", // 好像不能处理有[]的？
+  process: ()=>{}
 }
-registerABProcessor(process_hide)*/
+registerABProcessor(process_hide)
 
-/*const process_flod:ABProcessorSpecSimp = {
-  id: "flod",
-  name: "可折叠的（借callout）",
-  process_param: ProcessDataType.text,
-  process_return: ProcessDataType.el,
-  process: (el, header, content)=>{
-    const child = new MarkdownRenderChild(el);
-    content = text_quote("[!note]+\n"+content)
-    MarkdownRenderer.renderMarkdown(content, el, "", child);
-    return el
-  }
+const process_flod:ABProcessorSpecSimp = {
+  id: "fold",
+  name: "可折叠的(借callout)",
+  process_alias: "add([!note]+)|quote", // 好像不能处理有[]的？
+  process: ()=>{}
 }
 registerABProcessor(process_flod)*/
 
@@ -168,7 +156,7 @@ const process_code2quote:ABProcessorSpecSimp = {
   id: "code2quote",
   name: "代码转引用块",
   process_alias: "Xcode|quote",
-  process: (el, header, content)=>{}
+  process: ()=>{}
 }
 registerABProcessor(process_code2quote)
 
@@ -178,7 +166,7 @@ const process_quote2code:ABProcessorSpecSimp = {
   match: /^quote2code(\((.*)\))?$/,
   default: "quote2code()",
   process_alias: "Xquote|code%1",
-  process: (el, header, content)=>{
+  process: ()=>{
     /*let matchs = header.match(/^quote2code(\((.*)\))?$/)
     if (!matchs) return content
     content = text_Xquote(content)

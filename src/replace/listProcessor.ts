@@ -694,7 +694,7 @@ export class ListProcess{
 
   /** 列表数据转mermaid流程图
    * ~~@bug 旧版bug（未内置mermaid）会闪一下~~ 
-   * 然后注意一下mermaid的(项)不能有空格，或非法字符。空格我处理掉了，字符我先不管
+   * 然后注意一下mermaid的(项)不能有空格，或非法字符。空格我处理掉了，字符我先不管。算了，还是不处理空格吧
    */
   private static data2mermaid(
     list_itemInfo: List_ListItem, 
@@ -708,19 +708,19 @@ export class ListProcess{
     let prev_level = 999
     for (let i=0; i<list_itemInfo.length; i++){
       if (list_itemInfo[i].level>prev_level){ // 向右正常加箭头
-        prev_line_content = prev_line_content+" --> "+list_itemInfo[i].content.replace(/ /g, "_")
+        prev_line_content = prev_line_content+" --> "+list_itemInfo[i].content//.replace(/ /g, "_")
       } else {                                // 换行，并……
         list_line_content.push(prev_line_content)
         prev_line_content = ""
 
         for (let j=i; j>=0; j--){             // 回退到上一个比自己大的
           if(list_itemInfo[j].level<list_itemInfo[i].level) {
-            prev_line_content = list_itemInfo[j].content.replace(/ /g, "_")
+            prev_line_content = list_itemInfo[j].content//.replace(/ /g, "_")
             break
           }
         }
         if (prev_line_content) prev_line_content=prev_line_content+" --> "  // 如果有比自己大的
-        prev_line_content=prev_line_content+list_itemInfo[i].content.replace(/ /g, "_")
+        prev_line_content=prev_line_content+list_itemInfo[i].content//.replace(/ /g, "_")
       }
       prev_level = list_itemInfo[i].level
     }
