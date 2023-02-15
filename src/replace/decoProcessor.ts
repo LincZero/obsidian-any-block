@@ -66,6 +66,57 @@ const process_scroll:ABProcessorSpecSimp = {
 }
 registerABProcessor(process_scroll)
 
+const process_overfold:ABProcessorSpecSimp = {
+  id: "overfold",
+  name: "超出折叠",
+  match: /^overfold(\((\d+)\))?$/,
+  default: "overfold(380)",
+  process_param: ProcessDataType.el,
+  process_return: ProcessDataType.el,
+  process: (el, header, content)=>{
+    // 找参数
+    const matchs = header.match(/^overfold(\((\d+)\))?$/)
+    if (!matchs) return el
+    let arg1:number
+    if (!matchs[1]) arg1=460  // 默认值
+    else{
+      if (!matchs[2]) return el
+      arg1 = Number(matchs[2])
+      if (isNaN(arg1)) return
+    }
+    // 修改元素
+    if(el.children.length!=1) return el
+    const sub_el = el.children[0]
+    sub_el.remove()
+    const mid_el = el.createDiv({cls:["ab-deco-overfold"]})
+    const sub_button = mid_el.createDiv({cls: ["ab-deco-overfold-button"], text: "展开"})
+    sub_el.addClass("ab-deco-overfold-content")
+    mid_el.appendChild(sub_el)
+    mid_el.appendChild(sub_button)
+
+    mid_el.setAttribute("style", `max-height: ${arg1}px`)
+    mid_el.setAttribute("is-fold", "true")
+    sub_button.onclick = ()=>{
+      const is_fold = mid_el.getAttribute("is-fold")
+      if (!is_fold) return
+      if (is_fold=="true") {
+        mid_el.setAttribute("style", "")
+        mid_el.setAttribute("is-fold", "false")
+        sub_button.setText("折叠")
+      }
+      else{
+        mid_el.setAttribute("style", `max-height: ${arg1}px`)
+        mid_el.setAttribute("is-fold", "true")
+        sub_button.setText("展开")
+      }
+    }
+
+    return el
+  }
+}
+registerABProcessor(process_overfold)
+
+
 const process_addClass:ABProcessorSpecSimp = {
   id: "addClass",
   name: "增加class",
@@ -86,7 +137,7 @@ registerABProcessor(process_addClass)
 
 const process_addDiv:ABProcessorSpecSimp = {
   id: "addDiv",
-  name: "增加class",
+  name: "增加div和class",
   detail: "给当前块增加一个父类，需要给这个父类一个类名",
   match: /^addDiv\((.*)\)$/,
   process_param: ProcessDataType.el,

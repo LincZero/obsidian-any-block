@@ -1,4 +1,4 @@
-中文 | [英语](README.md)
+中文 | [English](README.md)
 
 # obsidian-any-block
 
@@ -12,7 +12,7 @@ Function：Block conversion、list to table or other tree graph，See the `demo`
 
 ## If bug
 
-try to close `strict line wrapping`
+~~try to close `strict line wrapping`~~
 
 ## Suport command
 
@@ -43,6 +43,17 @@ Look the setup panel or [Usage Tutorial & Sample Library](./demo)
 
 ![](demo/png/titleSelector.png)
 
+![](demo/png/addTitle.png)
+
+![](demo/png/scroll.gif)
+
+![](demo/png/overfold.png)
+
+![](demo/png/flod.gif)
+
+![](demo/png/heimu.gif)
+
+![](demo/png/userProcessor.png)
 
 ## Update log
 

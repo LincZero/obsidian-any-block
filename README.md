@@ -1,4 +1,4 @@
-[中文](README_zh.md) | 英语
+[中文](README_zh.md) | English
 
 # obsidian-any-block
 
@@ -12,7 +12,7 @@ Function：Block conversion、list to table or other tree graph，See the `demo`
 
 ## If bug
 
-try to close `strict line wrapping`
+~~try to close `strict line wrapping`~~
 
 ## Suport command
 
@@ -43,6 +43,17 @@ Here are some of the more common processors:
 
 ![](demo/png/titleSelector.png)
 
+![](demo/png/addTitle.png)
+
+![](demo/png/scroll.gif)
+
+![](demo/png/overfold.png)
+
+![](demo/png/flod.gif)
+
+![](demo/png/heimu.gif)
+
+![](demo/png/userProcessor.png)
 
 ## Update log
 

@@ -32,22 +32,6 @@ const process_md:ABProcessorSpecSimp = {
 }
 registerABProcessor(process_md)
 
-/*const process_hide:ABProcessorSpecSimp = {
-  id: "hide",
-  name: "默认折叠(借callout)",
-  process_alias: "add([!note]-)|quote", // 好像不能处理有[]的？
-  process: ()=>{}
-}
-registerABProcessor(process_hide)
-
-const process_flod:ABProcessorSpecSimp = {
-  id: "fold",
-  name: "可折叠的(借callout)",
-  process_alias: "add([!note]+)|quote", // 好像不能处理有[]的？
-  process: ()=>{}
-}
-registerABProcessor(process_flod)*/
-
 const process_quote:ABProcessorSpecSimp = {
   id: "quote",
   name: "增加引用块",

@@ -112,6 +112,31 @@
       line-height: 30px;
       padding-left: 6px;
       border-radius: 5px;
+      width: 100%;
+    }
+  }
+
+  // 超出折叠
+  .ab-deco-overfold{
+    overflow-y: hidden;
+    position: relative;
+    .ab-deco-overfold-button{
+      position: absolute;
+      bottom: 0;
+      height: 40px;
+      line-height: 40px;
+      width: 100%;
+      text-align: center;
+      box-sizing: content-box;
+    }
+    .ab-deco-overfold-content{
+      margin-bottom: 40px;
+    }
+  }
+  .ab-deco-overfold[is-fold="true"]{
+    .ab-deco-overfold-button{
+      padding-top: 60px;
+      background-image: linear-gradient(-180deg, rgba(24, 26, 27, 0) 0%, rgb(24, 26, 27) 100%)
     }
   }
 
