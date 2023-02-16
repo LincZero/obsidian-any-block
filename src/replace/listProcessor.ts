@@ -176,11 +176,11 @@ export class ListProcess{
     let mul_mode:string = ""      // 多行模式，para或list或title或空
     for (let line of list_text) {
       const match_heading = line.match(ABReg.reg_heading)
-      const match_list = line.match(ABReg.reg_list2)
+      const match_list = line.match(ABReg.reg_list)
       if (match_heading){                                     // 1. 标题层级
         removeTailBlank()
         list_itemInfo.push({
-          content: match_heading[2],
+          content: match_heading[3],
           level: match_heading[1].length-10
         })
         mul_mode = "title"
@@ -188,7 +188,7 @@ export class ListProcess{
       else if (match_list){                                   // 2. 列表层级
         removeTailBlank()
         list_itemInfo.push({
-          content: match_list[2],
+          content: match_list[3],
           level: match_list[1].length+1//+10
         })
         mul_mode = "list"

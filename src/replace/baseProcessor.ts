@@ -96,7 +96,7 @@ const process_Xcode:ABProcessorSpecSimp = {
       if (code_flag==""){     // 寻找开始标志
         const match_tmp = list_content[i].match(ABReg.reg_code)
         if(match_tmp){
-          code_flag = match_tmp[1]
+          code_flag = match_tmp[3]
           line_start = i
         }
       }

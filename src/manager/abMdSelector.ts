@@ -212,8 +212,8 @@ class ABMdSelector_code extends ABMdSelector{
         if (i!=0) {
           const header = list_text[i-1].match(ABReg.reg_header)
           if (header){
-            code_flag = match_tmp[1]
-            prev_header = header[2]
+            code_flag = match_tmp[3]
+            prev_header = header[4]
             prev_from = i-1
             continue
           }
@@ -222,7 +222,7 @@ class ABMdSelector_code extends ABMdSelector{
         if (this.settings.select_code==ConfSelect.ifhead) continue
         // 没有header 也选
         prev_from = i
-        code_flag = match_tmp[1]
+        code_flag = match_tmp[3]
         prev_header = ""
         continue
       }
@@ -331,8 +331,8 @@ class ABMdSelector_heading extends ABMdSelector{
         if (i!=0) {
           const header = list_text[i-1].match(ABReg.reg_header)
           if (header){
-            prev_heading_level = match_tmp[1].length
-            prev_header = header[2]
+            prev_heading_level = match_tmp[3].length
+            prev_header = header[4]
             prev_from = i-1
             continue
           }
@@ -341,14 +341,14 @@ class ABMdSelector_heading extends ABMdSelector{
         if (this.settings.select_code==ConfSelect.ifhead) continue
         // 没有header 也选
         prev_from = i
-        prev_heading_level = match_tmp[1].length
+        prev_heading_level = match_tmp[3].length
         prev_header = ""
         continue
       }
       else {                                   // 选择结束标志
         const match_tmp = list_text[i].match(ABReg.reg_heading)
         if (!match_tmp) continue
-        if (match_tmp[1].length >= prev_heading_level) continue // 【改】可选同级
+        if (match_tmp[3].length >= prev_heading_level) continue // 【改】可选同级
         const from = this.map_line_ch[prev_from]
         const to = this.map_line_ch[i]-1  // 不包括这一行
         matchInfo.push({
