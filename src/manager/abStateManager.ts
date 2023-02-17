@@ -4,7 +4,7 @@ import  {MarkdownView, type View, type Editor, type EditorPosition} from 'obsidi
 
 import type AnyBlockPlugin from '../main'
 import { ConfDecoration } from "src/config/abSettingTab"
-import { get_selectors, /*list_ABMdSelector,*/ ABMdSelector, type MdSelectorSpec} from "./abMdSelector"
+import { get_selectors, /*list_ABMdSelector,*/ ABMdSelector, type MdSelectorRangeSpec} from "./abMdSelector"
 import { ABDecorationManager } from "./abDecorationManager"
 import { ABReplaceWidget } from "./replaceWidgetType"
 
@@ -210,7 +210,7 @@ export class ABStateManager{
     })
     if(decoration_mode==ConfDecoration.inline){       // 线装饰
       for (let abManager of list_abRangeManager){     // 遍历多个范围管理器
-        let listRangeSpec: MdSelectorSpec[] = abManager.specKeywords
+        let listRangeSpec: MdSelectorRangeSpec[] = abManager.specKeywords
         for(let rangeSpec of listRangeSpec){          // 遍历每个范围管理器里的多个范围集
           const decoration: Decoration = Decoration.mark({class: "ab-line-brace"})
           list_add_decoration.push(decoration.range(rangeSpec.from, rangeSpec.to))
@@ -220,7 +220,7 @@ export class ABStateManager{
     else{                                             // 块装饰
       const cursorSpec = this.getCursorCh()
       for (let abManager of list_abRangeManager){     // 遍历多个范围管理器
-        let listRangeSpec: MdSelectorSpec[] = abManager.specKeywords
+        let listRangeSpec: MdSelectorRangeSpec[] = abManager.specKeywords
         for(let rangeSpec of listRangeSpec){          // 遍历每个范围管理器里的多个范围集
           let decoration: Decoration
           if (cursorSpec.from>=rangeSpec.from && cursorSpec.from<=rangeSpec.to 

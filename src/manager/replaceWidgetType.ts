@@ -2,14 +2,14 @@ import type {Editor, EditorPosition} from 'obsidian';
 import {EditorView, WidgetType} from "@codemirror/view"
 
 import {autoABProcessor} from "../replace/abProcessor"
-import type {MdSelectorSpec} from "./abMdSelector"
+import type {MdSelectorRangeSpec} from "./abMdSelector"
 
 export class ABReplaceWidget extends WidgetType {
-  rangeSpec: MdSelectorSpec
+  rangeSpec: MdSelectorRangeSpec
   global_editor: Editor|null
   div: HTMLDivElement
 
-  constructor(rangeSpec: MdSelectorSpec, editor: Editor|null){
+  constructor(rangeSpec: MdSelectorRangeSpec, editor: Editor|null){
     super()
     this.rangeSpec = rangeSpec
     this.global_editor = editor

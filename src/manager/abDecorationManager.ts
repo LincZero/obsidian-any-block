@@ -2,7 +2,7 @@ import {EditorView, Decoration} from "@codemirror/view"
 import type {Extension} from "@codemirror/state"
 
 import type { ABStateManager } from './abStateManager';
-import type { MdSelectorSpec } from "./abMdSelector"
+import type { MdSelectorRangeSpec } from "./abMdSelector"
 import { ABReplaceWidget } from "./replaceWidgetType"
 
 interface CursorSpec{
@@ -15,13 +15,13 @@ interface CursorSpec{
  * 其中传入r_this的作用主要是为了装饰块可能可以返过来设置光标位置
  */
 export class ABDecorationManager{
-  rangeSpec: MdSelectorSpec
+  rangeSpec: MdSelectorRangeSpec
   cursorSpec: CursorSpec
   decoration: Decoration
   isBlock: boolean
   r_this: ABStateManager
 
-  constructor(r_this: ABStateManager, rangeSpec: MdSelectorSpec, cursorSpec:CursorSpec){
+  constructor(r_this: ABStateManager, rangeSpec: MdSelectorRangeSpec, cursorSpec:CursorSpec){
     this.rangeSpec = rangeSpec
     this.cursorSpec = cursorSpec
     this.r_this = r_this
