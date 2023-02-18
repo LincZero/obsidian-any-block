@@ -1,5 +1,3 @@
-import {ConfSelect, type ABSettingInterface} from "src/config/abSettingTab"
-
 /** MD选择器
  * 旧方案
  *  - 每个选择器对全文进行一次选择
@@ -32,7 +30,7 @@ export function autoMdSelector(
   mdText: string = "",      // 全文文本
   // setting: ABSettingInterface,
 ):MdSelectorRangeSpec[]{
-  let list_MdSelectorRangeSpec:MdSelectorRangeSpec[] = []
+  let list_mdSelectorRangeSpec:MdSelectorRangeSpec[] = []
   let list_text:string[] = mdText.split("\n")
 
   /** 行数 - total_ch 映射表
@@ -40,44 +38,52 @@ export function autoMdSelector(
    * map_line_ch[i] = 序列i行最前面的位置
    * map_line_ch[i+1]-1 = 序列i行最后面的位置
    */
-  let map_line_ch: number[] = [0]   // line-ch 映射表
+  // 创建 line-ch 映射表
+  let map_line_ch: number[] = [0]
   let count_ch = 0
   for (let line of list_text){
     count_ch = count_ch + line.length + 1
-    this.map_line_ch.push(count_ch)
+    map_line_ch.push(count_ch)
   }
-
+  // 将全文遍历为多个AB块选择范围
   for (let i=0; i<list_text.length; i++){
     const line = list_text[i]
-    for (let selecotr of list_MdSelector){
+    for (let selecotr of list_mdSelector){
       if (selecotr.match.test(line)) {
         let sim:MdSelectorRangeSpecSimp|null = selecotr.selector(list_text, i)
         if (!sim) continue
-        list_MdSelectorRangeSpec.push({
+        // 语法糖
+        if (sim.selector=="list") if (sim.header.indexOf("2")==0) sim.header="list"+sim.header
+        if (sim.selector=="title") {
+          if (sim.header.indexOf("2")==0) sim.header="title"+sim.header
+          else if(sim.header.indexOf("list")==0) sim.header="title2list|"+sim.header
+        }
+        // 行改ch
+        list_mdSelectorRangeSpec.push({
           from_ch: map_line_ch[sim.from_line],
           to_ch: map_line_ch[sim.to_line]-1,
           header: sim.header, 
           selector: sim.selector,
-          content: sim.selector
+          content: sim.content,
+          prefix: sim.prefix,
         })
         i = sim.to_line-1
         break
       }
     }
   }
-
-  return list_MdSelectorRangeSpec
+  return list_mdSelectorRangeSpec
 }
 
-/** md选择器列表 */
-let list_MdSelector: MdSelectorSpec[] = []
+
 /** 选择器范围 - 严格版 */
 export interface MdSelectorRangeSpec {
   from_ch: number,  // 替换范围
   to_ch: number,    // .
   header: string,   // 头部信息
   selector: string, // 选择器（范围选择方式）
-  content: string   // 内容信息
+  content: string,  // 内容信息
+  prefix: string,
 }
 /** 选择器范围 - 简单版 */
 export interface MdSelectorRangeSpecSimp {
@@ -85,7 +91,8 @@ export interface MdSelectorRangeSpecSimp {
   to_line: number,  // .
   header: string,   // 头部信息
   selector: string, // 选择器（范围选择方式）
-  content: string   // 内容信息
+  content: string,  // 内容信息
+  prefix: string,
 }
 export interface MdSelectorSpec{
   match: RegExp
@@ -95,8 +102,10 @@ export interface MdSelectorSpec{
     // confSelect: ConfSelect    // 选择器配置
   )=>MdSelectorRangeSpecSimp|null // 返回一个MdSelectorRangeSpec。然后遍历器的行数要跳转到里面的`to`继续循环
 }
+/** md选择器列表 */
+export let list_mdSelector: MdSelectorSpec[] = []
 export function registerMdSelector (mdSelectorSpec:MdSelectorSpec){
-  list_MdSelector.push(mdSelectorSpec)
+  list_mdSelector.push(mdSelectorSpec)
 }
 
 // 配置返回列表

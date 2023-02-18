@@ -1,6 +1,6 @@
 /** @attention 修改正则要注意小括号的位置是否对应，不然还要去修改索引 */
 export const ABReg = {
-  reg_header: /^(\s|>\s|-\s)*\[(.*)\]/,
+  reg_header:   /^((\s|>\s|-\s)*)\[(.*)\]/,
 
   reg_front: /^{\[.*?\]/,
   reg_end: /^}./,

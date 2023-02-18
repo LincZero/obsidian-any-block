@@ -1,9 +1,10 @@
 import {App, PluginSettingTab, Setting, Modal} from "obsidian"
 import type AnyBlockPlugin from "../main"
 import {generateInfoTable, registerABProcessorUser, type ABProcessorSpecUser} from "src/replace/abProcessor"
-import {} from "src/replace/baseProcessor"  // 加载所有处理器
-import {} from "src/replace/listProcessor"  // ^
-import {} from "src/replace/decoProcessor"  // ^
+import {} from "src/replace/baseProcessor"    // 加载所有处理器和选择器
+import {} from "src/replace/listProcessor"    // ^
+import {} from "src/replace/decoProcessor"    // ^
+import {} from "src/manager/abMdBaseSelector" // ^
 
 /** 设置值接口 */
 export interface ABSettingInterface {

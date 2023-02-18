@@ -205,13 +205,22 @@ export class ABStateManager{
 
     // 装饰调整 - 查
     let list_add_decoration:Range<Decoration>[] = []
-    const list_range:MdSelectorRangeSpec[] = autoMdSelector(this.mdText)
-    for (let range of list_range){
+    const list_rangeSpec:MdSelectorRangeSpec[] = autoMdSelector(this.mdText)
+    for (let rangeSpec of list_rangeSpec){
       let decoration: Decoration
-      decoration = Decoration.replace({widget: new ABReplaceWidget(
-        range, this.editor
-      )})
-      list_add_decoration.push(decoration.range(range.from_ch, range.to_ch))
+      // 判断光标位置
+      const cursorSpec = this.getCursorCh()
+      if (cursorSpec.from>=rangeSpec.from_ch && cursorSpec.from<=rangeSpec.to_ch 
+          || cursorSpec.to>=rangeSpec.from_ch && cursorSpec.to<=rangeSpec.to_ch) {
+        decoration = Decoration.mark({class: "ab-line-yellow"})
+        is_current_cursor_in = true
+      }
+      else{
+        decoration = Decoration.replace({widget: new ABReplaceWidget(
+          rangeSpec, this.editor
+        )})
+      }
+      list_add_decoration.push(decoration.range(rangeSpec.from_ch, rangeSpec.to_ch))
     }
     
     /*const list_abRangeManager:ABMdSelector[] = get_selectors(this.plugin_this.settings).map(c => {
@@ -232,6 +241,7 @@ export class ABStateManager{
         let listRangeSpec: MdSelectorRangeSpec[] = abManager.specKeywords
         for(let rangeSpec of listRangeSpec){          // 遍历每个范围管理器里的多个范围集
           let decoration: Decoration
+          // 判断光标位置
           if (cursorSpec.from>=rangeSpec.from_ch && cursorSpec.from<=rangeSpec.to_ch 
               || cursorSpec.to>=rangeSpec.from_ch && cursorSpec.to<=rangeSpec.to_ch) {
             decoration = Decoration.mark({class: "ab-line-yellow"})
