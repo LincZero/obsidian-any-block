@@ -4,7 +4,7 @@ import  {MarkdownView, type View, type Editor, type EditorPosition} from 'obsidi
 
 import type AnyBlockPlugin from '../main'
 import { ConfDecoration } from "src/config/abSettingTab"
-import { get_selectors, /*list_ABMdSelector,*/ ABMdSelector, type MdSelectorRangeSpec} from "./abMdSelector"
+import { autoMdSelector, type MdSelectorRangeSpec} from "./abMdSelector"
 import { ABDecorationManager } from "./abDecorationManager"
 import { ABReplaceWidget } from "./replaceWidgetType"
 
@@ -205,7 +205,16 @@ export class ABStateManager{
 
     // 装饰调整 - 查
     let list_add_decoration:Range<Decoration>[] = []
-    const list_abRangeManager:ABMdSelector[] = get_selectors(this.plugin_this.settings).map(c => {
+    const list_range:MdSelectorRangeSpec[] = autoMdSelector(this.mdText)
+    for (let range of list_range){
+      let decoration: Decoration
+      decoration = Decoration.replace({widget: new ABReplaceWidget(
+        range, this.editor
+      )})
+      list_add_decoration.push(decoration.range(range.from_ch, range.to_ch))
+    }
+    
+    /*const list_abRangeManager:ABMdSelector[] = get_selectors(this.plugin_this.settings).map(c => {
       return new c(this.mdText, this.plugin_this.settings)
     })
     if(decoration_mode==ConfDecoration.inline){       // 线装饰
@@ -213,7 +222,7 @@ export class ABStateManager{
         let listRangeSpec: MdSelectorRangeSpec[] = abManager.specKeywords
         for(let rangeSpec of listRangeSpec){          // 遍历每个范围管理器里的多个范围集
           const decoration: Decoration = Decoration.mark({class: "ab-line-brace"})
-          list_add_decoration.push(decoration.range(rangeSpec.from, rangeSpec.to))
+          list_add_decoration.push(decoration.range(rangeSpec.from_ch, rangeSpec.to_ch))
         }
       }
     }
@@ -223,8 +232,8 @@ export class ABStateManager{
         let listRangeSpec: MdSelectorRangeSpec[] = abManager.specKeywords
         for(let rangeSpec of listRangeSpec){          // 遍历每个范围管理器里的多个范围集
           let decoration: Decoration
-          if (cursorSpec.from>=rangeSpec.from && cursorSpec.from<=rangeSpec.to 
-              || cursorSpec.to>=rangeSpec.from && cursorSpec.to<=rangeSpec.to) {
+          if (cursorSpec.from>=rangeSpec.from_ch && cursorSpec.from<=rangeSpec.to_ch 
+              || cursorSpec.to>=rangeSpec.from_ch && cursorSpec.to<=rangeSpec.to_ch) {
             decoration = Decoration.mark({class: "ab-line-yellow"})
             is_current_cursor_in = true
           }
@@ -233,10 +242,10 @@ export class ABStateManager{
               rangeSpec, this.editor
             )})
           }
-          list_add_decoration.push(decoration.range(rangeSpec.from, rangeSpec.to))
+          list_add_decoration.push(decoration.range(rangeSpec.from_ch, rangeSpec.to_ch))
         }
       }
-    }
+    }*/
 
     /*console.log("状态比较", 
       (is_current_cursor_in!=this.is_prev_cursor_in

@@ -53,7 +53,7 @@ export class ABReplaceWidget extends WidgetType {
        */
       if (this.global_editor){
         const editor: Editor = this.global_editor
-        let pos = this.getCursorPos(editor, this.rangeSpec.from)
+        let pos = this.getCursorPos(editor, this.rangeSpec.from_ch)
         if (pos) {
           editor.setCursor(pos)
           // 往返修改，间接重新渲染State

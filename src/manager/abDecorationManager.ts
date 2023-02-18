@@ -26,8 +26,8 @@ export class ABDecorationManager{
     this.cursorSpec = cursorSpec
     this.r_this = r_this
 
-    let from = rangeSpec.from
-    let to = rangeSpec.to
+    let from = rangeSpec.from_ch
+    let to = rangeSpec.to_ch
     let cfrom = cursorSpec.from
     let cto = cursorSpec.to
     // 如果光标位置在块内，则不启用块，仅使用高亮

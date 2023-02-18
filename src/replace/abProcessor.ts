@@ -80,7 +80,7 @@ export function autoABProcessor(el:HTMLDivElement, header:string, content:string
   }
 }
 
-/** 创建推荐下拉框 */
+/** 处理器一览表 - 下拉框推荐 */
 export function getProcessorOptions(){
   return list_abProcessor
   .filter(item=>{
@@ -91,7 +91,7 @@ export function getProcessorOptions(){
   })
 }
 
-/** 处理器一览表 - 生成器 */
+/** 处理器一览表 - 全部信息 */
 export function generateInfoTable(el: HTMLElement){
   const table_p = el.createEl("div",{
     cls: ["ab-setting","md-table-fig"],
@@ -131,7 +131,36 @@ export function generateInfoTable(el: HTMLElement){
   return table_p
 }
 
-/** 注册ab处理器。
+
+/** ab处理器 - 严格版，的接口与列表
+ */
+let list_abProcessor: ABProcessorSpec[] = []
+/** ab处理器子接口
+ * @warn 暂时不允许扩展，处理器的参数和返回值目前还是使用的手动一个一个来检查的
+ */
+/** ab处理器接口 - 严格版 */
+interface ABProcessorSpec{
+  id: string
+  name: string
+  match: RegExp|string
+  default: string|null
+  detail: string
+  process_alias: string,
+  process_param: ProcessDataType|null,
+  process_return: ProcessDataType|null,
+  process: (el:HTMLDivElement, header:string, content:string)=> any
+  is_disable: boolean   // 是否禁用，默认false
+  register_from: string // 自带、其他插件、面板设置，如果是其他插件，则需要提供插件的名称（不知道能不能自动识别）
+  // 非注册项：
+  // ~~is_inner：这个不可设置，用来区分是内部还是外部给的~~
+  // is_enable: 加载后能禁用这个项
+}
+export enum ProcessDataType {
+  text= "string",
+  el= "HTMLElement"
+}
+
+/** ab处理器 - 语法糖版，的接口与注册函数
  * 使用 ab处理器接口 - 语法糖版
  * 不允许直接写严格版的，有些参数不能让用户填
  */
@@ -167,7 +196,7 @@ export function registerABProcessor(sim: ABProcessorSpecSimp){
   list_abProcessor.push(abProcessorSpec)
 }
 
-/** 注册ab处理器 - 用户版
+/** ab处理器 - 用户版，的接口与注册函数
  * 使用 ab处理器接口 - 用户版（都是字符串存储）
  * 特点：不能注册process（无法存储在txt中），只能注册别名
  */
@@ -192,31 +221,4 @@ export function registerABProcessorUser(sim: ABProcessorSpecUser){
     register_from: "用户",
   }
   list_abProcessor.push(abProcessorSpec)
-}
-
-/** ab处理器列表 */
-let list_abProcessor: ABProcessorSpec[] = []
-/** ab处理器子接口
- * @warn 暂时不允许扩展，处理器的参数和返回值目前还是使用的手动一个一个来检查的
- */
-export enum ProcessDataType {
-  text= "string",
-  el= "HTMLElement"
-}
-/** ab处理器接口 - 严格版 */
-interface ABProcessorSpec{
-  id: string
-  name: string
-  match: RegExp|string
-  default: string|null
-  detail: string
-  process_alias: string,
-  process_param: ProcessDataType|null,
-  process_return: ProcessDataType|null,
-  process: (el:HTMLDivElement, header:string, content:string)=> any
-  is_disable: boolean   // 是否禁用，默认false
-  register_from: string // 自带、其他插件、面板设置，如果是其他插件，则需要提供插件的名称（不知道能不能自动识别）
-  // 非注册项：
-  // ~~is_inner：这个不可设置，用来区分是内部还是外部给的~~
-  // is_enable: 加载后能禁用这个项
 }
