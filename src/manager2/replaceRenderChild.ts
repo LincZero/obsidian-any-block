@@ -27,13 +27,13 @@ export class RelpaceRender extends MarkdownRenderChild {
    */
   onload() {
     const div:HTMLDivElement = this.containerEl.createDiv({
-      cls: ["ab-replace"]
+      cls: ["ab-replace", "cm-embed-block", "markdown-rendered"]
     });
     div.setAttribute("type_header", this.header)
 
     // 主体部分
     const dom_note = div.createDiv({
-      cls: ["ab-note"]
+      cls: ["ab-note", "drop-shadow"]
     })
     let dom_replaceEl = dom_note.createDiv({
       cls: ["ab-replaceEl"]
@@ -43,7 +43,7 @@ export class RelpaceRender extends MarkdownRenderChild {
     
     // 下拉框格式部分
     const dom_edit = div.createEl("select", {
-      cls: ["ab-button"], 
+      cls: ["ab-button", "edit-block-button"], 
       attr: {"aria-label": "Edit this block - "+this.header}
     });
     const first_dom_option = dom_edit.createEl("option",{ // 这个需要在首选
@@ -76,6 +76,15 @@ export class RelpaceRender extends MarkdownRenderChild {
       dom_replaceEl.replaceWith(new_dom_replaceEl);
       dom_replaceEl = new_dom_replaceEl
     }
+
+    // 下拉框隐藏
+    const button_show = ()=>{dom_edit.show()}
+    const button_hide  = ()=>{dom_edit.hide()}
+    dom_edit.hide()
+    dom_note.onmouseover = button_show
+    dom_note.onmouseout = button_hide
+    dom_edit.onmouseover = button_show
+    dom_edit.onmouseout = button_hide
   }
 
   static str_icon_code2 = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-darkreader-inline-stroke="" style="--darkreader-inline-stroke:currentColor;"><path d="m18 16 4-4-4-4"></path><path d="m6 8-4 4 4 4"></path><path d="m14.5 4-5 16"></path></svg>`

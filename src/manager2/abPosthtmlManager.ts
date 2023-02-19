@@ -107,7 +107,7 @@ const getSourceMarkdown = (
     const text_content = list_text.slice(lineStart, lineEnd + 1).join("\n");
     let text_header = lineStart==0?"":list_text[lineStart-1]
     const text_header_match = text_header.match(ABReg.reg_header)
-    text_header = text_header_match?text_header_match[2]:""
+    text_header = text_header_match?text_header_match[4]:""
     return {
       header: text_header,
       content: text_content,

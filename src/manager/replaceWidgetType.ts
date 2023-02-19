@@ -24,16 +24,16 @@ export class ABReplaceWidget extends WidgetType {
     // 根元素
     this.div = document.createElement("div");
     this.div.setAttribute("type_header", this.rangeSpec.header)
-    this.div.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
+    this.div.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered"]) // , "show-indentation-guide"
 
     // 内容替换元素
-    let dom_note = this.div.createEl("div", {cls: ["drop-shadow", "ab-note"]});
+    let dom_note = this.div.createEl("div", {cls: ["ab-note", "drop-shadow"]});
     autoABProcessor(dom_note, this.rangeSpec.header, this.rangeSpec.content)
 
     // 编辑按钮
     if (this.global_editor){
       let dom_edit = this.div.createEl("div", {
-        cls: ["ab-button", "edit-block-button"], 
+        cls: ["ab-button", "edit-block-button"], // cm-embed-block和edit-block-button是自带的js样式？用来悬浮显示的
         attr: {"aria-label": "Edit this block - "+this.rangeSpec.header}
       });
       dom_edit.innerHTML = ABReplaceWidget.str_icon_code2
