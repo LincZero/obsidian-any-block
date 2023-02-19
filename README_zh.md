@@ -8,7 +8,7 @@ A Obsidian Plugin. You can flexibility to create a 'Block' by some means.
 
 Function：Block conversion、list to table or other tree graph，See the `demo` sample folder for details
 
-[Usage Tutorial & Sample Library](./demo)
+[中文教程和示例库](./demo_zh)
 
 ## If bug
 
@@ -16,7 +16,7 @@ Function：Block conversion、list to table or other tree graph，See the `demo`
 
 ## Suport command
 
-Look the setup panel or [Usage Tutorial & Sample Library](./demo)
+Look the setup panel or [中文教程和示例库](./demo_zh)
 
 说其中一些比较常用的处理器：
 - 列表转表格

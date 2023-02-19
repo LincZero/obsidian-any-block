@@ -75,7 +75,6 @@ export function autoMdSelector(
   return list_mdSelectorRangeSpec
 }
 
-
 /** 选择器范围 - 严格版 */
 export interface MdSelectorRangeSpec {
   from_ch: number,  // 替换范围

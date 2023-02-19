@@ -5,6 +5,60 @@ import {
   type MdSelectorRangeSpecSimp
 } from "./abMdSelector"
 
+const mdSelector_brace:MdSelectorSpec = {
+  match: ABReg.reg_front,
+  selector: (list_text, from_line)=>{
+    let mdRange:MdSelectorRangeSpecSimp = {
+        from_line: from_line-1,
+        to_line: from_line+1,
+        header: "",
+        selector: "barce",
+        content: "",
+        prefix: ""
+    }
+    // 验证首行
+    if (from_line <= 0) return null
+    const first_line_match = list_text[from_line].match(ABReg.reg_front)
+    if (!first_line_match) return null
+    mdRange.prefix = first_line_match[1]  // 可以是空
+    // 验证header
+    const header_line_match = list_text[from_line-1].match(ABReg.reg_header)
+    if (!header_line_match) return null
+    if (!header_line_match
+      || !header_line_match[3] 
+      || header_line_match[1]!=mdRange.prefix
+    ) return null
+    mdRange.header = header_line_match[3]
+    // 开头找到了，现在开始找结束。不需要循环尾处理器
+    let last_nonempty:number = from_line
+    for (let i=from_line+1; i<list_text.length; i++){
+      const line = list_text[i]
+      if (line.indexOf(mdRange.prefix)!=0) break
+      const line2 = line.replace(mdRange.prefix, "")    // 删掉无用前缀
+      if (ABReg.reg_end.test(line2)) {         // 列表
+        last_nonempty = i
+        continue 
+      }
+      if (/^\s+?\S/.test(line2)) {              // 开头有缩进
+        last_nonempty = i
+        continue
+      }
+      if (/^\s*$/.test(line2)) {                // 空行
+        last_nonempty = i
+        continue
+      }
+      break
+    }
+    mdRange.to_line = last_nonempty+1
+    mdRange.content = list_text
+      .slice(mdRange.from_line+1, mdRange.to_line)
+      .map((line)=>{return line.replace(mdRange.prefix, "")})
+      .join("\n")
+    return mdRange
+  }
+}
+registerMdSelector(mdSelector_brace)
+
 /*const mdSelector_brace:MdSelectorSpec = {
   match: ABReg.reg_front,
   selector: (mdText, from, confSelect)=>{
@@ -59,7 +113,7 @@ const mdSelector_list:MdSelectorSpec = {
       || header_line_match[1]!=mdRange.prefix
     ) return null
     mdRange.header = header_line_match[3]
-    // 开头找到了，现在开始找结束
+    // 开头找到了，现在开始找结束。不需要循环尾处理器
     let last_nonempty:number = from_line
     for (let i=from_line+1; i<list_text.length; i++){
       const line = list_text[i]
