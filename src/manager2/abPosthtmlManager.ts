@@ -37,32 +37,24 @@ export class ABPosthtmlManager{
     if (!mdSrc) return
 
     // 设置开关
-    const able_list:boolean = (this.settings.select_list == ConfSelect.yes) || ((this.settings.select_list == ConfSelect.ifhead) && mdSrc.header!="")
-    const able_quote:boolean = (this.settings.select_list == ConfSelect.yes) || ((this.settings.select_quote == ConfSelect.ifhead) && mdSrc.header!="")
-    const able_code:boolean = (this.settings.select_list == ConfSelect.yes) || ((this.settings.select_code == ConfSelect.ifhead) && mdSrc.header!="")
-    const able_brace:boolean = this.settings.select_brace == ConfSelect.yes
-    const able_heading:boolean = this.settings.select_heading == ConfSelect.ifhead
+    // const able_list:boolean = (this.settings.select_list == ConfSelect.yes) || ((this.settings.select_list == ConfSelect.ifhead) && mdSrc.header!="")
+    // const able_quote:boolean = (this.settings.select_list == ConfSelect.yes) || ((this.settings.select_quote == ConfSelect.ifhead) && mdSrc.header!="")
+    // const able_code:boolean = (this.settings.select_list == ConfSelect.yes) || ((this.settings.select_code == ConfSelect.ifhead) && mdSrc.header!="")
+    // const able_brace:boolean = this.settings.select_brace == ConfSelect.yes
+    // const able_heading:boolean = this.settings.select_heading == ConfSelect.ifhead
 
     // 局部选择器
     const divEl:any = el  // @fixing error：“HTML Collection”类型必须具有在指令中返回迭代器的“[Symbol.iterator]()”方法
     for (const subEl of divEl.children) {                          // 这个如果是块的话一般就一层，多层应该是p-br的情况
       // 这一部分是找到根div里的<ul>或<quote><ul>
-      let targetEl: HTMLElement
-      if (able_list && subEl instanceof HTMLUListElement) {     // 列表
-        targetEl = subEl
-        if (/^\s*-\s(.*)/.test(mdSrc.content)) {
-          if (mdSrc.header.indexOf("2")==0) mdSrc.header="list"+mdSrc.header
-        }
-        else {
-          console.warn("html选择器: ul格式错误", mdSrc) // 按理说不会
-          continue
-        }
+      if (subEl instanceof HTMLUListElement) {     // 列表
+        replaceElement(subEl, ctx, "list")
       }
-      else if (able_quote && subEl instanceof HTMLQuoteElement){
-        targetEl = subEl
+      else if (subEl instanceof HTMLQuoteElement){
+        const result = replaceElement(subEl, ctx, "quote")
       }
-      else if (able_code && subEl instanceof HTMLPreElement){
-        targetEl = subEl
+      else if (subEl instanceof HTMLPreElement){
+        replaceElement(subEl, ctx, "code")
       }
       /*else if (
         child instanceof HTMLQuoteElement &&
@@ -71,27 +63,38 @@ export class ABPosthtmlManager{
         sub_el = child.firstElementChild;
       }*/
       else continue
-      
-      mdSrc.header=mdSrc.header??"md"   // 渲染模式的列表选择器若无header则给md
-      ctx.addChild(new RelpaceRender(targetEl, mdSrc.header, mdSrc.content));
     }
+    
 
     // 结束，开启全局选择器
     if (mdSrc.is_end){
-      global_selector(el, ctx, able_heading)
+      global_selector(el, ctx)
       return
     }
     else if (el.classList.contains("mod-footer")){
-      global_selector(el, ctx, able_heading)
+      global_selector(el, ctx)
       return
     }
   }
 }
 
+/** 尝试转化el */
+function replaceElement(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext, selector: string){
+  const mdSrc = getSourceMarkdown(targetEl, ctx)
+  if (!mdSrc) return false
+
+  if (selector=="list"){
+    if (mdSrc.header.indexOf("2")==0) mdSrc.header="list"+mdSrc.header
+  }
+
+  mdSrc.header=mdSrc.header??"md"   // 渲染模式的列表选择器若无header则给md
+  ctx.addChild(new RelpaceRender(targetEl, mdSrc.header, mdSrc.content));
+}
+
 /** 将html还原回md格式
  * 被processTextSection调用
  */
-const getSourceMarkdown = (
+function getSourceMarkdown(
   sectionEl: HTMLElement,
   ctx: MarkdownPostProcessorContext,
 ): {
@@ -99,12 +102,19 @@ const getSourceMarkdown = (
   content: string, 
   info:MarkdownSectionInformation,
   is_end:boolean
-}|null => {
+}|null {
   let info = ctx.getSectionInfo(sectionEl);     // info: MarkdownSectionInformation | null
   if (info) {
     const { text, lineStart, lineEnd } = info;  // 分别是：全文文档、div的开始行、div的结束行
     const list_text = text.replace(/(\s*$)/g,"").split("\n")   // @attension 去除尾部空格否则无法判断 is_end，头部不能去除否则会错位
     const text_content = list_text.slice(lineStart, lineEnd + 1).join("\n");
+
+
+
+
+
+
+    // 这里需要重写
     let text_header = lineStart==0?"":list_text[lineStart-1]
     const text_header_match = text_header.match(ABReg.reg_header)
     text_header = text_header_match?text_header_match[4]:""
@@ -143,10 +153,8 @@ const getSourceMarkdown = (
  */
 function global_selector(
   el: HTMLElement, 
-  ctx: MarkdownPostProcessorContext,
-  able_heading:boolean
+  ctx: MarkdownPostProcessorContext
 ){
-  if (!able_heading) return
   // const pEl = el.parentElement    // 这里无法获取parentElement
   const pageEl = document.querySelectorAll(".workspace-leaf.mod-active .markdown-preview-section")[0]
   if (!pageEl) return
