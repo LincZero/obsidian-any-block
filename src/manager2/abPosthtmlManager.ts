@@ -44,8 +44,7 @@ export class ABPosthtmlManager{
     // const able_heading:boolean = this.settings.select_heading == ConfSelect.ifhead
 
     // 局部选择器
-    const divEl:any = el  // @fixing error：“HTML Collection”类型必须具有在指令中返回迭代器的“[Symbol.iterator]()”方法
-    for (const subEl of divEl.children) {                          // 这个如果是块的话一般就一层，多层应该是p-br的情况
+    for (const subEl of el.children) {                          // 这个如果是块的话一般就一层，多层应该是p-br的情况
       // 这一部分是找到根div里的<ul>或<quote><ul>
       if (subEl instanceof HTMLUListElement) {     // 列表
         replaceElement(subEl, ctx, "list")
@@ -56,6 +55,11 @@ export class ABPosthtmlManager{
       else if (subEl instanceof HTMLPreElement){
         replaceElement(subEl, ctx, "code")
       }
+
+
+      
+
+
       /*else if (
         child instanceof HTMLQuoteElement &&
         child.firstElementChild instanceof HTMLUListElement
@@ -64,7 +68,22 @@ export class ABPosthtmlManager{
       }*/
       else continue
     }
-    
+
+    /** 找到div里的每一个选择块 */
+    function findBlock(targetEl: HTMLElement){
+      if (targetEl instanceof HTMLUListElement
+        || targetEl instanceof HTMLQuoteElement
+        || targetEl instanceof HTMLPreElement
+      ) {
+        // 判断是否有header并替换元素
+        if(replaceElement(targetEl, ctx, "list")) return
+        else if(!(targetEl instanceof HTMLPreElement)) {
+          for (let targetEl2 of targetEl.children){
+            findBlock(targetEl)
+          }
+        }
+      }
+    }
 
     // 结束，开启全局选择器
     if (mdSrc.is_end){
@@ -78,7 +97,9 @@ export class ABPosthtmlManager{
   }
 }
 
-/** 尝试转化el */
+/** 尝试转化el
+ * 判断是否有header并替换元素
+ */
 function replaceElement(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext, selector: string){
   const mdSrc = getSourceMarkdown(targetEl, ctx)
   if (!mdSrc) return false

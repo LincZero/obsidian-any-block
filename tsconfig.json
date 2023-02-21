@@ -14,13 +14,14 @@
     "importHelpers": true,
     // "allowSyntheticDefaultImports": true, // markdown-it模块要加这个
     "isolatedModules": true,
-	  "strictNullChecks": true,
+    "strictNullChecks": true,
     "lib": [
       "DOM",
       "ES5",
       "ES6",
       "ES7",
-      //"dom.iterable"  // 并重新启动项目，不然该代码报错：for (let el of blockEl.querySelectorAll("[id^=TX_]"))
+      "dom.iterable"  // 并重新启动项目，不然该代码报错：for (let el of blockEl.querySelectorAll("[id^=TX_]"))
+                      // 或在for of时报错：类型“HTMLCollection”必须具有返回迭代器的 "[Symbol.iterator]()" 方法
     ],
   },
   "include": [
