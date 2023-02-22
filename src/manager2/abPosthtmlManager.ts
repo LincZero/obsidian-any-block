@@ -45,28 +45,7 @@ export class ABPosthtmlManager{
 
     // 局部选择器
     for (const subEl of el.children) {                          // 这个如果是块的话一般就一层，多层应该是p-br的情况
-      // 这一部分是找到根div里的<ul>或<quote><ul>
-      if (subEl instanceof HTMLUListElement) {     // 列表
-        replaceElement(subEl, ctx, "list")
-      }
-      else if (subEl instanceof HTMLQuoteElement){
-        const result = replaceElement(subEl, ctx, "quote")
-      }
-      else if (subEl instanceof HTMLPreElement){
-        replaceElement(subEl, ctx, "code")
-      }
-
-
-      
-
-
-      /*else if (
-        child instanceof HTMLQuoteElement &&
-        child.firstElementChild instanceof HTMLUListElement
-      ) {
-        sub_el = child.firstElementChild;
-      }*/
-      else continue
+      findBlock(subEl as HTMLElement)
     }
 
     /** 找到div里的每一个选择块 */
@@ -78,15 +57,17 @@ export class ABPosthtmlManager{
         // 判断是否有header并替换元素
         if(replaceElement(targetEl, ctx, "list")) return
         else if(!(targetEl instanceof HTMLPreElement)) {
+          targetEl.children
+          targetEl.firstElementChild
           for (let targetEl2 of targetEl.children){
-            findBlock(targetEl)
+            findBlock(targetEl2 as HTMLElement)
           }
         }
       }
     }
 
     // 结束，开启全局选择器
-    if (mdSrc.is_end){
+    if (mdSrc.to_line==mdSrc.content.split("\n").length){
       global_selector(el, ctx)
       return
     }
@@ -101,9 +82,10 @@ export class ABPosthtmlManager{
  * 判断是否有header并替换元素
  */
 function replaceElement(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext, selector: string){
+  console.log("判断是否有header", selector)
   const mdSrc = getSourceMarkdown(targetEl, ctx)
-  if (!mdSrc) return false
-
+  if (!mdSrc || !mdSrc.header) return false
+  console.log("判断是否有header：：：：有")
   if (selector=="list"){
     if (mdSrc.header.indexOf("2")==0) mdSrc.header="list"+mdSrc.header
   }
@@ -112,39 +94,74 @@ function replaceElement(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext
   ctx.addChild(new RelpaceRender(targetEl, mdSrc.header, mdSrc.content));
 }
 
+interface HTMLSelectorRangeSpec {
+  from_line: number,// 替换范围
+  to_line: number,  // .
+  header: string,   // 头部信息
+  selector: string, // 选择器（范围选择方式）
+  content: string,  // 内容信息（已去除尾部空格）
+  prefix: string,
+}
 /** 将html还原回md格式
  * 被processTextSection调用
  */
 function getSourceMarkdown(
   sectionEl: HTMLElement,
   ctx: MarkdownPostProcessorContext,
-): {
-  header: string, 
-  content: string, 
-  info:MarkdownSectionInformation,
-  is_end:boolean
-}|null {
+): HTMLSelectorRangeSpec|null {
   let info = ctx.getSectionInfo(sectionEl);     // info: MarkdownSectionInformation | null
   if (info) {
-    const { text, lineStart, lineEnd } = info;  // 分别是：全文文档、div的开始行、div的结束行
+    // 基本信息
+    const { text, lineStart, lineEnd } = info;  // 分别是：全文文档、div的开始行、div的结束行（结束行是包含的，+1才是不包含）
     const list_text = text.replace(/(\s*$)/g,"").split("\n")   // @attension 去除尾部空格否则无法判断 is_end，头部不能去除否则会错位
     const text_content = list_text.slice(lineStart, lineEnd + 1).join("\n");
 
-
-
-
-
-
-    // 这里需要重写
-    let text_header = lineStart==0?"":list_text[lineStart-1]
-    const text_header_match = text_header.match(ABReg.reg_header)
-    text_header = text_header_match?text_header_match[4]:""
-    return {
-      header: text_header,
-      content: text_content,
-      info: info,
-      is_end: list_text.length==lineEnd+1
+    // 找类型、找前缀
+    let selector:string = "none"
+    let prefix:string = ""
+    if (sectionEl instanceof HTMLUListElement) {
+      selector = "list"
+      const match = list_text[0].match(ABReg.reg_list)
+      if (!match) return null
+      else prefix = match[1]
     }
+    else if (sectionEl instanceof HTMLQuoteElement) {
+      selector = "quote"
+      const match = list_text[0].match(ABReg.reg_quote)
+      if (!match) return null
+      else prefix = match[1]
+    }
+    else if (sectionEl instanceof HTMLPreElement) {
+      selector = "code"
+      const match = list_text[0].match(ABReg.reg_code)
+      if (!match) return null
+      else prefix = match[1]
+    }
+    else if (sectionEl instanceof HTMLHeadingElement) {
+      selector = "heading"
+      const match = list_text[0].match(ABReg.reg_heading)
+      if (!match) return null
+      else prefix = match[1]
+    }
+
+    // 找是否有头部
+    /** @todo 需要重写，一方面头部有可能在上上行，二方面要判断有前缀的情况*/
+    if (lineStart==0) return null
+    if (list_text[lineStart-1].indexOf(prefix)!=0) return null
+    const match_header = list_text[lineStart-1].replace(prefix, "").match(ABReg.reg_header)
+    if (!match_header) return null
+    const header = match_header[4]
+
+    // 返回
+    const result:HTMLSelectorRangeSpec = {
+      from_line: lineStart,
+      to_line: lineEnd+1,
+      header: header,
+      selector: selector,
+      content: text_content,
+      prefix: prefix
+    }
+    return result
   }
   // console.warn("获取MarkdownSectionInformation失败，可能会产生bug") // 其实会return void，应该不会有bug
   return null
@@ -213,7 +230,7 @@ function global_selector(
       if (!match) continue
       prev_heading_level = match[1].length
       prev_header = mdSrc.header
-      prev_from_line = mdSrc.info.lineStart
+      prev_from_line = mdSrc.from_line
       prev_el = divEl.children[0] // 就是标题那级
       // 隐藏全局选择器的header块
       const divEl_last = pageEl.children[i-1] as HTMLElement
@@ -260,8 +277,8 @@ function global_selector(
       }
       
       const header = prev_header??"md"
-      const content = mdSrc_last.info.text.split("\n")
-        .slice(prev_from_line, mdSrc_last.info.lineEnd+1).join("\n");
+      const content = mdSrc_last.content.split("\n")
+        .slice(prev_from_line, mdSrc_last.to_line).join("\n");
       if(prev_el) ctx.addChild(new RelpaceRender(prev_el, header, content));
 
       prev_header = ""
@@ -281,8 +298,8 @@ function global_selector(
       return
     }
     const header = prev_header??"md"
-    const content = mdSrc_last.info.text.trim().split("\n")
-      .slice(prev_from_line, mdSrc_last.info.lineEnd+1).join("\n");
+    const content = mdSrc_last.content.trim().split("\n")
+      .slice(prev_from_line, mdSrc_last.to_line).join("\n");
     if(prev_el) ctx.addChild(new RelpaceRender(prev_el, header, content));
   }
 }
