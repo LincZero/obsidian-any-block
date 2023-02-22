@@ -31,17 +31,12 @@ export class ABPosthtmlManager{
     // 设置里不启用，直接关了
     if (this.settings.decoration_render==ConfDecoration.none) return
 
+    console.log("关卡1 1")
     // 获取el对应的源md
     const mdSrc = getSourceMarkdown(el, ctx)
     // console.log("el ctx", el, ctx, mdSrc)
     if (!mdSrc) return
-
-    // 设置开关
-    // const able_list:boolean = (this.settings.select_list == ConfSelect.yes) || ((this.settings.select_list == ConfSelect.ifhead) && mdSrc.header!="")
-    // const able_quote:boolean = (this.settings.select_list == ConfSelect.yes) || ((this.settings.select_quote == ConfSelect.ifhead) && mdSrc.header!="")
-    // const able_code:boolean = (this.settings.select_list == ConfSelect.yes) || ((this.settings.select_code == ConfSelect.ifhead) && mdSrc.header!="")
-    // const able_brace:boolean = this.settings.select_brace == ConfSelect.yes
-    // const able_heading:boolean = this.settings.select_heading == ConfSelect.ifhead
+    console.log("关卡1 2")
 
     // 局部选择器
     for (const subEl of el.children) {                          // 这个如果是块的话一般就一层，多层应该是p-br的情况
@@ -68,10 +63,12 @@ export class ABPosthtmlManager{
 
     // 结束，开启全局选择器
     if (mdSrc.to_line==mdSrc.content.split("\n").length){
+      console.log("开始全局选择")
       global_selector(el, ctx)
       return
     }
     else if (el.classList.contains("mod-footer")){
+      console.log("开始全局选择")
       global_selector(el, ctx)
       return
     }
@@ -82,10 +79,10 @@ export class ABPosthtmlManager{
  * 判断是否有header并替换元素
  */
 function replaceElement(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext, selector: string){
-  console.log("判断是否有header", selector)
+  console.log("关卡2 1 判断是否有header", selector)
   const mdSrc = getSourceMarkdown(targetEl, ctx)
   if (!mdSrc || !mdSrc.header) return false
-  console.log("判断是否有header：：：：有")
+  console.log("关卡2 2 判断是否有header：：：：有")
   if (selector=="list"){
     if (mdSrc.header.indexOf("2")==0) mdSrc.header="list"+mdSrc.header
   }
@@ -112,45 +109,51 @@ function getSourceMarkdown(
   let info = ctx.getSectionInfo(sectionEl);     // info: MarkdownSectionInformation | null
   if (info) {
     // 基本信息
+    console.log("info", info)
     const { text, lineStart, lineEnd } = info;  // 分别是：全文文档、div的开始行、div的结束行（结束行是包含的，+1才是不包含）
-    const list_text = text.replace(/(\s*$)/g,"").split("\n")   // @attension 去除尾部空格否则无法判断 is_end，头部不能去除否则会错位
-    const text_content = list_text.slice(lineStart, lineEnd + 1).join("\n");
+    const list_text = text.replace(/(\s*$)/g,"").split("\n")
+    const list_content = list_text.slice(lineStart, lineEnd + 1)   // @attension 去除尾部空格否则无法判断 is_end，头部不能去除否则会错位
+    const content = list_content.join("\n");
 
     // 找类型、找前缀
+    console.log("关卡 3-1")
     let selector:string = "none"
     let prefix:string = ""
-    if (sectionEl instanceof HTMLUListElement) {
+    if (sectionEl instanceof HTMLUListElement) {console.log("列表啊为", list_content)
       selector = "list"
-      const match = list_text[0].match(ABReg.reg_list)
+      const match = list_content[0].match(ABReg.reg_list)
       if (!match) return null
       else prefix = match[1]
     }
     else if (sectionEl instanceof HTMLQuoteElement) {
       selector = "quote"
-      const match = list_text[0].match(ABReg.reg_quote)
+      const match = list_content[0].match(ABReg.reg_quote)
       if (!match) return null
       else prefix = match[1]
     }
     else if (sectionEl instanceof HTMLPreElement) {
       selector = "code"
-      const match = list_text[0].match(ABReg.reg_code)
+      const match = list_content[0].match(ABReg.reg_code)
       if (!match) return null
       else prefix = match[1]
     }
     else if (sectionEl instanceof HTMLHeadingElement) {
       selector = "heading"
-      const match = list_text[0].match(ABReg.reg_heading)
+      const match = list_content[0].match(ABReg.reg_heading)
       if (!match) return null
       else prefix = match[1]
     }
+    console.log("关卡 3-2")
 
-    // 找是否有头部
+    // 找头部header
     /** @todo 需要重写，一方面头部有可能在上上行，二方面要判断有前缀的情况*/
     if (lineStart==0) return null
+    console.log("内容", list_text, list_text[lineStart-1])
     if (list_text[lineStart-1].indexOf(prefix)!=0) return null
     const match_header = list_text[lineStart-1].replace(prefix, "").match(ABReg.reg_header)
     if (!match_header) return null
     const header = match_header[4]
+    console.log("关卡 3-3")
 
     // 返回
     const result:HTMLSelectorRangeSpec = {
@@ -158,7 +161,7 @@ function getSourceMarkdown(
       to_line: lineEnd+1,
       header: header,
       selector: selector,
-      content: text_content,
+      content: content,
       prefix: prefix
     }
     return result
