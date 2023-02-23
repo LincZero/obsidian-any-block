@@ -40,25 +40,7 @@ export class ABPosthtmlManager{
 
     // 局部选择器
     for (const subEl of el.children) {                          // 这个如果是块的话一般就一层，多层应该是p-br的情况
-      findBlock(subEl as HTMLElement)
-    }
-
-    /** 找到div里的每一个选择块 */
-    function findBlock(targetEl: HTMLElement){
-      if (targetEl instanceof HTMLUListElement
-        || targetEl instanceof HTMLQuoteElement
-        || targetEl instanceof HTMLPreElement
-      ) {
-        // 判断是否有header并替换元素
-        if(replaceElement(targetEl, ctx, "list")) return
-        else if(!(targetEl instanceof HTMLPreElement)) {
-          targetEl.children
-          targetEl.firstElementChild
-          for (let targetEl2 of targetEl.children){
-            findBlock(targetEl2 as HTMLElement)
-          }
-        }
-      }
+      findABBlock(subEl as HTMLElement, ctx)
     }
 
     // 结束，开启全局选择器
@@ -75,20 +57,41 @@ export class ABPosthtmlManager{
   }
 }
 
+/** 尝试找到div里的每一个ab块
+ * 并尝试转化转化元素
+ */
+function findABBlock(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext){
+  if (targetEl instanceof HTMLUListElement
+    || targetEl instanceof HTMLQuoteElement
+    || targetEl instanceof HTMLPreElement
+  ) {
+    // 判断是否有header并替换元素
+    console.log("关卡2 1")
+    if(replaceABBlock(targetEl, ctx)) return
+    else if(!(targetEl instanceof HTMLPreElement)) {
+      console.log("关卡2 2")
+      for (let targetEl2 of targetEl.children){
+        console.log("关卡3", targetEl2)
+        findABBlock(targetEl2 as HTMLElement, ctx)
+      }
+    }
+  }
+}
+
 /** 尝试转化el
  * 判断是否有header并替换元素
  */
-function replaceElement(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext, selector: string){
-  console.log("关卡2 1 判断是否有header", selector)
-  const mdSrc = getSourceMarkdown(targetEl, ctx)
-  if (!mdSrc || !mdSrc.header) return false
-  console.log("关卡2 2 判断是否有header：：：：有")
-  if (selector=="list"){
-    if (mdSrc.header.indexOf("2")==0) mdSrc.header="list"+mdSrc.header
+function replaceABBlock(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext){
+  const range = getSourceMarkdown(targetEl, ctx)
+  console.log("试图转化", targetEl, range, ctx, ctx.docId, ctx.sourcePath, ctx.frontmatter)
+  if (!range || !range.header) return false
+
+  // 语法糖
+  if (range.selector=="list"){
+    if (range.header.indexOf("2")==0) range.header="list"+range.header
   }
 
-  mdSrc.header=mdSrc.header??"md"   // 渲染模式的列表选择器若无header则给md
-  ctx.addChild(new RelpaceRender(targetEl, mdSrc.header, mdSrc.content));
+  ctx.addChild(new RelpaceRender(targetEl, range.header, range.content));
 }
 
 interface HTMLSelectorRangeSpec {
@@ -101,6 +104,10 @@ interface HTMLSelectorRangeSpec {
 }
 /** 将html还原回md格式
  * 被processTextSection调用
+ * @returns 三种结果
+ *  1. 获取info失败：返回null
+ *  2. 获取info成功，满足ab块条件：返回HTMLSelectorRangeSpec
+ *  3. 获取info成功，不满足ab块：  返回HTMLSelectorRangeSpec，但header为""
  */
 function getSourceMarkdown(
   sectionEl: HTMLElement,
@@ -108,63 +115,60 @@ function getSourceMarkdown(
 ): HTMLSelectorRangeSpec|null {
   let info = ctx.getSectionInfo(sectionEl);     // info: MarkdownSectionInformation | null
   if (info) {
+    let range:HTMLSelectorRangeSpec = {
+      from_line: 0,
+      to_line: 1,
+      header: "",
+      selector: "none",
+      content: "",
+      prefix: ""
+    }
+
     // 基本信息
-    console.log("info", info)
     const { text, lineStart, lineEnd } = info;  // 分别是：全文文档、div的开始行、div的结束行（结束行是包含的，+1才是不包含）
     const list_text = text.replace(/(\s*$)/g,"").split("\n")
     const list_content = list_text.slice(lineStart, lineEnd + 1)   // @attension 去除尾部空格否则无法判断 is_end，头部不能去除否则会错位
-    const content = list_content.join("\n");
+    range.from_line = lineStart
+    range.to_line = lineEnd+1
+    range.content = list_content.join("\n");
 
     // 找类型、找前缀
-    console.log("关卡 3-1")
-    let selector:string = "none"
-    let prefix:string = ""
-    if (sectionEl instanceof HTMLUListElement) {console.log("列表啊为", list_content)
-      selector = "list"
+    if (sectionEl instanceof HTMLUListElement) {
+      range.selector = "list"
       const match = list_content[0].match(ABReg.reg_list)
-      if (!match) return null
-      else prefix = match[1]
+      if (!match) return range
+      else range.prefix = match[1]
     }
     else if (sectionEl instanceof HTMLQuoteElement) {
-      selector = "quote"
+      range.selector = "quote"
       const match = list_content[0].match(ABReg.reg_quote)
-      if (!match) return null
-      else prefix = match[1]
+      if (!match) return range
+      else range.prefix = match[1]
     }
     else if (sectionEl instanceof HTMLPreElement) {
-      selector = "code"
+      range.selector = "code"
       const match = list_content[0].match(ABReg.reg_code)
-      if (!match) return null
-      else prefix = match[1]
+      if (!match) return range
+      else range.prefix = match[1]
     }
     else if (sectionEl instanceof HTMLHeadingElement) {
-      selector = "heading"
+      range.selector = "heading"
       const match = list_content[0].match(ABReg.reg_heading)
-      if (!match) return null
-      else prefix = match[1]
+      if (!match) return range
+      else range.prefix = match[1]
     }
-    console.log("关卡 3-2")
 
     // 找头部header
-    /** @todo 需要重写，一方面头部有可能在上上行，二方面要判断有前缀的情况*/
-    if (lineStart==0) return null
-    console.log("内容", list_text, list_text[lineStart-1])
-    if (list_text[lineStart-1].indexOf(prefix)!=0) return null
-    const match_header = list_text[lineStart-1].replace(prefix, "").match(ABReg.reg_header)
-    if (!match_header) return null
-    const header = match_header[4]
-    console.log("关卡 3-3")
-
-    // 返回
-    const result:HTMLSelectorRangeSpec = {
-      from_line: lineStart,
-      to_line: lineEnd+1,
-      header: header,
-      selector: selector,
-      content: content,
-      prefix: prefix
-    }
-    return result
+    /** @todo 需要重写，一方面头部有可能在上上行 */
+    if (lineStart==0) return range
+    if (list_text[lineStart-1].indexOf(range.prefix)!=0) return range
+    const match_header = list_text[lineStart-1].replace(range.prefix, "").match(ABReg.reg_header)
+    if (!match_header) return range
+    
+    // （必须是最后一步，通过有无header来判断是否是ab块）
+    range.header = match_header[4]
+    console.log("内容", list_text, "--", list_text, lineStart ,"+++", list_text[lineStart-1], "##", range)
+    return range
   }
   // console.warn("获取MarkdownSectionInformation失败，可能会产生bug") // 其实会return void，应该不会有bug
   return null
