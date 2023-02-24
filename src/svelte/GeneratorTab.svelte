@@ -4,7 +4,6 @@
   import type {List_ListInfo} from "src/replace/listProcess"
 
   export let list_itemInfo:List_ListInfo;
-  export let modeMD:boolean;
   export let modeT:boolean;
 
   let tab:HTMLDivElement;
@@ -30,13 +29,8 @@
         }
       }
       else{                         // 找结束，不需要找标志，因为传过来的是二层一叉树
-        if (modeMD) {
-          const child = new MarkdownRenderChild(current_dom);
-          MarkdownRenderer.renderMarkdown(itemInfo.content, current_dom, "", child);
-        }
-        else{
-          current_dom.innerHTML = itemInfo.content.replace(/\n/g, "<br/>")
-        }
+        const child = new MarkdownRenderChild(current_dom);
+        MarkdownRenderer.renderMarkdown(itemInfo.content, current_dom, "", child);
         current_dom = null
       }
     }

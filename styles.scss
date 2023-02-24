@@ -61,6 +61,18 @@
     }
   }
 
+  // 通用表格
+  .ab-table{
+    td>p:first-child,
+    th>p:first-child{
+      margin-top: 0;
+    }
+    td>p:last-child,
+    th>p:last-child{
+      margin-bottom: 0;
+    }
+  }
+
   // 列表格
   .ab-list-table{
     .ab-foldable-tr>td:first-child{

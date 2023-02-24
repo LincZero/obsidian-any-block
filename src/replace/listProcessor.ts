@@ -23,18 +23,16 @@ export type List_TableItem = TableItem[]
 export class ListProcess{
 
   /** title转列表 */
-  static title2list(text: string, div: HTMLDivElement, modeMD=false) {
+  static title2list(text: string, div: HTMLDivElement) {
     let list_itemInfo = this.title2data(text)
     list_itemInfo = this.data2strict(list_itemInfo)
     return this.data2list(list_itemInfo)
   }
 
-  /** 列表转表格
-   * @param modeMD: md（使用md嵌套功能）功耗可能较大
-   */
-  static list2table(text: string, div: HTMLDivElement, modeMD=false, modeT=false) {
+  /** 列表转表格 */
+  static list2table(text: string, div: HTMLDivElement, modeT=false) {
     let list_itemInfo = this.list2data(text)
-    return this.data2table(list_itemInfo, div, modeMD, modeT)
+    return this.data2table(list_itemInfo, div, modeT)
   }
 
   /** 列表转列表 */
@@ -44,35 +42,35 @@ export class ListProcess{
   }*/
 
   /** 列表转列表格 */
-  static list2lt(text: string, div: HTMLDivElement, modeMD=false, modeT=false) {
+  static list2lt(text: string, div: HTMLDivElement, modeT=false) {
     let list_itemInfo = this.list2data(text, true)
-    return this.uldata2ultable(list_itemInfo, div, modeMD, modeT)
+    return this.uldata2ultable(list_itemInfo, div, modeT)
   }
 
   /** 列表转二维表格 */
-  static list2ut(text: string, div: HTMLDivElement, modeMD=false, modeT=false) {
+  static list2ut(text: string, div: HTMLDivElement, modeT=false) {
     //【old】
     /*let list_itemInfo = this.old_ulist2data(text)
-    return this.data2table(list_itemInfo, div, modeMD)*/
+    return this.data2table(list_itemInfo, div)*/
     //【new】
     let data = this.list2data(text)
     data = this.data_mL_2_2L(data)
     data = this.data_2L_2_mL1B(data)
-    return this.data2table(data, div, modeMD, modeT)
+    return this.data2table(data, div, modeT)
   }
 
   /** 一级列表转时间线 */
-  static list2timeline(text: string, div: HTMLDivElement, modeMD=false, modeT=false) {
+  static list2timeline(text: string, div: HTMLDivElement, modeT=false) {
     let data = this.list2data(text)
     data = this.data_mL_2_2L(data)
-    return this.data2table(data, div, modeMD, modeT)
+    return this.data2table(data, div, modeT)
   }
 
   /** 一级列表转标签栏 */
-  static list2tab(text: string, div: HTMLDivElement, modeMD=false, modeT=false) {
+  static list2tab(text: string, div: HTMLDivElement, modeT=false) {
     let data = this.list2data(text)
     data = this.data_mL_2_2L1B(data)
-    return this.data2tab(data, div, modeMD, modeT)
+    return this.data2tab(data, div, modeT)
   }
 
   /** 列表转mermaid流程图 */
@@ -543,7 +541,6 @@ export class ListProcess{
   private static data2table(
     list_itemInfo: List_ListItem, 
     div: HTMLDivElement,
-    modeMD: boolean,
     modeT: boolean        // 是否转置
   ){
     // 组装成表格数据 (列表是深度优先)
@@ -587,7 +584,6 @@ export class ListProcess{
       props: {
         list_tableInfo: list_tableInfo,
         modeT: modeT,
-        modeMD: modeMD,
         prev_line: prev_line
       }
     })
@@ -601,7 +597,6 @@ export class ListProcess{
   private static uldata2ultable(
     list_itemInfo: List_ListItem, 
     div: HTMLDivElement,
-    modeMD: boolean,
     modeT: boolean
   ){
     // 组装成表格数据 (列表是深度优先)
@@ -644,7 +639,6 @@ export class ListProcess{
       props: {
         list_tableInfo: list_tableInfo,
         modeT: modeT,
-        modeMD: modeMD,
         prev_line: prev_line,
         tr_line_level: tr_line_level
       }
@@ -678,15 +672,13 @@ export class ListProcess{
   private static data2tab(
     list_itemInfo: List_ListItem, 
     div: HTMLDivElement,
-    modeMD: boolean,
     modeT: boolean
   ){
     new GeneratorTab({
       target: div,
       props: {
         list_itemInfo: list_itemInfo,
-        modeT: modeT,
-        modeMD: modeMD
+        modeT: modeT
       }
     })
     return div

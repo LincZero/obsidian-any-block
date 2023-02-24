@@ -4,13 +4,13 @@
   import type {List_TableInfo} from "src/replace/listProcess"
 
   export let list_tableInfo:List_TableInfo;
-  export let modeMD:boolean;
   export let modeT:boolean;
   export let prev_line: number;
 
   let table:HTMLDivElement;
   onMount(async()=>{
     // 表格数据 组装成表格
+    table.addClasses(["ab-table", "ab-data-table"])
     if (modeT) table.setAttribute("modeT", "true")
     let thead
     if(list_tableInfo[0].content.indexOf("< ")==0){ // 判断是否有表头
@@ -31,19 +31,12 @@
       }
       for (let item of list_tableInfo){                           // 遍历表格列，创建td
         if (item.tableLine!=index_line) continue
-        if (modeMD) {   // md版
-          let td = tr.createEl(is_head?"th":"td", {
-            attr:{"rowspan": item.tableRow}
-          })
-          const child = new MarkdownRenderChild(td);
-          MarkdownRenderer.renderMarkdown(item.content, td, "", child);
-        }
-        else{           // 非md版
-          tr.createEl(is_head?"th":"td", {
-            // text: item.content, //.replace("\n","<br/>"),
-            attr:{"rowspan": item.tableRow}
-          }).innerHTML = item.content.replace(/\n/g,"<br/>")
-        }
+        // md版
+        let td = tr.createEl(is_head?"th":"td", {
+          attr:{"rowspan": item.tableRow}
+        })
+        const child = new MarkdownRenderChild(td);
+        MarkdownRenderer.renderMarkdown(item.content, td, "", child);
       }
     }
   })

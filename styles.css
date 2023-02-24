@@ -66,6 +66,16 @@
   padding: 8px 10px;
 }
 
+.ab-note .ab-table td > p:first-child,
+.ab-note .ab-table th > p:first-child {
+  margin-top: 0;
+}
+
+.ab-note .ab-table td > p:last-child,
+.ab-note .ab-table th > p:last-child {
+  margin-bottom: 0;
+}
+
 .ab-note .ab-list-table .ab-foldable-tr > td:first-child > div {
   padding-left: 15px;
   position: relative;

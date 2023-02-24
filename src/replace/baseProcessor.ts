@@ -297,7 +297,7 @@ const process_list2table:ABProcessorSpecSimp = {
   process: (el, header, content)=>{
     const matchs = header.match(/list2(md)?table(T)?/)
     if (!matchs) return el
-    ListProcess.list2table(content, el, matchs[1]=="md", matchs[2]=="T")
+    ListProcess.list2table(content, el, matchs[2]=="T")
     return el
   }
 }
@@ -313,7 +313,7 @@ const process_list2lt:ABProcessorSpecSimp = {
   process: (el, header, content)=>{
     const matchs = header.match(/list2(md)?lt(T)?/)
     if (!matchs) return el
-    ListProcess.list2lt(content, el, matchs[1]=="md", matchs[2]=="T")
+    ListProcess.list2lt(content, el, matchs[2]=="T")
     return el
   }
 }
@@ -329,7 +329,7 @@ const process_list2ut:ABProcessorSpecSimp = {
   process: (el, header, content)=>{
     const matchs = header.match(/list2(md)?ut(T)?/)
     if (!matchs) return el
-    ListProcess.list2ut(content, el, matchs[1]=="md", matchs[2]=="T")
+    ListProcess.list2ut(content, el, matchs[2]=="T")
     return el
   }
 }
@@ -345,7 +345,7 @@ const process_list2timeline:ABProcessorSpecSimp = {
   process: (el, header, content)=>{
     const matchs = header.match(/list2(md)?timeline(T)?/)
     if (!matchs) return el
-    ListProcess.list2timeline(content, el, matchs[1]=="md", matchs[2]=="T")
+    ListProcess.list2timeline(content, el, matchs[2]=="T")
     return el
   }
 }
@@ -361,7 +361,7 @@ const process_list2tab:ABProcessorSpecSimp = {
   process: (el, header, content)=>{
     const matchs = header.match(/list2(md)?tab(T)?$/)
     if (!matchs) return el
-    ListProcess.list2tab(content, el, matchs[1]=="md", matchs[2]=="T")
+    ListProcess.list2tab(content, el, matchs[2]=="T")
     return el
   }
 }
