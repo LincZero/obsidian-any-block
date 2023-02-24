@@ -1,7 +1,7 @@
 import { MarkdownRenderChild } from "obsidian";
 import { autoABProcessor, getProcessorOptions } from "../replace/abProcessor"
 
-export class RelpaceRender extends MarkdownRenderChild {
+export class ReplaceRender extends MarkdownRenderChild {
   content: string;
   header: string;
 

@@ -6,7 +6,7 @@ import type {
 import {ABReg} from "src/config/abReg"
 import {ConfDecoration, ConfSelect} from "src/config/abSettingTab"
 import type AnyBlockPlugin from "../main"
-import {RelpaceRender} from "./replaceRenderChild"
+import {ReplaceRender} from "./replaceRenderChild"
 
 /** Html处理器
  * 被调用的可能：
@@ -31,12 +31,9 @@ export class ABPosthtmlManager{
     // 设置里不启用，直接关了
     if (this.settings.decoration_render==ConfDecoration.none) return
 
-    console.log("关卡1 1")
     // 获取el对应的源md
     const mdSrc = getSourceMarkdown(el, ctx)
-    // console.log("el ctx", el, ctx, mdSrc)
     if (!mdSrc) return
-    console.log("关卡1 2")
 
     // 局部选择器
     for (const subEl of el.children) {                          // 这个如果是块的话一般就一层，多层应该是p-br的情况
@@ -45,12 +42,10 @@ export class ABPosthtmlManager{
 
     // 结束，开启全局选择器
     if (mdSrc.to_line==mdSrc.content.split("\n").length){
-      console.log("开始全局选择")
       global_selector(el, ctx)
       return
     }
     else if (el.classList.contains("mod-footer")){
-      console.log("开始全局选择")
       global_selector(el, ctx)
       return
     }
@@ -65,16 +60,17 @@ function findABBlock(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext){
     || targetEl instanceof HTMLQuoteElement
     || targetEl instanceof HTMLPreElement
   ) {
-    // 判断是否有header并替换元素
-    console.log("关卡2 1")
-    if(replaceABBlock(targetEl, ctx)) return
+    /** @fail 原来的想法无法成立……这里本来打算用来递归寻找嵌套的ab块的，
+     * 但好像不行，ctx.getSectionInfo 他获取不了嵌套中el的start和end位置
+     * 判断是否有header并替换元素 */
+    /*if(replaceABBlock(targetEl, ctx)) return
     else if(!(targetEl instanceof HTMLPreElement)) {
-      console.log("关卡2 2")
       for (let targetEl2 of targetEl.children){
-        console.log("关卡3", targetEl2)
         findABBlock(targetEl2 as HTMLElement, ctx)
       }
-    }
+    }*/
+
+    replaceABBlock(targetEl, ctx)
   }
 }
 
@@ -83,7 +79,6 @@ function findABBlock(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext){
  */
 function replaceABBlock(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext){
   const range = getSourceMarkdown(targetEl, ctx)
-  console.log("试图转化", targetEl, range, ctx, ctx.docId, ctx.sourcePath, ctx.frontmatter)
   if (!range || !range.header) return false
 
   // 语法糖
@@ -91,7 +86,7 @@ function replaceABBlock(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext
     if (range.header.indexOf("2")==0) range.header="list"+range.header
   }
 
-  ctx.addChild(new RelpaceRender(targetEl, range.header, range.content));
+  ctx.addChild(new ReplaceRender(targetEl, range.header, range.content));
 }
 
 interface HTMLSelectorRangeSpec {
@@ -167,7 +162,6 @@ function getSourceMarkdown(
     
     // （必须是最后一步，通过有无header来判断是否是ab块）
     range.header = match_header[4]
-    console.log("内容", list_text, "--", list_text, lineStart ,"+++", list_text[lineStart-1], "##", range)
     return range
   }
   // console.warn("获取MarkdownSectionInformation失败，可能会产生bug") // 其实会return void，应该不会有bug
@@ -286,7 +280,7 @@ function global_selector(
       const header = prev_header??"md"
       const content = mdSrc_last.content.split("\n")
         .slice(prev_from_line, mdSrc_last.to_line).join("\n");
-      if(prev_el) ctx.addChild(new RelpaceRender(prev_el, header, content));
+      if(prev_el) ctx.addChild(new ReplaceRender(prev_el, header, content));
 
       prev_header = ""
       prev_from_line = 0
@@ -307,6 +301,6 @@ function global_selector(
     const header = prev_header??"md"
     const content = mdSrc_last.content.trim().split("\n")
       .slice(prev_from_line, mdSrc_last.to_line).join("\n");
-    if(prev_el) ctx.addChild(new RelpaceRender(prev_el, header, content));
+    if(prev_el) ctx.addChild(new ReplaceRender(prev_el, header, content));
   }
 }
