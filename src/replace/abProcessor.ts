@@ -13,6 +13,7 @@ export function autoABProcessor(el:HTMLDivElement, header:string, content:string
   // 尾处理。如果还是text内容，则给一个md渲染器
   if (prev_type==ProcessDataType.text) {
     const child = new MarkdownRenderChild(el);
+    el.addClass("markdown-rendered")
     MarkdownRenderer.renderMarkdown(prev_result, el, "", child);
     prev_type = ProcessDataType.el
     prev_result = el
@@ -52,6 +53,7 @@ export function autoABProcessor(el:HTMLDivElement, header:string, content:string
           if(abReplaceProcessor.process_param != prev_type){
             if (abReplaceProcessor.process_param==ProcessDataType.el && prev_type==ProcessDataType.text){
               const child = new MarkdownRenderChild(el);
+              el.addClass("markdown-rendered")
               MarkdownRenderer.renderMarkdown(prev_result, el, "", child);
               prev_type = ProcessDataType.el
               prev_result = el

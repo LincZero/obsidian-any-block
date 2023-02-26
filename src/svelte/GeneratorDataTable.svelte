@@ -36,6 +36,7 @@
           attr:{"rowspan": item.tableRow}
         })
         const child = new MarkdownRenderChild(td);
+        td.addClass("markdown-rendered")
         MarkdownRenderer.renderMarkdown(item.content, td, "", child);
       }
     }

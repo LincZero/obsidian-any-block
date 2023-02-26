@@ -14,6 +14,7 @@ export class ABCodeblockManager{
     let child = new MarkdownRenderChild(blockEl);
     ctx.addChild(child);
   
+    blockEl.addClass("markdown-rendered")
     MarkdownRenderer.renderMarkdown(src, blockEl, ctx.sourcePath, child);
   }
 }

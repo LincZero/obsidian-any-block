@@ -27,7 +27,7 @@ export class ReplaceRender extends MarkdownRenderChild {
    */
   onload() {
     const div:HTMLDivElement = this.containerEl.createDiv({
-      cls: ["ab-replace", "cm-embed-block", "markdown-rendered"]
+      cls: ["ab-replace", "cm-embed-block"]
     });
     div.setAttribute("type_header", this.header)
 

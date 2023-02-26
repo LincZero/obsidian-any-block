@@ -26,6 +26,7 @@ const process_md:ABProcessorSpecSimp = {
   process: (el, header, content)=>{
     const child = new MarkdownRenderChild(el);
     // ctx.addChild(child);
+    el.addClass("markdown-rendered")
     MarkdownRenderer.renderMarkdown(content, el, "", child);
     return el
   }

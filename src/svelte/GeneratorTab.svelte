@@ -30,6 +30,7 @@
       }
       else{                         // 找结束，不需要找标志，因为传过来的是二层一叉树
         const child = new MarkdownRenderChild(current_dom);
+        current_dom.addClass("markdown-rendered")
         MarkdownRenderer.renderMarkdown(itemInfo.content, current_dom, "", child);
         current_dom = null
       }

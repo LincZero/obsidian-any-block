@@ -13,6 +13,7 @@ import {ReplaceRender} from "./replaceRenderChild"
  *   1. 全局html会分为多个块，会被每个块调用一次
  *      多换行会切分块、块类型不同也会切分（哪怕之间没有空行）
  *   2. 局部渲染时，也会被每个渲染项调用一次 (MarkdownRenderer.renderMarkdown方法，感觉tableextend插件也是这个原因)
+ *      .markdown-rendered的内容也会调用一次（即本插件中的 .ab-note.drop-shadow 元素）
  *   3. 用根节点createEl时也会被调用一次（.replaceEl）
   *  4. 状态会缓存，如果切换回编辑模式没更改再切回来，不会再次被调用
  * 
@@ -28,6 +29,8 @@ export class ABPosthtmlManager{
     el: HTMLElement, 
     ctx: MarkdownPostProcessorContext
   ) {
+    console.log("测试render方法是否会调用", el)
+
     // 设置里不启用，直接关了
     if (this.settings.decoration_render==ConfDecoration.none) return
 
@@ -35,9 +38,32 @@ export class ABPosthtmlManager{
     const mdSrc = getSourceMarkdown(el, ctx)
     if (!mdSrc) return
 
-    // 局部选择器
-    for (const subEl of el.children) {                          // 这个如果是块的话一般就一层，多层应该是p-br的情况
-      findABBlock(subEl as HTMLElement, ctx)
+    // 1. RenderMarkdown引起的回调
+    if (el.classList.contains("ab-note")){
+      for (const renderEl of el.querySelectorAll(".markdown-rendered")){
+        for(let i=1; i<renderEl.children.length; i++){  // start form 1, i>0 is true
+          const subEl = renderEl.children[i] as HTMLElement
+          const lastEl = renderEl.children[i-1] as HTMLElement
+          if (subEl instanceof HTMLUListElement
+            || subEl instanceof HTMLQuoteElement
+            || subEl instanceof HTMLPreElement
+          ){
+            if(
+              lastEl instanceof HTMLParagraphElement
+              && ABReg.reg_header.test(lastEl.getText())
+            ) {
+              console.log("根据html元素，渲染嵌套中的ab块")
+              // 渲染
+            }
+          }
+        }
+      }
+    }
+    // 2. 根的局部选择器
+    else{
+      for (const subEl of el.children) {                          // 这个如果是块的话一般就一层，多层应该是p-br的情况
+        findABBlock(subEl as HTMLElement, ctx)
+      }
     }
 
     // 结束，开启全局选择器

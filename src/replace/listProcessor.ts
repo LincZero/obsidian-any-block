@@ -178,7 +178,7 @@ export class ListProcess{
       if (match_heading){                                     // 1. 标题层级
         removeTailBlank()
         list_itemInfo.push({
-          content: match_heading[3],
+          content: match_heading[4],
           level: match_heading[1].length-10
         })
         mul_mode = "title"
@@ -186,7 +186,7 @@ export class ListProcess{
       else if (match_list){                                   // 2. 列表层级
         removeTailBlank()
         list_itemInfo.push({
-          content: match_list[3],
+          content: match_list[4],
           level: match_list[1].length+1//+10
         })
         mul_mode = "list"
@@ -722,6 +722,7 @@ export class ListProcess{
     let text = list_line_content.join("\n")
 
     //const child = new MarkdownRenderChild(div);
+    // div.addClass("markdown-rendered")
     //MarkdownRenderer.renderMarkdown(text, div, "", child);
     
     mermaid.mermaidAPI.renderAsync("ab-mermaid-"+getID(), text, (svgCode:string)=>{
