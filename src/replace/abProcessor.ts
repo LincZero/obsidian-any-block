@@ -96,14 +96,12 @@ export function getProcessorOptions(){
 }
 
 /** 处理器一览表 - 全部信息 */
-export function generateInfoTable(el: HTMLElement){
+export function generateProcessorInfoTable(el: HTMLElement){
   const table_p = el.createEl("div",{
-    cls: ["ab-setting","md-table-fig"],
-    attr: {"style": "overflow-x:scroll; transform:scaleY(-1)"}
+    cls: ["ab-setting","md-table-fig1"]
   })
   const table = table_p.createEl("table",{
-    cls: ["ab-setting","setting-table"],
-    attr: {"style": "overflow-x:scroll; transform:scaleY(-1); white-space: nowrap"}
+    cls: ["ab-setting","md-table-fig2"]
   })
   {
     const thead = table.createEl("thead")

@@ -1,7 +1,7 @@
 import {ABReg} from "src/config/abReg"
 import {
   registerMdSelector, 
-  type MdSelectorSpec,
+  type MdSelectorSpecSimp,
   type MdSelectorRangeSpecSimp
 } from "./abMdSelector"
 
@@ -72,7 +72,9 @@ function easySelector_headtail(
 /**
  * 首尾选择器
  */
-const mdSelector_headtail:MdSelectorSpec = {
+const mdSelector_headtail:MdSelectorSpecSimp = {
+  id: "headtail",
+  name: "头尾选择器",
   match: ABReg.reg_headtail,
   selector: (list_text, from_line)=>{
     let mdRangeTmp = easySelector_headtail(list_text, from_line, "headtail", ABReg.reg_headtail)
@@ -104,7 +106,9 @@ registerMdSelector(mdSelector_headtail)
 /**
  * 列表选择器
  */
-const mdSelector_list:MdSelectorSpec = {
+const mdSelector_list:MdSelectorSpecSimp = {
+  id: "list",
+  name: "列表选择器",
   match: ABReg.reg_list,
   selector: (list_text, from_line)=>{
     let mdRangeTmp = easySelector(list_text, from_line, "list", ABReg.reg_list)
@@ -138,7 +142,9 @@ registerMdSelector(mdSelector_list)
 /**
  * 代码块选择器
  */
-const mdSelector_code:MdSelectorSpec = {
+const mdSelector_code:MdSelectorSpecSimp = {
+  id: "code",
+  name: "代码选择器",
   match: ABReg.reg_code,
   selector: (list_text, from_line)=>{
     let mdRangeTmp = easySelector(list_text, from_line, "code", ABReg.reg_code)
@@ -170,7 +176,9 @@ registerMdSelector(mdSelector_code)
 /**
  * 引用块选择器
  */
-const mdSelector_quote:MdSelectorSpec = {
+const mdSelector_quote:MdSelectorSpecSimp = {
+  id: "quote",
+  name: "引用块选择器",
   match: ABReg.reg_quote,
   selector: (list_text, from_line)=>{
     let mdRangeTmp = easySelector(list_text, from_line, "quote", ABReg.reg_quote)
@@ -200,7 +208,9 @@ registerMdSelector(mdSelector_quote)
 /**
  * 标题选择器
  */
-const mdSelector_heading:MdSelectorSpec = {
+const mdSelector_heading:MdSelectorSpecSimp = {
+  id: "heading",
+  name: "标题选择器",
   match: ABReg.reg_heading,
   selector: (list_text, from_line)=>{
     let mdRangeTmp = easySelector(list_text, from_line, "heading", ABReg.reg_heading)
@@ -215,11 +225,11 @@ const mdSelector_heading:MdSelectorSpec = {
       const line2 = line.replace(mdRange.prefix, "")    // 删掉无用前缀
       // 空行
       if (ABReg.reg_emptyline.test(line2)) {continue}
-      last_nonempty = i
       // 更大的标题
       const match = line2.match(ABReg.reg_heading)
-      if (!match) continue
-      if (match[3].length > mdRange.levelFlag.length) {break}
+      if (!match) {last_nonempty=i; continue}
+      if (match[3].length < mdRange.levelFlag.length) {break}
+      last_nonempty=i;
     }
     mdRange.to_line = last_nonempty+1
     mdRange.content = list_text

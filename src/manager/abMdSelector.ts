@@ -75,6 +75,31 @@ export function autoMdSelector(
   return list_mdSelectorRangeSpec
 }
 
+/** 选择器一览表 - 全部信息 */
+export function generateSelectorInfoTable(el: HTMLElement){
+  const table_p = el.createEl("div",{
+    cls: ["ab-setting","md-table-fig1"]
+  })
+  const table = table_p.createEl("table",{
+    cls: ["ab-setting","md-table-fig2"]
+  })
+  {
+    const thead = table.createEl("thead")
+    const tr = thead.createEl("tr")
+    tr.createEl("td", {text: "选择器名"})
+    tr.createEl("td", {text: "首行正则"})
+    tr.createEl("td", {text: "是否启用"})
+  }
+  const tbody = table.createEl("tbody")
+  for (let item of list_mdSelector){
+    const tr = tbody.createEl("tr")
+    tr.createEl("td", {text: item.name})
+    tr.createEl("td", {text: String(item.match)})
+    tr.createEl("td", {text: item.is_disable?"禁用":"启用"})
+  }
+  return table_p
+}
+
 /** 选择器范围 - 严格版 */
 export interface MdSelectorRangeSpec {
   from_ch: number,  // 替换范围
@@ -94,7 +119,10 @@ export interface MdSelectorRangeSpecSimp {
   content: string,  // 内容信息
   prefix: string,
 }
-export interface MdSelectorSpec{
+/** md选择器 - 注册版 */
+export interface MdSelectorSpecSimp{
+  id: string
+  name: string
   match: RegExp
   selector: (
     list_text: string[],    // 全文
@@ -102,10 +130,20 @@ export interface MdSelectorSpec{
     // confSelect: ConfSelect    // 选择器配置
   )=>MdSelectorRangeSpecSimp|null // 返回一个MdSelectorRangeSpec。然后遍历器的行数要跳转到里面的`to`继续循环
 }
+/** md选择器 - 严格版 */
+export interface MdSelectorSpec extends MdSelectorSpecSimp{
+  is_disable: boolean
+}
 /** md选择器列表 */
 export let list_mdSelector: MdSelectorSpec[] = []
-export function registerMdSelector (mdSelectorSpec:MdSelectorSpec){
-  list_mdSelector.push(mdSelectorSpec)
+export function registerMdSelector (simp:MdSelectorSpecSimp){
+  list_mdSelector.push({
+    id: simp.id,
+    name: simp.name,
+    match: simp.match,
+    selector: simp.selector,
+    is_disable: false
+  })
 }
 
 // 配置返回列表
