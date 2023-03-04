@@ -41,14 +41,12 @@ const mdSrc = getSourceMarkdown(el, ctx)
     // 1. RenderMarkdown引起的调用
     /*else if (el.classList.contains("ab-note")){
     for (const renderEl of el.querySelectorAll(".markdown-rendered")){  // 子渲染块，需要在该子渲染块中找ul quote pre*/
-    console.log("选择上", !mdSrc, el, el.classList[0], el.classList.contains("markdown-rendered"))
     if (!mdSrc) {
       if (!el.classList.contains("markdown-rendered")) return
       const renderEl = el;
       for(let i=1; i<renderEl.children.length; i++){  // start form 1, i>0 is true
         const subEl = renderEl.children[i] as HTMLDivElement
         const lastEl = renderEl.children[i-1] as HTMLElement
-        console.log("官咖1", subEl, lastEl)
         
         // 寻找正体
         if (!(subEl instanceof HTMLUListElement
@@ -57,15 +55,17 @@ const mdSrc = getSourceMarkdown(el, ctx)
         )) return
         
         // 寻找头部
-        console.log("官咖2")
         if(!(lastEl instanceof HTMLParagraphElement)) return
         const header_match = lastEl.getText().match(ABReg.reg_header)
         if (!header_match) return
         const header_str = header_match[4]
 
         // 渲染
-        console.log("html渲染成的md", html2md(subEl.innerHTML))
-        //autoABProcessor(subEl, header_str, html2md(subEl.innerHTML))
+        const newEl = renderEl.createDiv()
+        autoABProcessor(newEl, header_str, html2md(subEl.innerHTML))
+
+        subEl.hide()
+        lastEl.hide()
       }
     }
     // 2. html渲染模式的逐个切割块调用

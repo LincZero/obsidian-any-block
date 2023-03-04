@@ -140,10 +140,11 @@ export class ListProcess{
 
     const list_text = text.split("\n")
     for (let line of list_text) {                                             // 每行
-      if (/^\s*?-\s(.*?)/.test(line)) {
-        let list_inline: string[] = line.replace(/^\s*?-\s/, "").split("| ") // 内联分行
+      const m_line = line.match(ABReg.reg_list)
+      if (m_line) {
+        let list_inline: string[] = m_line[4].split("| ") // 内联分行
         /** @bug  制表符长度是1而非4 */
-        let level_inline: number = line.replace(/-\s(.*?)$/, "").length
+        let level_inline: number = m_line[1].length
         let inline_comp = update_inline_comp(level_inline, list_inline.length-1)
                                                                               // 不保留缩进（普通树表格）
         for (let index=0; index<list_inline.length; index++){
@@ -229,8 +230,9 @@ export class ListProcess{
     let level2 = -1
     const list_text = text.split("\n")
     for (let line of list_text) {                                             // 每行
-      if (/^\s*?-\s(.*?)/.test(line)) {
-        let level_inline: number = line.replace(/-\s(.*?)$/, "").length
+      const m_line = line.match(ABReg.reg_list)
+      if (m_line) {
+        let level_inline: number = m_line[1].length
         let this_level: number                                    // 一共三种可能：1、2、3，3表示其他level
         if (level1<0) {level1=level_inline; this_level = 1}       // 未配置level1
         else if (level1>=level_inline) this_level = 1             // 是level1
@@ -247,7 +249,7 @@ export class ListProcess{
           continue
         }
         list_itemInfo.push({
-          content: line.replace(/^\s*?-\s/, ""),
+          content: m_line[4],
           level: this_level
         })
       }
@@ -288,9 +290,10 @@ export class ListProcess{
     
     const list_text = text.split("\n")
     for (let line of list_text) {                                             // 每行
-      if (/^\s*?-\s(.*?)/.test(line)) {
-        let list_inline: string[] = line.replace(/^\s*?-\s/, "").split("| ") // 内联分行
-        let level_inline: number = line.replace(/-\s(.*?)$/, "").length
+      const m_line = line.match(ABReg.reg_list)
+      if (m_line) {
+        let list_inline: string[] = m_line[4].split("| ") // 内联分行
+        let level_inline: number = m_line[1].length
                                                                               // 保留缩进（列表格）
         for (let inline_i=0; inline_i<list_inline.length; inline_i++){
           if(inline_i==0) {                                                   // level为内联缩进
