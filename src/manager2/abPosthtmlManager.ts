@@ -1,3 +1,4 @@
+import html2md from 'html-to-md'
 import type {
   MarkdownPostProcessorContext,
   MarkdownSectionInformation
@@ -7,6 +8,8 @@ import {ABReg} from "src/config/abReg"
 import {ConfDecoration, ConfSelect} from "src/config/abSettingTab"
 import type AnyBlockPlugin from "../main"
 import {ReplaceRender} from "./replaceRenderChild"
+import {autoABProcessor} from "src/replace/abProcessor"
+import { match } from 'assert'
 
 /** Html处理器
  * 被调用的可能：
@@ -29,51 +32,57 @@ export class ABPosthtmlManager{
     el: HTMLElement, 
     ctx: MarkdownPostProcessorContext
   ) {
-    console.log("测试render方法是否会调用", el)
-
     // 设置里不启用，直接关了
     if (this.settings.decoration_render==ConfDecoration.none) return
 
     // 获取el对应的源md
-    const mdSrc = getSourceMarkdown(el, ctx)
-    if (!mdSrc) return
+const mdSrc = getSourceMarkdown(el, ctx)
+    
+    // 1. RenderMarkdown引起的调用
+    /*else if (el.classList.contains("ab-note")){
+    for (const renderEl of el.querySelectorAll(".markdown-rendered")){  // 子渲染块，需要在该子渲染块中找ul quote pre*/
+    console.log("选择上", !mdSrc, el, el.classList[0], el.classList.contains("markdown-rendered"))
+    if (!mdSrc) {
+      if (!el.classList.contains("markdown-rendered")) return
+      const renderEl = el;
+      for(let i=1; i<renderEl.children.length; i++){  // start form 1, i>0 is true
+        const subEl = renderEl.children[i] as HTMLDivElement
+        const lastEl = renderEl.children[i-1] as HTMLElement
+        console.log("官咖1", subEl, lastEl)
+        
+        // 寻找正体
+        if (!(subEl instanceof HTMLUListElement
+          || subEl instanceof HTMLQuoteElement
+          || subEl instanceof HTMLPreElement
+        )) return
+        
+        // 寻找头部
+        console.log("官咖2")
+        if(!(lastEl instanceof HTMLParagraphElement)) return
+        const header_match = lastEl.getText().match(ABReg.reg_header)
+        if (!header_match) return
+        const header_str = header_match[4]
 
-    // 1. RenderMarkdown引起的回调
-    if (el.classList.contains("ab-note")){
-      for (const renderEl of el.querySelectorAll(".markdown-rendered")){
-        for(let i=1; i<renderEl.children.length; i++){  // start form 1, i>0 is true
-          const subEl = renderEl.children[i] as HTMLElement
-          const lastEl = renderEl.children[i-1] as HTMLElement
-          if (subEl instanceof HTMLUListElement
-            || subEl instanceof HTMLQuoteElement
-            || subEl instanceof HTMLPreElement
-          ){
-            if(
-              lastEl instanceof HTMLParagraphElement
-              && ABReg.reg_header.test(lastEl.getText())
-            ) {
-              console.log("根据html元素，渲染嵌套中的ab块")
-              // 渲染
-            }
-          }
-        }
+        // 渲染
+        console.log("html渲染成的md", html2md(subEl.innerHTML))
+        //autoABProcessor(subEl, header_str, html2md(subEl.innerHTML))
       }
     }
-    // 2. 根的局部选择器
+    // 2. html渲染模式的逐个切割块调用
     else{
       for (const subEl of el.children) {                          // 这个如果是块的话一般就一层，多层应该是p-br的情况
         findABBlock(subEl as HTMLElement, ctx)
       }
-    }
 
-    // 结束，开启全局选择器
-    if (mdSrc.to_line==mdSrc.content.split("\n").length){
-      global_selector(el, ctx)
-      return
-    }
-    else if (el.classList.contains("mod-footer")){
-      global_selector(el, ctx)
-      return
+      // 结束，开启全局选择器
+      if (mdSrc.to_line==mdSrc.content.split("\n").length){
+        global_selector(el, ctx)
+        return
+      }
+      else if (el.classList.contains("mod-footer")){
+        global_selector(el, ctx)
+        return
+      }
     }
   }
 }
@@ -104,7 +113,7 @@ function findABBlock(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext){
  * 判断是否有header并替换元素
  */
 function replaceABBlock(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext){
-  const range = getSourceMarkdown(targetEl, ctx)
+const range = getSourceMarkdown(targetEl, ctx)
   if (!range || !range.header) return false
 
   // 语法糖

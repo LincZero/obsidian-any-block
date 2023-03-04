@@ -24,10 +24,11 @@ const process_md:ABProcessorSpecSimp = {
   process_param: ProcessDataType.text,
   process_return: ProcessDataType.el,
   process: (el, header, content)=>{
-    const child = new MarkdownRenderChild(el);
+    const subEl = el.createDiv()
+    subEl.addClass("markdown-rendered")
+    const child = new MarkdownRenderChild(subEl);
+    MarkdownRenderer.renderMarkdown(content, subEl, "", child);
     // ctx.addChild(child);
-    el.addClass("markdown-rendered")
-    MarkdownRenderer.renderMarkdown(content, el, "", child);
     return el
   }
 }
@@ -437,7 +438,6 @@ const process_text:ABProcessorSpecSimp = {
   process_param: ProcessDataType.text,
   process_return: ProcessDataType.el,
   process: (el, header, content)=>{
-    el.addClasses(["ab-replace", "cm-embed-block", "markdown-rendered", "show-indentation-guide"])
     // 文本元素。pre不好用，这里还是得用<br>换行最好
     // `<p>${content.split("\n").map(line=>{return "<span>"+line+"</span>"}).join("<br/>")}</p>`
     el.innerHTML = `<p>${content.replace(/ /g, "&nbsp;").split("\n").join("<br/>")}</p>`

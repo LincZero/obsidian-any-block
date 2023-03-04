@@ -26,6 +26,8 @@ function easySelector(
   const first_line_match = list_text[from_line].match(frist_reg)
   if (!first_line_match) return null
   mdRange.prefix = first_line_match[1]  // 可以是空
+  mdRange.levelFlag = first_line_match[3]
+
   // 验证header
   let header_line_match:RegExpMatchArray | null
   if (list_text[from_line-1].indexOf(mdRange.prefix)==0
@@ -37,7 +39,6 @@ function easySelector(
   header_line_match = list_text[mdRange.from_line].match(ABReg.reg_header)
   if (!header_line_match) return null
   if (header_line_match[1]!=mdRange.prefix) return null
-  mdRange.levelFlag = header_line_match[3]
   mdRange.header = header_line_match[4]
   return mdRange
 }
