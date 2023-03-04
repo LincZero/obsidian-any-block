@@ -64,12 +64,21 @@
   // 通用表格
   .ab-table{
     td>p:first-child,
-    th>p:first-child{
+    th>p:first-child,
+    .ab-list-table-witharrow>p:first-child
+    {
       margin-top: 0;
     }
     td>p:last-child,
-    th>p:last-child{
+    th>p:last-child,
+    .ab-list-table-witharrow>p:last-child{
       margin-bottom: 0;
+    }
+
+    border-collapse:collapse; // 去除单元格间距
+    td,th{
+      padding: 2px 5px;
+      border: solid #363636 1px;
     }
   }
 
@@ -126,6 +135,15 @@
       border-radius: 5px;
       width: 100%;
     }
+  }
+
+  // 滚动
+  .ab-deco-scroll.ab-deco-scroll-y{
+    overflow-y:auto;
+  }
+  .ab-deco-scroll.ab-deco-scroll-x{
+    overflow-x:auto;
+    white-space: nowrap;
   }
 
   // 超出折叠

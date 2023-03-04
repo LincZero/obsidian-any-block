@@ -45,27 +45,38 @@ const mdSrc = getSourceMarkdown(el, ctx)
       if (!el.classList.contains("markdown-rendered")) return
       const renderEl = el;
       for(let i=1; i<renderEl.children.length; i++){  // start form 1, i>0 is true
-        const subEl = renderEl.children[i] as HTMLDivElement
-        const lastEl = renderEl.children[i-1] as HTMLElement
+        const contentEl = renderEl.children[i] as HTMLDivElement
+        const headerEl = renderEl.children[i-1] as HTMLElement
         
-        // 寻找正体
-        if (!(subEl instanceof HTMLUListElement
-          || subEl instanceof HTMLQuoteElement
-          || subEl instanceof HTMLPreElement
-        )) return
+        // 寻找正体（首尾选择器的header较特殊，另外处理）
+        /*if (subEl instanceof HTMLParagraphElement){
+          const m_headtail = subEl.getText().match(ABReg.reg_headtail)
+          if (!m_headtail) return
+          
+        }
+        else*/
+
+        /** @bug 应该嵌套进quote和ul里面再找 */
+        if (!(contentEl instanceof HTMLUListElement
+          || contentEl instanceof HTMLQuoteElement
+          || contentEl instanceof HTMLPreElement
+        )) continue
         
         // 寻找头部
-        if(!(lastEl instanceof HTMLParagraphElement)) return
-        const header_match = lastEl.getText().match(ABReg.reg_header)
-        if (!header_match) return
+        if(!(headerEl instanceof HTMLParagraphElement)) continue
+        const header_match = headerEl.getText().match(ABReg.reg_header)
+        if (!header_match) continue
         const header_str = header_match[4]
 
         // 渲染
-        const newEl = renderEl.createDiv()
-        autoABProcessor(newEl, header_str, html2md(subEl.innerHTML))
+        //const newEl = renderEl.createDiv({cls: "ab-re-rendered"})
+        const newEl = document.createElement("div")
+        newEl.addClass("ab-re-rendered")
+        headerEl.parentNode?.insertBefore(newEl, headerEl.nextSibling)
+        autoABProcessor(newEl, header_str, html2md(contentEl.innerHTML))
 
-        subEl.hide()
-        lastEl.hide()
+        contentEl.hide()
+        headerEl.hide()
       }
     }
     // 2. html渲染模式的逐个切割块调用

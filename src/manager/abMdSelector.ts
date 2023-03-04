@@ -124,6 +124,7 @@ export interface MdSelectorSpecSimp{
   id: string
   name: string
   match: RegExp
+  detail?: string
   selector: (
     list_text: string[],    // 全文
     from_line: number,        // 从第几行开始搜索
@@ -141,6 +142,7 @@ export function registerMdSelector (simp:MdSelectorSpecSimp){
     id: simp.id,
     name: simp.name,
     match: simp.match,
+    detail: simp.detail??"",
     selector: simp.selector,
     is_disable: false
   })

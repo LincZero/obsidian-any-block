@@ -140,7 +140,7 @@ export class ListProcess{
 
     const list_text = text.split("\n")
     for (let line of list_text) {                                             // 每行
-      const m_line = line.match(ABReg.reg_list)
+      const m_line = line.match(ABReg.reg_list_noprefix)
       if (m_line) {
         let list_inline: string[] = m_line[4].split("| ") // 内联分行
         /** @bug  制表符长度是1而非4 */
@@ -174,9 +174,9 @@ export class ListProcess{
     const list_text = text.split("\n")
     let mul_mode:string = ""      // 多行模式，para或list或title或空
     for (let line of list_text) {
-      const match_heading = line.match(ABReg.reg_heading)
-      const match_list = line.match(ABReg.reg_list)
-      if (match_heading){                                     // 1. 标题层级
+      const match_heading = line.match(ABReg.reg_heading_noprefix)
+      const match_list = line.match(ABReg.reg_list_noprefix)
+      if (match_heading && !match_heading[1]){                // 1. 标题层级（只识别根处）
         removeTailBlank()
         list_itemInfo.push({
           content: match_heading[4],
@@ -184,7 +184,7 @@ export class ListProcess{
         })
         mul_mode = "title"
       }
-      else if (match_list){                                   // 2. 列表层级
+      else if (match_list && !match_list[1]){                 // 2. 列表层级（只识别根处）
         removeTailBlank()
         list_itemInfo.push({
           content: match_list[4],
@@ -230,7 +230,7 @@ export class ListProcess{
     let level2 = -1
     const list_text = text.split("\n")
     for (let line of list_text) {                                             // 每行
-      const m_line = line.match(ABReg.reg_list)
+      const m_line = line.match(ABReg.reg_list_noprefix)
       if (m_line) {
         let level_inline: number = m_line[1].length
         let this_level: number                                    // 一共三种可能：1、2、3，3表示其他level
@@ -290,7 +290,7 @@ export class ListProcess{
     
     const list_text = text.split("\n")
     for (let line of list_text) {                                             // 每行
-      const m_line = line.match(ABReg.reg_list)
+      const m_line = line.match(ABReg.reg_list_noprefix)
       if (m_line) {
         let list_inline: string[] = m_line[4].split("| ") // 内联分行
         let level_inline: number = m_line[1].length

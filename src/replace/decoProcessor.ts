@@ -39,13 +39,13 @@ registerABProcessor(process_fold)
 const process_scroll:ABProcessorSpecSimp = {
   id: "scroll",
   name: "滚动",
-  match: /^scroll(\((\d+)\))?$/,
+  match: /^scroll(\((\d+)\))?(T)?$/,
   default: "scroll(460)",
   process_param: ProcessDataType.el,
   process_return: ProcessDataType.el,
   process: (el, header, content)=>{
     // 找参数
-    const matchs = header.match(/^scroll(\((\d+)\))?$/)
+    const matchs = header.match(/^scroll(\((\d+)\))?(T)?$/)
     if (!matchs) return el
     let arg1
     if (!matchs[1]) arg1=460  // 默认值
@@ -59,7 +59,12 @@ const process_scroll:ABProcessorSpecSimp = {
     const sub_el = el.children[0]
     sub_el.remove()
     const mid_el = el.createDiv({cls:["ab-deco-scroll"]})
-    mid_el.setAttribute("style", `overflow-y:auto; max-height: ${arg1}px`)
+    if (!matchs[3]){
+      mid_el.addClass("ab-deco-scroll-y")
+      mid_el.setAttribute("style", `max-height: ${arg1}px`)
+    } else {
+      mid_el.addClass("ab-deco-scroll-x")
+    }
     mid_el.appendChild(sub_el)
     return el
   }

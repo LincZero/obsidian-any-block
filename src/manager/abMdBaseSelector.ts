@@ -75,6 +75,7 @@ function easySelector_headtail(
 const mdSelector_headtail:MdSelectorSpecSimp = {
   id: "headtail",
   name: "头尾选择器",
+  detail: "以`:::`开头和结尾，处理器名写在第一个`:::`的后面，不需要加`[]`。其实就和代码块差不多，这也是VuePress的一个md扩展语法",
   match: ABReg.reg_headtail,
   selector: (list_text, from_line)=>{
     let mdRangeTmp = easySelector_headtail(list_text, from_line, "headtail", ABReg.reg_headtail)
@@ -110,6 +111,7 @@ const mdSelector_list:MdSelectorSpecSimp = {
   id: "list",
   name: "列表选择器",
   match: ABReg.reg_list,
+  detail: "在列表的上一/两行加上`[处理器名]`的header，注意header必须和列表首行位于同一层次",
   selector: (list_text, from_line)=>{
     let mdRangeTmp = easySelector(list_text, from_line, "list", ABReg.reg_list)
     if (!mdRangeTmp) return null
@@ -122,7 +124,7 @@ const mdSelector_list:MdSelectorSpecSimp = {
       if (line.indexOf(mdRange.prefix)!=0) break
       const line2 = line.replace(mdRange.prefix, "")    // 删掉无用前缀
       // 列表
-      if (ABReg.reg_list.test(line2)) {last_nonempty = i; continue}
+      if (ABReg.reg_list_noprefix.test(line2)) {last_nonempty = i; continue}
       // 开头有缩进
       if (ABReg.reg_indentline.test(line2)) {last_nonempty = i; continue}
       // 空行
@@ -146,6 +148,7 @@ const mdSelector_code:MdSelectorSpecSimp = {
   id: "code",
   name: "代码选择器",
   match: ABReg.reg_code,
+  detail: "在代码块的上一/两行加上`[处理器名]`的header，注意header必须和代码块首行位于同一层次",
   selector: (list_text, from_line)=>{
     let mdRangeTmp = easySelector(list_text, from_line, "code", ABReg.reg_code)
     if (!mdRangeTmp) return null
@@ -180,6 +183,7 @@ const mdSelector_quote:MdSelectorSpecSimp = {
   id: "quote",
   name: "引用块选择器",
   match: ABReg.reg_quote,
+  detail: "在引用块的上一/两行加上`[处理器名]`的header，注意header必须和引用块首行位于同一层次",
   selector: (list_text, from_line)=>{
     let mdRangeTmp = easySelector(list_text, from_line, "quote", ABReg.reg_quote)
     if (!mdRangeTmp) return null
@@ -212,6 +216,7 @@ const mdSelector_heading:MdSelectorSpecSimp = {
   id: "heading",
   name: "标题选择器",
   match: ABReg.reg_heading,
+  detail: "在标题的上一/两行加上`[处理器名]`的header，注意header必须和标题首行位于同一层次",
   selector: (list_text, from_line)=>{
     let mdRangeTmp = easySelector(list_text, from_line, "heading", ABReg.reg_heading)
     if (!mdRangeTmp) return null

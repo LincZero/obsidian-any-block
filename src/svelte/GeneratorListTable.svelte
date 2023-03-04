@@ -53,10 +53,11 @@
         // md版
         let td = tr.createEl(is_head?"th":"td", {
           attr:{"rowspan": item.tableRow}
-        }).createDiv()
-        const child = new MarkdownRenderChild(td);
-        td.addClass("markdown-rendered")
-        MarkdownRenderer.renderMarkdown(item.content, td, "", child);
+        })
+        let td_cell = td.createDiv({cls: "ab-list-table-witharrow"})
+        const child = new MarkdownRenderChild(td_cell);
+        td_cell.addClass("markdown-rendered")
+        MarkdownRenderer.renderMarkdown(item.content, td_cell, "", child);
       }
     }
 

@@ -66,14 +66,25 @@
   padding: 8px 10px;
 }
 
+.ab-note .ab-table {
+  border-collapse: collapse;
+}
+
 .ab-note .ab-table td > p:first-child,
-.ab-note .ab-table th > p:first-child {
+.ab-note .ab-table th > p:first-child,
+.ab-note .ab-table .ab-list-table-witharrow > p:first-child {
   margin-top: 0;
 }
 
 .ab-note .ab-table td > p:last-child,
-.ab-note .ab-table th > p:last-child {
+.ab-note .ab-table th > p:last-child,
+.ab-note .ab-table .ab-list-table-witharrow > p:last-child {
   margin-bottom: 0;
+}
+
+.ab-note .ab-table td, .ab-note .ab-table th {
+  padding: 2px 5px;
+  border: solid #363636 1px;
 }
 
 .ab-note .ab-list-table .ab-foldable-tr > td:first-child > div {
@@ -141,6 +152,15 @@
   padding-left: 6px;
   border-radius: 5px;
   width: 100%;
+}
+
+.ab-note .ab-deco-scroll.ab-deco-scroll-y {
+  overflow-y: auto;
+}
+
+.ab-note .ab-deco-scroll.ab-deco-scroll-x {
+  overflow-x: auto;
+  white-space: nowrap;
 }
 
 .ab-note .ab-deco-overfold {
