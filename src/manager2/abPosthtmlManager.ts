@@ -78,7 +78,7 @@ function findABBlock_recurve(targetEl: HTMLElement){
   }*/
 
   // replaceABBlock(targetEl, ctx)
-  
+  console.log("准备再渲染", targetEl)
   for(let i=0; i<targetEl.children.length; i++){  // start form 0，因为可以递归，该层不一定需要header
     const contentEl = targetEl.children[i] as HTMLDivElement
     let headerEl
@@ -100,16 +100,18 @@ function findABBlock_recurve(targetEl: HTMLElement){
     )) continue
     
     // 寻找头部
+    console.log("寻找头部")
     if(i==0 || !(headerEl instanceof HTMLParagraphElement)) {
-      if(targetEl instanceof HTMLUListElement
-        || targetEl instanceof HTMLQuoteElement
+      console.log("没有头部")
+      if(contentEl instanceof HTMLUListElement
+        || contentEl instanceof HTMLQuoteElement
       ) findABBlock_recurve(contentEl);
       continue
     }
     const header_match = headerEl.getText().match(ABReg.reg_header)
     if (!header_match) {
-      if(targetEl instanceof HTMLUListElement
-        || targetEl instanceof HTMLQuoteElement
+      if(contentEl instanceof HTMLUListElement
+        || contentEl instanceof HTMLQuoteElement
       ) findABBlock_recurve(contentEl);
       continue
     }
