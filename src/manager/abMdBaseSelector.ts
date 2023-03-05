@@ -92,7 +92,7 @@ const mdSelector_headtail:MdSelectorSpecSimp = {
       if (ABReg.reg_emptyline_noprefix.test(line2)) {continue}
       last_nonempty = i
       // 结束
-      if (ABReg.reg_headtail.test(line2)) {last_nonempty = i; break}
+      if (ABReg.reg_headtail_noprefix.test(line2)) {last_nonempty = i; break}
     }
     mdRange.to_line = last_nonempty+1
     mdRange.content = list_text
@@ -196,7 +196,7 @@ const mdSelector_quote:MdSelectorSpecSimp = {
       if (line.indexOf(mdRange.prefix)!=0) break
       const line2 = line.replace(mdRange.prefix, "")    // 删掉无用前缀
       // 引用
-      if (ABReg.reg_quote.test(line2)) {last_nonempty = i; continue}
+      if (ABReg.reg_quote_noprefix.test(line2)) {last_nonempty = i; continue}
       break
     }
     mdRange.to_line = last_nonempty+1
@@ -208,6 +208,39 @@ const mdSelector_quote:MdSelectorSpecSimp = {
   }
 }
 registerMdSelector(mdSelector_quote)
+
+/**
+ * 表格块选择器
+ */
+const mdSelector_table:MdSelectorSpecSimp = {
+  id: "table",
+  name: "表格选择器",
+  match: ABReg.reg_table,
+  detail: "在表格的上一/两行加上`[处理器名]`的header，注意header必须和表格首行位于同一层次",
+  selector: (list_text, from_line)=>{
+    let mdRangeTmp = easySelector(list_text, from_line, "table", ABReg.reg_table)
+    if (!mdRangeTmp) return null
+    const mdRange = mdRangeTmp
+    // 开头找到了，现在开始找结束。不需要循环尾处理器
+    let last_nonempty:number = from_line
+    for (let i=from_line+1; i<list_text.length; i++){
+      const line = list_text[i]
+      // 前缀不符合
+      if (line.indexOf(mdRange.prefix)!=0) break
+      const line2 = line.replace(mdRange.prefix, "")    // 删掉无用前缀
+      // 表格
+      if (ABReg.reg_table_noprefix.test(line2)) {last_nonempty = i; continue}
+      break
+    }
+    mdRange.to_line = last_nonempty+1
+    mdRange.content = list_text
+      .slice(from_line, mdRange.to_line)
+      .map((line)=>{return line.replace(mdRange.prefix, "")})
+      .join("\n")
+    return mdRange
+  }
+}
+registerMdSelector(mdSelector_table)
 
 /**
  * 标题选择器
@@ -231,7 +264,7 @@ const mdSelector_heading:MdSelectorSpecSimp = {
       // 空行
       if (ABReg.reg_emptyline_noprefix.test(line2)) {continue}
       // 更大的标题
-      const match = line2.match(ABReg.reg_heading)
+      const match = line2.match(ABReg.reg_heading_noprefix)
       if (!match) {last_nonempty=i; continue}
       if (match[3].length < mdRange.levelFlag.length) {break}
       last_nonempty=i;

@@ -93,20 +93,24 @@ function findABBlock_recurve(targetEl: HTMLElement){
       
     } */
 
-    /** @bug 应该嵌套进quote和ul里面再找 */
     if (!(contentEl instanceof HTMLUListElement
       || contentEl instanceof HTMLQuoteElement
       || contentEl instanceof HTMLPreElement
+      || contentEl instanceof HTMLTableElement
     )) continue
     
     // 寻找头部
     if(i==0 || !(headerEl instanceof HTMLParagraphElement)) {
-      if(!(targetEl instanceof HTMLPreElement)) findABBlock_recurve(contentEl);
+      if(targetEl instanceof HTMLUListElement
+        || targetEl instanceof HTMLQuoteElement
+      ) findABBlock_recurve(contentEl);
       continue
     }
     const header_match = headerEl.getText().match(ABReg.reg_header)
     if (!header_match) {
-      if(!(targetEl instanceof HTMLPreElement)) findABBlock_recurve(contentEl);
+      if(targetEl instanceof HTMLUListElement
+        || targetEl instanceof HTMLQuoteElement
+      ) findABBlock_recurve(contentEl);
       continue
     }
     const header_str = header_match[4]
