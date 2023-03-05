@@ -137,6 +137,7 @@ function findABBlock_cross(targetEl: HTMLElement, ctx: MarkdownPostProcessorCont
   if (targetEl instanceof HTMLUListElement
     || targetEl instanceof HTMLQuoteElement
     || targetEl instanceof HTMLPreElement
+    || targetEl instanceof HTMLTableElement
   ) {
     replaceABBlock(targetEl, ctx)
   }
@@ -353,6 +354,12 @@ function getSourceMarkdown(
     else if (sectionEl instanceof HTMLHeadingElement) {
       range.selector = "heading"
       const match = list_content[0].match(ABReg.reg_heading)
+      if (!match) return range
+      else range.prefix = match[1]
+    }
+    else if (sectionEl instanceof HTMLTableElement) {
+      range.selector = "heading"
+      const match = list_content[0].match(ABReg.reg_table)
       if (!match) return range
       else range.prefix = match[1]
     }
