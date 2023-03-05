@@ -36,86 +36,104 @@ export class ABPosthtmlManager{
     if (this.settings.decoration_render==ConfDecoration.none) return
 
     // 获取el对应的源md
-const mdSrc = getSourceMarkdown(el, ctx)
+    const mdSrc = getSourceMarkdown(el, ctx)
     
-    // 1. RenderMarkdown引起的调用
-    /*else if (el.classList.contains("ab-note")){
-    for (const renderEl of el.querySelectorAll(".markdown-rendered")){  // 子渲染块，需要在该子渲染块中找ul quote pre*/
+    // 1. RenderMarkdown引起的调用（需要嵌套寻找）
     if (!mdSrc) {
       if (!el.classList.contains("markdown-rendered")) return
-      const renderEl = el;
-      for(let i=1; i<renderEl.children.length; i++){  // start form 1, i>0 is true
-        const contentEl = renderEl.children[i] as HTMLDivElement
-        const headerEl = renderEl.children[i-1] as HTMLElement
-        
-        // 寻找正体（首尾选择器的header较特殊，另外处理）
-        /*if (subEl instanceof HTMLParagraphElement){
-          const m_headtail = subEl.getText().match(ABReg.reg_headtail)
-          if (!m_headtail) return
-          
-        }
-        else*/
-
-        /** @bug 应该嵌套进quote和ul里面再找 */
-        if (!(contentEl instanceof HTMLUListElement
-          || contentEl instanceof HTMLQuoteElement
-          || contentEl instanceof HTMLPreElement
-        )) continue
-        
-        // 寻找头部
-        if(!(headerEl instanceof HTMLParagraphElement)) continue
-        const header_match = headerEl.getText().match(ABReg.reg_header)
-        if (!header_match) continue
-        const header_str = header_match[4]
-
-        // 渲染
-        //const newEl = renderEl.createDiv({cls: "ab-re-rendered"})
-        const newEl = document.createElement("div")
-        newEl.addClass("ab-re-rendered")
-        headerEl.parentNode?.insertBefore(newEl, headerEl.nextSibling)
-        autoABProcessor(newEl, header_str, html2md(contentEl.innerHTML))
-
-        contentEl.hide()
-        headerEl.hide()
-      }
+      findABBlock_recurve(el)
     }
-    // 2. html渲染模式的逐个切割块调用
+    // 2. html渲染模式的逐个切割块调用（需要跨切割块寻找）
     else{
       for (const subEl of el.children) {                          // 这个如果是块的话一般就一层，多层应该是p-br的情况
-        findABBlock(subEl as HTMLElement, ctx)
+        findABBlock_cross(subEl as HTMLElement, ctx)
       }
 
       // 结束，开启全局选择器
       if (mdSrc.to_line==mdSrc.content.split("\n").length){
-        global_selector(el, ctx)
+        findABBlock_global(el, ctx)
         return
       }
       else if (el.classList.contains("mod-footer")){
-        global_selector(el, ctx)
+        findABBlock_global(el, ctx)
         return
       }
     }
   }
 }
 
-/** 尝试找到div里的每一个ab块
- * 并尝试转化转化元素
+/** 找ab块 - 递归版 
+ * 特点
+ *  1. 递归调用
  */
-function findABBlock(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext){
+function findABBlock_recurve(targetEl: HTMLElement){
+  /** @fail 原来的想法无法成立……这里本来打算用来递归寻找嵌套的ab块的，
+   * 但好像不行，ctx.getSectionInfo 他获取不了嵌套中el的start和end位置
+   * 判断是否有header并替换元素 */
+  /*if(replaceABBlock(targetEl, ctx)) return
+  else if(!(targetEl instanceof HTMLPreElement)) {
+    for (let targetEl2 of targetEl.children){
+      findABBlock(targetEl2 as HTMLElement, ctx)
+    }
+  }*/
+
+  // replaceABBlock(targetEl, ctx)
+  
+  for(let i=0; i<targetEl.children.length; i++){  // start form 0，因为可以递归，该层不一定需要header
+    const contentEl = targetEl.children[i] as HTMLDivElement
+    let headerEl
+    headerEl = i==0?null:targetEl.children[i-1] as HTMLElement|null
+    
+    // 寻找正体
+    
+    /** @todo （首尾选择器的header较特殊，另外处理） */
+    /*if (subEl instanceof HTMLParagraphElement){
+      const m_headtail = subEl.getText().match(ABReg.reg_headtail)
+      if (!m_headtail) return
+      
+    } */
+
+    /** @bug 应该嵌套进quote和ul里面再找 */
+    if (!(contentEl instanceof HTMLUListElement
+      || contentEl instanceof HTMLQuoteElement
+      || contentEl instanceof HTMLPreElement
+    )) continue
+    
+    // 寻找头部
+    if(i==0 || !(headerEl instanceof HTMLParagraphElement)) {
+      if(!(targetEl instanceof HTMLPreElement)) findABBlock_recurve(contentEl);
+      continue
+    }
+    const header_match = headerEl.getText().match(ABReg.reg_header)
+    if (!header_match) {
+      if(!(targetEl instanceof HTMLPreElement)) findABBlock_recurve(contentEl);
+      continue
+    }
+    const header_str = header_match[4]
+
+    // 渲染
+    //const newEl = targetEl.createDiv({cls: "ab-re-rendered"})
+    const newEl = document.createElement("div")
+    newEl.addClass("ab-re-rendered")
+    headerEl.parentNode?.insertBefore(newEl, headerEl.nextSibling)
+    autoABProcessor(newEl, header_str, html2md(contentEl.innerHTML))
+
+    contentEl.hide()
+    headerEl.hide()
+  }
+}
+
+/** 找ab块 - 跨切割块版
+ * 特点：
+ *  1. 跨越AB优化的切割块来寻找
+ *  2. 只为在根部的AB块，使用 MarkdownRenderChild 进行渲染
+ *  3. 只寻找在根部的AB块？？？（对，目前对这个功能失效）
+ */
+function findABBlock_cross(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext){
   if (targetEl instanceof HTMLUListElement
     || targetEl instanceof HTMLQuoteElement
     || targetEl instanceof HTMLPreElement
   ) {
-    /** @fail 原来的想法无法成立……这里本来打算用来递归寻找嵌套的ab块的，
-     * 但好像不行，ctx.getSectionInfo 他获取不了嵌套中el的start和end位置
-     * 判断是否有header并替换元素 */
-    /*if(replaceABBlock(targetEl, ctx)) return
-    else if(!(targetEl instanceof HTMLPreElement)) {
-      for (let targetEl2 of targetEl.children){
-        findABBlock(targetEl2 as HTMLElement, ctx)
-      }
-    }*/
-
     replaceABBlock(targetEl, ctx)
   }
 }
@@ -124,7 +142,7 @@ function findABBlock(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext){
  * 判断是否有header并替换元素
  */
 function replaceABBlock(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext){
-const range = getSourceMarkdown(targetEl, ctx)
+  const range = getSourceMarkdown(targetEl, ctx)
   if (!range || !range.header) return false
 
   // 语法糖
@@ -135,87 +153,7 @@ const range = getSourceMarkdown(targetEl, ctx)
   ctx.addChild(new ReplaceRender(targetEl, range.header, range.content));
 }
 
-interface HTMLSelectorRangeSpec {
-  from_line: number,// 替换范围
-  to_line: number,  // .
-  header: string,   // 头部信息
-  selector: string, // 选择器（范围选择方式）
-  content: string,  // 内容信息（已去除尾部空格）
-  prefix: string,
-}
-/** 将html还原回md格式
- * 被processTextSection调用
- * @returns 三种结果
- *  1. 获取info失败：返回null
- *  2. 获取info成功，满足ab块条件：返回HTMLSelectorRangeSpec
- *  3. 获取info成功，不满足ab块：  返回HTMLSelectorRangeSpec，但header为""
- */
-function getSourceMarkdown(
-  sectionEl: HTMLElement,
-  ctx: MarkdownPostProcessorContext,
-): HTMLSelectorRangeSpec|null {
-  let info = ctx.getSectionInfo(sectionEl);     // info: MarkdownSectionInformation | null
-  if (info) {
-    let range:HTMLSelectorRangeSpec = {
-      from_line: 0,
-      to_line: 1,
-      header: "",
-      selector: "none",
-      content: "",
-      prefix: ""
-    }
-
-    // 基本信息
-    const { text, lineStart, lineEnd } = info;  // 分别是：全文文档、div的开始行、div的结束行（结束行是包含的，+1才是不包含）
-    const list_text = text.replace(/(\s*$)/g,"").split("\n")
-    const list_content = list_text.slice(lineStart, lineEnd + 1)   // @attension 去除尾部空格否则无法判断 is_end，头部不能去除否则会错位
-    range.from_line = lineStart
-    range.to_line = lineEnd+1
-    range.content = list_content.join("\n");
-
-    // 找类型、找前缀
-    if (sectionEl instanceof HTMLUListElement) {
-      range.selector = "list"
-      const match = list_content[0].match(ABReg.reg_list)
-      if (!match) return range
-      else range.prefix = match[1]
-    }
-    else if (sectionEl instanceof HTMLQuoteElement) {
-      range.selector = "quote"
-      const match = list_content[0].match(ABReg.reg_quote)
-      if (!match) return range
-      else range.prefix = match[1]
-    }
-    else if (sectionEl instanceof HTMLPreElement) {
-      range.selector = "code"
-      const match = list_content[0].match(ABReg.reg_code)
-      if (!match) return range
-      else range.prefix = match[1]
-    }
-    else if (sectionEl instanceof HTMLHeadingElement) {
-      range.selector = "heading"
-      const match = list_content[0].match(ABReg.reg_heading)
-      if (!match) return range
-      else range.prefix = match[1]
-    }
-
-    // 找头部header
-    /** @todo 需要重写，一方面头部有可能在上上行 */
-    if (lineStart==0) return range
-    if (list_text[lineStart-1].indexOf(range.prefix)!=0) return range
-    const match_header = list_text[lineStart-1].replace(range.prefix, "").match(ABReg.reg_header)
-    if (!match_header) return range
-    
-    // （必须是最后一步，通过有无header来判断是否是ab块）
-    range.header = match_header[4]
-    return range
-  }
-  // console.warn("获取MarkdownSectionInformation失败，可能会产生bug") // 其实会return void，应该不会有bug
-  return null
-};
-
-
-/** 全局选择器，在同一个文档里只渲染一次
+/** 找AB块 - 全局选择器版，在同一个文档里只渲染一次
  * 失败经验1：
  *      if (pEl.getAttribute("ab-title-flag")=="true")
  *      pEl.setAttribute("ab-title-flag", "true") // f这个好像会被清除掉
@@ -236,7 +174,7 @@ function getSourceMarkdown(
  * div/cEl是文档的根div，类型总为div
  * content/sub/(cEl.children)是有可能为p table这些元素的东西
  */
-function global_selector(
+function findABBlock_global(
   el: HTMLElement, 
   ctx: MarkdownPostProcessorContext
 ){
@@ -350,3 +288,82 @@ function global_selector(
     if(prev_el) ctx.addChild(new ReplaceRender(prev_el, header, content));
   }
 }
+
+interface HTMLSelectorRangeSpec {
+  from_line: number,// 替换范围
+  to_line: number,  // .
+  header: string,   // 头部信息
+  selector: string, // 选择器（范围选择方式）
+  content: string,  // 内容信息（已去除尾部空格）
+  prefix: string,
+}
+/** 将html还原回md格式
+ * 被processTextSection调用
+ * @returns 三种结果
+ *  1. 获取info失败：返回null
+ *  2. 获取info成功，满足ab块条件：返回HTMLSelectorRangeSpec
+ *  3. 获取info成功，不满足ab块：  返回HTMLSelectorRangeSpec，但header为""
+ */
+function getSourceMarkdown(
+  sectionEl: HTMLElement,
+  ctx: MarkdownPostProcessorContext,
+): HTMLSelectorRangeSpec|null {
+  let info = ctx.getSectionInfo(sectionEl);     // info: MarkdownSectionInformation | null
+  if (info) {
+    let range:HTMLSelectorRangeSpec = {
+      from_line: 0,
+      to_line: 1,
+      header: "",
+      selector: "none",
+      content: "",
+      prefix: ""
+    }
+
+    // 基本信息
+    const { text, lineStart, lineEnd } = info;  // 分别是：全文文档、div的开始行、div的结束行（结束行是包含的，+1才是不包含）
+    const list_text = text.replace(/(\s*$)/g,"").split("\n")
+    const list_content = list_text.slice(lineStart, lineEnd + 1)   // @attension 去除尾部空格否则无法判断 is_end，头部不能去除否则会错位
+    range.from_line = lineStart
+    range.to_line = lineEnd+1
+    range.content = list_content.join("\n");
+
+    // 找类型、找前缀
+    if (sectionEl instanceof HTMLUListElement) {
+      range.selector = "list"
+      const match = list_content[0].match(ABReg.reg_list)
+      if (!match) return range
+      else range.prefix = match[1]
+    }
+    else if (sectionEl instanceof HTMLQuoteElement) {
+      range.selector = "quote"
+      const match = list_content[0].match(ABReg.reg_quote)
+      if (!match) return range
+      else range.prefix = match[1]
+    }
+    else if (sectionEl instanceof HTMLPreElement) {
+      range.selector = "code"
+      const match = list_content[0].match(ABReg.reg_code)
+      if (!match) return range
+      else range.prefix = match[1]
+    }
+    else if (sectionEl instanceof HTMLHeadingElement) {
+      range.selector = "heading"
+      const match = list_content[0].match(ABReg.reg_heading)
+      if (!match) return range
+      else range.prefix = match[1]
+    }
+
+    // 找头部header
+    /** @todo 需要重写，一方面头部有可能在上上行 */
+    if (lineStart==0) return range
+    if (list_text[lineStart-1].indexOf(range.prefix)!=0) return range
+    const match_header = list_text[lineStart-1].replace(range.prefix, "").match(ABReg.reg_header)
+    if (!match_header) return range
+    
+    // （必须是最后一步，通过有无header来判断是否是ab块）
+    range.header = match_header[4]
+    return range
+  }
+  // console.warn("获取MarkdownSectionInformation失败，可能会产生bug") // 其实会return void，应该不会有bug
+  return null
+};

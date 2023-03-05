@@ -31,7 +31,7 @@ function easySelector(
   // 验证header
   let header_line_match:RegExpMatchArray | null
   if (list_text[from_line-1].indexOf(mdRange.prefix)==0
-    && ABReg.reg_emptyline.test(list_text[from_line-1]/*.replace(mdRange.prefix, "")*/)
+    && ABReg.reg_emptyline_noprefix.test(list_text[from_line-1]/*.replace(mdRange.prefix, "")*/)
     && from_line>1
   ){
     mdRange.from_line = from_line-2
@@ -89,7 +89,7 @@ const mdSelector_headtail:MdSelectorSpecSimp = {
       if (line.indexOf(mdRange.prefix)!=0) break
       const line2 = line.replace(mdRange.prefix, "")    // 删掉无用前缀
       // 空行
-      if (ABReg.reg_emptyline.test(line2)) {continue}
+      if (ABReg.reg_emptyline_noprefix.test(line2)) {continue}
       last_nonempty = i
       // 结束
       if (ABReg.reg_headtail.test(line2)) {last_nonempty = i; break}
@@ -126,9 +126,9 @@ const mdSelector_list:MdSelectorSpecSimp = {
       // 列表
       if (ABReg.reg_list_noprefix.test(line2)) {last_nonempty = i; continue}
       // 开头有缩进
-      if (ABReg.reg_indentline.test(line2)) {last_nonempty = i; continue}
+      if (ABReg.reg_indentline_noprefix.test(line2)) {last_nonempty = i; continue}
       // 空行
-      if (ABReg.reg_emptyline.test(line2)) {continue}
+      if (ABReg.reg_emptyline_noprefix.test(line2)) {continue}
       break
     }
     mdRange.to_line = last_nonempty+1
@@ -161,7 +161,7 @@ const mdSelector_code:MdSelectorSpecSimp = {
       if (line.indexOf(mdRange.prefix)!=0) break
       const line2 = line.replace(mdRange.prefix, "")    // 删掉无用前缀
       // 空行
-      if (ABReg.reg_emptyline.test(line2)) {continue}
+      if (ABReg.reg_emptyline_noprefix.test(line2)) {continue}
       last_nonempty = i
       // 结束
       if (line2.indexOf(mdRange.levelFlag)==0) {last_nonempty = i; break}
@@ -229,7 +229,7 @@ const mdSelector_heading:MdSelectorSpecSimp = {
       if (line.indexOf(mdRange.prefix)!=0) break
       const line2 = line.replace(mdRange.prefix, "")    // 删掉无用前缀
       // 空行
-      if (ABReg.reg_emptyline.test(line2)) {continue}
+      if (ABReg.reg_emptyline_noprefix.test(line2)) {continue}
       // 更大的标题
       const match = line2.match(ABReg.reg_heading)
       if (!match) {last_nonempty=i; continue}

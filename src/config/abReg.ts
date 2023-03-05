@@ -1,6 +1,6 @@
 /** @attention 修改正则要注意小括号的位置是否对应，不然还要去修改索引 */
 export const ABReg = {
-  reg_header:   /^((\s|>\s|-\s|\*\s|\+\s)*)(\[(.*)\])/,
+  reg_header:   /^((\s|>\s|-\s|\*\s|\+\s)*)(\[(.*)\])\s*$/,
 
   // 有前缀版本（给选择器用）
   reg_headtail: /^((\s|>\s|-\s|\*\s|\+\s)*)(:::)(.*)/,
@@ -16,6 +16,6 @@ export const ABReg = {
   reg_quote_noprefix:    /^((\s)*)(>\s)(.*)/,          
   reg_heading_noprefix:  /^((\s)*)(\#+\s)(.*)/,         
 
-  reg_emptyline:/^\s*$/,
-  reg_indentline:/^\s+?\S/,
+  reg_emptyline_noprefix:/^\s*$/,
+  reg_indentline_noprefix:/^\s+?\S/,
 }
