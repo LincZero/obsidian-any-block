@@ -104,3 +104,8 @@ Look the setup panel or [中文教程和示例库](./demo_zh)
 	- **引用块内的列表/列表内的引用块 无法识别**
 	- **表格转置与表头符号冲突、转置模式目前是纯css实现的 如果大家的行高不相同，会出现不匹配的情况。**
 	  后续会将css实现改进为转化table元素实现
+
+Reference、import
+
+- [html-to-md](https://github.com/stonehank/html-to-md)
+- [mermaid](https://github.com/mermaid-js/mermaid)
