@@ -27,52 +27,39 @@ Look the setup panel or [中文教程和示例库](./demo_zh)
 - 列表转时间线
 - 标题转列表从而转其他（can use title2list processor）
 
-![](demo/png/list2table.png)
+![](demo_zh/png/list2table.png)
 
-![](demo/png/list2mdtable.png)
+![](demo_zh/png/list2mdtable.png)
 
-![](demo/png/list2tableT.png)
+![](demo_zh/png/list2tableT.png)
 
-![](demo/png/list2ut.gif)
+![](demo_zh/png/list2lt.gif)
 
-![](demo/png/list2tab.gif)
+![](demo_zh/png/list2tab.gif)
 
-![](demo/png/list2mermaid.png)
+![](demo_zh/png/list2mermaid.png)
 
-![](demo/png/list2mindmap.png)
+![](demo_zh/png/list2mindmap.png)
 
-![](demo/png/titleSelector.png)
+![](demo_zh/png/titleSelector.png)
 
-![](demo/png/addTitle.png)
+![](demo_zh/png/addTitle.png)
 
-![](demo/png/scroll.gif)
+![](demo_zh/png/scroll.gif)
 
-![](demo/png/overfold.png)
+![](demo_zh/png/overfold.png)
 
-![](demo/png/flod.gif)
+![](demo_zh/png/flod.gif)
 
-![](demo/png/heimu.gif)
+![](demo_zh/png/heimu.gif)
 
-![](demo/png/userProcessor.png)
-
-## Update log
-
-- v1.3.0
-	- 用户层面的修改不多，但对代码处理器部分**重构了一遍**，以便后续的开发
-		- 使用了SVELTE框架辅助开发
-		- 扩展了处理器接口，能够接受更多种类的处理器、且处理器的组合会更加多样
-	- 提供了处理器的简单自定义（通过设置面板设置 `别名` 的方式）
-	- 提供了众多新的处理器，与新的处理器类型——装饰处理器
-		- 标题& 黑幕& 折叠& 滚动& 动态增加class
-- v1.3.0 之前
-	- 不记录，详见commits
-	- 增加了标题选择器
+![](demo_zh/png/userProcessor.png)
 
 ## support
 
 开发不易，赞助入口（可备注：OB插件support）
 
-![](demo/png/support_zfb.png)![](demo/png/support_wechat.png)
+![](demo_zh/png/support_zfb.png)![](demo_zh/png/support_wechat.png)
 
 
 ![Obsidian Downloads](https://img.shields.io/badge/dynamic/json?logo=obsidian&color=%23483699&label=downloads&query=%24%5B%22obsidian-any-block%22%5D.downloads&url=https%3A%2F%2Fraw.githubusercontent.com%2Fobsidianmd%2Fobsidian-releases%2Fmaster%2Fcommunity-plugin-stats.json)

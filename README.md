@@ -27,15 +27,15 @@ Here are some of the more common processors:
 - list2timeline
 - title2list + list2somthing
 
-![](demo/png/list2table.png)
 
-![](demo/png/list2mdtable.png)
+
+![](demo/png/list2table.png)
 
 ![](demo/png/list2tableT.png)
 
-![](demo/png/list2ut.gif)
+![](demo/png/list2lt.png)
 
-![](demo/png/list2tab.gif)
+![](demo/png/list2tab.png)
 
 ![](demo/png/list2mermaid.png)
 
@@ -45,28 +45,15 @@ Here are some of the more common processors:
 
 ![](demo/png/addTitle.png)
 
-![](demo/png/scroll.gif)
+![](demo/png/scroll.png)
 
 ![](demo/png/overfold.png)
 
-![](demo/png/flod.gif)
+![](demo/png/flod.png)
 
 ![](demo/png/heimu.gif)
 
 ![](demo/png/userProcessor.png)
-
-## Update log
-
-- v1.3.0
-	- 用户层面的修改不多，但对代码处理器部分**重构了一遍**，以便后续的开发
-		- 使用了SVELTE框架辅助开发
-		- 扩展了处理器接口，能够接受更多种类的处理器、且处理器的组合会更加多样
-	- 提供了处理器的简单自定义（通过设置面板设置 `别名` 的方式）
-	- 提供了众多新的处理器，与新的处理器类型——装饰处理器
-		- 标题& 黑幕& 折叠& 滚动& 动态增加class
-- v1.3.0 之前
-	- 不记录，详见commits
-	- 增加了标题选择器
 
 ## support
 
