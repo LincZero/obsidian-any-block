@@ -148,37 +148,38 @@
 .ab-note .ab-faq .ab-faq-line {
   line-height: 30px;
   height: 30px;
-  margin-bottom: 15px;
+  width: 100%;
   padding: 0 15px 0 15px;
   clear: both;
 }
 
 .ab-note .ab-faq .ab-faq-line .ab-faq-bubble {
+  width: 100%;
   float: left;
-  border: solid #252525;
-  border-radius: 12px;
-}
-
-.ab-note .ab-faq .ab-faq-line .ab-faq-a, .ab-note .ab-faq .ab-faq-line .ab-faq-A {
-  background-color: #f5f8fe;
-}
-
-.ab-note .ab-faq .ab-faq-line .ab-faq-a, .ab-note .ab-faq .ab-faq-line .ab-faq-A::before {
-  content: "A";
-  margin-left: 15px;
-  margin-right: 15px;
 }
 
 .ab-note .ab-faq .ab-faq-line .ab-faq-q, .ab-note .ab-faq .ab-faq-line .ab-faq-Q {
   background-color: #1e53ee;
-  float: right;
+  border-radius: 12px 12px 0 0;
 }
 
 .ab-note .ab-faq .ab-faq-line .ab-faq-q, .ab-note .ab-faq .ab-faq-line .ab-faq-Q::before {
   content: "Q";
   margin-left: 15px;
   margin-right: 15px;
-  float: right;
+}
+
+.ab-note .ab-faq .ab-faq-line .ab-faq-a, .ab-note .ab-faq .ab-faq-line .ab-faq-A {
+  background-color: #f5f8fe;
+  color: #a994a6;
+  margin-bottom: 20px;
+  border-radius: 0 0 12px 12px;
+}
+
+.ab-note .ab-faq .ab-faq-line .ab-faq-a, .ab-note .ab-faq .ab-faq-line .ab-faq-A::before {
+  content: "A";
+  margin-left: 15px;
+  margin-right: 15px;
 }
 
 .ab-note .ab-deco-fold .ab-deco-fold-button {
