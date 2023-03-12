@@ -125,6 +125,41 @@
     .ab-foldable-tr[tr_level="8"]>td:first-child{padding-left: calc(8*12px);}
   }
 
+  // FAQ
+  .ab-faq{
+    .ab-faq-line{
+      line-height: 30px;
+      height: 30px;
+      margin-bottom: 15px;
+      padding: 0 15px 0 15px;
+      clear: both;
+      
+      .ab-faq-bubble {
+        float: left;
+        border: solid #252525;
+        border-radius: 12px;
+      }
+      .ab-faq-a, .ab-faq-A{
+        background-color: #f5f8fe;
+      }
+      .ab-faq-a, .ab-faq-A::before{
+        content: "A";
+        margin-left: 15px;
+        margin-right: 15px;
+      }
+      .ab-faq-q, .ab-faq-Q{
+        background-color: #1e53ee;
+        float: right;
+      }
+      .ab-faq-q, .ab-faq-Q::before{
+        content: "Q";
+        margin-left: 15px;
+        margin-right: 15px;
+        float: right;
+      }
+    }
+  }
+
   // 折叠
   .ab-deco-fold{
     .ab-deco-fold-button{

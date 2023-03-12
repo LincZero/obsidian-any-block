@@ -1,0 +1,39 @@
+import {ProcessDataType, registerABProcessor, type ABProcessorSpecSimp} from "./abProcessor"
+
+const process_faq:ABProcessorSpecSimp = {
+  id: "faq",
+  name: "FAQ",
+  match: "FAQ",
+  process_param: ProcessDataType.text,
+  process_return: ProcessDataType.el,
+  process: (el, header, content)=>{
+    const e_faq:HTMLElement = el.createDiv({cls: "ab-faq"})
+    const list_content:string[] = content.split("\n");
+
+    let mode_qa:string = ""
+    let last_content:string = ""
+    for (let line of list_content){
+      const m_line = line.match(/^([a-zA-Z])(: |：)(.*)/)
+      if (!m_line){ // 不匹配
+        if (mode_qa) {
+          last_content = last_content + "\n" + line
+        }
+        continue
+      } else {      // 匹配
+        if (mode_qa) {
+          const e_faq_line = e_faq.createDiv({cls:"ab-faq-line"})
+          e_faq_line.createDiv({cls:`ab-faq-bubble ab-faq-${mode_qa}`, text:last_content})
+        }
+        mode_qa = m_line[1]
+        last_content = m_line[3]
+      }
+    }
+    // 循环尾
+    if (mode_qa) {
+      const e_faq_line = e_faq.createDiv({cls:"ab-faq-line"})
+          e_faq_line.createDiv({cls:`ab-faq-bubble ab-faq-${mode_qa}`, text:last_content})
+    }
+    return el
+  }
+}
+registerABProcessor(process_faq)

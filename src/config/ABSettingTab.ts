@@ -4,6 +4,7 @@ import {generateProcessorInfoTable, registerABProcessorUser, type ABProcessorSpe
 import {} from "src/replace/baseProcessor"    // 加载所有处理器和选择器
 import {} from "src/replace/listProcessor"    // ^
 import {} from "src/replace/decoProcessor"    // ^
+import {} from "src/replace/exProcessor"      // ^
 import {} from "src/manager/abMdBaseSelector" // ^
 import {generateSelectorInfoTable} from "src/manager/abMdSelector"  // ^
 
