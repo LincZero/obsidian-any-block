@@ -1,3 +1,4 @@
+import { MarkdownRenderer, MarkdownRenderChild } from 'obsidian'
 import {ProcessDataType, registerABProcessor, type ABProcessorSpecSimp} from "./abProcessor"
 
 const process_faq:ABProcessorSpecSimp = {
@@ -21,8 +22,12 @@ const process_faq:ABProcessorSpecSimp = {
         continue
       } else {      // 匹配
         if (mode_qa) {
-          const e_faq_line = e_faq.createDiv({cls:"ab-faq-line"})
-          e_faq_line.createDiv({cls:`ab-faq-bubble ab-faq-${mode_qa}`, text:last_content})
+          const e_faq_line = e_faq.createDiv({cls:`ab-faq-line ab-faq-${mode_qa}`})
+          const e_faq_bubble = e_faq_line.createDiv({cls:`ab-faq-bubble ab-faq-${mode_qa}`})
+          const e_faq_content = e_faq_bubble.createDiv({cls:"ab-faq-content"})
+          const child = new MarkdownRenderChild(e_faq_content);
+          e_faq_content.addClass("markdown-rendered")
+          MarkdownRenderer.renderMarkdown(last_content, e_faq_content, "", child);
         }
         mode_qa = m_line[1]
         last_content = m_line[3]
@@ -30,8 +35,12 @@ const process_faq:ABProcessorSpecSimp = {
     }
     // 循环尾
     if (mode_qa) {
-      const e_faq_line = e_faq.createDiv({cls:"ab-faq-line"})
-          e_faq_line.createDiv({cls:`ab-faq-bubble ab-faq-${mode_qa}`, text:last_content})
+      const e_faq_line = e_faq.createDiv({cls:`ab-faq-line ab-faq-${mode_qa}`})
+          const e_faq_bubble = e_faq_line.createDiv({cls:`ab-faq-bubble ab-faq-${mode_qa}`})
+          const e_faq_content = e_faq_bubble.createDiv({cls:"ab-faq-content"})
+          const child = new MarkdownRenderChild(e_faq_content);
+          e_faq_content.addClass("markdown-rendered")
+          MarkdownRenderer.renderMarkdown(last_content, e_faq_content, "", child);
     }
     return el
   }
