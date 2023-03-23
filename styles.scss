@@ -125,6 +125,14 @@
     .ab-foldable-tr[tr_level="8"]>td:first-child{padding-left: calc(8*12px);}
   }
 
+  // Folder
+  .ab-list-table.ab-list-folder{
+    border: none;
+    td{
+      white-space: nowrap;
+    }
+  }
+
   // FAQ
   .markdown-rendered.ab-faq-content{
     p:first-child {margin-top: 0;}

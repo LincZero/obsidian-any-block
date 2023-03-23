@@ -47,6 +47,12 @@ export class ListProcess{
     return this.uldata2ultable(list_itemInfo, div, modeT)
   }
 
+  /** 列表转树形目录 */
+  static list2folder(text: string, div: HTMLDivElement, modeT=false) {
+    let list_itemInfo = this.list2data(text, true)
+    return this.uldata2ultable(list_itemInfo, div, modeT, true)
+  }
+
   /** 列表转二维表格 */
   static list2ut(text: string, div: HTMLDivElement, modeT=false) {
     //【old】
@@ -600,7 +606,8 @@ export class ListProcess{
   private static uldata2ultable(
     list_itemInfo: List_ListItem, 
     div: HTMLDivElement,
-    modeT: boolean
+    modeT: boolean,
+    is_folder=false
   ){
     // 组装成表格数据 (列表是深度优先)
     let tr_line_level = [] // 表格行等级（树形表格独有）
@@ -609,17 +616,40 @@ export class ListProcess{
     let prev_level = 999 // 上一行的等级
     for (let i=0; i<list_itemInfo.length; i++){
       let item = list_itemInfo[i]
+      let item_type:string = ""
 
       // 获取所在行数。分换行（创建新行）和不换行，第一行总是创建新行
       // 这里的if表示该换行了
       if (item.level <= prev_level) {
         prev_line++
         if (item.level==0) {
+          /** @可优化 前面是列表级别转空格，现在是删除空格转回列表级别。这受限于Item格式 */
           const matchs = item.content.match(/^((&nbsp;)*)/)
           if (!matchs) return div
           if (!matchs[1]) tr_line_level.push(0)
           else tr_line_level.push(Math.round(matchs[1].length/6))
           item.content = item.content.replace(/^((&nbsp;)*)/, "")
+          
+          // 由字符串前缀得出文件格式
+          if(is_folder){
+            const matchs = item.content.match(/^(=|~) /)
+            // 无类型/不显示图标的文件类型
+            if (!matchs){}
+            // 文件夹
+            else if (matchs[1]=="= "){
+              item_type = "folder"
+              item.content = item.content.replace(/^\= /, "")
+            }
+            // 根据后缀名决定
+            else if(matchs[1]="~ "){
+              const m_line = item.content.match(/^\~(.*)\.(.*)/)
+              if(!m_line) {}
+              else {
+                item_type = m_line[2]
+              }
+              item.content = item.content.replace(/^\~ /, "")
+            }
+          }
         }
         else {
           tr_line_level.push(0)
@@ -643,7 +673,8 @@ export class ListProcess{
         list_tableInfo: list_tableInfo,
         modeT: modeT,
         prev_line: prev_line,
-        tr_line_level: tr_line_level
+        tr_line_level: tr_line_level,
+        is_folder: is_folder
       }
     })
     return div

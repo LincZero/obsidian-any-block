@@ -145,6 +145,14 @@
   padding-left: calc(8*12px);
 }
 
+.ab-note .ab-list-table.ab-list-folder {
+  border: none;
+}
+
+.ab-note .ab-list-table.ab-list-folder td {
+  white-space: nowrap;
+}
+
 .ab-note .markdown-rendered.ab-faq-content p:first-child {
   margin-top: 0;
 }

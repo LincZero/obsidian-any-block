@@ -42,6 +42,8 @@ export class ABPosthtmlManager{
     if (!mdSrc) {
       if (!el.classList.contains("markdown-rendered")) return
       findABBlock_recurve(el)
+      // 并修复RenderMarkdown引起的图片错误
+      // fixing_img(el)
     }
     // 2. html渲染模式的逐个切割块调用（需要跨切割块寻找）
     else{

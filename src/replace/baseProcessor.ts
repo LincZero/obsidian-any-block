@@ -321,6 +321,22 @@ const process_list2lt:ABProcessorSpecSimp = {
 }
 registerABProcessor(process_list2lt)
 
+const process_list2folder:ABProcessorSpecSimp = {
+  id: "list2folder",
+  name: "列表转树状目录",
+  match: /list2(md)?folder(T)?/,
+  default: "list2folder",
+  process_param: ProcessDataType.text,
+  process_return: ProcessDataType.el,
+  process: (el, header, content)=>{
+    const matchs = header.match(/list2(md)?folder(T)?/)
+    if (!matchs) return el
+    ListProcess.list2folder(content, el, matchs[2]=="T")
+    return el
+  }
+}
+registerABProcessor(process_list2lt)
+
 const process_list2ut:ABProcessorSpecSimp = {
   id: "list2ut",
   name: "列表转二维表格",
