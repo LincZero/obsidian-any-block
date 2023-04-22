@@ -1,6 +1,6 @@
 import {MarkdownRenderChild, MarkdownRenderer} from 'obsidian';
 
-import {ProcessDataType, registerABProcessor, type ABProcessorSpecSimp} from "./abProcessor"
+import {ProcessDataType, ABProcessManager, type ABProcessorSpecSimp} from "./abProcessor"
 import {ABReg} from "src/config/abReg"
 import {ListProcess} from "./listProcessor"
 import {getID} from "src/utils/utils"
@@ -32,7 +32,7 @@ const process_md:ABProcessorSpecSimp = {
     return el
   }
 }
-registerABProcessor(process_md)
+ABProcessManager.getInstance().registerABProcessor(process_md)
 
 const process_quote:ABProcessorSpecSimp = {
   id: "quote",
@@ -43,7 +43,7 @@ const process_quote:ABProcessorSpecSimp = {
     return content.split("\n").map((line)=>{return "> "+line}).join("\n")
   }
 }
-registerABProcessor(process_quote)
+ABProcessManager.getInstance().registerABProcessor(process_quote)
 
 const process_code:ABProcessorSpecSimp = {
   id: "code",
@@ -60,7 +60,7 @@ const process_code:ABProcessorSpecSimp = {
     return "```"+content+"\n```"
   }
 }
-registerABProcessor(process_code)
+ABProcessManager.getInstance().registerABProcessor(process_code)
 
 const process_Xquote:ABProcessorSpecSimp = {
   id: "Xquote",
@@ -73,7 +73,7 @@ const process_Xquote:ABProcessorSpecSimp = {
     }).join("\n")
   }
 }
-registerABProcessor(process_Xquote)
+ABProcessManager.getInstance().registerABProcessor(process_Xquote)
 
 const process_Xcode:ABProcessorSpecSimp = {
   id: "Xcode",
@@ -118,7 +118,7 @@ const process_Xcode:ABProcessorSpecSimp = {
     return content
   }
 }
-registerABProcessor(process_Xcode)
+ABProcessManager.getInstance().registerABProcessor(process_Xcode)
 
 const process_X:ABProcessorSpecSimp = {
   id: "X",
@@ -136,7 +136,7 @@ const process_X:ABProcessorSpecSimp = {
     return content
   }
 }
-registerABProcessor(process_X)
+ABProcessManager.getInstance().registerABProcessor(process_X)
 
 const process_code2quote:ABProcessorSpecSimp = {
   id: "code2quote",
@@ -144,7 +144,7 @@ const process_code2quote:ABProcessorSpecSimp = {
   process_alias: "Xcode|quote",
   process: ()=>{}
 }
-registerABProcessor(process_code2quote)
+ABProcessManager.getInstance().registerABProcessor(process_code2quote)
 
 const process_quote2code:ABProcessorSpecSimp = {
   id: "quote2code",
@@ -161,7 +161,7 @@ const process_quote2code:ABProcessorSpecSimp = {
     return content*/
   }
 }
-registerABProcessor(process_quote2code)
+ABProcessManager.getInstance().registerABProcessor(process_quote2code)
 
 const process_slice:ABProcessorSpecSimp = {
   id: "slice",
@@ -187,7 +187,7 @@ const process_slice:ABProcessorSpecSimp = {
     }
   }
 }
-registerABProcessor(process_slice)
+ABProcessManager.getInstance().registerABProcessor(process_slice)
 
 const process_add:ABProcessorSpecSimp = {
   id: "add",
@@ -219,7 +219,7 @@ const process_add:ABProcessorSpecSimp = {
     return list_content.join("\n")
   }
 }
-registerABProcessor(process_add)
+ABProcessManager.getInstance().registerABProcessor(process_add)
 
 const process_title2list:ABProcessorSpecSimp = {
   id: "title2list",
@@ -232,7 +232,7 @@ const process_title2list:ABProcessorSpecSimp = {
     return content
   }
 }
-registerABProcessor(process_title2list)
+ABProcessManager.getInstance().registerABProcessor(process_title2list)
 
 const process_title2table:ABProcessorSpecSimp = {
   id: "title2table",
@@ -245,7 +245,7 @@ const process_title2table:ABProcessorSpecSimp = {
     return el
   }
 }
-registerABProcessor(process_title2table)
+ABProcessManager.getInstance().registerABProcessor(process_title2table)
 
 const process_title2mindmap:ABProcessorSpecSimp = {
   id: "title2mindmap",
@@ -258,7 +258,7 @@ const process_title2mindmap:ABProcessorSpecSimp = {
     return el
   }
 }
-registerABProcessor(process_title2mindmap)
+ABProcessManager.getInstance().registerABProcessor(process_title2mindmap)
 
 const process_listroot:ABProcessorSpecSimp = {
   id: "listroot",
@@ -276,7 +276,7 @@ const process_listroot:ABProcessorSpecSimp = {
     return content
   }
 }
-registerABProcessor(process_listroot)
+ABProcessManager.getInstance().registerABProcessor(process_listroot)
 
 const process_listXinline:ABProcessorSpecSimp = {
   id: "listXinline",
@@ -287,7 +287,7 @@ const process_listXinline:ABProcessorSpecSimp = {
     return ListProcess.listXinline(content)
   }
 }
-registerABProcessor(process_listXinline)
+ABProcessManager.getInstance().registerABProcessor(process_listXinline)
 
 const process_list2table:ABProcessorSpecSimp = {
   id: "list2table",
@@ -303,7 +303,7 @@ const process_list2table:ABProcessorSpecSimp = {
     return el
   }
 }
-registerABProcessor(process_list2table)
+ABProcessManager.getInstance().registerABProcessor(process_list2table)
 
 const process_list2lt:ABProcessorSpecSimp = {
   id: "list2lt",
@@ -319,7 +319,7 @@ const process_list2lt:ABProcessorSpecSimp = {
     return el
   }
 }
-registerABProcessor(process_list2lt)
+ABProcessManager.getInstance().registerABProcessor(process_list2lt)
 
 const process_list2folder:ABProcessorSpecSimp = {
   id: "list2folder",
@@ -335,7 +335,7 @@ const process_list2folder:ABProcessorSpecSimp = {
     return el
   }
 }
-registerABProcessor(process_list2lt)
+ABProcessManager.getInstance().registerABProcessor(process_list2lt)
 
 const process_list2ut:ABProcessorSpecSimp = {
   id: "list2ut",
@@ -351,7 +351,7 @@ const process_list2ut:ABProcessorSpecSimp = {
     return el
   }
 }
-registerABProcessor(process_list2ut)
+ABProcessManager.getInstance().registerABProcessor(process_list2ut)
 
 const process_list2timeline:ABProcessorSpecSimp = {
   id: "list2timeline",
@@ -367,7 +367,7 @@ const process_list2timeline:ABProcessorSpecSimp = {
     return el
   }
 }
-registerABProcessor(process_list2timeline)
+ABProcessManager.getInstance().registerABProcessor(process_list2timeline)
 
 const process_list2tab:ABProcessorSpecSimp = {
   id: "list2tab",
@@ -383,7 +383,7 @@ const process_list2tab:ABProcessorSpecSimp = {
     return el
   }
 }
-registerABProcessor(process_list2tab)
+ABProcessManager.getInstance().registerABProcessor(process_list2tab)
 
 const process_list2mermaid:ABProcessorSpecSimp = {
   id: "list2mermaid",
@@ -395,7 +395,7 @@ const process_list2mermaid:ABProcessorSpecSimp = {
     return el
   }
 }
-registerABProcessor(process_list2mermaid)
+ABProcessManager.getInstance().registerABProcessor(process_list2mermaid)
 
 const process_list2mindmap:ABProcessorSpecSimp = {
   id: "list2mindmap",
@@ -407,7 +407,7 @@ const process_list2mindmap:ABProcessorSpecSimp = {
     return el
   }
 }
-registerABProcessor(process_list2mindmap)
+ABProcessManager.getInstance().registerABProcessor(process_list2mindmap)
 
 const process_callout:ABProcessorSpecSimp = {
   id: "callout",
@@ -421,7 +421,7 @@ const process_callout:ABProcessorSpecSimp = {
     return "```ad-"+header.slice(1)+"\n"+content+"\n```"
   }
 }
-registerABProcessor(process_callout)
+ABProcessManager.getInstance().registerABProcessor(process_callout)
 
 const process_mermaid:ABProcessorSpecSimp = {
   id: "mermaid",
@@ -445,7 +445,7 @@ const process_mermaid:ABProcessorSpecSimp = {
     return el
   }
 }
-registerABProcessor(process_mermaid)
+ABProcessManager.getInstance().registerABProcessor(process_mermaid)
 
 const process_text:ABProcessorSpecSimp = {
   id: "text",
@@ -460,4 +460,4 @@ const process_text:ABProcessorSpecSimp = {
     return el
   }
 }
-registerABProcessor(process_text)
+ABProcessManager.getInstance().registerABProcessor(process_text)

@@ -1,4 +1,4 @@
-import {ProcessDataType, registerABProcessor, type ABProcessorSpecSimp} from "./abProcessor"
+import {ProcessDataType, ABProcessManager, type ABProcessorSpecSimp} from "./abProcessor"
 
 export const DECOProcessor = 0  // 用于模块化，防报错，其实没啥用
 
@@ -34,7 +34,7 @@ const process_fold:ABProcessorSpecSimp = {
     return el
   }
 }
-registerABProcessor(process_fold)
+ABProcessManager.getInstance().registerABProcessor(process_fold)
 
 const process_scroll:ABProcessorSpecSimp = {
   id: "scroll",
@@ -69,7 +69,7 @@ const process_scroll:ABProcessorSpecSimp = {
     return el
   }
 }
-registerABProcessor(process_scroll)
+ABProcessManager.getInstance().registerABProcessor(process_scroll)
 
 const process_overfold:ABProcessorSpecSimp = {
   id: "overfold",
@@ -119,7 +119,7 @@ const process_overfold:ABProcessorSpecSimp = {
     return el
   }
 }
-registerABProcessor(process_overfold)
+ABProcessManager.getInstance().registerABProcessor(process_overfold)
 
 
 const process_addClass:ABProcessorSpecSimp = {
@@ -138,7 +138,7 @@ const process_addClass:ABProcessorSpecSimp = {
     return el
   }
 }
-registerABProcessor(process_addClass)
+ABProcessManager.getInstance().registerABProcessor(process_addClass)
 
 const process_addDiv:ABProcessorSpecSimp = {
   id: "addDiv",
@@ -160,7 +160,7 @@ const process_addDiv:ABProcessorSpecSimp = {
     return el
   }
 }
-registerABProcessor(process_addDiv)
+ABProcessManager.getInstance().registerABProcessor(process_addDiv)
 
 const process_heimu:ABProcessorSpecSimp = {
   id: "heimu",
@@ -169,7 +169,7 @@ const process_heimu:ABProcessorSpecSimp = {
   process_alias: "addClass(ab-deco-heimu)",
   process: (el, header, content)=>{}
 }
-registerABProcessor(process_heimu)
+ABProcessManager.getInstance().registerABProcessor(process_heimu)
 
 const process_title:ABProcessorSpecSimp = {
   id: "title",
@@ -221,4 +221,4 @@ const process_title:ABProcessorSpecSimp = {
     return el
   }
 }
-registerABProcessor(process_title)
+ABProcessManager.getInstance().registerABProcessor(process_title)

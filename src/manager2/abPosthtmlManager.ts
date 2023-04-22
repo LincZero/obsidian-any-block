@@ -8,7 +8,7 @@ import {ABReg} from "src/config/abReg"
 import {ConfDecoration, ConfSelect} from "src/config/abSettingTab"
 import type AnyBlockPlugin from "../main"
 import {ReplaceRender} from "./replaceRenderChild"
-import {autoABProcessor} from "src/replace/abProcessor"
+import {ABProcessManager} from "src/replace/abProcessor"
 import { match } from 'assert'
 
 /** Html处理器
@@ -124,7 +124,7 @@ function findABBlock_recurve(targetEl: HTMLElement){
     const newEl = document.createElement("div")
     newEl.addClass("ab-re-rendered")
     headerEl.parentNode?.insertBefore(newEl, headerEl.nextSibling)
-    autoABProcessor(newEl, header_str, html2md(contentEl.innerHTML))
+    ABProcessManager.getInstance().autoABProcessor(newEl, header_str, html2md(contentEl.innerHTML))
 
     contentEl.hide()
     headerEl.hide()

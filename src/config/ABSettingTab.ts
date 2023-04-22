@@ -1,7 +1,7 @@
 import {App, PluginSettingTab, Setting, Modal} from "obsidian"
 import type AnyBlockPlugin from "../main"
-import {generateProcessorInfoTable, registerABProcessorUser, type ABProcessorSpecUser} from "src/replace/abProcessor"
-import {} from "src/replace/baseProcessor"    // 加载所有处理器和选择器
+import {ABProcessManager, type ABProcessorSpecUser} from "src/replace/abProcessor"
+import {} from "src/replace/textProcessor"    // 加载所有处理器和选择器
 import {} from "src/replace/listProcessor"    // ^
 import {} from "src/replace/decoProcessor"    // ^
 import {} from "src/replace/exProcessor"      // ^
@@ -58,7 +58,7 @@ export class ABSettingTab extends PluginSettingTab {
 		super(app, plugin);
 		this.plugin = plugin;
     for (let item of plugin.settings.user_processor){
-      registerABProcessorUser(item)
+      ABProcessManager.getInstance().registerABProcessor(item)
     }
 	}
 
@@ -130,15 +130,15 @@ export class ABSettingTab extends PluginSettingTab {
         .setIcon("plus-circle")
         .onClick(e => {
           new ABProcessorModal(this.app, async (result)=>{
-            registerABProcessorUser(result)
+            ABProcessManager.getInstance().registerABProcessor(result)
             settings.user_processor.push(result)
             await this.plugin.saveSettings();
             this.processorPanel.remove()
-            this.processorPanel = generateProcessorInfoTable(containerEl)
+            this.processorPanel = ABProcessManager.getInstance().generateProcessorInfoTable(containerEl)
           }).open()
         })
       })
-    this.processorPanel = generateProcessorInfoTable(containerEl)
+    this.processorPanel = ABProcessManager.getInstance().generateProcessorInfoTable(containerEl)
 	}
 }
 
