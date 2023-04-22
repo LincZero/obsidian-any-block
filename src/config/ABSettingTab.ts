@@ -1,6 +1,7 @@
 import {App, PluginSettingTab, Setting, Modal} from "obsidian"
 import type AnyBlockPlugin from "../main"
-import {ABProcessManager, type ABProcessorSpecUser} from "src/replace/abProcessorManager"
+import {ABProcessManager} from "src/replace/abProcessorManager"
+import type {ABProcessorSpecUser} from "src/replace/abProcessorInterface"
 import {} from "src/replace/textProcessor"    // 加载所有处理器和选择器
 import {} from "src/replace/listProcessor"    // ^
 import {} from "src/replace/decoProcessor"    // ^

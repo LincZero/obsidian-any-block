@@ -1,5 +1,6 @@
 import { MarkdownRenderer, MarkdownRenderChild } from 'obsidian'
-import {ProcessDataType, ABProcessManager, type ABProcessorSpecSimp} from "./abProcessorManager"
+import {ABProcessManager} from "./abProcessorManager"
+import {ProcessDataType, type ABProcessorSpecSimp} from "./abProcessorInterface"
 
 const process_faq:ABProcessorSpecSimp = {
   id: "faq",
