@@ -1,5 +1,5 @@
 import { MarkdownRenderChild } from "obsidian";
-import { ABProcessManager } from "../replace/abProcessor"
+import { ABProcessManager } from "../replace/abProcessorManager"
 
 export class ReplaceRender extends MarkdownRenderChild {
   content: string;

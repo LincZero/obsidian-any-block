@@ -72,7 +72,7 @@ export class ABProcessManager {
     let prev_result:any = content
     let list_header = header.split("|")
     let prev_type: ProcessDataType = ProcessDataType.text
-    prev_result = run_processor(el, list_header, prev_result, prev_type)
+    prev_result = this.autoABProcessor_runProcessor(el, list_header, prev_result, prev_type)
     
     // 尾处理。如果还是text内容，则给一个md渲染器
     if (prev_type==ProcessDataType.text) {
@@ -84,73 +84,11 @@ export class ABProcessManager {
       prev_result = el
     }
     return prev_result
-
-    // iterable function
-    function run_processor(el:HTMLDivElement, list_header:string[], prev_result:any, prev_type:ProcessDataType):any{
-      // 循环header组，直到遍历完文本处理器或遇到渲染处理器
-      for (let item_header of list_header){
-        for (let abReplaceProcessor of this.list_abProcessor){
-          // 通过header寻找处理器
-          if (typeof(abReplaceProcessor.match)=='string'){if (abReplaceProcessor.match!=item_header) continue}
-          else {if (!abReplaceProcessor.match.test(item_header)) continue}
-          // 检查是否有别名。若是，递归
-          if(abReplaceProcessor.process_alias){
-            // 别名支持引用正则参数
-            let alias = abReplaceProcessor.process_alias
-            ;(()=>{
-              if (abReplaceProcessor.process_alias.indexOf("%")<0) return
-              if (typeof(abReplaceProcessor.match)=="string") return
-              const matchs = item_header.match(abReplaceProcessor.match)
-              if (!matchs) return
-              const len = matchs.length
-              if (len==1) return
-              // replaceAlias
-              for (let i=1; i<len; i++){
-                if (!matchs[i]) continue
-                alias = alias.replace(RegExp(`%${i}`), matchs[i]) /** @bug 按理应该用`(?<!\\)%${i}`，但ob不支持正则的向前查找 */
-              }
-            })()
-            prev_result = run_processor(el, alias.split("|"), prev_result, prev_type)
-          }
-          // 若不是，使用process方法
-          else if(abReplaceProcessor.process){
-            // 检查输入类型
-            if(abReplaceProcessor.process_param != prev_type){
-              if (abReplaceProcessor.process_param==ProcessDataType.el && prev_type==ProcessDataType.text){
-                const subEl = el.createDiv()
-                subEl.addClass("markdown-rendered")
-                const child = new MarkdownRenderChild(subEl);
-                MarkdownRenderer.renderMarkdown(prev_result, subEl, "", child);
-                prev_type = ProcessDataType.el
-                prev_result = el
-              }
-              else{
-                console.warn("处理器参数类型错误", abReplaceProcessor.process_param, prev_type);
-                break
-              }
-            }
-            // 执行处理器
-            prev_result = abReplaceProcessor.process(el, item_header, prev_result)
-            // 检查输出类型
-            if(prev_result instanceof HTMLElement){prev_type = ProcessDataType.el}
-            else if(typeof(prev_result) == "string"){prev_type = ProcessDataType.text}
-            else {
-              console.warn("处理器输出类型错误", abReplaceProcessor.process_param, prev_type);
-              break
-            }
-          }
-          else{
-            console.warn("处理器必须实现process或process_alias方法")
-          }
-        }
-      }
-      return prev_result
-    }
   }
 
   /// 处理器一览表 - 下拉框推荐
   getProcessorOptions(){
-    return list_abProcessor
+    return this.list_abProcessor
     .filter(item=>{
       return item.default
     })
@@ -181,7 +119,7 @@ export class ABProcessManager {
       tr.createEl("td", {text: "定义来源"})
     }
     const tbody = table.createEl("tbody")
-    for (let item of list_abProcessor){
+    for (let item of this.list_abProcessor){
       const tr = tbody.createEl("tr")
       tr.createEl("td", {text: item.name})
       tr.createEl("td", {text: String(item.default)})
@@ -254,5 +192,67 @@ export class ABProcessManager {
       register_from: "用户",
     }
     return abProcessorSpec
+  }
+
+  // iterable function
+  private autoABProcessor_runProcessor(el:HTMLDivElement, list_header:string[], prev_result:any, prev_type:ProcessDataType):any{
+    // 循环header组，直到遍历完文本处理器或遇到渲染处理器
+    for (let item_header of list_header){
+      for (let abReplaceProcessor of this.list_abProcessor){
+        // 通过header寻找处理器
+        if (typeof(abReplaceProcessor.match)=='string'){if (abReplaceProcessor.match!=item_header) continue}
+        else {if (!abReplaceProcessor.match.test(item_header)) continue}
+        // 检查是否有别名。若是，递归
+        if(abReplaceProcessor.process_alias){
+          // 别名支持引用正则参数
+          let alias = abReplaceProcessor.process_alias
+          ;(()=>{
+            if (abReplaceProcessor.process_alias.indexOf("%")<0) return
+            if (typeof(abReplaceProcessor.match)=="string") return
+            const matchs = item_header.match(abReplaceProcessor.match)
+            if (!matchs) return
+            const len = matchs.length
+            if (len==1) return
+            // replaceAlias
+            for (let i=1; i<len; i++){
+              if (!matchs[i]) continue
+              alias = alias.replace(RegExp(`%${i}`), matchs[i]) /** @bug 按理应该用`(?<!\\)%${i}`，但ob不支持正则的向前查找 */
+            }
+          })()
+          prev_result = this.autoABProcessor_runProcessor(el, alias.split("|"), prev_result, prev_type)
+        }
+        // 若不是，使用process方法
+        else if(abReplaceProcessor.process){
+          // 检查输入类型
+          if(abReplaceProcessor.process_param != prev_type){
+            if (abReplaceProcessor.process_param==ProcessDataType.el && prev_type==ProcessDataType.text){
+              const subEl = el.createDiv()
+              subEl.addClass("markdown-rendered")
+              const child = new MarkdownRenderChild(subEl);
+              MarkdownRenderer.renderMarkdown(prev_result, subEl, "", child);
+              prev_type = ProcessDataType.el
+              prev_result = el
+            }
+            else{
+              console.warn("处理器参数类型错误", abReplaceProcessor.process_param, prev_type);
+              break
+            }
+          }
+          // 执行处理器
+          prev_result = abReplaceProcessor.process(el, item_header, prev_result)
+          // 检查输出类型
+          if(prev_result instanceof HTMLElement){prev_type = ProcessDataType.el}
+          else if(typeof(prev_result) == "string"){prev_type = ProcessDataType.text}
+          else {
+            console.warn("处理器输出类型错误", abReplaceProcessor.process_param, prev_type);
+            break
+          }
+        }
+        else{
+          console.warn("处理器必须实现process或process_alias方法")
+        }
+      }
+    }
+    return prev_result
   }
 }

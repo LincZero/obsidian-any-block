@@ -1,4 +1,4 @@
-import {ProcessDataType, ABProcessManager, type ABProcessorSpecSimp} from "./abProcessor"
+import {ProcessDataType, ABProcessManager, type ABProcessorSpecSimp} from "./abProcessorManager"
 
 export const DECOProcessor = 0  // 用于模块化，防报错，其实没啥用
 
