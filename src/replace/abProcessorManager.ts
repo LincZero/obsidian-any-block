@@ -87,40 +87,48 @@ export class ABProcessManager {
   }
 
   /// 用户注册处理器
-  registerABProcessor(process: ABProcessorSpec| ABProcessorSpecSimp| ABProcessorSpecUser){
-    this.list_abProcessor.push(this.adaptToABProcessorSepc(process));
+  registerABProcessor<TInput extends keyof ProcessDataType, TOutput extends keyof ProcessDataType>(
+    process: ABProcessorSpec<TInput, TOutput>| ABProcessorSpecSimp<TInput, TOutput>| ABProcessorSpecUser
+  ){
+    this.list_abProcessor.push(this.adaptToABProcessorSepc<TInput, TOutput>(process));
   }
 
   private static m_instance: ABProcessManager // 单例
 
   /// ab处理器 - 严格版，的接口与列表
-  private list_abProcessor: ABProcessorSpec[] = []
+  private list_abProcessor: ABProcessorSpec<keyof ProcessDataType, keyof ProcessDataType>[] = []
 
   /// 适配器
-  private adaptToABProcessorSepc(process: ABProcessorSpec| ABProcessorSpecSimp| ABProcessorSpecUser): ABProcessorSpec{
+  private adaptToABProcessorSepc<TInput extends keyof ProcessDataType, TOutput extends keyof ProcessDataType>(
+    process: ABProcessorSpec<TInput, TOutput>
+    | ABProcessorSpecSimp<TInput, TOutput>
+    | ABProcessorSpecUser
+  ): ABProcessorSpec<TInput, TOutput>{
     if ('is_disable' in process) { // 严格版 存储版
       return process
     }
     else if ('process' in process) { // 用户版 注册版
-      return this.adaptToABProcessorSepc_simp(process)
+      return this.adaptToABProcessorSepc_simp<TInput, TOutput>(process)
     }
     else { // 别名版 无代码版
-      return this.adaptToABProcessorSepc_user(process)
+      return this.adaptToABProcessorSepc_user<TInput, TOutput>(process)
     }
   }
 
-  private adaptToABProcessorSepc_simp(sim: ABProcessorSpecSimp):ABProcessorSpec{
+  private adaptToABProcessorSepc_simp<TInput extends keyof ProcessDataType, TOutput extends keyof ProcessDataType>(
+    sim: ABProcessorSpecSimp<TInput, TOutput>
+  ):ABProcessorSpec<TInput, TOutput>{
     //type t_param = Parameters<typeof sim.process>
     //type t_return = ReturnType<typeof sim.process>
-    const abProcessorSpec:ABProcessorSpec = {
+    const abProcessorSpec:ABProcessorSpec<TInput, TOutput>= {
       id: sim.id,
       name: sim.name,
       match: sim.match??sim.id,
       default: sim.default??(!sim.match||typeof(sim.match)=="string")?sim.id:null,
       detail: sim.detail??"",
       process_alias: sim.process_alias??"",
-      process_param: sim.process_param??null,
-      process_return: sim.process_return??null,
+      process_param: TInput,
+      process_return: TOutput,
       process: sim.process,
       is_disable: false,
       register_from: "内置",
@@ -128,8 +136,10 @@ export class ABProcessManager {
     return abProcessorSpec
   }
 
-  private adaptToABProcessorSepc_user(sim: ABProcessorSpecUser):ABProcessorSpec{
-    const abProcessorSpec:ABProcessorSpec = {
+  private adaptToABProcessorSepc_user<TInput extends keyof ProcessDataType, TOutput extends keyof ProcessDataType>(
+    sim: ABProcessorSpecUser
+  ):ABProcessorSpec<TInput, TOutput>{
+    const abProcessorSpec:ABProcessorSpec<TInput, TOutput> = {
       id: sim.id,
       name: sim.name,
       match: /^\//.test(sim.match)?RegExp(sim.match):sim.match,
