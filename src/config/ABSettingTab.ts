@@ -1,3 +1,7 @@
+/**
+ * Obsidian 的插件设置页面
+ */
+
 import {App, PluginSettingTab, Setting, Modal} from "obsidian"
 import type AnyBlockPlugin from "../main"
 import {ABProcessManager} from "src/replace/abProcessorManager"

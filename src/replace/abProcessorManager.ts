@@ -6,7 +6,14 @@ import {
   type ABProcessorSpecSimp,
   type ABProcessorSpecUser
 } from './abProcessorInterface'
-
+ 
+/**
+  * 处理器的管理器
+  * 
+  * 单例模式
+  * 
+  * 负责以迭代方式依次使用选择器
+  */
 export class ABProcessManager {
   // 单例模式
   static getInstance(): ABProcessManager {

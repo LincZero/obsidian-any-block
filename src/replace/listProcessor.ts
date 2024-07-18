@@ -1,3 +1,9 @@
+/**
+ * 处理器_列表版
+ * 
+ * 列表 -> html/列表
+ */
+
 import { MarkdownRenderer, MarkdownRenderChild, } from 'obsidian'
 import mermaid from "mermaid"
 import {getID} from "src/utils/utils"

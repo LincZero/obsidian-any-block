@@ -1,3 +1,9 @@
+/**
+ * 处理器_装饰版
+ * 
+ * html -> html
+ */
+
 import {ABProcessManager} from "./abProcessorManager"
 import {ProcessDataType, type ABProcessorSpecSimp} from "./abProcessorInterface"
 

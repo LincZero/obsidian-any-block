@@ -1,3 +1,12 @@
+/**
+ * 入口文件
+ * 
+ * 接管三个处理点：
+ * - 代码块"ab" (代码块)
+ * - cm (实时模式)
+ * - 接管渲染后 (渲染/阅读模式)
+ */
+
 import { Plugin } from "obsidian";
 import { ABCodeblockManager } from "./manager3/abCodeblockManager";
 import { ABStateManager } from "./manager/abStateManager";

@@ -1,3 +1,7 @@
+/**
+ * 处理器_特殊版？
+ */
+
 import { MarkdownRenderer, MarkdownRenderChild } from 'obsidian'
 import {ABProcessManager} from "./abProcessorManager"
 import {ProcessDataType, type ABProcessorSpecSimp} from "./abProcessorInterface"
