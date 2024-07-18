@@ -4,8 +4,8 @@
  * html -> html
  */
 
-import {ABProcessManager} from "./abProcessorManager"
-import {ProcessDataType, type ABProcessorSpecSimp} from "./abProcessorInterface"
+import {ABProcessManager} from "../abProcessorManager"
+import {ProcessDataType, ABProcessorSpec, type ABProcessorSpecSimp} from "./abProcessorInterface"
 
 export const DECOProcessor = 0  // 用于模块化，防报错，其实没啥用
 
@@ -41,7 +41,7 @@ const process_fold:ABProcessorSpecSimp = {
     return el
   }
 }
-ABProcessManager.getInstance().registerABProcessor(process_fold)
+ABProcessorSpec.registerABProcessor(process_fold)
 
 const process_scroll:ABProcessorSpecSimp = {
   id: "scroll",
@@ -76,7 +76,7 @@ const process_scroll:ABProcessorSpecSimp = {
     return el
   }
 }
-ABProcessManager.getInstance().registerABProcessor(process_scroll)
+ABProcessorSpec.registerABProcessor(process_scroll)
 
 const process_overfold:ABProcessorSpecSimp = {
   id: "overfold",
@@ -126,7 +126,7 @@ const process_overfold:ABProcessorSpecSimp = {
     return el
   }
 }
-ABProcessManager.getInstance().registerABProcessor(process_overfold)
+ABProcessorSpec.registerABProcessor(process_overfold)
 
 
 const process_addClass:ABProcessorSpecSimp = {
@@ -145,7 +145,7 @@ const process_addClass:ABProcessorSpecSimp = {
     return el
   }
 }
-ABProcessManager.getInstance().registerABProcessor(process_addClass)
+ABProcessorSpec.registerABProcessor(process_addClass)
 
 const process_addDiv:ABProcessorSpecSimp = {
   id: "addDiv",
@@ -167,7 +167,7 @@ const process_addDiv:ABProcessorSpecSimp = {
     return el
   }
 }
-ABProcessManager.getInstance().registerABProcessor(process_addDiv)
+ABProcessorSpec.registerABProcessor(process_addDiv)
 
 const process_heimu:ABProcessorSpecSimp = {
   id: "heimu",
@@ -176,7 +176,7 @@ const process_heimu:ABProcessorSpecSimp = {
   process_alias: "addClass(ab-deco-heimu)",
   process: (el, header, content)=>{}
 }
-ABProcessManager.getInstance().registerABProcessor(process_heimu)
+ABProcessorSpec.registerABProcessor(process_heimu)
 
 const process_title:ABProcessorSpecSimp = {
   id: "title",
@@ -228,4 +228,4 @@ const process_title:ABProcessorSpecSimp = {
     return el
   }
 }
-ABProcessManager.getInstance().registerABProcessor(process_title)
+ABProcessorSpec.registerABProcessor(process_title)

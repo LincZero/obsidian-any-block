@@ -3,8 +3,8 @@
  */
 
 import { MarkdownRenderer, MarkdownRenderChild } from 'obsidian'
-import {ABProcessManager} from "./abProcessorManager"
-import {ProcessDataType, type ABProcessorSpecSimp} from "./abProcessorInterface"
+import {ABProcessManager} from "../abProcessorManager"
+import {ProcessDataType, ABProcessorSpec, type ABProcessorSpecSimp} from "./abProcessorInterface"
 
 const process_faq:ABProcessorSpecSimp = {
   id: "faq",
@@ -50,4 +50,4 @@ const process_faq:ABProcessorSpecSimp = {
     return el
   }
 }
-ABProcessManager.getInstance().registerABProcessor(process_faq)
+ABProcessorSpec.registerABProcessor(process_faq)

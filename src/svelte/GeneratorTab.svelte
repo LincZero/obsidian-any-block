@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { MarkdownRenderer, MarkdownRenderChild } from 'obsidian'
-  import type {List_ListInfo} from "src/replace/listProcess"
+  import type {List_ListInfo} from "src/ab_converter/converter/listProcess"
 
   export let list_itemInfo:List_ListInfo;
   export let modeT:boolean;
