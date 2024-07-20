@@ -22,24 +22,34 @@ export default class AnyBlockPlugin extends Plugin {
     await this.loadSettings();
     this.addSettingTab(new ABSettingTab(this.app, this));
 
-    // 代码块
+    // 钩子组1 - 代码块
     this.registerMarkdownCodeBlockProcessor("ab", ABCodeblockManager.processor);
     
-    // 非渲染模式 cm扩展 - StateField
-    // 刚开插件时和每次打开文件时都运行
-    let abm: ABStateManager|null
-    this.app.workspace.onLayoutReady(()=>{
-      abm?.destructor();
-      abm = new ABStateManager(this)
-    })
-    this.registerEvent(
-      this.app.workspace.on('file-open', (fileObj) => {
+    // 钩子组2 - 非渲染模式 cm扩展 - StateField
+    {
+      let abm: ABStateManager|null
+      // 刚启动插件时触发
+      this.app.workspace.onLayoutReady(()=>{
         abm?.destructor();
         abm = new ABStateManager(this)
       })
-    );
+      // 新打开文件，和两个不同的已经打开文件标签页之前切换会触发
+      this.registerEvent(
+        this.app.workspace.on('file-open', (fileObj) => {
+          abm?.destructor();
+          abm = new ABStateManager(this)
+        })
+      )
+      // 新打开文件，以及切换聚焦布局触发。修复 Obsidian V1.5.8 导致的bug，之前版本不需要这个
+      this.registerEvent(
+        this.app.workspace.on('layout-change', () => {
+          abm?.destructor();
+          abm = new ABStateManager(this)
+        })
+      )
+    }
 
-    // 渲染模式 后处理器
+    // 钩子组3 - 渲染模式 后处理器
     const htmlProcessor = ABPosthtmlManager.processor.bind(this)
     this.registerMarkdownPostProcessor(htmlProcessor);
   }
