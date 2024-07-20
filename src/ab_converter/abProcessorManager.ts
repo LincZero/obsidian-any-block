@@ -138,7 +138,7 @@ export class ABProcessManager {
               prev_result = el
             }
             else{
-              console.warn("处理器参数类型错误", abReplaceProcessor.process_param, prev_type);
+              console.warn("处理器参数类型错误", abReplaceProcessor.id, abReplaceProcessor.process_param, prev_type);
               break
             }
           }
@@ -148,7 +148,7 @@ export class ABProcessManager {
           if(prev_result instanceof HTMLElement){prev_type = ProcessDataType.el}
           else if(typeof(prev_result) == "string"){prev_type = ProcessDataType.text}
           else {
-            console.warn("处理器输出类型错误", abReplaceProcessor.process_param, prev_type);
+            console.warn("处理器输出类型错误", abReplaceProcessor.id, abReplaceProcessor.process_param, prev_type);
             break
           }
         }

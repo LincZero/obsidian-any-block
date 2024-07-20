@@ -33,11 +33,11 @@ enum Editor_mode{
 export class ABStateManager{
   plugin_this: AnyBlockPlugin
   replace_this = this
-  view: View
-  editor: Editor
-  editorView: EditorView
-  editorState: EditorState
-  initialFileName: String // 固定为构造时的名字
+  view: View                // Ob View
+  editor: Editor            // Ob Editor
+  editorView: EditorView    // CM View
+  editorState: EditorState  // CM State
+  initialFileName: String   // 固定为构造时的名字
 
   // 用于防止频繁刷新，true->true/false->false，不大刷新，false->true/true->false，大刷新
   is_prev_cursor_in:boolean
@@ -50,17 +50,19 @@ export class ABStateManager{
 
   constructor(plugin_this: AnyBlockPlugin){
     this.plugin_this=plugin_this
-    // 因为打开文档会触发，所以后台打开的文档会return false
-    if (this.init()) this.setStateEffects()
-    console.log(">>> ABStateManager, initialFileName:", this.initialFileName)
+    // 因为打开文档会触发，所以后台打开的文档会return false，聚焦到一个非文件的新标签页也会return false
+    let ret = this.init()
+
+    console.log(">>> ABStateManager, initialFileName:", this.initialFileName, "initRet:", ret)
+
+    if (ret) this.setStateEffects()
   }
 
   destructor() {
-    // @ts-ignore 这里会说View没有file属性
     console.log("<<< ABStateManager, initialFileName:", this.initialFileName)
   }
 
-  /** 设置常用变量 */
+  // 设置常用变量
   private init() {
     const view: View|null = this.plugin_this.app.workspace.getActiveViewOfType(MarkdownView); // 未聚焦(active)会返回null
     if (!view) return false
@@ -79,11 +81,12 @@ export class ABStateManager{
     return true
   }
 
-  /** 设置初始状态字段并派发 */
+  // 设置初始状态字段并派发
   private setStateEffects() {
     let stateEffects: StateEffect<unknown>[] = []
   
-    /** 修改StateEffect1 - 加入StateField、css样式
+    /**
+     * 修改StateEffect1 - 加入StateField、css样式
      * 当EditorState没有(下划线)StateField时，则将该(下划线)状态字段 添加进 EditorEffect中
      *    （函数末尾再将EditorEffect派发到EditorView中）。
      * 就是说只会在第一次时执行，才会触发
@@ -97,7 +100,7 @@ export class ABStateManager{
       ))
     }
   
-    /** 派发 */
+    // 派发
     this.editorView.dispatch({effects: stateEffects})
     return true
   }
@@ -184,7 +187,8 @@ export class ABStateManager{
     }
   }
 
-  /** 装饰调整（删增改），包起来准备防抖 
+  /**
+   * 装饰调整（删增改），包起来准备防抖 
    * 小刷新：位置映射（每次都会刷新）
    * 大刷新：全部元素删掉再重新创建（避免频繁大刷新）
    * _
