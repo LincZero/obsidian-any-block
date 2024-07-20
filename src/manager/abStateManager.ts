@@ -32,11 +32,12 @@ enum Editor_mode{
  */
 export class ABStateManager{
   plugin_this: AnyBlockPlugin
-  replace_this=this
+  replace_this = this
   view: View
   editor: Editor
   editorView: EditorView
   editorState: EditorState
+  initialFileName: String // 固定为构造时的名字
 
   // 用于防止频繁刷新，true->true/false->false，不大刷新，false->true/true->false，大刷新
   is_prev_cursor_in:boolean
@@ -51,12 +52,12 @@ export class ABStateManager{
     this.plugin_this=plugin_this
     // 因为打开文档会触发，所以后台打开的文档会return false
     if (this.init()) this.setStateEffects()
-
-    console.log(">>> ABStateManager")
+    console.log(">>> ABStateManager, initialFileName:", this.initialFileName)
   }
 
   destructor() {
-    console.log("<<< ABStateManager")
+    // @ts-ignore 这里会说View没有file属性
+    console.log("<<< ABStateManager, initialFileName:", this.initialFileName)
   }
 
   /** 设置常用变量 */
@@ -64,6 +65,8 @@ export class ABStateManager{
     const view: View|null = this.plugin_this.app.workspace.getActiveViewOfType(MarkdownView); // 未聚焦(active)会返回null
     if (!view) return false
     this.view = view
+    // @ts-ignore 这里会说View没有file属性
+    this.initialFileName = this.view.file.basename
     // @ts-ignore 这里会说View没有editor属性
     this.editor = this.view.editor
     // @ts-ignore 这里会说Editor没有cm属性
