@@ -32,6 +32,8 @@ export class ABPosthtmlManager{
     el: HTMLElement, 
     ctx: MarkdownPostProcessorContext
   ) {
+    console.log(" -- ABPosthtmlManager.processor")
+
     // 设置里不启用，直接关了
     if (this.settings.decoration_render==ConfDecoration.none) return
 
@@ -80,7 +82,7 @@ function findABBlock_recurve(targetEl: HTMLElement){
   }*/
 
   // replaceABBlock(targetEl, ctx)
-  console.log("准备再渲染", targetEl)
+  // console.log("hook 准备再渲染", targetEl)
   for(let i=0; i<targetEl.children.length; i++){  // start form 0，因为可以递归，该层不一定需要header
     const contentEl = targetEl.children[i] as HTMLDivElement
     let headerEl
@@ -102,9 +104,9 @@ function findABBlock_recurve(targetEl: HTMLElement){
     )) continue
     
     // 寻找头部
-    console.log("寻找头部")
+    // console.log("hook 寻找头部")
     if(i==0 || !(headerEl instanceof HTMLParagraphElement)) {
-      console.log("没有头部")
+      // console.log("hook 没有头部")
       if(contentEl instanceof HTMLUListElement
         || contentEl instanceof HTMLQuoteElement
       ) findABBlock_recurve(contentEl);

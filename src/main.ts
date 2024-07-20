@@ -27,12 +27,15 @@ export default class AnyBlockPlugin extends Plugin {
     
     // 非渲染模式 cm扩展 - StateField
     // 刚开插件时和每次打开文件时都运行
+    let abm: ABStateManager|null
     this.app.workspace.onLayoutReady(()=>{
-      new ABStateManager(this)
+      abm?.destructor();
+      abm = new ABStateManager(this)
     })
     this.registerEvent(
       this.app.workspace.on('file-open', (fileObj) => {
-        new ABStateManager(this)
+        abm?.destructor();
+        abm = new ABStateManager(this)
       })
     );
 

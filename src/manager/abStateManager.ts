@@ -51,6 +51,12 @@ export class ABStateManager{
     this.plugin_this=plugin_this
     // 因为打开文档会触发，所以后台打开的文档会return false
     if (this.init()) this.setStateEffects()
+
+    console.log(">>> ABStateManager")
+  }
+
+  destructor() {
+    console.log("<<< ABStateManager")
   }
 
   /** 设置常用变量 */
