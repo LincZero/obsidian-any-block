@@ -4,7 +4,7 @@
 
 import {App, PluginSettingTab, Setting, Modal} from "obsidian"
 import type AnyBlockPlugin from "../main"
-import {ABProcessManager} from "src/ab_converter/abProcessorManager"
+import {ABConvertManager} from "src/ab_converter/abConvertManager"
 import {ABProcessorSpec, type ABProcessorSpecUser} from "src/ab_converter/converter/abProcessorInterface"
 import {} from "src/ab_converter/converter/textProcessor"    // 加载所有处理器和选择器
 import {} from "src/ab_converter/converter/listProcessor"    // ^
@@ -139,11 +139,11 @@ export class ABSettingTab extends PluginSettingTab {
             settings.user_processor.push(result)
             await this.plugin.saveSettings();
             this.processorPanel.remove()
-            this.processorPanel = ABProcessManager.getInstance().generateProcessorInfoTable(containerEl)
+            this.processorPanel = ABConvertManager.getInstance().generateProcessorInfoTable(containerEl)
           }).open()
         })
       })
-    this.processorPanel = ABProcessManager.getInstance().generateProcessorInfoTable(containerEl)
+    this.processorPanel = ABConvertManager.getInstance().generateProcessorInfoTable(containerEl)
 	}
 }
 

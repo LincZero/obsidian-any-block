@@ -1,6 +1,6 @@
 import {MarkdownRenderChild, MarkdownRenderer} from 'obsidian';
 
-import {ABProcessManager} from "../abProcessorManager"
+import {ABConvertManager} from "../abConvertManager"
 import {ProcessDataType, ABProcessorSpec, type ABProcessorSpecSimp} from "./abProcessorInterface"
 import {ABReg} from "src/config/abReg"
 import {ListProcess} from "./listProcessor"

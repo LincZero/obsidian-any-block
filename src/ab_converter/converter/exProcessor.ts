@@ -3,7 +3,7 @@
  */
 
 import { MarkdownRenderer, MarkdownRenderChild } from 'obsidian'
-import {ABProcessManager} from "../abProcessorManager"
+import {ABConvertManager} from "../abConvertManager"
 import {ProcessDataType, ABProcessorSpec, type ABProcessorSpecSimp} from "./abProcessorInterface"
 
 const process_faq:ABProcessorSpecSimp = {

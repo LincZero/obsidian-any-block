@@ -1,7 +1,7 @@
 import type {Editor, EditorPosition} from 'obsidian';
 import {EditorView, WidgetType} from "@codemirror/view"
 
-import {ABProcessManager} from "../ab_converter/abProcessorManager"
+import {ABConvertManager} from "../ab_converter/abConvertManager"
 import type {MdSelectorRangeSpec} from "./abMdSelector"
 
 export class ABReplaceWidget extends WidgetType {
@@ -28,7 +28,7 @@ export class ABReplaceWidget extends WidgetType {
 
     // 内容替换元素
     let dom_note = this.div.createEl("div", {cls: ["ab-note", "drop-shadow"]});
-    ABProcessManager.getInstance().autoABProcessor(dom_note, this.rangeSpec.header, this.rangeSpec.content)
+    ABConvertManager.autoABProcessor(dom_note, this.rangeSpec.header, this.rangeSpec.content)
 
     // 编辑按钮
     if (this.global_editor){

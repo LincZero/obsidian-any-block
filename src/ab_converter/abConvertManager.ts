@@ -10,42 +10,32 @@ import {
 /**
   * 处理器的管理器
   * 
-  * 单例模式
-  * 
-  * 负责以迭代方式依次使用选择器
+  * @default
+  * 单例模式 
+  * 负责转换器的：注册、寻找、依次使用
   */
-export class ABProcessManager {
-  // 单例模式
-  static getInstance(): ABProcessManager {
-    if (!ABProcessManager.m_instance) {
-      ABProcessManager.m_instance = new ABProcessManager();
+export class ABConvertManager {
+
+  /** --------------------------------- 特殊函数 ---------------------------- */
+
+  /// 构造函数，单例模式
+  static getInstance(): ABConvertManager {
+    if (!ABConvertManager.m_instance) {
+      ABConvertManager.m_instance = new ABConvertManager();
     }
-    return ABProcessManager.m_instance;
-  }
-  
-  /** 自动寻找相匹配的ab处理器进行处理
-   * ab处理器能根据header和content来转化文本或生成dom元素
-   */
-  public autoABProcessor(el:HTMLDivElement, header:string, content:string):HTMLElement{
-    let prev_result:any = content
-    let list_header = header.split("|")
-    let prev_type: ProcessDataType = ProcessDataType.text
-    prev_result = this.autoABProcessor_runProcessor(el, list_header, prev_result, prev_type)
-    
-    // 尾处理。如果还是text内容，则给一个md渲染器
-    if (prev_type==ProcessDataType.text) {
-      const subEl = el.createDiv()
-      subEl.addClass("markdown-rendered")
-      const child = new MarkdownRenderChild(subEl);
-      MarkdownRenderer.renderMarkdown(prev_result, subEl, "", child);
-      prev_type = ProcessDataType.el
-      prev_result = el
-    }
-    return prev_result
+    return ABConvertManager.m_instance;
   }
 
+  /// 单例
+  private static m_instance: ABConvertManager
+
+  /** --------------------------------- 处理器容器管理 --------------------- */
+
+  /// ab处理器 - 严格版，的接口与列表
+  public list_abProcessor: ABProcessorSpec[] = []
+
   /// 处理器一览表 - 下拉框推荐
-  getProcessorOptions(){
+  public getProcessorOptions(){
     return this.list_abProcessor
     .filter(item=>{
       return item.default
@@ -56,7 +46,7 @@ export class ABProcessManager {
   }
 
   /// 处理器一览表 - 全部信息
-  generateProcessorInfoTable(el: HTMLElement){
+  public generateProcessorInfoTable(el: HTMLElement){
     const table_p = el.createEl("div",{
       cls: ["ab-setting","md-table-fig1"]
     })
@@ -93,16 +83,39 @@ export class ABProcessManager {
     return table_p
   }
 
-  private static m_instance: ABProcessManager // 单例
+  /** --------------------------------- 处理器的调用 ----------------------- */
+  
+  /**
+   * 自动寻找相匹配的ab处理器进行处理
+   * 
+   * @detail ab转换器能根据header和content来将有段txt文本转换为html元素
+   * 
+   * @param el 最后的渲染结果
+   * @param header 转换方式
+   * @param content 要转换的初始文本
+   */
+  public static autoABProcessor(el:HTMLDivElement, header:string, content:string):HTMLElement{
+    let prev_result:any = content
+    let list_header = header.split("|")
+    let prev_type: ProcessDataType = ProcessDataType.text
+    prev_result = this.autoABProcessor_runProcessor(el, list_header, prev_result, prev_type)
+    
+    // 尾处理。如果还是text内容，则给一个md渲染器
+    if (prev_type == ProcessDataType.text) {
+      const subEl = el.createDiv()
+      subEl.addClass("markdown-rendered")
+      const child = new MarkdownRenderChild(subEl);
+      MarkdownRenderer.renderMarkdown(prev_result, subEl, "", child);
+      prev_type = ProcessDataType.el
+      prev_result = el
+    }
+    return prev_result
+  }
 
-  /// ab处理器 - 严格版，的接口与列表
-  public list_abProcessor: ABProcessorSpec[] = []
-
-  // iterable function
-  private autoABProcessor_runProcessor(el:HTMLDivElement, list_header:string[], prev_result:any, prev_type:ProcessDataType):any{
+  private static autoABProcessor_runProcessor(el:HTMLDivElement, list_header:string[], prev_result:any, prev_type:ProcessDataType):any{
     // 循环header组，直到遍历完文本处理器或遇到渲染处理器
     for (let item_header of list_header){
-      for (let abReplaceProcessor of this.list_abProcessor){
+      for (let abReplaceProcessor of ABConvertManager.getInstance().list_abProcessor){
         // 通过header寻找处理器
         if (typeof(abReplaceProcessor.match)=='string'){if (abReplaceProcessor.match!=item_header) continue}
         else {if (!abReplaceProcessor.match.test(item_header)) continue}

@@ -4,7 +4,7 @@
  * html -> html
  */
 
-import {ABProcessManager} from "../abProcessorManager"
+import {ABConvertManager} from "../abConvertManager"
 import {ProcessDataType, ABProcessorSpec, type ABProcessorSpecSimp} from "./abProcessorInterface"
 
 export const DECOProcessor = 0  // 用于模块化，防报错，其实没啥用
