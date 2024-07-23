@@ -6,7 +6,7 @@ import { MarkdownRenderer, MarkdownRenderChild } from 'obsidian'
 import {ABConvertManager} from "../abConvertManager"
 import {ProcessDataType, ABProcessorSpec, type ABProcessorSpecSimp} from "./abProcessorInterface"
 
-const process_faq:ABProcessorSpecSimp = {
+const process_faq = ABProcessorSpec.factory({
   id: "faq",
   name: "FAQ",
   match: "FAQ",
@@ -49,5 +49,4 @@ const process_faq:ABProcessorSpecSimp = {
     }
     return el
   }
-}
-ABProcessorSpec.registerABProcessor(process_faq)
+})

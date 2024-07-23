@@ -19,7 +19,7 @@ export const mermaid_init = async () => {
  * 2. 让处理器能互相调用
  */
 
-const process_md:ABProcessorSpecSimp = {
+const process_md = ABProcessorSpec.factory({
   id: "md",
   name: "md",
   process_param: ProcessDataType.text,
@@ -32,10 +32,9 @@ const process_md:ABProcessorSpecSimp = {
     // ctx.addChild(child);
     return el
   }
-}
-ABProcessorSpec.registerABProcessor(process_md)
+})
 
-const process_quote:ABProcessorSpecSimp = {
+const process_quote = ABProcessorSpec.factory({
   id: "quote",
   name: "增加引用块",
   process_param: ProcessDataType.text,
@@ -43,10 +42,9 @@ const process_quote:ABProcessorSpecSimp = {
   process: (el, header, content)=>{
     return content.split("\n").map((line)=>{return "> "+line}).join("\n")
   }
-}
-ABProcessorSpec.registerABProcessor(process_quote)
+})
 
-const process_code:ABProcessorSpecSimp = {
+const process_code = ABProcessorSpec.factory({
   id: "code",
   name: "增加代码块",
   match: /^code(\((.*)\))?$/,
@@ -60,10 +58,9 @@ const process_code:ABProcessorSpecSimp = {
     if (matchs[1]) content = matchs[2]+"\n"+content
     return "```"+content+"\n```"
   }
-}
-ABProcessorSpec.registerABProcessor(process_code)
+})
 
-const process_Xquote:ABProcessorSpecSimp = {
+const process_Xquote = ABProcessorSpec.factory({
   id: "Xquote",
   name: "去除引用块",
   process_param: ProcessDataType.text,
@@ -73,10 +70,9 @@ const process_Xquote:ABProcessorSpecSimp = {
       return line.replace(/^>\s/, "")
     }).join("\n")
   }
-}
-ABProcessorSpec.registerABProcessor(process_Xquote)
+})
 
-const process_Xcode:ABProcessorSpecSimp = {
+const process_Xcode = ABProcessorSpec.factory({
   id: "Xcode",
   name: "去除代码块",
   match: /^Xcode(\((true|false)\))?$/,
@@ -118,10 +114,9 @@ const process_Xcode:ABProcessorSpecSimp = {
     }
     return content
   }
-}
-ABProcessorSpec.registerABProcessor(process_Xcode)
+})
 
-const process_X:ABProcessorSpecSimp = {
+const process_X = ABProcessorSpec.factory({
   id: "X",
   name: "去除代码或引用块",
   process_param: ProcessDataType.text,
@@ -136,18 +131,16 @@ const process_X:ABProcessorSpecSimp = {
     else if (flag=="quote") return process_Xquote.process(el, header, content)
     return content
   }
-}
-ABProcessorSpec.registerABProcessor(process_X)
+})
 
-const process_code2quote:ABProcessorSpecSimp = {
+const process_code2quote = ABProcessorSpec.factory({
   id: "code2quote",
   name: "代码转引用块",
   process_alias: "Xcode|quote",
   process: ()=>{}
-}
-ABProcessorSpec.registerABProcessor(process_code2quote)
+})
 
-const process_quote2code:ABProcessorSpecSimp = {
+const process_quote2code = ABProcessorSpec.factory({
   id: "quote2code",
   name: "引用转代码块",
   match: /^quote2code(\((.*)\))?$/,
@@ -161,10 +154,9 @@ const process_quote2code:ABProcessorSpecSimp = {
     content = text_code(content)
     return content*/
   }
-}
-ABProcessorSpec.registerABProcessor(process_quote2code)
+})
 
-const process_slice:ABProcessorSpecSimp = {
+const process_slice = ABProcessorSpec.factory({
   id: "slice",
   name: "切片",
   match: /^slice\((\s*\d+\s*?)(,\s*-?\d+\s*)?\)$/,
@@ -187,10 +179,9 @@ const process_slice:ABProcessorSpecSimp = {
       return content.split("\n").slice(arg1, arg2).join("\n")
     }
   }
-}
-ABProcessorSpec.registerABProcessor(process_slice)
+})
 
-const process_add:ABProcessorSpecSimp = {
+const process_add = ABProcessorSpec.factory({
   id: "add",
   name: "增添内容",
   match: /^add\((.*?)(,\s*-?\d+\s*)?\)$/,
@@ -219,10 +210,9 @@ const process_add:ABProcessorSpecSimp = {
     }
     return list_content.join("\n")
   }
-}
-ABProcessorSpec.registerABProcessor(process_add)
+})
 
-const process_title2list:ABProcessorSpecSimp = {
+const process_title2list = ABProcessorSpec.factory({
   id: "title2list",
   name: "标题到列表",
   process_param: ProcessDataType.text,
@@ -232,10 +222,9 @@ const process_title2list:ABProcessorSpecSimp = {
     content = ListProcess.title2list(content, el)
     return content
   }
-}
-ABProcessorSpec.registerABProcessor(process_title2list)
+})
 
-const process_title2table:ABProcessorSpecSimp = {
+const process_title2table = ABProcessorSpec.factory({
   id: "title2table",
   name: "标题到表格",
   process_param: ProcessDataType.text,
@@ -245,10 +234,9 @@ const process_title2table:ABProcessorSpecSimp = {
     ListProcess.list2table(content, el)
     return el
   }
-}
-ABProcessorSpec.registerABProcessor(process_title2table)
+})
 
-const process_title2mindmap:ABProcessorSpecSimp = {
+const process_title2mindmap = ABProcessorSpec.factory({
   id: "title2mindmap",
   name: "标题到脑图",
   process_param: ProcessDataType.text,
@@ -258,10 +246,9 @@ const process_title2mindmap:ABProcessorSpecSimp = {
     ListProcess.list2mindmap(content, el)
     return el
   }
-}
-ABProcessorSpec.registerABProcessor(process_title2mindmap)
+})
 
-const process_listroot:ABProcessorSpecSimp = {
+const process_listroot = ABProcessorSpec.factory({
   id: "listroot",
   name: "增加列表根",
   match: /^listroot\((.*)\)$/,
@@ -276,10 +263,9 @@ const process_listroot:ABProcessorSpecSimp = {
     content = "- "+arg1+"\n"+content
     return content
   }
-}
-ABProcessorSpec.registerABProcessor(process_listroot)
+})
 
-const process_listXinline:ABProcessorSpecSimp = {
+const process_listXinline = ABProcessorSpec.factory({
   id: "listXinline",
   name: "列表消除内联换行",
   process_param: ProcessDataType.text,
@@ -287,10 +273,9 @@ const process_listXinline:ABProcessorSpecSimp = {
   process: (el, header, content)=>{
     return ListProcess.listXinline(content)
   }
-}
-ABProcessorSpec.registerABProcessor(process_listXinline)
+})
 
-const process_list2table:ABProcessorSpecSimp = {
+const process_list2table = ABProcessorSpec.factory({
   id: "list2table",
   name: "列表转表格",
   match: /list2(md)?table(T)?/,
@@ -303,10 +288,9 @@ const process_list2table:ABProcessorSpecSimp = {
     ListProcess.list2table(content, el, matchs[2]=="T")
     return el
   }
-}
-ABProcessorSpec.registerABProcessor(process_list2table)
+})
 
-const process_list2lt:ABProcessorSpecSimp = {
+const process_list2lt = ABProcessorSpec.factory({
   id: "list2lt",
   name: "列表转列表表格",
   match: /list2(md)?lt(T)?/,
@@ -319,10 +303,9 @@ const process_list2lt:ABProcessorSpecSimp = {
     ListProcess.list2lt(content, el, matchs[2]=="T")
     return el
   }
-}
-ABProcessorSpec.registerABProcessor(process_list2lt)
+})
 
-const process_list2folder:ABProcessorSpecSimp = {
+const process_list2folder = ABProcessorSpec.factory({
   id: "list2folder",
   name: "列表转树状目录",
   match: /list2(md)?folder(T)?/,
@@ -335,10 +318,9 @@ const process_list2folder:ABProcessorSpecSimp = {
     ListProcess.list2folder(content, el, matchs[2]=="T")
     return el
   }
-}
-ABProcessorSpec.registerABProcessor(process_list2lt)
+})
 
-const process_list2ut:ABProcessorSpecSimp = {
+const process_list2ut = ABProcessorSpec.factory({
   id: "list2ut",
   name: "列表转二维表格",
   match: /list2(md)?ut(T)?/,
@@ -351,10 +333,9 @@ const process_list2ut:ABProcessorSpecSimp = {
     ListProcess.list2ut(content, el, matchs[2]=="T")
     return el
   }
-}
-ABProcessorSpec.registerABProcessor(process_list2ut)
+})
 
-const process_list2timeline:ABProcessorSpecSimp = {
+const process_list2timeline = ABProcessorSpec.factory({
   id: "list2timeline",
   name: "一级列表转时间线",
   match: /list2(md)?timeline(T)?/,
@@ -367,10 +348,9 @@ const process_list2timeline:ABProcessorSpecSimp = {
     ListProcess.list2timeline(content, el, matchs[2]=="T")
     return el
   }
-}
-ABProcessorSpec.registerABProcessor(process_list2timeline)
+})
 
-const process_list2tab:ABProcessorSpecSimp = {
+const process_list2tab = ABProcessorSpec.factory({
   id: "list2tab",
   name: "一级列表转标签栏",
   match: /list2(md)?tab(T)?$/,
@@ -383,10 +363,9 @@ const process_list2tab:ABProcessorSpecSimp = {
     ListProcess.list2tab(content, el, matchs[2]=="T")
     return el
   }
-}
-ABProcessorSpec.registerABProcessor(process_list2tab)
+})
 
-const process_list2mermaid:ABProcessorSpecSimp = {
+const process_list2mermaid = ABProcessorSpec.factory({
   id: "list2mermaid",
   name: "列表转mermaid流程图",
   process_param: ProcessDataType.text,
@@ -395,10 +374,9 @@ const process_list2mermaid:ABProcessorSpecSimp = {
     ListProcess.list2mermaid(content, el)
     return el
   }
-}
-ABProcessorSpec.registerABProcessor(process_list2mermaid)
+})
 
-const process_list2mindmap:ABProcessorSpecSimp = {
+const process_list2mindmap = ABProcessorSpec.factory({
   id: "list2mindmap",
   name: "列表转mermaid思维导图",
   process_param: ProcessDataType.text,
@@ -407,10 +385,9 @@ const process_list2mindmap:ABProcessorSpecSimp = {
     ListProcess.list2mindmap(content, el)
     return el
   }
-}
-ABProcessorSpec.registerABProcessor(process_list2mindmap)
+})
 
-const process_callout:ABProcessorSpecSimp = {
+const process_callout = ABProcessorSpec.factory({
   id: "callout",
   name: "callout语法糖",
   match: /^\!/,
@@ -421,10 +398,9 @@ const process_callout:ABProcessorSpecSimp = {
   process: (el, header, content)=>{
     return "```ad-"+header.slice(1)+"\n"+content+"\n```"
   }
-}
-ABProcessorSpec.registerABProcessor(process_callout)
+})
 
-const process_mermaid:ABProcessorSpecSimp = {
+const process_mermaid = ABProcessorSpec.factory({
   id: "mermaid",
   name: "新mermaid",
   match: /^mermaid(\((.*)\))?$/,
@@ -445,10 +421,9 @@ const process_mermaid:ABProcessorSpecSimp = {
     })(el, header, content)
     return el
   }
-}
-ABProcessorSpec.registerABProcessor(process_mermaid)
+})
 
-const process_text:ABProcessorSpecSimp = {
+const process_text = ABProcessorSpec.factory({
   id: "text",
   name: "纯文本",
   detail: "其实一般会更推荐用code()代替，那个更精确",
@@ -460,5 +435,4 @@ const process_text:ABProcessorSpecSimp = {
     el.innerHTML = `<p>${content.replace(/ /g, "&nbsp;").split("\n").join("<br/>")}</p>`
     return el
   }
-}
-ABProcessorSpec.registerABProcessor(process_text)
+})

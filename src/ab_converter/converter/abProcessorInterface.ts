@@ -26,8 +26,9 @@ export class ABProcessorSpec {
   process_param: ProcessDataType|null
   process_return: ProcessDataType|null
   process: (el:HTMLDivElement, header:string, content:string)=> any
-  is_disable: boolean       // 是否禁用，默认false
-  register_from: string     // 自带、其他插件、面板设置，如果是其他插件，则需要提供插件的名称（不知道能不能自动识别）
+  is_disable: boolean = false     // 是否禁用，默认false
+  register_from: string = "内置"  // 自带、其他插件、面板设置，如果是其他插件，则需要提供插件的名称（不知道能不能自动识别）
+                                  // TODO，这个词条应该修改成 “作者名” 鼓励二次开发
 
   /** --------------------------------- 动态参数 -------------------------- */
 
@@ -37,14 +38,65 @@ export class ABProcessorSpec {
 
   /** --------------------------------- 特殊函数 -------------------------- */
 
+  /// 构造 + 容器管理
+  public static factory(process: ABProcessorSpecSimp| ABProcessorSpecUser): ABProcessorSpec {
+    let ret: ABProcessorSpec = new ABProcessorSpec(process)
+    ABConvertManager.getInstance().list_abConvert.push(ret)
+    return ret 
+  }
+
+  /// 构造函数
   /// TODO 应该将注册修改为创建实例，因为里面有动态参数
+  /// TODO id冲突提醒
+  /// TODO 别名功能删除，由独立的别名模块负责，不集成在转换器里 
+  /// (优点是转换器功能保持单一性和可复用性，二是允许无代码设置别名，缺点是二次开发者需要多注册一次或独立设置转换器)
+  constructor(process: ABProcessorSpecSimp| ABProcessorSpecUser) {
+    // 注册版
+    if ('process' in process) {
+      this.constructor_simp(process)
+    }
+    // 别名版
+    else {
+      this.constructor_user(process)
+    }
+  }
 
-  //constructor() {}
+  constructor_simp(sim: ABProcessorSpecSimp) {
+    this.id = sim.id
+    this.name = sim.name
+    this.match = sim.match??sim.id
+    this.default = sim.default??(!sim.match||typeof(sim.match)=="string")?sim.id:null
+    this.detail = sim.detail??""
+    this.process_alias = sim.process_alias??""
+    this.process_param = sim.process_param??null
+    this.process_return = sim.process_return??null
+    this.process = sim.process
+    this.is_disable = false
+    this.register_from = "内置"
+  }
 
-  //destructor() {}
+  constructor_user(sim: ABProcessorSpecUser) {
+    this.id = sim.id
+    this.name = sim.name
+    this.match = /^\//.test(sim.match)?RegExp(sim.match):sim.match
+    this.default = null
+    this.detail = ""
+    this.process_alias = sim.process_alias
+    this.process_param = null
+    this.process_return = null
+    this.process = ()=>{}
+    this.is_disable = false
+    this.register_from = "用户"
+  }
+
+  /// 析构函数
+  destructor() {
+    ABConvertManager.getInstance().list_abConvert.remove(this)
+  }
   
-  /** --------------------------------- 处理器容器管理 --------------------- */
+  /** --------------------------------- 处理器容器管理 (旧) --------------- */
 
+  /*
   /// 用户注册处理器
   public static registerABProcessor(process: ABProcessorSpec| ABProcessorSpecSimp| ABProcessorSpecUser){
     ABConvertManager.getInstance().list_abConvert.push(ABProcessorSpec.registerABProcessor_adapt(process));
@@ -97,6 +149,7 @@ export class ABProcessorSpec {
     }
     return abProcessorSpec
   }
+  */
 }
 
 /**

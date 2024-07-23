@@ -9,7 +9,7 @@ import {ProcessDataType, ABProcessorSpec, type ABProcessorSpecSimp} from "./abPr
 
 export const DECOProcessor = 0  // 用于模块化，防报错，其实没啥用
 
-const process_fold:ABProcessorSpecSimp = {
+const process_fold = ABProcessorSpec.factory({
   id: "fold",
   name: "折叠",
   process_param: ProcessDataType.el,
@@ -40,10 +40,9 @@ const process_fold:ABProcessorSpecSimp = {
     mid_el.appendChild(sub_el)
     return el
   }
-}
-ABProcessorSpec.registerABProcessor(process_fold)
+})
 
-const process_scroll:ABProcessorSpecSimp = {
+const process_scroll = ABProcessorSpec.factory({
   id: "scroll",
   name: "滚动",
   match: /^scroll(\((\d+)\))?(T)?$/,
@@ -75,10 +74,9 @@ const process_scroll:ABProcessorSpecSimp = {
     mid_el.appendChild(sub_el)
     return el
   }
-}
-ABProcessorSpec.registerABProcessor(process_scroll)
+})
 
-const process_overfold:ABProcessorSpecSimp = {
+const process_overfold = ABProcessorSpec.factory({
   id: "overfold",
   name: "超出折叠",
   match: /^overfold(\((\d+)\))?$/,
@@ -125,11 +123,10 @@ const process_overfold:ABProcessorSpecSimp = {
 
     return el
   }
-}
-ABProcessorSpec.registerABProcessor(process_overfold)
+})
 
 
-const process_addClass:ABProcessorSpecSimp = {
+const process_addClass = ABProcessorSpec.factory({
   id: "addClass",
   name: "增加class",
   detail: "给当前块增加一个类名",
@@ -144,10 +141,9 @@ const process_addClass:ABProcessorSpecSimp = {
     sub_el.addClass(String(matchs[1]))
     return el
   }
-}
-ABProcessorSpec.registerABProcessor(process_addClass)
+})
 
-const process_addDiv:ABProcessorSpecSimp = {
+const process_addDiv = ABProcessorSpec.factory({
   id: "addDiv",
   name: "增加div和class",
   detail: "给当前块增加一个父类，需要给这个父类一个类名",
@@ -166,19 +162,17 @@ const process_addDiv:ABProcessorSpecSimp = {
     mid_el.appendChild(sub_el)
     return el
   }
-}
-ABProcessorSpec.registerABProcessor(process_addDiv)
+})
 
-const process_heimu:ABProcessorSpecSimp = {
+const process_heimu = ABProcessorSpec.factory({
   id: "heimu",
   name: "黑幕",
   detail: "和萌娘百科的黑幕效果相似",
   process_alias: "addClass(ab-deco-heimu)",
   process: (el, header, content)=>{}
-}
-ABProcessorSpec.registerABProcessor(process_heimu)
+})
 
-const process_title:ABProcessorSpecSimp = {
+const process_title = ABProcessorSpec.factory({
   id: "title",
   name: "标题",
   match: /^#(.*)/,
@@ -227,5 +221,4 @@ const process_title:ABProcessorSpecSimp = {
     sub_title.setAttribute("title-type", title_type)
     return el
   }
-}
-ABProcessorSpec.registerABProcessor(process_title)
+})

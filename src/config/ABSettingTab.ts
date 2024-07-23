@@ -1,5 +1,7 @@
 /**
  * Obsidian 的插件设置页面
+ * 
+ * TODO：设备Debug日志开关
  */
 
 import {App, PluginSettingTab, Setting, Modal} from "obsidian"
@@ -10,7 +12,7 @@ import {} from "src/ab_converter/converter/textProcessor"    // 加载所有处�
 import {} from "src/ab_converter/converter/listProcessor"    // ^
 import {} from "src/ab_converter/converter/decoProcessor"    // ^
 import {} from "src/ab_converter/converter/exProcessor"      // ^
-import {} from "src/manager/abMdBaseSelector" // ^
+import {} from "src/manager/abMdBaseSelector"                // ^
 import {generateSelectorInfoTable} from "src/manager/abMdSelector"  // ^
 
 /** 设置值接口 */
@@ -63,7 +65,7 @@ export class ABSettingTab extends PluginSettingTab {
 		super(app, plugin);
 		this.plugin = plugin;
     for (let item of plugin.settings.user_processor){
-      ABProcessorSpec.registerABProcessor(item)
+      ABProcessorSpec.factory(item)
     }
 	}
 
@@ -135,7 +137,7 @@ export class ABSettingTab extends PluginSettingTab {
         .setIcon("plus-circle")
         .onClick(e => {
           new ABProcessorModal(this.app, async (result)=>{
-            ABProcessorSpec.registerABProcessor(result)
+            ABProcessorSpec.factory(result)
             settings.user_processor.push(result)
             await this.plugin.saveSettings();
             this.processorPanel.remove()
