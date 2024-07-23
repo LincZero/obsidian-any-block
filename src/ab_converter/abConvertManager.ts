@@ -32,11 +32,11 @@ export class ABConvertManager {
   /** --------------------------------- 处理器容器管理 --------------------- */
 
   /// ab处理器 - 严格版，的接口与列表
-  public list_abProcessor: ABProcessorSpec[] = []
+  public list_abConvert: ABProcessorSpec[] = []
 
   /// 处理器一览表 - 下拉框推荐
-  public getProcessorOptions(){
-    return this.list_abProcessor
+  public getConvertOptions(){
+    return this.list_abConvert
     .filter(item=>{
       return item.default
     })
@@ -46,7 +46,7 @@ export class ABConvertManager {
   }
 
   /// 处理器一览表 - 全部信息
-  public generateProcessorInfoTable(el: HTMLElement){
+  public generateConvertInfoTable(el: HTMLElement){
     const table_p = el.createEl("div",{
       cls: ["ab-setting","md-table-fig1"]
     })
@@ -67,7 +67,7 @@ export class ABConvertManager {
       tr.createEl("td", {text: "定义来源"})
     }
     const tbody = table.createEl("tbody")
-    for (let item of this.list_abProcessor){
+    for (let item of this.list_abConvert){
       const tr = tbody.createEl("tr")
       tr.createEl("td", {text: item.name})
       tr.createEl("td", {text: String(item.default)})
@@ -94,11 +94,11 @@ export class ABConvertManager {
    * @param header 转换方式
    * @param content 要转换的初始文本
    */
-  public static autoABProcessor(el:HTMLDivElement, header:string, content:string):HTMLElement{
+  public static autoABConvert(el:HTMLDivElement, header:string, content:string):HTMLElement{
     let prev_result:any = content
     let list_header = header.split("|")
     let prev_type: ProcessDataType = ProcessDataType.text
-    prev_result = this.autoABProcessor_runProcessor(el, list_header, prev_result, prev_type)
+    prev_result = this.autoABConvert_runConvert(el, list_header, prev_result, prev_type)
     
     // 尾处理。如果还是text内容，则给一个md渲染器
     if (prev_type == ProcessDataType.text) {
@@ -112,10 +112,10 @@ export class ABConvertManager {
     return prev_result
   }
 
-  private static autoABProcessor_runProcessor(el:HTMLDivElement, list_header:string[], prev_result:any, prev_type:ProcessDataType):any{
+  private static autoABConvert_runConvert(el:HTMLDivElement, list_header:string[], prev_result:any, prev_type:ProcessDataType):any{
     // 循环header组，直到遍历完文本处理器或遇到渲染处理器
     for (let item_header of list_header){
-      for (let abReplaceProcessor of ABConvertManager.getInstance().list_abProcessor){
+      for (let abReplaceProcessor of ABConvertManager.getInstance().list_abConvert){
         // 通过header寻找处理器
         if (typeof(abReplaceProcessor.match)=='string'){if (abReplaceProcessor.match!=item_header) continue}
         else {if (!abReplaceProcessor.match.test(item_header)) continue}
@@ -136,7 +136,7 @@ export class ABConvertManager {
               alias = alias.replace(RegExp(`%${i}`), matchs[i]) /** @bug 按理应该用`(?<!\\)%${i}`，但ob不支持正则的向前查找 */
             }
           })()
-          prev_result = this.autoABProcessor_runProcessor(el, alias.split("|"), prev_result, prev_type)
+          prev_result = this.autoABConvert_runConvert(el, alias.split("|"), prev_result, prev_type)
         }
         // 若不是，使用process方法
         else if(abReplaceProcessor.process){

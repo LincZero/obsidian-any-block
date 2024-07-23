@@ -34,13 +34,20 @@ export class ABProcessorSpec {
   // 非注册项：
   // ~~is_inner：这个不可设置，用来区分是内部还是外部给的~~
   // is_enable: 加载后能禁用这个项
+
+  /** --------------------------------- 特殊函数 -------------------------- */
+
+  /// TODO 应该将注册修改为创建实例，因为里面有动态参数
+
+  //constructor() {}
+
+  //destructor() {}
   
   /** --------------------------------- 处理器容器管理 --------------------- */
 
   /// 用户注册处理器
-  /// TODO 应该修改为创建实例，因为里面有动态参数
   public static registerABProcessor(process: ABProcessorSpec| ABProcessorSpecSimp| ABProcessorSpecUser){
-    ABConvertManager.getInstance().list_abProcessor.push(ABProcessorSpec.registerABProcessor_adapt(process));
+    ABConvertManager.getInstance().list_abConvert.push(ABProcessorSpec.registerABProcessor_adapt(process));
   }
 
   public static registerABProcessor_adapt(process: ABProcessorSpec| ABProcessorSpecSimp| ABProcessorSpecUser): ABProcessorSpec{

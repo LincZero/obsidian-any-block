@@ -26,11 +26,17 @@ enum Editor_mode{
   PREVIEW
 }
 
-/** 状态管理器
+/**
+ * 状态管理器
+ * 
+ * @default
  * 启用状态字段装饰功能
- * 一次性使用
+ * RAII原则，一次性使用
  */
 export class ABStateManager{
+
+  /** --------------------------------- 主要参数 -------------------------- */
+
   plugin_this: AnyBlockPlugin
   replace_this = this
   view: View                // Ob View
@@ -47,6 +53,8 @@ export class ABStateManager{
   get cursor(): EditorPosition {return this.editor.getCursor();}
   get state(): any {return this.view.getState()}
   get mdText(): string {return this.editor.getValue()}
+
+  /** --------------------------------- 特殊函数 -------------------------- */
 
   constructor(plugin_this: AnyBlockPlugin){
     this.plugin_this=plugin_this
@@ -80,6 +88,8 @@ export class ABStateManager{
     this.prev_editor_mode = Editor_mode.NONE
     return true
   }
+
+  /** --------------------------------- 其他函数 -------------------------- */
 
   // 设置初始状态字段并派发
   private setStateEffects() {

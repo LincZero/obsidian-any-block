@@ -38,7 +38,7 @@ export class ReplaceRender extends MarkdownRenderChild {
     let dom_replaceEl = dom_note.createDiv({
       cls: ["ab-replaceEl"]
     })
-    ABConvertManager.autoABProcessor(dom_replaceEl, this.header, this.content)
+    ABConvertManager.autoABConvert(dom_replaceEl, this.header, this.content)
     this.containerEl.replaceWith(div);
     
     // 下拉框格式部分
@@ -52,7 +52,7 @@ export class ReplaceRender extends MarkdownRenderChild {
     })
     first_dom_option.selected=true
     let header_name_flag = ""   // 当前填写的处理器是否标准处理器，如过则隐藏第一个option改用标准的那个
-    for (let item of ABConvertManager.getInstance().getProcessorOptions()){
+    for (let item of ABConvertManager.getInstance().getConvertOptions()){
       const dom_option = dom_edit.createEl("option",{
         text:item.name,
         attr:{"value":item.id},
@@ -72,7 +72,7 @@ export class ReplaceRender extends MarkdownRenderChild {
       const new_dom_replaceEl = dom_note.createDiv({
         cls: ["ab-replaceEl"]
       })
-      ABConvertManager.autoABProcessor(new_dom_replaceEl, new_header, this.content)
+      ABConvertManager.autoABConvert(new_dom_replaceEl, new_header, this.content)
       dom_replaceEl.replaceWith(new_dom_replaceEl);
       dom_replaceEl = new_dom_replaceEl
     }

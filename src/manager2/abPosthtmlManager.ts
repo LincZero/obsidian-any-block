@@ -126,7 +126,7 @@ function findABBlock_recurve(targetEl: HTMLElement){
     const newEl = document.createElement("div")
     newEl.addClass("ab-re-rendered")
     headerEl.parentNode?.insertBefore(newEl, headerEl.nextSibling)
-    ABConvertManager.autoABProcessor(newEl, header_str, html2md(contentEl.innerHTML))
+    ABConvertManager.autoABConvert(newEl, header_str, html2md(contentEl.innerHTML))
 
     contentEl.hide()
     headerEl.hide()

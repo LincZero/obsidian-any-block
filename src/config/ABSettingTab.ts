@@ -139,11 +139,11 @@ export class ABSettingTab extends PluginSettingTab {
             settings.user_processor.push(result)
             await this.plugin.saveSettings();
             this.processorPanel.remove()
-            this.processorPanel = ABConvertManager.getInstance().generateProcessorInfoTable(containerEl)
+            this.processorPanel = ABConvertManager.getInstance().generateConvertInfoTable(containerEl)
           }).open()
         })
       })
-    this.processorPanel = ABConvertManager.getInstance().generateProcessorInfoTable(containerEl)
+    this.processorPanel = ABConvertManager.getInstance().generateConvertInfoTable(containerEl)
 	}
 }
 
