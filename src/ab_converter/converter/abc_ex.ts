@@ -4,14 +4,14 @@
 
 import { MarkdownRenderer, MarkdownRenderChild } from 'obsidian'
 import {ABConvertManager} from "../ABConvertManager"
-import {ProcessDataType, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
+import {ABConvert_IOType, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
 
 const abc_faq = ABConvert.factory({
   id: "faq",
   name: "FAQ",
   match: "FAQ",
-  process_param: ProcessDataType.text,
-  process_return: ProcessDataType.el,
+  process_param: ABConvert_IOType.text,
+  process_return: ABConvert_IOType.el,
   process: (el, header, content)=>{
     const e_faq:HTMLElement = el.createDiv({cls: "ab-faq"})
     const list_content:string[] = content.split("\n");

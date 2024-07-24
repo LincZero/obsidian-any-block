@@ -5,15 +5,15 @@
  */
 
 import {ABConvertManager} from "../ABConvertManager"
-import {ProcessDataType, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
+import {ABConvert_IOType, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
 
 export const DECOProcessor = 0  // 用于模块化，防报错，其实没啥用
 
 const abc_fold = ABConvert.factory({
   id: "fold",
   name: "折叠",
-  process_param: ProcessDataType.el,
-  process_return: ProcessDataType.el,
+  process_param: ABConvert_IOType.el,
+  process_return: ABConvert_IOType.el,
   process: (el, header, content)=>{
     if(el.children.length!=1) return el
     const sub_el = el.children[0] as HTMLElement
@@ -47,8 +47,8 @@ const abc_scroll = ABConvert.factory({
   name: "滚动",
   match: /^scroll(\((\d+)\))?(T)?$/,
   default: "scroll(460)",
-  process_param: ProcessDataType.el,
-  process_return: ProcessDataType.el,
+  process_param: ABConvert_IOType.el,
+  process_return: ABConvert_IOType.el,
   process: (el, header, content)=>{
     // 找参数
     const matchs = header.match(/^scroll(\((\d+)\))?(T)?$/)
@@ -81,8 +81,8 @@ const abc_overfold = ABConvert.factory({
   name: "超出折叠",
   match: /^overfold(\((\d+)\))?$/,
   default: "overfold(380)",
-  process_param: ProcessDataType.el,
-  process_return: ProcessDataType.el,
+  process_param: ABConvert_IOType.el,
+  process_return: ABConvert_IOType.el,
   process: (el, header, content)=>{
     // 找参数
     const matchs = header.match(/^overfold(\((\d+)\))?$/)
@@ -131,8 +131,8 @@ const abc_addClass = ABConvert.factory({
   name: "增加class",
   detail: "给当前块增加一个类名",
   match: /^addClass\((.*)\)$/,
-  process_param: ProcessDataType.el,
-  process_return: ProcessDataType.el,
+  process_param: ABConvert_IOType.el,
+  process_return: ABConvert_IOType.el,
   process: (el, header, content)=>{
     const matchs = header.match(/^addClass\((.*)\)$/)
     if (!matchs || !matchs[1]) return el
@@ -148,8 +148,8 @@ const abc_addDiv = ABConvert.factory({
   name: "增加div和class",
   detail: "给当前块增加一个父类，需要给这个父类一个类名",
   match: /^addDiv\((.*)\)$/,
-  process_param: ProcessDataType.el,
-  process_return: ProcessDataType.el,
+  process_param: ABConvert_IOType.el,
+  process_return: ABConvert_IOType.el,
   process: (el, header, content)=>{
     const matchs = header.match(/^addDiv\((.*)\)$/)
     if (!matchs || !matchs[1]) return el
@@ -177,8 +177,8 @@ const abc_title = ABConvert.factory({
   name: "标题",
   match: /^#(.*)/,
   detail: "若直接处理代码或表格块，则会有特殊风格",
-  process_param: ProcessDataType.el,
-  process_return: ProcessDataType.el,
+  process_param: ABConvert_IOType.el,
+  process_return: ABConvert_IOType.el,
   process: (el, header, content)=>{
     const matchs = header.match(/^#(.*)/)
     if (!matchs || !matchs[1]) return el

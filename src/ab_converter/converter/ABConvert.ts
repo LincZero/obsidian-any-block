@@ -5,13 +5,16 @@ import { ABConvertManager } from "../ABConvertManager"
  * @warn 暂时不允许扩展，处理器的参数和返回值目前还是使用的手动一个一个来检查的
  * 待增加一个list和json专用格式
  */
-export enum ProcessDataType {
+export enum ABConvert_IOType {
   text = "string",
   el = "HTMLElement"
 }
 
 /**
  * ab转换器
+ * 
+ * @detail
+ * 被所有权：ABConvertManager
  */
 export class ABConvert {
 
@@ -23,8 +26,8 @@ export class ABConvert {
   default: string|null            // 下拉选择的默认规则，不填的话：非正则默认为id，有正则则为空
   detail: string                  // 处理器描述
   process_alias: string           // 组装，如果不为空串则会覆盖process方法，但扔需要给process一个空实现
-  process_param: ProcessDataType|null
-  process_return: ProcessDataType|null
+  process_param: ABConvert_IOType|null
+  process_return: ABConvert_IOType|null
   process: (el:HTMLDivElement, header:string, content:string)=> any
   is_disable: boolean = false     // 是否禁用，默认false
   register_from: string = "内置"  // 自带、其他插件、面板设置，如果是其他插件，则需要提供插件的名称（不知道能不能自动识别）
@@ -162,8 +165,8 @@ export interface ABConvert_SpecSimp{
   default?: string|null     // 下拉选择的默认规则，不填的话：非正则默认为id，有正则则为空
   detail?: string           // 处理器描述
   process_alias?: string    // 组装，如果不为空串则会覆盖process方法，但扔需要给process一个空实现
-  process_param?: ProcessDataType
-  process_return?: ProcessDataType
+  process_param?: ABConvert_IOType
+  process_return?: ABConvert_IOType
   process: (el:HTMLDivElement, header:string, content:string)=> any
                             // 处理器
 }

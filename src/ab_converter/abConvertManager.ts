@@ -1,10 +1,8 @@
 /** 基于接口写的扩展处理器的文件 */
 import {MarkdownRenderChild, MarkdownRenderer} from 'obsidian';
 import {
-  ProcessDataType, 
-  ABConvert,
-  type ABConvert_SpecSimp,
-  type ABConvert_SpecUser
+  ABConvert_IOType, 
+  ABConvert
 } from './converter/ABConvert'
  
 /**
@@ -97,22 +95,22 @@ export class ABConvertManager {
   public static autoABConvert(el:HTMLDivElement, header:string, content:string):HTMLElement{
     let prev_result:any = content
     let list_header = header.split("|")
-    let prev_type: ProcessDataType = ProcessDataType.text
+    let prev_type: ABConvert_IOType = ABConvert_IOType.text
     prev_result = this.autoABConvert_runConvert(el, list_header, prev_result, prev_type)
     
     // 尾处理。如果还是text内容，则给一个md渲染器
-    if (prev_type == ProcessDataType.text) {
+    if (prev_type == ABConvert_IOType.text) {
       const subEl = el.createDiv()
       subEl.addClass("markdown-rendered")
       const child = new MarkdownRenderChild(subEl);
       MarkdownRenderer.renderMarkdown(prev_result, subEl, "", child);
-      prev_type = ProcessDataType.el
+      prev_type = ABConvert_IOType.el
       prev_result = el
     }
     return prev_result
   }
 
-  private static autoABConvert_runConvert(el:HTMLDivElement, list_header:string[], prev_result:any, prev_type:ProcessDataType):any{
+  private static autoABConvert_runConvert(el:HTMLDivElement, list_header:string[], prev_result:any, prev_type:ABConvert_IOType):any{
     // 循环header组，直到遍历完文本处理器或遇到渲染处理器
     for (let item_header of list_header){
       for (let abReplaceProcessor of ABConvertManager.getInstance().list_abConvert){
@@ -142,12 +140,12 @@ export class ABConvertManager {
         else if(abReplaceProcessor.process){
           // 检查输入类型
           if(abReplaceProcessor.process_param != prev_type){
-            if (abReplaceProcessor.process_param==ProcessDataType.el && prev_type==ProcessDataType.text){
+            if (abReplaceProcessor.process_param==ABConvert_IOType.el && prev_type==ABConvert_IOType.text){
               const subEl = el.createDiv()
               subEl.addClass("markdown-rendered")
               const child = new MarkdownRenderChild(subEl);
               MarkdownRenderer.renderMarkdown(prev_result, subEl, "", child);
-              prev_type = ProcessDataType.el
+              prev_type = ABConvert_IOType.el
               prev_result = el
             }
             else{
@@ -158,8 +156,8 @@ export class ABConvertManager {
           // 执行处理器
           prev_result = abReplaceProcessor.process(el, item_header, prev_result)
           // 检查输出类型
-          if(prev_result instanceof HTMLElement){prev_type = ProcessDataType.el}
-          else if(typeof(prev_result) == "string"){prev_type = ProcessDataType.text}
+          if(prev_result instanceof HTMLElement){prev_type = ABConvert_IOType.el}
+          else if(typeof(prev_result) == "string"){prev_type = ABConvert_IOType.text}
           else {
             console.warn("处理器输出类型错误", abReplaceProcessor.id, abReplaceProcessor.process_param, prev_type);
             break
