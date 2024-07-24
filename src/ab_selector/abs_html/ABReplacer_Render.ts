@@ -1,11 +1,11 @@
 import { MarkdownRenderChild } from "obsidian";
 import { ABConvertManager } from "../../ab_converter/ABConvertManager"
 
-export class ReplaceRender extends MarkdownRenderChild {
+export class ABReplacer_Render extends MarkdownRenderChild {
   content: string;
   header: string;
 
-  // override。这里就是新增了一个text参数而已，其他不变
+  // 构造函数，override。这里就是新增了一个text参数而已，其他不变
   constructor(containerEl: HTMLElement, header: string, content: string) {
     super(containerEl);
     this.header = header;

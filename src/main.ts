@@ -8,7 +8,7 @@
  */
 
 import { Plugin } from "obsidian";
-import { ABSelector_CodeBlock } from "./ab_selector/abs_code/ABSelector_CodeBlock";
+import { ABReplacer_CodeBlock } from "./ab_selector/abs_code/ABReplacer_CodeBlock";
 import { ABStateManager } from "./ab_selector/abs_cm/ABStateManager";
 import { ABSelector_PostHtml } from "./ab_selector/abs_html/ABSelector_PostHtml";
 import type { ABSettingInterface } from "./config/abSettingTab"
@@ -23,7 +23,7 @@ export default class AnyBlockPlugin extends Plugin {
     this.addSettingTab(new ABSettingTab(this.app, this));
 
     // 钩子组1 - 代码块
-    this.registerMarkdownCodeBlockProcessor("ab", ABSelector_CodeBlock.processor);
+    this.registerMarkdownCodeBlockProcessor("ab", ABReplacer_CodeBlock.processor);
     
     // 钩子组2 - 非渲染模式 cm扩展 - StateField
     {

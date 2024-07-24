@@ -3,7 +3,7 @@ import {
   registerMdSelector, 
   type MdSelectorSpecSimp,
   type MdSelectorRangeSpecSimp
-} from "../abs_cm/abMdSelector"
+} from "./ABSelector_Md"
 
 function easySelector(
   list_text:string[],

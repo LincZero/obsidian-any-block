@@ -39,20 +39,30 @@ npm run build
 
 整个Ob插件的核心分为两个部分：
 
-- 主插件 AnyBlock，代码缩写 `AB`
-    - 选择器 AnyBlockSelector，代码缩写 `ABS`。
-        - 按作用块区分
-            - 在Obsidian中，这个支持Ob的三种选择器：
-                - 代码块选择器，代码缩写 `ABS_Code`
-                - CM选择器，代码缩写 `ABS_CM`
-                - 后选择器，代码缩写 `ABS_Html`
-                - 从text中选择，代码缩写 `ABS_Md`
-            - 在VuePress中，这个支持两种选择器：
-                - 代码块选择器
-                - `:::` 选择器
-        - 按语法区分
-            - 可以动态注册各种选择器 (list、table、quote、codeblock等，其中codeblock选择器一般是内置了的)
-    - 转换器 AnyBlockConvert，代码中简写 `ABC`
-        - 这个是通用的，指定用法：将txt转化为html
-        - 按语法区分
-            - 可以动态注册各种转换器 (2mermaid、2lt、2mindmap等)
+- 主插件，`AnyBlock`，代码缩写 `AB`
+    - 选择器 `AnyBlockSelector`，代码缩写 `ABS`
+        - 用法：选择范围，并返回范围值
+        - 特征：通用、可扩展
+        - 类别：可以动态注册各种选择器 (list、table、quote、codeblock等，其中codeblock选择器一般是内置了的)
+    - 转换器，`AnyBlockConvert`，代码缩写 `ABC`
+        - 用法：将txt转化为html
+        - 特征：通用、可扩展
+        - 类别：可以动态注册各种转换器 (2mermaid、2lt、2mindmap等)
+    - 替换器，`AnyBlockReplacer`，代码缩写 `ABR`
+        - 用法：选择器选择完范围后，替换器将这部分范围的东西交给转换器，并将转换后的结果替换掉原内容
+        - 特征：非通用、不可扩展
+
+另外坏有一个区域：
+
+- 区域
+    - 在Obsidian中，这个支持Ob的三种选择器：
+        - 代码块选择器，代码缩写 `ABS_CodeBlock`
+        - CM选择器，代码缩写 `ABS_CM`
+        - 后选择器，代码缩写 `ABS_Html`
+    - 在VuePress中，这个支持两种选择器：
+        - 代码块选择器
+        - `:::` 选择器
+            
+其中每个**区域**需要都实现一遍**替换器**和**选择器**。即实现数是他俩的乘积
+
+（其中：CodeBlock 一般自带选择器，一般来说无需再次选择。除非存在嵌套 AnyBlock 的情况）

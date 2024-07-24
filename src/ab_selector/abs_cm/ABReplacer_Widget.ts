@@ -2,9 +2,9 @@ import type {Editor, EditorPosition} from 'obsidian';
 import {EditorView, WidgetType} from "@codemirror/view"
 
 import {ABConvertManager} from "../../ab_converter/ABConvertManager"
-import type {MdSelectorRangeSpec} from "./abMdSelector"
+import type {MdSelectorRangeSpec} from "./ABSelector_Md"
 
-export class ABReplaceWidget extends WidgetType {
+export class ABReplacer_Widget extends WidgetType {
   rangeSpec: MdSelectorRangeSpec
   global_editor: Editor|null
   div: HTMLDivElement
@@ -37,7 +37,7 @@ export class ABReplaceWidget extends WidgetType {
         cls: ["ab-button", "edit-block-button"], // cm-embed-block和edit-block-button是自带的js样式？用来悬浮显示的
         attr: {"aria-label": "Edit this block - "+this.rangeSpec.header}
       });
-      dom_edit.innerHTML = ABReplaceWidget.str_icon_code2
+      dom_edit.innerHTML = ABReplacer_Widget.str_icon_code2
     
       // 通过控制光标移动间接取消显示块
       // this.div.ondblclick = ()=>{this.moveCursorToHead()}

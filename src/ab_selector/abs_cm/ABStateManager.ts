@@ -1,4 +1,6 @@
 /**
+ * 钩子入口
+ * 
  * 总逻辑梳理
  * mermaid
  * - 状态管理器 : 用来设置状态的
@@ -15,9 +17,9 @@ import  {MarkdownView, type View, type Editor, type EditorPosition} from 'obsidi
 
 import type AnyBlockPlugin from '../../main'
 import { ConfDecoration } from "src/config/abSettingTab"
-import { autoMdSelector, type MdSelectorRangeSpec} from "./abMdSelector"
+import { autoMdSelector, type MdSelectorRangeSpec} from "./ABSelector_Md"
 import { ABDecorationManager } from "./ABDecorationManager"
-import { ABReplaceWidget } from "./ABReplaceWidget"
+import { ABReplacer_Widget } from "./ABReplacer_Widget"
 
 // 获取 - 模式
 enum Editor_mode{
@@ -240,7 +242,7 @@ export class ABStateManager{
         is_current_cursor_in = true
       }
       else{
-        decoration = Decoration.replace({widget: new ABReplaceWidget(
+        decoration = Decoration.replace({widget: new ABReplacer_Widget(
           rangeSpec, this.editor
         )})
       }

@@ -2,8 +2,8 @@ import {EditorView, Decoration} from "@codemirror/view"
 import type {Extension} from "@codemirror/state"
 
 import type { ABStateManager } from './ABStateManager';
-import type { MdSelectorRangeSpec } from "./abMdSelector"
-import { ABReplaceWidget } from "./ABReplaceWidget"
+import type { MdSelectorRangeSpec } from "./ABSelector_Md"
+import { ABReplacer_Widget } from "./ABReplacer_Widget"
 
 interface CursorSpec{
   from:number, 
@@ -51,7 +51,7 @@ export class ABDecorationManager{
       return Decoration.mark({class: "ab-line-brace"})
     }
     else{ // text:string, item:SpecKeyword, editor:Editor
-      return Decoration.replace({widget: new ABReplaceWidget(
+      return Decoration.replace({widget: new ABReplacer_Widget(
         this.rangeSpec, this.r_this.editor
       )})
     }

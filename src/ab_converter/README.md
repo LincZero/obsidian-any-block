@@ -1,26 +1,12 @@
 # Any Block Convert
 
+（先读src下的README）
+
 ## 缩写
 
 `AnyBlock` 在程序中有时缩写为 `AB`
 
 而 `AnyBlockConvert` 则缩写为 `ABC`
-
-## 转化器与选择器模块
-
-整个Ob插件的核心分为两个部分：
-
-- 主插件 AnyBlock，代码缩写 `AB`
-    - 选择器 AnyBlockSelector，代码缩写 `ABS`
-        - 在Obsidian中，这个支持Ob的三种选择器：
-            - 代码块选择器，代码缩写 `ABS_Code`
-            - CM选择器，代码缩写 `ABS_CM`
-            - 后选择器，代码缩写 `ABS_Html`
-        - 在VuePress中，这个支持两种选择器：
-            - 代码块选择器
-            - `:::` 选择器
-    - 转换器 AnyBlockConvert，代码中简写 `ABC`
-        - 这个是通用的，指定用法：将txt转化为html
 
 ## 该模块设计不应依赖于Ob插件
 

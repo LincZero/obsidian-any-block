@@ -7,7 +7,7 @@ import type {
 import {ABReg} from "src/config/abReg"
 import {ConfDecoration, ConfSelect} from "src/config/abSettingTab"
 import type AnyBlockPlugin from "../../main"
-import {ReplaceRender} from "./replaceRenderChild"
+import {ABReplacer_Render} from "./ABReplacer_Render"
 import {ABConvertManager} from "src/ab_converter/ABConvertManager"
 import { match } from 'assert'
 
@@ -27,7 +27,7 @@ import { match } from 'assert'
  *   - 渲染器
  */
 export class ABSelector_PostHtml{
-  static processor(
+  public static processor(
     this: AnyBlockPlugin,
     el: HTMLElement, 
     ctx: MarkdownPostProcessorContext
@@ -162,7 +162,7 @@ function replaceABBlock(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext
     if (range.header.indexOf("2")==0) range.header="list"+range.header
   }
 
-  ctx.addChild(new ReplaceRender(targetEl, range.header, range.content));
+  ctx.addChild(new ABReplacer_Render(targetEl, range.header, range.content));
 }
 
 /**
@@ -279,7 +279,7 @@ function findABBlock_global(
       const header = prev_header??"md"
       const content = mdSrc_last.content.split("\n")
         .slice(prev_from_line, mdSrc_last.to_line).join("\n");
-      if(prev_el) ctx.addChild(new ReplaceRender(prev_el, header, content));
+      if(prev_el) ctx.addChild(new ABReplacer_Render(prev_el, header, content));
 
       prev_header = ""
       prev_from_line = 0
@@ -300,7 +300,7 @@ function findABBlock_global(
     const header = prev_header??"md"
     const content = mdSrc_last.content.trim().split("\n")
       .slice(prev_from_line, mdSrc_last.to_line).join("\n");
-    if(prev_el) ctx.addChild(new ReplaceRender(prev_el, header, content));
+    if(prev_el) ctx.addChild(new ABReplacer_Render(prev_el, header, content));
   }
 }
 
