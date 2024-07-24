@@ -1,8 +1,17 @@
+/**
+ * 生成一个随机id
+ * 
+ * @detail 因为mermaid渲染块时需要一个id，不然多个mermaid块会发生冲突
+ */
 export function getID(length=16){
   return Number(Math.random().toString().substr(3,length) + Date.now()).toString(36);
 }
 
-// 话说可以参考一下 https://github.com/stonehank/html-to-md
+/**
+ * html转md - 旧
+ * 
+ * @detail 话说可以参考一下 https://github.com/stonehank/html-to-md
+ */ 
 /*export function html2md(el:HTMLElement):string{
   if (el instanceof HTMLUListElement
     || el instanceof HTMLQuoteElement

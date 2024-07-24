@@ -1,14 +1,5 @@
-import {EditorView, Decoration, type DecorationSet} from "@codemirror/view"
-import {StateField, StateEffect, EditorState, Transaction, Range} from "@codemirror/state"
-import  {MarkdownView, type View, type Editor, type EditorPosition} from 'obsidian';
-
-import type AnyBlockPlugin from '../main'
-import { ConfDecoration } from "src/config/abSettingTab"
-import { autoMdSelector, type MdSelectorRangeSpec} from "./abMdSelector"
-import { ABDecorationManager } from "./ABDecorationManager"
-import { ABReplaceWidget } from "./replaceWidgetType"
-
-/** 总逻辑梳理
+/**
+ * 总逻辑梳理
  * mermaid
  * - 状态管理器 : 用来设置状态的
  *   - 范围管理器 (全文文本构造) interface SpecKeyword : 一个文档有多个范围管理器
@@ -18,12 +9,22 @@ import { ABReplaceWidget } from "./replaceWidgetType"
  * - 选择范围
  */
 
+import {EditorView, Decoration, type DecorationSet} from "@codemirror/view"
+import {StateField, StateEffect, EditorState, Transaction, Range} from "@codemirror/state"
+import  {MarkdownView, type View, type Editor, type EditorPosition} from 'obsidian';
+
+import type AnyBlockPlugin from '../../main'
+import { ConfDecoration } from "src/config/abSettingTab"
+import { autoMdSelector, type MdSelectorRangeSpec} from "./abMdSelector"
+import { ABDecorationManager } from "./ABDecorationManager"
+import { ABReplaceWidget } from "./ABReplaceWidget"
+
 // 获取 - 模式
 enum Editor_mode{
-  NONE,
-  SOURCE,
-  SOURCE_LIVE,
-  PREVIEW
+  NONE,         // 获取失败
+  SOURCE,       // 源码模式
+  SOURCE_LIVE,  // 实时模式
+  PREVIEW,      // 阅读模式
 }
 
 /**
@@ -150,7 +151,7 @@ export class ABStateManager{
     return this.refreshStrong2(decorationSet, tr, decoration_mode, editor_mode)
   }
 
-  /** 获取编辑器模式 */
+  /// 获取编辑器模式
   private getEditorMode(): Editor_mode {
     let editor_dom: Element | null
     /** @warning 不能用 editor_dom = document

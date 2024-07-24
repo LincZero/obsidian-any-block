@@ -9,7 +9,7 @@ import {ProcessDataType, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
 
 export const DECOProcessor = 0  // 用于模块化，防报错，其实没啥用
 
-const process_fold = ABConvert.factory({
+const abc_fold = ABConvert.factory({
   id: "fold",
   name: "折叠",
   process_param: ProcessDataType.el,
@@ -42,7 +42,7 @@ const process_fold = ABConvert.factory({
   }
 })
 
-const process_scroll = ABConvert.factory({
+const abc_scroll = ABConvert.factory({
   id: "scroll",
   name: "滚动",
   match: /^scroll(\((\d+)\))?(T)?$/,
@@ -76,7 +76,7 @@ const process_scroll = ABConvert.factory({
   }
 })
 
-const process_overfold = ABConvert.factory({
+const abc_overfold = ABConvert.factory({
   id: "overfold",
   name: "超出折叠",
   match: /^overfold(\((\d+)\))?$/,
@@ -126,7 +126,7 @@ const process_overfold = ABConvert.factory({
 })
 
 
-const process_addClass = ABConvert.factory({
+const abc_addClass = ABConvert.factory({
   id: "addClass",
   name: "增加class",
   detail: "给当前块增加一个类名",
@@ -143,7 +143,7 @@ const process_addClass = ABConvert.factory({
   }
 })
 
-const process_addDiv = ABConvert.factory({
+const abc_addDiv = ABConvert.factory({
   id: "addDiv",
   name: "增加div和class",
   detail: "给当前块增加一个父类，需要给这个父类一个类名",
@@ -164,7 +164,7 @@ const process_addDiv = ABConvert.factory({
   }
 })
 
-const process_heimu = ABConvert.factory({
+const abc_heimu = ABConvert.factory({
   id: "heimu",
   name: "黑幕",
   detail: "和萌娘百科的黑幕效果相似",
@@ -172,7 +172,7 @@ const process_heimu = ABConvert.factory({
   process: (el, header, content)=>{}
 })
 
-const process_title = ABConvert.factory({
+const abc_title = ABConvert.factory({
   id: "title",
   name: "标题",
   match: /^#(.*)/,

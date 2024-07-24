@@ -6,12 +6,13 @@ import type {
 
 import {ABReg} from "src/config/abReg"
 import {ConfDecoration, ConfSelect} from "src/config/abSettingTab"
-import type AnyBlockPlugin from "../main"
+import type AnyBlockPlugin from "../../main"
 import {ReplaceRender} from "./replaceRenderChild"
 import {ABConvertManager} from "src/ab_converter/ABConvertManager"
 import { match } from 'assert'
 
-/** Html处理器
+/**
+ * Html处理器
  * 被调用的可能：
  *   1. 全局html会分为多个块，会被每个块调用一次
  *      多换行会切分块、块类型不同也会切分（哪怕之间没有空行）
@@ -24,9 +25,8 @@ import { match } from 'assert'
  * - 后处理器，附带还原成md的功能
  *   - ~~html选择器~~
  *   - 渲染器
- * 
  */
-export class ABPosthtmlManager{
+export class ABSelector_PostHtml{
   static processor(
     this: AnyBlockPlugin,
     el: HTMLElement, 
@@ -66,7 +66,8 @@ export class ABPosthtmlManager{
   }
 }
 
-/** 找ab块 - 递归版 
+/**
+ * 找ab块 - 递归版 
  * 特点
  *  1. 递归调用
  */
@@ -164,7 +165,10 @@ function replaceABBlock(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext
   ctx.addChild(new ReplaceRender(targetEl, range.header, range.content));
 }
 
-/** 找AB块 - 全局选择器版，在同一个文档里只渲染一次
+/**
+ * 找AB块 - 全局选择器版，在同一个文档里只渲染一次
+ * 
+ * @detail
  * 失败经验1：
  *      if (pEl.getAttribute("ab-title-flag")=="true")
  *      pEl.setAttribute("ab-title-flag", "true") // f这个好像会被清除掉
@@ -308,8 +312,12 @@ interface HTMLSelectorRangeSpec {
   content: string,  // 内容信息（已去除尾部空格）
   prefix: string,
 }
-/** 将html还原回md格式
+/**
+ * 将html还原回md格式
+ * 
+ * @detail
  * 被processTextSection调用
+ * 
  * @returns 三种结果
  *  1. 获取info失败：返回null
  *  2. 获取info成功，满足ab块条件：返回HTMLSelectorRangeSpec

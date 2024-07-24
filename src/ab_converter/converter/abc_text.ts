@@ -3,7 +3,7 @@ import {MarkdownRenderChild, MarkdownRenderer} from 'obsidian';
 import {ABConvertManager} from "../ABConvertManager"
 import {ProcessDataType, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
 import {ABReg} from "src/config/abReg"
-import {ListProcess} from "./listProcessor"
+import {ListProcess} from "./abc_list"
 import {getID} from "src/utils/utils"
 
 import mermaid from "mermaid"
@@ -19,7 +19,7 @@ export const mermaid_init = async () => {
  * 2. 让处理器能互相调用
  */
 
-const process_md = ABConvert.factory({
+const abc_md = ABConvert.factory({
   id: "md",
   name: "md",
   process_param: ProcessDataType.text,
@@ -34,7 +34,7 @@ const process_md = ABConvert.factory({
   }
 })
 
-const process_quote = ABConvert.factory({
+const abc_quote = ABConvert.factory({
   id: "quote",
   name: "增加引用块",
   process_param: ProcessDataType.text,
@@ -44,7 +44,7 @@ const process_quote = ABConvert.factory({
   }
 })
 
-const process_code = ABConvert.factory({
+const abc_code = ABConvert.factory({
   id: "code",
   name: "增加代码块",
   match: /^code(\((.*)\))?$/,
@@ -60,7 +60,7 @@ const process_code = ABConvert.factory({
   }
 })
 
-const process_Xquote = ABConvert.factory({
+const abc_Xquote = ABConvert.factory({
   id: "Xquote",
   name: "去除引用块",
   process_param: ProcessDataType.text,
@@ -72,7 +72,7 @@ const process_Xquote = ABConvert.factory({
   }
 })
 
-const process_Xcode = ABConvert.factory({
+const abc_Xcode = ABConvert.factory({
   id: "Xcode",
   name: "去除代码块",
   match: /^Xcode(\((true|false)\))?$/,
@@ -116,7 +116,7 @@ const process_Xcode = ABConvert.factory({
   }
 })
 
-const process_X = ABConvert.factory({
+const abc_X = ABConvert.factory({
   id: "X",
   name: "去除代码或引用块",
   process_param: ProcessDataType.text,
@@ -127,20 +127,20 @@ const process_X = ABConvert.factory({
       if (ABReg.reg_code.test(line)) {flag="code";break}
       else if (ABReg.reg_quote.test(line)) {flag="quote";break}
     }
-    if (flag=="code") return process_Xcode.process(el, header, content)
-    else if (flag=="quote") return process_Xquote.process(el, header, content)
+    if (flag=="code") return abc_Xcode.process(el, header, content)
+    else if (flag=="quote") return abc_Xquote.process(el, header, content)
     return content
   }
 })
 
-const process_code2quote = ABConvert.factory({
+const abc_code2quote = ABConvert.factory({
   id: "code2quote",
   name: "代码转引用块",
   process_alias: "Xcode|quote",
   process: ()=>{}
 })
 
-const process_quote2code = ABConvert.factory({
+const abc_quote2code = ABConvert.factory({
   id: "quote2code",
   name: "引用转代码块",
   match: /^quote2code(\((.*)\))?$/,
@@ -156,7 +156,7 @@ const process_quote2code = ABConvert.factory({
   }
 })
 
-const process_slice = ABConvert.factory({
+const abc_slice = ABConvert.factory({
   id: "slice",
   name: "切片",
   match: /^slice\((\s*\d+\s*?)(,\s*-?\d+\s*)?\)$/,
@@ -181,7 +181,7 @@ const process_slice = ABConvert.factory({
   }
 })
 
-const process_add = ABConvert.factory({
+const abc_add = ABConvert.factory({
   id: "add",
   name: "增添内容",
   match: /^add\((.*?)(,\s*-?\d+\s*)?\)$/,
@@ -212,7 +212,7 @@ const process_add = ABConvert.factory({
   }
 })
 
-const process_title2list = ABConvert.factory({
+const abc_title2list = ABConvert.factory({
   id: "title2list",
   name: "标题到列表",
   process_param: ProcessDataType.text,
@@ -224,7 +224,7 @@ const process_title2list = ABConvert.factory({
   }
 })
 
-const process_title2table = ABConvert.factory({
+const abc_title2table = ABConvert.factory({
   id: "title2table",
   name: "标题到表格",
   process_param: ProcessDataType.text,
@@ -236,7 +236,7 @@ const process_title2table = ABConvert.factory({
   }
 })
 
-const process_title2mindmap = ABConvert.factory({
+const abc_title2mindmap = ABConvert.factory({
   id: "title2mindmap",
   name: "标题到脑图",
   process_param: ProcessDataType.text,
@@ -248,7 +248,7 @@ const process_title2mindmap = ABConvert.factory({
   }
 })
 
-const process_listroot = ABConvert.factory({
+const abc_listroot = ABConvert.factory({
   id: "listroot",
   name: "增加列表根",
   match: /^listroot\((.*)\)$/,
@@ -265,7 +265,7 @@ const process_listroot = ABConvert.factory({
   }
 })
 
-const process_listXinline = ABConvert.factory({
+const abc_listXinline = ABConvert.factory({
   id: "listXinline",
   name: "列表消除内联换行",
   process_param: ProcessDataType.text,
@@ -275,7 +275,7 @@ const process_listXinline = ABConvert.factory({
   }
 })
 
-const process_list2table = ABConvert.factory({
+const abc_list2table = ABConvert.factory({
   id: "list2table",
   name: "列表转表格",
   match: /list2(md)?table(T)?/,
@@ -290,7 +290,7 @@ const process_list2table = ABConvert.factory({
   }
 })
 
-const process_list2lt = ABConvert.factory({
+const abc_list2lt = ABConvert.factory({
   id: "list2lt",
   name: "列表转列表表格",
   match: /list2(md)?lt(T)?/,
@@ -305,7 +305,7 @@ const process_list2lt = ABConvert.factory({
   }
 })
 
-const process_list2folder = ABConvert.factory({
+const abc_list2folder = ABConvert.factory({
   id: "list2folder",
   name: "列表转树状目录",
   match: /list2(md)?folder(T)?/,
@@ -320,7 +320,7 @@ const process_list2folder = ABConvert.factory({
   }
 })
 
-const process_list2ut = ABConvert.factory({
+const abc_list2ut = ABConvert.factory({
   id: "list2ut",
   name: "列表转二维表格",
   match: /list2(md)?ut(T)?/,
@@ -335,7 +335,7 @@ const process_list2ut = ABConvert.factory({
   }
 })
 
-const process_list2timeline = ABConvert.factory({
+const abc_list2timeline = ABConvert.factory({
   id: "list2timeline",
   name: "一级列表转时间线",
   match: /list2(md)?timeline(T)?/,
@@ -350,7 +350,7 @@ const process_list2timeline = ABConvert.factory({
   }
 })
 
-const process_list2tab = ABConvert.factory({
+const abc_list2tab = ABConvert.factory({
   id: "list2tab",
   name: "一级列表转标签栏",
   match: /list2(md)?tab(T)?$/,
@@ -365,7 +365,7 @@ const process_list2tab = ABConvert.factory({
   }
 })
 
-const process_list2mermaid = ABConvert.factory({
+const abc_list2mermaid = ABConvert.factory({
   id: "list2mermaid",
   name: "列表转mermaid流程图",
   process_param: ProcessDataType.text,
@@ -376,7 +376,7 @@ const process_list2mermaid = ABConvert.factory({
   }
 })
 
-const process_list2mindmap = ABConvert.factory({
+const abc_list2mindmap = ABConvert.factory({
   id: "list2mindmap",
   name: "列表转mermaid思维导图",
   process_param: ProcessDataType.text,
@@ -387,7 +387,7 @@ const process_list2mindmap = ABConvert.factory({
   }
 })
 
-const process_callout = ABConvert.factory({
+const abc_callout = ABConvert.factory({
   id: "callout",
   name: "callout语法糖",
   match: /^\!/,
@@ -400,7 +400,7 @@ const process_callout = ABConvert.factory({
   }
 })
 
-const process_mermaid = ABConvert.factory({
+const abc_mermaid = ABConvert.factory({
   id: "mermaid",
   name: "新mermaid",
   match: /^mermaid(\((.*)\))?$/,
@@ -423,7 +423,7 @@ const process_mermaid = ABConvert.factory({
   }
 })
 
-const process_text = ABConvert.factory({
+const abc_text = ABConvert.factory({
   id: "text",
   name: "纯文本",
   detail: "其实一般会更推荐用code()代替，那个更精确",

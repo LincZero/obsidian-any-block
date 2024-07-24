@@ -3,16 +3,20 @@ import type {Extension} from "@codemirror/state"
 
 import type { ABStateManager } from './ABStateManager';
 import type { MdSelectorRangeSpec } from "./abMdSelector"
-import { ABReplaceWidget } from "./replaceWidgetType"
+import { ABReplaceWidget } from "./ABReplaceWidget"
 
 interface CursorSpec{
   from:number, 
   to:number
 }
-/** @todo: 现在这个文件和类没什么用了，基本可以优化掉了 */
-/** 装饰管理器
- * 返回一个Decoration
- * 其中传入r_this的作用主要是为了装饰块可能可以返过来设置光标位置
+
+/**
+ * 装饰管理器
+ * 
+ * @detail
+ * TODO: 现在这个文件和类没什么用了，基本可以优化掉了
+ * @param r_this 其中传入r_this的作用主要是为了装饰块可能可以返过来设置光标位置
+ * @return 返回一个Decoration
  */
 export class ABDecorationManager{
   rangeSpec: MdSelectorRangeSpec
@@ -21,6 +25,7 @@ export class ABDecorationManager{
   isBlock: boolean
   r_this: ABStateManager
 
+  // 构造函数
   constructor(r_this: ABStateManager, rangeSpec: MdSelectorRangeSpec, cursorSpec:CursorSpec){
     this.rangeSpec = rangeSpec
     this.cursorSpec = cursorSpec

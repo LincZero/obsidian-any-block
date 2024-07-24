@@ -1,9 +1,5 @@
 # 开发README
 
-## 程序设计
-
-这部分我写到公开md笔记里，去官网看
-
 ## 编译与发布
 
 ### 编译
@@ -34,3 +30,29 @@ npm run build
 ### 发布到社区 - Github Action 自动
 
 参考：[Using GitHub actions to release plugins](https://forum.obsidian.md/t/using-github-actions-to-release-plugins/7877)
+
+## 程序设计
+
+这部分更多的内容我会写到公开md笔记里，去官网看
+
+### 转化器与选择器模块
+
+整个Ob插件的核心分为两个部分：
+
+- 主插件 AnyBlock，代码缩写 `AB`
+    - 选择器 AnyBlockSelector，代码缩写 `ABS`。
+        - 按作用块区分
+            - 在Obsidian中，这个支持Ob的三种选择器：
+                - 代码块选择器，代码缩写 `ABS_Code`
+                - CM选择器，代码缩写 `ABS_CM`
+                - 后选择器，代码缩写 `ABS_Html`
+                - 从text中选择，代码缩写 `ABS_Md`
+            - 在VuePress中，这个支持两种选择器：
+                - 代码块选择器
+                - `:::` 选择器
+        - 按语法区分
+            - 可以动态注册各种选择器 (list、table、quote、codeblock等，其中codeblock选择器一般是内置了的)
+    - 转换器 AnyBlockConvert，代码中简写 `ABC`
+        - 这个是通用的，指定用法：将txt转化为html
+        - 按语法区分
+            - 可以动态注册各种转换器 (2mermaid、2lt、2mindmap等)

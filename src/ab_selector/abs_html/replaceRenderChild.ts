@@ -1,5 +1,5 @@
 import { MarkdownRenderChild } from "obsidian";
-import { ABConvertManager } from "../ab_converter/ABConvertManager"
+import { ABConvertManager } from "../../ab_converter/ABConvertManager"
 
 export class ReplaceRender extends MarkdownRenderChild {
   content: string;

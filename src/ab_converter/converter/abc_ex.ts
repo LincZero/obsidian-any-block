@@ -6,7 +6,7 @@ import { MarkdownRenderer, MarkdownRenderChild } from 'obsidian'
 import {ABConvertManager} from "../ABConvertManager"
 import {ProcessDataType, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
 
-const process_faq = ABConvert.factory({
+const abc_faq = ABConvert.factory({
   id: "faq",
   name: "FAQ",
   match: "FAQ",

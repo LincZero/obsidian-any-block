@@ -1,7 +1,7 @@
 import type {Editor, EditorPosition} from 'obsidian';
 import {EditorView, WidgetType} from "@codemirror/view"
 
-import {ABConvertManager} from "../ab_converter/ABConvertManager"
+import {ABConvertManager} from "../../ab_converter/ABConvertManager"
 import type {MdSelectorRangeSpec} from "./abMdSelector"
 
 export class ABReplaceWidget extends WidgetType {
@@ -9,6 +9,7 @@ export class ABReplaceWidget extends WidgetType {
   global_editor: Editor|null
   div: HTMLDivElement
 
+  // 构造函数
   constructor(rangeSpec: MdSelectorRangeSpec, editor: Editor|null){
     super()
     this.rangeSpec = rangeSpec

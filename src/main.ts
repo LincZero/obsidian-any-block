@@ -8,9 +8,9 @@
  */
 
 import { Plugin } from "obsidian";
-import { ABCodeblockManager } from "./manager3/abCodeblockManager";
-import { ABStateManager } from "./manager/ABStateManager";
-import { ABPosthtmlManager } from "./manager2/ABPosthtmlManager";
+import { ABSelector_CodeBlock } from "./ab_selector/abs_code/ABSelector_CodeBlock";
+import { ABStateManager } from "./ab_selector/abs_cm/ABStateManager";
+import { ABSelector_PostHtml } from "./ab_selector/abs_html/ABSelector_PostHtml";
 import type { ABSettingInterface } from "./config/abSettingTab"
 import { ABSettingTab, AB_SETTINGS } from "./config/abSettingTab"
 
@@ -23,7 +23,7 @@ export default class AnyBlockPlugin extends Plugin {
     this.addSettingTab(new ABSettingTab(this.app, this));
 
     // 钩子组1 - 代码块
-    this.registerMarkdownCodeBlockProcessor("ab", ABCodeblockManager.processor);
+    this.registerMarkdownCodeBlockProcessor("ab", ABSelector_CodeBlock.processor);
     
     // 钩子组2 - 非渲染模式 cm扩展 - StateField
     {
@@ -50,7 +50,7 @@ export default class AnyBlockPlugin extends Plugin {
     }
 
     // 钩子组3 - 渲染模式 后处理器
-    const htmlProcessor = ABPosthtmlManager.processor.bind(this)
+    const htmlProcessor = ABSelector_PostHtml.processor.bind(this)
     this.registerMarkdownPostProcessor(htmlProcessor);
   }
 
