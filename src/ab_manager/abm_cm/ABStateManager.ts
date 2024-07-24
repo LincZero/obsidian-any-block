@@ -16,7 +16,7 @@ import {StateField, StateEffect, EditorState, Transaction, Range} from "@codemir
 import  {MarkdownView, type View, type Editor, type EditorPosition} from 'obsidian';
 
 import type AnyBlockPlugin from '../../main'
-import { ConfDecoration } from "src/config/abSettingTab"
+import { ConfDecoration } from "src/config/ABSettingTab"
 import { autoMdSelector, type MdSelectorRangeSpec} from "./ABSelector_Md"
 import { ABDecorationManager } from "./ABDecorationManager"
 import { ABReplacer_Widget } from "./ABReplacer_Widget"

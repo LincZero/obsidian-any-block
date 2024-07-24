@@ -5,7 +5,7 @@ import type {
 } from "obsidian"
 
 import {ABReg} from "src/config/abReg"
-import {ConfDecoration, ConfSelect} from "src/config/abSettingTab"
+import {ConfDecoration, ConfSelect} from "src/config/ABSettingTab"
 import type AnyBlockPlugin from "../../main"
 import {ABReplacer_Render} from "./ABReplacer_Render"
 import {ABConvertManager} from "src/ab_converter/ABConvertManager"
