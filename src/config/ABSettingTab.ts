@@ -6,8 +6,8 @@
 
 import {App, PluginSettingTab, Setting, Modal} from "obsidian"
 import type AnyBlockPlugin from "../main"
-import {ABConvertManager} from "src/ab_converter/abConvertManager"
-import {ABProcessorSpec, type ABProcessorSpecUser} from "src/ab_converter/converter/abProcessorInterface"
+import {ABConvertManager} from "src/ab_converter/ABConvertManager"
+import {ABConvert, type ABConvert_SpecUser} from "src/ab_converter/converter/ABConvert"
 import {} from "src/ab_converter/converter/textProcessor"    // 加载所有处理器和选择器
 import {} from "src/ab_converter/converter/listProcessor"    // ^
 import {} from "src/ab_converter/converter/decoProcessor"    // ^
@@ -28,7 +28,7 @@ export interface ABSettingInterface {
   decoration_live: ConfDecoration
   decoration_render: ConfDecoration
   is_neg_level: boolean,
-  user_processor: ABProcessorSpecUser[]
+  user_processor: ABConvert_SpecUser[]
 }
 export enum ConfSelect{
   no = "no",
@@ -65,7 +65,7 @@ export class ABSettingTab extends PluginSettingTab {
 		super(app, plugin);
 		this.plugin = plugin;
     for (let item of plugin.settings.user_processor){
-      ABProcessorSpec.factory(item)
+      ABConvert.factory(item)
     }
 	}
 
@@ -137,7 +137,7 @@ export class ABSettingTab extends PluginSettingTab {
         .setIcon("plus-circle")
         .onClick(e => {
           new ABProcessorModal(this.app, async (result)=>{
-            ABProcessorSpec.factory(result)
+            ABConvert.factory(result)
             settings.user_processor.push(result)
             await this.plugin.saveSettings();
             this.processorPanel.remove()
@@ -150,12 +150,12 @@ export class ABSettingTab extends PluginSettingTab {
 }
 
 class ABProcessorModal extends Modal {
-  args: ABProcessorSpecUser
-  onSubmit: (args: ABProcessorSpecUser)=>void
+  args: ABConvert_SpecUser
+  onSubmit: (args: ABConvert_SpecUser)=>void
 
   constructor(
     app: App, 
-    onSubmit: (args: ABProcessorSpecUser)=>void
+    onSubmit: (args: ABConvert_SpecUser)=>void
   ) {
     super(app);
     this.args = {

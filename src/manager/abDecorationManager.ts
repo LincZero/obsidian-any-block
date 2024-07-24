@@ -1,7 +1,7 @@
 import {EditorView, Decoration} from "@codemirror/view"
 import type {Extension} from "@codemirror/state"
 
-import type { ABStateManager } from './abStateManager';
+import type { ABStateManager } from './ABStateManager';
 import type { MdSelectorRangeSpec } from "./abMdSelector"
 import { ABReplaceWidget } from "./replaceWidgetType"
 

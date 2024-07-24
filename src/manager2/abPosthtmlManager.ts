@@ -8,7 +8,7 @@ import {ABReg} from "src/config/abReg"
 import {ConfDecoration, ConfSelect} from "src/config/abSettingTab"
 import type AnyBlockPlugin from "../main"
 import {ReplaceRender} from "./replaceRenderChild"
-import {ABConvertManager} from "src/ab_converter/abConvertManager"
+import {ABConvertManager} from "src/ab_converter/ABConvertManager"
 import { match } from 'assert'
 
 /** Html处理器

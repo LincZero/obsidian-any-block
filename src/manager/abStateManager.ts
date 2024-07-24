@@ -5,7 +5,7 @@ import  {MarkdownView, type View, type Editor, type EditorPosition} from 'obsidi
 import type AnyBlockPlugin from '../main'
 import { ConfDecoration } from "src/config/abSettingTab"
 import { autoMdSelector, type MdSelectorRangeSpec} from "./abMdSelector"
-import { ABDecorationManager } from "./abDecorationManager"
+import { ABDecorationManager } from "./ABDecorationManager"
 import { ABReplaceWidget } from "./replaceWidgetType"
 
 /** 总逻辑梳理

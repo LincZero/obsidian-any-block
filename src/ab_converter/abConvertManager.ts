@@ -2,10 +2,10 @@
 import {MarkdownRenderChild, MarkdownRenderer} from 'obsidian';
 import {
   ProcessDataType, 
-  ABProcessorSpec,
-  type ABProcessorSpecSimp,
-  type ABProcessorSpecUser
-} from './converter/abProcessorInterface'
+  ABConvert,
+  type ABConvert_SpecSimp,
+  type ABConvert_SpecUser
+} from './converter/ABConvert'
  
 /**
   * 处理器的管理器
@@ -32,7 +32,7 @@ export class ABConvertManager {
   /** --------------------------------- 处理器容器管理 --------------------- */
 
   /// ab处理器 - 严格版，的接口与列表
-  public list_abConvert: ABProcessorSpec[] = []
+  public list_abConvert: ABConvert[] = []
 
   /// 处理器一览表 - 下拉框推荐
   public getConvertOptions(){

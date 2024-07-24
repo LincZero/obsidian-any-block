@@ -3,10 +3,10 @@
  */
 
 import { MarkdownRenderer, MarkdownRenderChild } from 'obsidian'
-import {ABConvertManager} from "../abConvertManager"
-import {ProcessDataType, ABProcessorSpec, type ABProcessorSpecSimp} from "./abProcessorInterface"
+import {ABConvertManager} from "../ABConvertManager"
+import {ProcessDataType, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
 
-const process_faq = ABProcessorSpec.factory({
+const process_faq = ABConvert.factory({
   id: "faq",
   name: "FAQ",
   match: "FAQ",

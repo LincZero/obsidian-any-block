@@ -9,8 +9,8 @@
 
 import { Plugin } from "obsidian";
 import { ABCodeblockManager } from "./manager3/abCodeblockManager";
-import { ABStateManager } from "./manager/abStateManager";
-import { ABPosthtmlManager } from "./manager2/abPosthtmlManager";
+import { ABStateManager } from "./manager/ABStateManager";
+import { ABPosthtmlManager } from "./manager2/ABPosthtmlManager";
 import type { ABSettingInterface } from "./config/abSettingTab"
 import { ABSettingTab, AB_SETTINGS } from "./config/abSettingTab"
 
