@@ -32,7 +32,7 @@ export class ABSelector_PostHtml{
     el: HTMLElement, 
     ctx: MarkdownPostProcessorContext
   ) {
-    console.log(" -- ABPosthtmlManager.processor")
+    console.log(" -- ABPosthtmlManager.processor")  // TODO 有个可能导致性能缺陷的问题：实时模式这里居然会被调用？有必要不再走一遍吗
 
     // 设置里不启用，直接关了
     if (this.settings.decoration_render==ConfDecoration.none) return

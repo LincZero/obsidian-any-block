@@ -1,12 +1,12 @@
 /** 基于接口写的扩展处理器的文件 */
-import {MarkdownRenderChild, MarkdownRenderer} from 'obsidian';
+import { assert } from 'console';
 import {
   ABConvert_IOType, 
   ABConvert
 } from './converter/ABConvert'
  
 /**
-  * 处理器的管理器
+  * 处理器的管理器。注意：使用前必须先执行：`redefine_renderMarkdown`
   * 
   * @default
   * 单例模式 
@@ -19,7 +19,7 @@ export class ABConvertManager {
   /// 构造函数，单例模式
   static getInstance(): ABConvertManager {
     if (!ABConvertManager.m_instance) {
-      ABConvertManager.m_instance = new ABConvertManager();
+      ABConvertManager.m_instance = new ABConvertManager()
     }
     return ABConvertManager.m_instance;
   }
@@ -29,7 +29,7 @@ export class ABConvertManager {
 
   /** --------------------------------- 处理器容器管理 --------------------- */
 
-  /// ab处理器 - 严格版，的接口与列表
+  /// ab处理器 - 严格版，的接口与列表 (动态)
   public list_abConvert: ABConvert[] = []
 
   /// 处理器一览表 - 下拉框推荐
@@ -81,13 +81,28 @@ export class ABConvertManager {
     return table_p
   }
 
+  /** --------------------------------- 通用解耦适配 (动态) ----------------- */
+
+  /**
+   * 渲染文本为html
+   * @detail 这里需要能够被回调函数替换。从而用于接回软件自身的html渲染机制，来进行解耦
+   * @param markdown 原md
+   * @param el 要追加到的元素
+   */
+  private m_renderMarkdownFn:(markdown: string, el: HTMLElement) => Promise<void> = async (markdown, el) => {
+    console.error("AnyBlockError: 请先制定/重定义md渲染器")
+  }
+
+  /// 用回调函数替换重渲染器
+  public redefine_renderMarkdown(callback: (markdown: string, el: HTMLElement) => Promise<void>) {
+    this.m_renderMarkdownFn = callback
+  }
+
   /** --------------------------------- 处理器的调用 ----------------------- */
   
   /**
    * 自动寻找相匹配的ab处理器进行处理
-   * 
    * @detail ab转换器能根据header和content来将有段txt文本转换为html元素
-   * 
    * @param el 最后的渲染结果
    * @param header 转换方式
    * @param content 要转换的初始文本
@@ -102,8 +117,7 @@ export class ABConvertManager {
     if (prev_type == ABConvert_IOType.text) {
       const subEl = el.createDiv()
       subEl.addClass("markdown-rendered")
-      const child = new MarkdownRenderChild(subEl);
-      MarkdownRenderer.renderMarkdown(prev_result, subEl, "", child);
+      ABConvertManager.getInstance().m_renderMarkdownFn(prev_result, subEl);
       prev_type = ABConvert_IOType.el
       prev_result = el
     }
@@ -143,8 +157,7 @@ export class ABConvertManager {
             if (abReplaceProcessor.process_param==ABConvert_IOType.el && prev_type==ABConvert_IOType.text){
               const subEl = el.createDiv()
               subEl.addClass("markdown-rendered")
-              const child = new MarkdownRenderChild(subEl);
-              MarkdownRenderer.renderMarkdown(prev_result, subEl, "", child);
+              ABConvertManager.getInstance().m_renderMarkdownFn(prev_result, subEl);
               prev_type = ABConvert_IOType.el
               prev_result = el
             }

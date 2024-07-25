@@ -7,10 +7,13 @@
  * - 接管渲染后 (渲染/阅读模式)
  */
 
-import { Plugin } from "obsidian";
-import { ABReplacer_CodeBlock } from "./ab_manager/abm_code/ABReplacer_CodeBlock";
-import { ABStateManager } from "./ab_manager/abm_cm/ABStateManager";
-import { ABSelector_PostHtml } from "./ab_manager/abm_html/ABSelector_PostHtml";
+import { Plugin } from "obsidian"
+import {MarkdownRenderChild, MarkdownRenderer} from 'obsidian'
+
+import { ABReplacer_CodeBlock } from "./ab_manager/abm_code/ABReplacer_CodeBlock"
+import { ABStateManager } from "./ab_manager/abm_cm/ABStateManager"
+import { ABSelector_PostHtml } from "./ab_manager/abm_html/ABSelector_PostHtml"
+import { ABConvertManager } from "./ab_converter/ABConvertManager"
 import type { ABSettingInterface } from "./config/ABSettingTab"
 import { ABSettingTab, AB_SETTINGS } from "./config/ABSettingTab"
 
@@ -21,6 +24,23 @@ export default class AnyBlockPlugin extends Plugin {
 	async onload() {
     await this.loadSettings();
     this.addSettingTab(new ABSettingTab(this.app, this));
+
+    // 将ob的解耦行为传入回调函数 (目的是将转换器和Obsidian相解耦合)
+    ABConvertManager.getInstance().redefine_renderMarkdown((markdown: string, el: HTMLElement): Promise<void> => {
+      /**
+       * 原定义：
+       * Renders markdown string to an HTML element.
+       * @param markdown - The markdown source code
+       * @param el - The element to append to
+       * @param sourcePath - The normalized path of this markdown file, used to resolve relative internal links
+       *     此标记文件的规范化路径，用于解析相对内部链接
+       *     TODO 我可能知道为什么重渲染图片会出现bug了，原因应该在这里
+       * @param component - A parent component to manage the lifecycle of the rendered child components, if any
+       *     一个父组件，用于管理呈现的子组件(如果有的话)的生命周期
+       * @public
+       */
+      return MarkdownRenderer.renderMarkdown(markdown, el, "", new MarkdownRenderChild(el))
+    })
 
     // 钩子组1 - 代码块
     this.registerMarkdownCodeBlockProcessor("ab", ABReplacer_CodeBlock.processor);
