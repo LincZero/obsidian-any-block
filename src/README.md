@@ -51,9 +51,10 @@ npm run build
                 - 代码块选择器，代码缩写 `ABS_CodeBlock` (自带选择器)
                 - CM选择器，代码缩写 `ABS_CM`
                 - 后选择器，代码缩写 `ABS_Html`
-            - 在VuePress中，这个支持两种选择器：
-                - 代码块选择器 (自带选择器)
-                - `:::` 选择器 (自带选择器)
+            - 在VuePress中，这个也支持多种选择器：
+                - Markdown-it 的 TokensStream
+                - `:::` 选择器 (markdown-it-container)
+            - 其他 TokensStream 或 AST 架构的软件
         - 再包含
             - 选择器 `AnyBlockSelector`，代码缩写 `ABS`
                 - 用法：选择范围，并返回范围值

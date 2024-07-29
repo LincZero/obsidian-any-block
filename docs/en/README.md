@@ -22,7 +22,7 @@ Here are some of the more common processors:
 - list2table  (2datatable)
 - list2listtable
 - list2mermaid  (graph LR)
-- list2mindmad  (mermaid v9.3.0 mindmap)
+- list2mindmap  (mermaid v9.3.0 mindmap)
 - list2tab
 - list2timeline
 - title2list + list2somthing
