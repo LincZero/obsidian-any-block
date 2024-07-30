@@ -19,6 +19,7 @@ interface ListItem {
   level: number;          // 级别
 }[]
 export type List_ListItem = ListItem[]
+
 // 通用表格数据，一个元素等于是一个单元格项
 interface TableItem extends ListItem{
   tableRow: number,       // 跨行数

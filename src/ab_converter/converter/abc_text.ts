@@ -1,3 +1,9 @@
+/**
+ * 转换器_文字版
+ * 
+ * string -> string|HTMLElement
+ */
+
 import {ABConvert_IOType, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
 import {ABConvertManager} from "../ABConvertManager"
 import {ABReg} from "../ABReg"
@@ -17,19 +23,6 @@ import {getID} from "src/utils/utils"
  * 1. 能方便在大纲里快速找到想要的处理器
  * 2. 让处理器能互相调用
  */
-
-const abc_md = ABConvert.factory({
-  id: "md",
-  name: "md",
-  process_param: ABConvert_IOType.text,
-  process_return: ABConvert_IOType.el,
-  process: (el, header, content)=>{
-    const subEl = el.createDiv()
-    subEl.addClass("markdown-rendered")
-    ABConvertManager.getInstance().m_renderMarkdownFn(content, subEl)
-    return el
-  }
-})
 
 const abc_quote = ABConvert.factory({
   id: "quote",
@@ -221,30 +214,6 @@ const abc_title2list = ABConvert.factory({
   }
 })
 
-const abc_title2table = ABConvert.factory({
-  id: "title2table",
-  name: "标题到表格",
-  process_param: ABConvert_IOType.text,
-  process_return: ABConvert_IOType.el,
-  process: (el, header, content)=>{
-    content = ListProcess.title2list(content, el)
-    ListProcess.list2table(content, el)
-    return el
-  }
-})
-
-const abc_title2mindmap = ABConvert.factory({
-  id: "title2mindmap",
-  name: "标题到脑图",
-  process_param: ABConvert_IOType.text,
-  process_return: ABConvert_IOType.el,
-  process: (el, header, content)=>{
-    content = ListProcess.title2list(content, el)
-    ListProcess.list2mindmap(content, el)
-    return el
-  }
-})
-
 const abc_listroot = ABConvert.factory({
   id: "listroot",
   name: "增加列表根",
@@ -269,6 +238,72 @@ const abc_listXinline = ABConvert.factory({
   process_return: ABConvert_IOType.text,
   process: (el, header, content)=>{
     return ListProcess.listXinline(content)
+  }
+})
+
+const abc_md = ABConvert.factory({
+  id: "md",
+  name: "md",
+  process_param: ABConvert_IOType.text,
+  process_return: ABConvert_IOType.el,
+  process: (el, header, content)=>{
+    const subEl = el.createDiv()
+    subEl.addClass("markdown-rendered")
+    ABConvertManager.getInstance().m_renderMarkdownFn(content, subEl)
+    return el
+  }
+})
+
+const abc_text = ABConvert.factory({
+  id: "text",
+  name: "纯文本",
+  detail: "其实一般会更推荐用code()代替，那个更精确",
+  process_param: ABConvert_IOType.text,
+  process_return: ABConvert_IOType.el,
+  process: (el, header, content)=>{
+    // 文本元素。pre不好用，这里还是得用<br>换行最好
+    // `<p>${content.split("\n").map(line=>{return "<span>"+line+"</span>"}).join("<br/>")}</p>`
+    el.innerHTML = `<p>${content.replace(/ /g, "&nbsp;").split("\n").join("<br/>")}</p>`
+    return el
+  }
+})
+
+const abc_callout = ABConvert.factory({
+  id: "callout",
+  name: "callout语法糖",
+  match: /^\!/,
+  default: "!note",
+  detail: "需要obsidian 0.14版本以上来支持callout语法",
+  process_param: ABConvert_IOType.text,
+  process_return: ABConvert_IOType.text,
+  process: (el, header, content)=>{
+    return "```ad-"+header.slice(1)+"\n"+content+"\n```"
+  }
+})
+
+// 纯组合，后续用别名模块替代
+const abc_title2table = ABConvert.factory({
+  id: "title2table",
+  name: "标题到表格",
+  process_param: ABConvert_IOType.text,
+  process_return: ABConvert_IOType.el,
+  process: (el, header, content)=>{
+    content = ListProcess.title2list(content, el)
+    ListProcess.list2table(content, el)
+    return el
+  }
+})
+
+// 纯组合，后续用别名模块替代
+const abc_title2mindmap = ABConvert.factory({
+  id: "title2mindmap",
+  name: "标题到脑图",
+  process_param: ABConvert_IOType.text,
+  process_return: ABConvert_IOType.el,
+  process: (el, header, content)=>{
+    content = ListProcess.title2list(content, el)
+    ListProcess.list2mindmap(content, el)
+    return el
   }
 })
 
@@ -384,19 +419,6 @@ const abc_list2mindmap = ABConvert.factory({
   }
 })
 
-const abc_callout = ABConvert.factory({
-  id: "callout",
-  name: "callout语法糖",
-  match: /^\!/,
-  default: "!note",
-  detail: "需要obsidian 0.14版本以上来支持callout语法",
-  process_param: ABConvert_IOType.text,
-  process_return: ABConvert_IOType.text,
-  process: (el, header, content)=>{
-    return "```ad-"+header.slice(1)+"\n"+content+"\n```"
-  }
-})
-
 const abc_mermaid = ABConvert.factory({
   id: "mermaid",
   name: "新mermaid",
@@ -416,20 +438,6 @@ const abc_mermaid = ABConvert.factory({
         el.innerHTML = svgCode
       });
     })(el, header, content)
-    return el
-  }
-})
-
-const abc_text = ABConvert.factory({
-  id: "text",
-  name: "纯文本",
-  detail: "其实一般会更推荐用code()代替，那个更精确",
-  process_param: ABConvert_IOType.text,
-  process_return: ABConvert_IOType.el,
-  process: (el, header, content)=>{
-    // 文本元素。pre不好用，这里还是得用<br>换行最好
-    // `<p>${content.split("\n").map(line=>{return "<span>"+line+"</span>"}).join("<br/>")}</p>`
-    el.innerHTML = `<p>${content.replace(/ /g, "&nbsp;").split("\n").join("<br/>")}</p>`
     return el
   }
 })
