@@ -1,3 +1,10 @@
+/**
+ * AB转换器的抽象基类
+ * 
+ * @detail
+ * 被所有权：ABConvertManager
+ */
+
 import { ABConvertManager } from "../ABConvertManager"
 
 /**
@@ -7,11 +14,13 @@ import { ABConvertManager } from "../ABConvertManager"
  */
 export enum ABConvert_IOType {
   text = "string",
-  el = "HTMLElement"
+  el = "HTMLElement",
+  el_text = "HTMLElementString",
 }
+type ABConvert_IOType2 = string|Element
 
 /**
- * ab转换器
+ * AB转换器的抽象基类
  * 
  * @detail
  * 被所有权：ABConvertManager
@@ -94,7 +103,12 @@ export class ABConvert {
 
   /// 析构函数
   destructor() {
-    ABConvertManager.getInstance().list_abConvert.remove(this)
+    // ABConvertManager.getInstance().list_abConvert.remove(this) // 旧，remove接口是ob定义的
+    
+    const index = ABConvertManager.getInstance().list_abConvert.indexOf(this)
+    if (index > -1) {
+      ABConvertManager.getInstance().list_abConvert.splice(index, 1)
+    }
   }
   
   /** --------------------------------- 处理器容器管理 (旧) --------------- */

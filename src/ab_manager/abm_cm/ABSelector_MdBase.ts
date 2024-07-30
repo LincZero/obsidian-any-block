@@ -1,4 +1,4 @@
-import {ABReg} from "src/config/abReg"
+import {ABReg} from "src/config/ABReg"
 import {
   registerMdSelector, 
   type MdSelectorSpecSimp,

@@ -1,12 +1,35 @@
-/** 基于接口写的扩展处理器的文件 */
-import { assert } from 'console';
+/** 
+ * @detail
+ * 具体用法和介绍等见 README.md
+ * 
+ * 依赖顺序
+ * 1. ABConvert.ts，转换器的抽象基类
+ * 2. ABConvertManager.ts，转换器的容器
+ * 3. ……，其他具体的转换器
+ * 
+ * 跨平台兼容依赖问题
+ * - 在Obsidian环境，能够使用document
+ * - 在vuepress和mdit环境，他是使用纯文本来解析渲染md而非面向对象，也不依赖document。所以为了兼顾这个，需要额外安装Node.js中能使用的[jsdom](https://github.com/jsdom/jsdom)
+ * 
+ * jsdom 老install失败。网上搜说：
+ * a: jsdom 依赖于 contextify，而 contextify 最近才支持 windows。安装它需要 python 和 C++ 编译器。
+ * b: jsdom 使用 contextify 在 DOM 上运行 JavaScript。而 contextify 需要本地 C++ 编译器。根据官方自述，在 Windows 平台上必须安装一堆东西
+ * 不过我后来尝试按一个回答中那样指定了版本就可以了：npm install -D jsdom@4.2.0
+ */
+
+// 仅用于提供document对象支持 (如果在Ob中则请注释掉他，用ob自带document对象的)
+// import jsdom from "jsdom"
+// const { JSDOM } = jsdom;
+// const { document } = (new JSDOM(`...`)).window;
+
+// AB转换器容器
 import {
   ABConvert_IOType, 
   ABConvert
 } from './converter/ABConvert'
  
 /**
-  * 处理器的管理器。注意：使用前必须先执行：`redefine_renderMarkdown`
+  * AB转换器的管理器。注意：使用前必须先执行：`redefine_renderMarkdown`
   * 
   * @default
   * 单例模式 
@@ -16,7 +39,7 @@ export class ABConvertManager {
 
   /** --------------------------------- 特殊函数 ---------------------------- */
 
-  /// 构造函数，单例模式
+  /// 单例模式
   static getInstance(): ABConvertManager {
     if (!ABConvertManager.m_instance) {
       ABConvertManager.m_instance = new ABConvertManager()
@@ -26,6 +49,17 @@ export class ABConvertManager {
 
   /// 单例
   private static m_instance: ABConvertManager
+
+  /// 构造函数
+  private constructor() {
+    /// 环境打印
+    // @ts-ignore 用于检查obsidian是否存在，不存在的话正常是飘红的
+    if (typeof obsidian !== 'undefined') {
+      console.log('obsidian环境');
+    } else {
+      console.log('mdit环境，非obsidian环境');
+    }
+  }
 
   /** --------------------------------- 处理器容器管理 --------------------- */
 
@@ -45,38 +79,36 @@ export class ABConvertManager {
 
   /// 处理器一览表 - 全部信息
   public generateConvertInfoTable(el: HTMLElement){
-    const table_p = el.createEl("div",{
-      cls: ["ab-setting","md-table-fig1"]
-    })
-    const table = table_p.createEl("table",{
-      cls: ["ab-setting","md-table-fig2"]
-    })
+    const table_p: HTMLDivElement = document.createElement("div"); el.appendChild(table_p); table_p.classList.add("markdown-rendered", "ab-setting", "md-table-fig1");
+    const table: HTMLDivElement = document.createElement("table"); table_p.appendChild(table); table_p.classList.add("ab-setting","md-table-fig2");
     {
-      const thead = table.createEl("thead")
-      const tr = thead.createEl("tr")
-      tr.createEl("td", {text: "处理器名"})
-      tr.createEl("td", {text: "下拉框默认项"})
-      tr.createEl("td", {text: "用途描述"})
-      tr.createEl("td", {text: "处理类型"})
-      tr.createEl("td", {text: "输出类型"})
-      tr.createEl("td", {text: "正则"})
-      tr.createEl("td", {text: "别名替换"})
-      tr.createEl("td", {text: "是否启用"})
-      tr.createEl("td", {text: "定义来源"})
+      const thead = document.createElement("thread"); table.appendChild(thead);
+      const tr = document.createElement("tr"); thead.appendChild(tr);
+      let td;
+      td = document.createElement("td"); tr.appendChild(td); td.textContent = "处理器名";
+      td = document.createElement("td"); tr.appendChild(td); td.textContent = "下拉框默认项";
+      td = document.createElement("td"); tr.appendChild(td); td.textContent = "用途描述";
+      td = document.createElement("td"); tr.appendChild(td); td.textContent = "处理类型";
+      td = document.createElement("td"); tr.appendChild(td); td.textContent = "输出类型";
+      td = document.createElement("td"); tr.appendChild(td); td.textContent = "正则";
+      td = document.createElement("td"); tr.appendChild(td); td.textContent = "别名替换";
+      td = document.createElement("td"); tr.appendChild(td); td.textContent = "是否启用";
+      td = document.createElement("td"); tr.appendChild(td); td.textContent = "定义来源";
     }
-    const tbody = table.createEl("tbody")
+    const tbody = document.createElement("tbody"); tbody.appendChild(tbody);
     for (let item of this.list_abConvert){
-      const tr = tbody.createEl("tr")
-      tr.createEl("td", {text: item.name})
-      tr.createEl("td", {text: String(item.default)})
-      tr.createEl("td", {text: item.detail, attr:{"style":"max-width:240px;overflow-x:auto"}})
-      // tr.createEl("td", {text: item.is_render?"渲染":"文本"})
-      tr.createEl("td", {text: String(item.process_param)})
-      tr.createEl("td", {text: String(item.process_return)})
-      tr.createEl("td", {text: String(item.match)})
-      tr.createEl("td", {text: item.process_alias})
-      tr.createEl("td", {text: item.is_disable?"禁用":"启用"})
-      tr.createEl("td", {text: item.register_from})
+      const tr = document.createElement("tr"); tbody.appendChild(tr)
+      let td
+      td = document.createElement("td"); tr.appendChild(td); td.textContent = item.name;
+      td = document.createElement("td"); tr.appendChild(td); td.textContent = String(item.default);
+      td = document.createElement("td"); tr.appendChild(td); td.textContent = item.detail; td.setAttribute("style", "max-width:240px;overflow-x:auto");
+      // td = document.createElement("td"); tr.appendChild(td); td.textContent = item.is_render?"渲染":"文本";
+      td = document.createElement("td"); tr.appendChild(td); td.textContent = String(item.process_param);
+      td = document.createElement("td"); tr.appendChild(td); td.textContent = String(item.process_return);
+      td = document.createElement("td"); tr.appendChild(td); td.textContent = String(item.match);
+      td = document.createElement("td"); tr.appendChild(td); td.textContent = item.process_alias;
+      td = document.createElement("td"); tr.appendChild(td); td.textContent = item.is_disable?"禁用":"启用";
+      td = document.createElement("td"); tr.appendChild(td); td.textContent = item.register_from;
     }
     return table_p
   }
@@ -89,12 +121,12 @@ export class ABConvertManager {
    * @param markdown 原md
    * @param el 要追加到的元素
    */
-  private m_renderMarkdownFn:(markdown: string, el: HTMLElement) => Promise<void> = async (markdown, el) => {
+  private m_renderMarkdownFn:(markdown: string, el: HTMLElement) => void = (markdown, el) => {
     console.error("AnyBlockError: 请先制定/重定义md渲染器")
   }
 
   /// 用回调函数替换重渲染器
-  public redefine_renderMarkdown(callback: (markdown: string, el: HTMLElement) => Promise<void>) {
+  public redefine_renderMarkdown(callback: (markdown: string, el: HTMLElement) => void) {
     this.m_renderMarkdownFn = callback
   }
 
@@ -106,8 +138,9 @@ export class ABConvertManager {
    * @param el 最后的渲染结果
    * @param header 转换方式
    * @param content 要转换的初始文本
+   * @return 等于el，无用，后面可以删了
    */
-  public static autoABConvert(el:HTMLDivElement, header:string, content:string):HTMLElement{
+  public static autoABConvert(el:HTMLDivElement, header:string, content:string): void{
     let prev_result:any = content
     let list_header = header.split("|")
     let prev_type: ABConvert_IOType = ABConvert_IOType.text
@@ -115,13 +148,11 @@ export class ABConvertManager {
     
     // 尾处理。如果还是text内容，则给一个md渲染器
     if (prev_type == ABConvert_IOType.text) {
-      const subEl = el.createDiv()
-      subEl.addClass("markdown-rendered")
+      const subEl = document.createElement("div"); el.appendChild(subEl); subEl.classList.add("markdown-rendered");
       ABConvertManager.getInstance().m_renderMarkdownFn(prev_result, subEl);
       prev_type = ABConvert_IOType.el
       prev_result = el
     }
-    return prev_result
   }
 
   private static autoABConvert_runConvert(el:HTMLDivElement, list_header:string[], prev_result:any, prev_type:ABConvert_IOType):any{
@@ -155,8 +186,7 @@ export class ABConvertManager {
           // 检查输入类型
           if(abReplaceProcessor.process_param != prev_type){
             if (abReplaceProcessor.process_param==ABConvert_IOType.el && prev_type==ABConvert_IOType.text){
-              const subEl = el.createDiv()
-              subEl.addClass("markdown-rendered")
+              const subEl: HTMLDivElement = document.createElement("div"); el.appendChild(subEl); subEl.classList.add("markdown-rendered");
               ABConvertManager.getInstance().m_renderMarkdownFn(prev_result, subEl);
               prev_type = ABConvert_IOType.el
               prev_result = el
@@ -169,8 +199,8 @@ export class ABConvertManager {
           // 执行处理器
           prev_result = abReplaceProcessor.process(el, item_header, prev_result)
           // 检查输出类型
-          if(prev_result instanceof HTMLElement){prev_type = ABConvert_IOType.el}
-          else if(typeof(prev_result) == "string"){prev_type = ABConvert_IOType.text}
+          if(typeof(prev_result) == "string"){prev_type = ABConvert_IOType.text}
+          else if (prev_result instanceof HTMLElement){prev_type = ABConvert_IOType.el}
           else {
             console.warn("处理器输出类型错误", abReplaceProcessor.id, abReplaceProcessor.process_param, prev_type);
             break

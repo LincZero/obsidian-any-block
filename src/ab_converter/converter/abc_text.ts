@@ -2,7 +2,7 @@ import {MarkdownRenderChild, MarkdownRenderer} from 'obsidian';
 
 import {ABConvertManager} from "../ABConvertManager"
 import {ABConvert_IOType, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
-import {ABReg} from "src/config/abReg"
+import {ABReg} from "../ABReg"
 import {ListProcess} from "./abc_list"
 import {getID} from "src/utils/utils"
 
