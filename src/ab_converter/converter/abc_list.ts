@@ -4,11 +4,11 @@
  * 列表 -> html/列表
  */
 
-import { MarkdownRenderer, MarkdownRenderChild, } from 'obsidian'
+// mermaid相关
 import mermaid from "mermaid"
 import {getID} from "src/utils/utils"
-import { ABReg } from 'src/config/ABReg'
 
+import { ABReg } from '../ABReg'
 import GeneratorBranchTable from "src/svelte/GeneratorBranchTable.svelte"
 import GeneratorListTable from "src/svelte/GeneratorListTable.svelte"
 import GeneratorTab from "src/svelte/GeneratorTab.svelte"

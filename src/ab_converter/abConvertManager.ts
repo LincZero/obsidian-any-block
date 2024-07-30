@@ -121,7 +121,7 @@ export class ABConvertManager {
    * @param markdown 原md
    * @param el 要追加到的元素
    */
-  private m_renderMarkdownFn:(markdown: string, el: HTMLElement) => void = (markdown, el) => {
+  public m_renderMarkdownFn:(markdown: string, el: HTMLElement) => void = (markdown, el) => {
     console.error("AnyBlockError: 请先制定/重定义md渲染器")
   }
 
@@ -145,7 +145,7 @@ export class ABConvertManager {
     let list_header = header.split("|")
     let prev_type: ABConvert_IOType = ABConvert_IOType.text
     prev_result = this.autoABConvert_runConvert(el, list_header, prev_result, prev_type)
-    
+
     // 尾处理。如果还是text内容，则给一个md渲染器
     if (prev_type == ABConvert_IOType.text) {
       const subEl = document.createElement("div"); el.appendChild(subEl); subEl.classList.add("markdown-rendered");

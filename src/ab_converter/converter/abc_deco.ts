@@ -4,8 +4,8 @@
  * html -> html
  */
 
-import {ABConvertManager} from "../ABConvertManager"
 import {ABConvert_IOType, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
+import {ABConvertManager} from "../ABConvertManager"
 
 export const DECOProcessor = 0  // 用于模块化，防报错，其实没啥用
 

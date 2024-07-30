@@ -2,9 +2,8 @@
  * 处理器_特殊版？
  */
 
-import { MarkdownRenderer, MarkdownRenderChild } from 'obsidian'
-import {ABConvertManager} from "../ABConvertManager"
 import {ABConvert_IOType, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
+import {ABConvertManager} from "../ABConvertManager"
 
 const abc_faq = ABConvert.factory({
   id: "faq",
@@ -30,9 +29,8 @@ const abc_faq = ABConvert.factory({
           const e_faq_line = e_faq.createDiv({cls:`ab-faq-line ab-faq-${mode_qa}`})
           const e_faq_bubble = e_faq_line.createDiv({cls:`ab-faq-bubble ab-faq-${mode_qa}`})
           const e_faq_content = e_faq_bubble.createDiv({cls:"ab-faq-content"})
-          const child = new MarkdownRenderChild(e_faq_content);
           e_faq_content.addClass("markdown-rendered")
-          MarkdownRenderer.renderMarkdown(last_content, e_faq_content, "", child);
+          ABConvertManager.getInstance().m_renderMarkdownFn(last_content, e_faq_content)
         }
         mode_qa = m_line[1]
         last_content = m_line[3]
@@ -43,9 +41,8 @@ const abc_faq = ABConvert.factory({
       const e_faq_line = e_faq.createDiv({cls:`ab-faq-line ab-faq-${mode_qa}`})
           const e_faq_bubble = e_faq_line.createDiv({cls:`ab-faq-bubble ab-faq-${mode_qa}`})
           const e_faq_content = e_faq_bubble.createDiv({cls:"ab-faq-content"})
-          const child = new MarkdownRenderChild(e_faq_content);
           e_faq_content.addClass("markdown-rendered")
-          MarkdownRenderer.renderMarkdown(last_content, e_faq_content, "", child);
+          ABConvertManager.getInstance().m_renderMarkdownFn(last_content, e_faq_content)
     }
     return el
   }

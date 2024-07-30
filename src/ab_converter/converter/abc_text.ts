@@ -1,17 +1,16 @@
-import {MarkdownRenderChild, MarkdownRenderer} from 'obsidian';
-
-import {ABConvertManager} from "../ABConvertManager"
 import {ABConvert_IOType, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
+import {ABConvertManager} from "../ABConvertManager"
 import {ABReg} from "../ABReg"
 import {ListProcess} from "./abc_list"
-import {getID} from "src/utils/utils"
 
+// mermaid相关
 import mermaid from "mermaid"
 import mindmap from '@mermaid-js/mermaid-mindmap';
 const initialize = mermaid.registerExternalDiagrams([mindmap]);
 export const mermaid_init = async () => {
   await initialize;
 };
+import {getID} from "src/utils/utils"
 
 /**
  * 将registerABProcessor的调用分成两步是因为：
@@ -27,9 +26,7 @@ const abc_md = ABConvert.factory({
   process: (el, header, content)=>{
     const subEl = el.createDiv()
     subEl.addClass("markdown-rendered")
-    const child = new MarkdownRenderChild(subEl);
-    MarkdownRenderer.renderMarkdown(content, subEl, "", child);
-    // ctx.addChild(child);
+    ABConvertManager.getInstance().m_renderMarkdownFn(content, subEl)
     return el
   }
 })
