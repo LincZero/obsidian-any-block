@@ -9,7 +9,7 @@
 //import {getID} from "src/utils/utils"
 
 import { ABReg } from '../ABReg'
-import {ABConvert_IOType, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
+import {ABConvert_IOEnum, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
 import {ABConvertManager} from "../ABConvertManager"
 
 // 通用列表数据，一个元素等于是一个列表项
@@ -29,14 +29,14 @@ export type List_TableItem = TableItem[]
 export class ListProcess{
 
   /** title转列表 */
-  static title2list(text: string, div: HTMLDivElement) {
+  static title2list(text: string, div: HTMLDivElement): string {
     let list_itemInfo = this.title2data(text)
     list_itemInfo = this.data2strict(list_itemInfo)
     return this.data2list(list_itemInfo)
   }
 
   /** 列表转表格 */
-  static list2table(text: string, div: HTMLDivElement, modeT=false) {
+  static list2table(text: string, div: HTMLDivElement, modeT=false): HTMLDivElement {
     let list_itemInfo = this.list2data(text)
     return this.data2table(list_itemInfo, div, modeT)
   }
@@ -610,7 +610,7 @@ export class ListProcess{
         let is_head
         let tr
         if (index_line==0 && thead){ // 判断是否第一行&&是否有表头
-          tr = thead.createEl("tr")
+          tr = document.createElement("tr"); thead.appendChild(tr);
           is_head = true
         }
         else{
@@ -619,10 +619,8 @@ export class ListProcess{
         }
         for (let item of list_tableInfo){                           // 遍历表格列，创建td
           if (item.tableLine!=index_line) continue
-          let td = tr.createEl(is_head?"th":"td", {
-            attr:{"rowspan": item.tableRow}
-          })
-          td.addClass("markdown-rendered")
+          let td = document.createElement(is_head?"th":"td"); tr.appendChild(td); td.setAttribute("rowspan", item.tableRow.toString());
+          td.classList.add("markdown-rendered")
           ABConvertManager.getInstance().m_renderMarkdownFn(item.content, td)
         }
       }
@@ -717,9 +715,7 @@ export class ListProcess{
         let tr: HTMLElement
         // 行 - 表头行（即是否第一行&&是否有表头）
         if (index_line==0 && thead){
-          tr = thead.createEl("tr", {
-            // attr: {"tr_level": tr_line_level[index_line]}
-          })
+          tr = document.createElement("tr"); thead.appendChild(tr); // attr: {"tr_level": tr_line_level[index_line]}
           is_head = true
         }
         // 行 - 非表头行

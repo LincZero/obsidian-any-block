@@ -19,12 +19,17 @@
 
 // 仅用于提供document对象支持 (如果在Ob中则请注释掉他，用ob自带document对象的)
 //import jsdom from "jsdom"
-//const { JSDOM } = jsdom;
-//const { document } = (new JSDOM(`...`)).window;
+//const { JSDOM } = jsdom
+//const dom = new JSDOM(`<!DOCTYPE html><html><body></body></html>`)
+//global.window = dom.window
+//global.document = dom.window.document
+//global.NodeList = dom.window.NodeList
+//global.HTMLElement = dom.window.document
 
 // AB转换器容器
 import {
-  ABConvert_IOType, 
+  ABConvert_IOEnum, 
+  type ABConvert_IOType, 
   ABConvert
 } from './converter/ABConvert'
  
@@ -141,21 +146,29 @@ export class ABConvertManager {
    * @return 等于el，无用，后面可以删了
    */
   public static autoABConvert(el:HTMLDivElement, header:string, content:string): void{
-    let prev_result:any = content
+    let prev_result:ABConvert_IOType = content             // 上次转换后的结果
+    let prev_type: ABConvert_IOEnum = ABConvert_IOEnum.text // 上次转换后的结果的类型
     let list_header = header.split("|")
-    let prev_type: ABConvert_IOType = ABConvert_IOType.text
     prev_result = this.autoABConvert_runConvert(el, list_header, prev_result, prev_type)
 
     // 尾处理。如果还是text内容，则给一个md渲染器
-    if (prev_type == ABConvert_IOType.text) {
+    if (typeof(prev_result) == "string" && prev_type == ABConvert_IOEnum.text) {
       const subEl = document.createElement("div"); el.appendChild(subEl); subEl.classList.add("markdown-rendered");
       ABConvertManager.getInstance().m_renderMarkdownFn(prev_result, subEl);
-      prev_type = ABConvert_IOType.el
+      prev_type = ABConvert_IOEnum.el
       prev_result = el
     }
   }
 
-  private static autoABConvert_runConvert(el:HTMLDivElement, list_header:string[], prev_result:any, prev_type:ABConvert_IOType):any{
+  /**
+   * autoABConvert的递归子函数
+   * @param el 
+   * @param list_header 
+   * @param prev_result 上次转换后的结果
+   * @param prev_type   上次转换后的结果的类型
+   * @returns           递归转换后的结果
+   */
+  private static autoABConvert_runConvert(el:HTMLDivElement, list_header:string[], prev_result:ABConvert_IOType, prev_type:ABConvert_IOEnum):ABConvert_IOType{
     // 循环header组，直到遍历完文本处理器或遇到渲染处理器
     for (let item_header of list_header){
       for (let abReplaceProcessor of ABConvertManager.getInstance().list_abConvert){
@@ -184,11 +197,13 @@ export class ABConvertManager {
         // 若不是，使用process方法
         else if(abReplaceProcessor.process){
           // 检查输入类型
-          if(abReplaceProcessor.process_param != prev_type){
-            if (abReplaceProcessor.process_param==ABConvert_IOType.el && prev_type==ABConvert_IOType.text){
+          // 允许自动插入一个md->html的转换器
+          // TODO，后面要被别名系统替换掉，`html->html` 的输入源是md时，里面插入一个md转换器
+          if (abReplaceProcessor.process_param != prev_type){
+            if (abReplaceProcessor.process_param==ABConvert_IOEnum.el && typeof(prev_result) == "string" && prev_type==ABConvert_IOEnum.text){
               const subEl: HTMLDivElement = document.createElement("div"); el.appendChild(subEl); subEl.classList.add("markdown-rendered");
               ABConvertManager.getInstance().m_renderMarkdownFn(prev_result, subEl);
-              prev_type = ABConvert_IOType.el
+              prev_type = ABConvert_IOEnum.el
               prev_result = el
             }
             else{
@@ -196,11 +211,15 @@ export class ABConvertManager {
               break
             }
           }
+
           // 执行处理器
           prev_result = abReplaceProcessor.process(el, item_header, prev_result)
+
           // 检查输出类型
-          if(typeof(prev_result) == "string"){prev_type = ABConvert_IOType.text}
-          else if (prev_result instanceof HTMLElement){prev_type = ABConvert_IOType.el}
+          if(typeof(prev_result) == "string"){prev_type = ABConvert_IOEnum.text}
+          // 下行换成了下下行。因为下行在mdit/jsdom环境可能报错：Right-hand side of 'instanceof' is not callable
+          //else if (prev_result instanceof HTMLElement){prev_type = ABConvert_IOType.el}
+          else if (typeof(prev_result) == "object"){prev_type = ABConvert_IOEnum.el}
           else {
             console.warn("处理器输出类型错误", abReplaceProcessor.id, abReplaceProcessor.process_param, prev_type);
             break

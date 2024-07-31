@@ -4,7 +4,7 @@
  * html -> html
  */
 
-import {ABConvert_IOType, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
+import {ABConvert_IOEnum, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
 import {ABConvertManager} from "../ABConvertManager"
 
 export const DECOProcessor = 0  // 用于模块化，防报错，其实没啥用
@@ -12,28 +12,28 @@ export const DECOProcessor = 0  // 用于模块化，防报错，其实没啥用
 const abc_fold = ABConvert.factory({
   id: "fold",
   name: "折叠",
-  process_param: ABConvert_IOType.el,
-  process_return: ABConvert_IOType.el,
+  process_param: ABConvert_IOEnum.el,
+  process_return: ABConvert_IOEnum.el,
   process: (el, header, content)=>{
     if(el.children.length!=1) return el
     const sub_el = el.children[0] as HTMLElement
     sub_el.remove()
     sub_el.setAttribute("is_hide", "true")
-    sub_el.addClass("ab-deco-fold-content")
-    sub_el.hide()
-    const mid_el = el.createDiv({cls:["ab-deco-fold"]})
-    const sub_button = mid_el.createDiv({cls: ["ab-deco-fold-button"], text: "展开"})
+    sub_el.classList.add("ab-deco-fold-content")
+    sub_el.style.display = "none"
+    const mid_el = document.createElement("div"); el.appendChild(mid_el); mid_el.classList.add("ab-deco-fold");
+    const sub_button = document.createElement("div"); mid_el.appendChild(sub_button); sub_button.classList.add("ab-deco-fold-button"); sub_button.textContent = "展开";
     sub_button.onclick = ()=>{
       const is_hide = sub_el.getAttribute("is_hide")
       if (is_hide && is_hide=="false") {
         sub_el.setAttribute("is_hide", "true"); 
-        sub_el.hide(); 
-        sub_button.setText("展开")
+        sub_el.style.display = "none"
+        sub_button.textContent = "展开"
       }
       else if(is_hide && is_hide=="true") {
         sub_el.setAttribute("is_hide", "false");
-        sub_el.show(); 
-        sub_button.setText("折叠")
+        sub_el.style.display = ""
+        sub_button.textContent = "折叠"
       }
     }
     mid_el.appendChild(sub_button)
@@ -47,8 +47,8 @@ const abc_scroll = ABConvert.factory({
   name: "滚动",
   match: /^scroll(\((\d+)\))?(T)?$/,
   default: "scroll(460)",
-  process_param: ABConvert_IOType.el,
-  process_return: ABConvert_IOType.el,
+  process_param: ABConvert_IOEnum.el,
+  process_return: ABConvert_IOEnum.el,
   process: (el, header, content)=>{
     // 找参数
     const matchs = header.match(/^scroll(\((\d+)\))?(T)?$/)
@@ -64,12 +64,12 @@ const abc_scroll = ABConvert.factory({
     if(el.children.length!=1) return el
     const sub_el = el.children[0]
     sub_el.remove()
-    const mid_el = el.createDiv({cls:["ab-deco-scroll"]})
+    const mid_el = document.createElement("div"); el.appendChild(mid_el); mid_el.classList.add("ab-deco-scroll");
     if (!matchs[3]){
-      mid_el.addClass("ab-deco-scroll-y")
+      mid_el.classList.add("ab-deco-scroll-y")
       mid_el.setAttribute("style", `max-height: ${arg1}px`)
     } else {
-      mid_el.addClass("ab-deco-scroll-x")
+      mid_el.classList.add("ab-deco-scroll-x")
     }
     mid_el.appendChild(sub_el)
     return el
@@ -81,8 +81,8 @@ const abc_overfold = ABConvert.factory({
   name: "超出折叠",
   match: /^overfold(\((\d+)\))?$/,
   default: "overfold(380)",
-  process_param: ABConvert_IOType.el,
-  process_return: ABConvert_IOType.el,
+  process_param: ABConvert_IOEnum.el,
+  process_return: ABConvert_IOEnum.el,
   process: (el, header, content)=>{
     // 找参数
     const matchs = header.match(/^overfold(\((\d+)\))?$/)
@@ -98,9 +98,9 @@ const abc_overfold = ABConvert.factory({
     if(el.children.length!=1) return el
     const sub_el = el.children[0]
     sub_el.remove()
-    const mid_el = el.createDiv({cls:["ab-deco-overfold"]})
-    const sub_button = mid_el.createDiv({cls: ["ab-deco-overfold-button"], text: "展开"})
-    sub_el.addClass("ab-deco-overfold-content")
+    const mid_el = document.createElement("div"); el.appendChild(mid_el); mid_el.classList.add("ab-deco-overfold");
+    const sub_button = document.createElement("div"); mid_el.appendChild(sub_button); sub_button.classList.add("ab-deco-overfold-button"); sub_button.textContent = "展开";
+    sub_el.classList.add("ab-deco-overfold-content")
     mid_el.appendChild(sub_el)
     mid_el.appendChild(sub_button)
 
@@ -112,12 +112,12 @@ const abc_overfold = ABConvert.factory({
       if (is_fold=="true") {
         mid_el.setAttribute("style", "")
         mid_el.setAttribute("is-fold", "false")
-        sub_button.setText("折叠")
+        sub_button.textContent = "折叠"
       }
       else{
         mid_el.setAttribute("style", `max-height: ${arg1}px`)
         mid_el.setAttribute("is-fold", "true")
-        sub_button.setText("展开")
+        sub_button.textContent = "展开"
       }
     }
 
@@ -131,14 +131,14 @@ const abc_addClass = ABConvert.factory({
   name: "增加class",
   detail: "给当前块增加一个类名",
   match: /^addClass\((.*)\)$/,
-  process_param: ABConvert_IOType.el,
-  process_return: ABConvert_IOType.el,
+  process_param: ABConvert_IOEnum.el,
+  process_return: ABConvert_IOEnum.el,
   process: (el, header, content)=>{
     const matchs = header.match(/^addClass\((.*)\)$/)
     if (!matchs || !matchs[1]) return el
     if(el.children.length!=1) return el
     const sub_el = el.children[0]
-    sub_el.addClass(String(matchs[1]))
+    sub_el.classList.add(String(matchs[1]))
     return el
   }
 })
@@ -148,8 +148,8 @@ const abc_addDiv = ABConvert.factory({
   name: "增加div和class",
   detail: "给当前块增加一个父类，需要给这个父类一个类名",
   match: /^addDiv\((.*)\)$/,
-  process_param: ABConvert_IOType.el,
-  process_return: ABConvert_IOType.el,
+  process_param: ABConvert_IOEnum.el,
+  process_return: ABConvert_IOEnum.el,
   process: (el, header, content)=>{
     const matchs = header.match(/^addDiv\((.*)\)$/)
     if (!matchs || !matchs[1]) return el
@@ -158,7 +158,7 @@ const abc_addDiv = ABConvert.factory({
     if(el.children.length!=1) return el
     const sub_el = el.children[0]
     sub_el.remove()
-    const mid_el = el.createDiv({cls:[arg1]})
+    const mid_el = document.createElement("div"); el.appendChild(mid_el); mid_el.classList.add(arg1)
     mid_el.appendChild(sub_el)
     return el
   }
@@ -177,8 +177,8 @@ const abc_title = ABConvert.factory({
   name: "标题",
   match: /^#(.*)/,
   detail: "若直接处理代码或表格块，则会有特殊风格",
-  process_param: ABConvert_IOType.el,
-  process_return: ABConvert_IOType.el,
+  process_param: ABConvert_IOEnum.el,
+  process_return: ABConvert_IOEnum.el,
   process: (el, header, content)=>{
     const matchs = header.match(/^#(.*)/)
     if (!matchs || !matchs[1]) return el
@@ -188,10 +188,10 @@ const abc_title = ABConvert.factory({
     if(el.children.length!=1) return el
     const sub_el = el.children[0] as HTMLElement
     sub_el.remove()
-    sub_el.addClass("ab-deco-title-content")
-    const mid_el = el.createDiv({cls:["ab-deco-title"]})
-    const sub_title = mid_el.createDiv({cls: ["ab-deco-title-title"]})
-    sub_title.createEl("p", {text: arg1})
+    sub_el.classList.add("ab-deco-title-content")
+    const mid_el = document.createElement("div"); el.appendChild(mid_el); mid_el.classList.add("ab-deco-title");
+    const sub_title = document.createElement("div"); mid_el.appendChild(sub_title); sub_title.classList.add("ab-deco-title-title");
+    const p_el = document.createElement("p"); sub_title.appendChild(p_el); p_el.textContent = arg1;
     mid_el.appendChild(sub_title)
     mid_el.appendChild(sub_el)
 

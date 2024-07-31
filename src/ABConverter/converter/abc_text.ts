@@ -4,7 +4,7 @@
  * string -> string|HTMLElement
  */
 
-import {ABConvert_IOType, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
+import {ABConvert_IOEnum, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
 import {ABConvertManager} from "../ABConvertManager"
 import {ABReg} from "../ABReg"
 import {ListProcess} from "./abc_list"
@@ -27,8 +27,8 @@ import {ListProcess} from "./abc_list"
 const abc_quote = ABConvert.factory({
   id: "quote",
   name: "增加引用块",
-  process_param: ABConvert_IOType.text,
-  process_return: ABConvert_IOType.text,
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.text,
   process: (el, header, content)=>{
     return content.split("\n").map((line)=>{return "> "+line}).join("\n")
   }
@@ -40,8 +40,8 @@ const abc_code = ABConvert.factory({
   match: /^code(\((.*)\))?$/,
   default: "code()",
   detail: "不加`()`表示用原文本的第一行作为代码类型，括号类型为空表示代码类型为空",
-  process_param: ABConvert_IOType.text,
-  process_return: ABConvert_IOType.text,
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.text,
   process: (el, header, content)=>{
     let matchs = header.match(/^code(\((.*)\))?$/)
     if (!matchs) return content
@@ -53,8 +53,8 @@ const abc_code = ABConvert.factory({
 const abc_Xquote = ABConvert.factory({
   id: "Xquote",
   name: "去除引用块",
-  process_param: ABConvert_IOType.text,
-  process_return: ABConvert_IOType.text,
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.text,
   process: (el, header, content)=>{
     return content.split("\n").map(line=>{
       return line.replace(/^>\s/, "")
@@ -68,8 +68,8 @@ const abc_Xcode = ABConvert.factory({
   match: /^Xcode(\((true|false)\))?$/,
   default: "Xcode(true)",
   detail: "参数为是否移除代码类型, 默认为false。记法: code|Xcode或code()|Xcode(true)内容不变",
-  process_param: ABConvert_IOType.text,
-  process_return: ABConvert_IOType.text,
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.text,
   process: (el, header, content)=>{
     let matchs = header.match(/^Xcode(\((true|false)\))?$/)
     if (!matchs) return content
@@ -109,8 +109,8 @@ const abc_Xcode = ABConvert.factory({
 const abc_X = ABConvert.factory({
   id: "X",
   name: "去除代码或引用块",
-  process_param: ABConvert_IOType.text,
-  process_return: ABConvert_IOType.text,
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.text,
   process: (el, header, content)=>{
     let flag = ""
     for (let line of content.split("\n")){
@@ -151,8 +151,8 @@ const abc_slice = ABConvert.factory({
   name: "切片",
   match: /^slice\((\s*\d+\s*?)(,\s*-?\d+\s*)?\)$/,
   detail: "和js的slice方法是一样的",
-  process_param: ABConvert_IOType.text,
-  process_return: ABConvert_IOType.text,
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.text,
   process: (el, header, content)=>{
     // slice好像不怕溢出或交错，会自动变空数组。就很省心，不用判断太多的东西
     const list_match = header.match(/^slice\((\s*\d+\s*)(,\s*-?\d+\s*)?\)$/)
@@ -176,8 +176,8 @@ const abc_add = ABConvert.factory({
   name: "增添内容",
   match: /^add\((.*?)(,\s*-?\d+\s*)?\)$/,
   detail: "增添. 参数2为行序, 默认0, 行尾-1。会插行增添",
-  process_param: ABConvert_IOType.text,
-  process_return: ABConvert_IOType.text,
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.text,
   process: (el, header, content)=>{
     const list_match = header.match(/^add\((.*?)(,\s*-?\d+\s*)?\)$/)
     if (!list_match) return content
@@ -205,8 +205,8 @@ const abc_add = ABConvert.factory({
 const abc_title2list = ABConvert.factory({
   id: "title2list",
   name: "标题到列表",
-  process_param: ABConvert_IOType.text,
-  process_return: ABConvert_IOType.text,
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.text,
   detail: "也可以当作是更强大的列表解析器",
   process: (el, header, content)=>{
     content = ListProcess.title2list(content, el)
@@ -219,8 +219,8 @@ const abc_listroot = ABConvert.factory({
   name: "增加列表根",
   match: /^listroot\((.*)\)$/,
   default: "listroot(root)",
-  process_param: ABConvert_IOType.text,
-  process_return: ABConvert_IOType.text,
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.text,
   process: (el, header, content)=>{
     const list_match = header.match(/^listroot\((.*)\)$/)
     if (!list_match) return content
@@ -234,8 +234,8 @@ const abc_listroot = ABConvert.factory({
 const abc_listXinline = ABConvert.factory({
   id: "listXinline",
   name: "列表消除内联换行",
-  process_param: ABConvert_IOType.text,
-  process_return: ABConvert_IOType.text,
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.text,
   process: (el, header, content)=>{
     return ListProcess.listXinline(content)
   }
@@ -244,8 +244,8 @@ const abc_listXinline = ABConvert.factory({
 const abc_md = ABConvert.factory({
   id: "md",
   name: "md",
-  process_param: ABConvert_IOType.text,
-  process_return: ABConvert_IOType.el,
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.el,
   process: (el, header, content)=>{
     const subEl = document.createElement("div"); el.appendChild(subEl); subEl.classList.add("markdown-rendered")
     ABConvertManager.getInstance().m_renderMarkdownFn(content, subEl)
@@ -257,8 +257,8 @@ const abc_text = ABConvert.factory({
   id: "text",
   name: "纯文本",
   detail: "其实一般会更推荐用code()代替，那个更精确",
-  process_param: ABConvert_IOType.text,
-  process_return: ABConvert_IOType.el,
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.el,
   process: (el, header, content)=>{
     // 文本元素。pre不好用，这里还是得用<br>换行最好
     // `<p>${content.split("\n").map(line=>{return "<span>"+line+"</span>"}).join("<br/>")}</p>`
@@ -273,8 +273,8 @@ const abc_callout = ABConvert.factory({
   match: /^\!/,
   default: "!note",
   detail: "需要obsidian 0.14版本以上来支持callout语法",
-  process_param: ABConvert_IOType.text,
-  process_return: ABConvert_IOType.text,
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.text,
   process: (el, header, content)=>{
     return "```ad-"+header.slice(1)+"\n"+content+"\n```"
   }
@@ -284,8 +284,8 @@ const abc_callout = ABConvert.factory({
 const abc_title2table = ABConvert.factory({
   id: "title2table",
   name: "标题到表格",
-  process_param: ABConvert_IOType.text,
-  process_return: ABConvert_IOType.el,
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.el,
   process: (el, header, content)=>{
     content = ListProcess.title2list(content, el)
     ListProcess.list2table(content, el)
@@ -298,8 +298,8 @@ const abc_list2table = ABConvert.factory({
   name: "列表转表格",
   match: /list2(md)?table(T)?/,
   default: "list2table",
-  process_param: ABConvert_IOType.text,
-  process_return: ABConvert_IOType.el,
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.el,
   process: (el, header, content)=>{
     const matchs = header.match(/list2(md)?table(T)?/)
     if (!matchs) return el
@@ -313,8 +313,8 @@ const abc_list2lt = ABConvert.factory({
   name: "列表转列表表格",
   match: /list2(md)?lt(T)?/,
   default: "list2lt",
-  process_param: ABConvert_IOType.text,
-  process_return: ABConvert_IOType.el,
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.el,
   process: (el, header, content)=>{
     const matchs = header.match(/list2(md)?lt(T)?/)
     if (!matchs) return el
@@ -328,8 +328,8 @@ const abc_list2folder = ABConvert.factory({
   name: "列表转树状目录",
   match: /list2(md)?folder(T)?/,
   default: "list2folder",
-  process_param: ABConvert_IOType.text,
-  process_return: ABConvert_IOType.el,
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.el,
   process: (el, header, content)=>{
     const matchs = header.match(/list2(md)?folder(T)?/)
     if (!matchs) return el
@@ -343,8 +343,8 @@ const abc_list2ut = ABConvert.factory({
   name: "列表转二维表格",
   match: /list2(md)?ut(T)?/,
   default: "list2ut",
-  process_param: ABConvert_IOType.text,
-  process_return: ABConvert_IOType.el,
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.el,
   process: (el, header, content)=>{
     const matchs = header.match(/list2(md)?ut(T)?/)
     if (!matchs) return el
@@ -358,8 +358,8 @@ const abc_list2timeline = ABConvert.factory({
   name: "一级列表转时间线",
   match: /list2(md)?timeline(T)?/,
   default: "list2mdtimeline",
-  process_param: ABConvert_IOType.text,
-  process_return: ABConvert_IOType.el,
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.el,
   process: (el, header, content)=>{
     const matchs = header.match(/list2(md)?timeline(T)?/)
     if (!matchs) return el
@@ -373,8 +373,8 @@ const abc_list2tab = ABConvert.factory({
   name: "一级列表转标签栏",
   match: /list2(md)?tab(T)?$/,
   default: "list2mdtab",
-  process_param: ABConvert_IOType.text,
-  process_return: ABConvert_IOType.el,
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.el,
   process: (el, header, content)=>{
     const matchs = header.match(/list2(md)?tab(T)?$/)
     if (!matchs) return el

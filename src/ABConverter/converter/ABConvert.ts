@@ -12,12 +12,12 @@ import { ABConvertManager } from "../ABConvertManager"
  * @warn 暂时不允许扩展，处理器的参数和返回值目前还是使用的手动一个一个来检查的
  * 待增加一个list和json专用格式
  */
-export enum ABConvert_IOType {
+export enum ABConvert_IOEnum {
   text = "string",
   el = "HTMLElement",
   el_text = "HTMLElementString"
 }
-type ABConvert_IOType2 = string|Element
+export type ABConvert_IOType = string|HTMLElement|void // TODO null是旧的别名系统，以后要删掉
 
 /**
  * AB转换器的抽象基类
@@ -35,9 +35,9 @@ export class ABConvert {
   default: string|null            // 下拉选择的默认规则，不填的话：非正则默认为id，有正则则为空
   detail: string                  // 处理器描述
   process_alias: string           // 组装，如果不为空串则会覆盖process方法，但扔需要给process一个空实现
-  process_param: ABConvert_IOType|null
-  process_return: ABConvert_IOType|null
-  process: (el:HTMLDivElement, header:string, content:string)=> any
+  process_param: ABConvert_IOEnum|null
+  process_return: ABConvert_IOEnum|null
+  process: (el:HTMLDivElement, header:string, content:string|any)=> ABConvert_IOType // html->html的处理器不需要用到content参数
   is_disable: boolean = false     // 是否禁用，默认false
   register_from: string = "内置"  // 自带、其他插件、面板设置，如果是其他插件，则需要提供插件的名称（不知道能不能自动识别）
                                   // TODO，这个词条应该修改成 “作者名” 鼓励二次开发
@@ -179,8 +179,8 @@ export interface ABConvert_SpecSimp{
   default?: string|null     // 下拉选择的默认规则，不填的话：非正则默认为id，有正则则为空
   detail?: string           // 处理器描述
   process_alias?: string    // 组装，如果不为空串则会覆盖process方法，但扔需要给process一个空实现
-  process_param?: ABConvert_IOType
-  process_return?: ABConvert_IOType
+  process_param?: ABConvert_IOEnum
+  process_return?: ABConvert_IOEnum
   process: (el:HTMLDivElement, header:string, content:string)=> any
                             // 处理器
 }

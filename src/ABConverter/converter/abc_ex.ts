@@ -2,15 +2,15 @@
  * 处理器_特殊版？
  */
 
-import {ABConvert_IOType, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
+import {ABConvert_IOEnum, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
 import {ABConvertManager} from "../ABConvertManager"
 
 const abc_faq = ABConvert.factory({
   id: "faq",
   name: "FAQ",
   match: "FAQ",
-  process_param: ABConvert_IOType.text,
-  process_return: ABConvert_IOType.el,
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.el,
   process: (el, header, content)=>{
     const e_faq:HTMLElement = document.createElement("div"); el.appendChild(e_faq); e_faq.classList.add("ab-faq");
     const list_content:string[] = content.split("\n");
