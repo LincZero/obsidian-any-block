@@ -598,8 +598,7 @@ export class ListProcess{
     // GeneratorBranchTable，原来是svelte
     {
       // 表格数据 组装成表格
-      const table = div
-      table.classList.add("ab-table", "ab-branch-table")
+      const table = document.createElement("table"); div.appendChild(table); table.classList.add("ab-table", "ab-branch-table")
       if (modeT) table.setAttribute("modeT", "true")
       let thead
       if(list_tableInfo[0].content.indexOf("< ")==0){ // 判断是否有表头
@@ -703,8 +702,7 @@ export class ListProcess{
     // GeneratorListTable，原Svelte
     {
       // 表格数据 组装成表格
-      const table:HTMLDivElement = div;
-      table.classList.add("ab-table", "ab-list-table")
+      const table = document.createElement("table"); div.appendChild(table); table.classList.add("ab-table", "ab-list-table")
       if (is_folder) table.classList.add("ab-list-folder")
       if (modeT) table.setAttribute("modeT", "true")
       let thead
@@ -811,8 +809,7 @@ export class ListProcess{
   ){
     // GeneratorTab，原svelte代码
     {
-      const tab = div;
-      tab.classList.add("ab-tab-root")
+      const tab = document.createElement("div"); div.appendChild(tab); tab.classList.add("ab-tab-root")
       if (modeT) tab.setAttribute("modeT", "true")
       const ul = document.createElement("ul"); tab.appendChild(ul);
       const content = document.createElement("div"); tab.appendChild(content);
