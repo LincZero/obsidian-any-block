@@ -6,12 +6,12 @@
 
 import {App, PluginSettingTab, Setting, Modal} from "obsidian"
 import type AnyBlockPlugin from "../main"
-import {ABConvertManager} from "src/ab_converter/ABConvertManager"
-import {ABConvert, type ABConvert_SpecUser} from "src/ab_converter/converter/ABConvert"
-import {} from "src/ab_converter/converter/abc_text"    // 加载所有处理器和选择器
-import {} from "src/ab_converter/converter/abc_list"    // ^
-import {} from "src/ab_converter/converter/abc_deco"    // ^
-import {} from "src/ab_converter/converter/abc_ex"      // ^
+import {ABConvertManager} from "src/ABConverter/ABConvertManager"
+import {ABConvert, type ABConvert_SpecUser} from "src/ABConverter/converter/ABConvert"
+import {} from "src/ABConverter/converter/abc_text"    // 加载所有处理器和选择器
+import {} from "src/ABConverter/converter/abc_list"    // ^
+import {} from "src/ABConverter/converter/abc_deco"    // ^
+import {} from "src/ABConverter/converter/abc_ex"      // ^
 import {} from "src/ab_manager/abm_cm/ABSelector_MdBase"                // ^
 import {generateSelectorInfoTable} from "src/ab_manager/abm_cm/ABSelector_Md"  // ^
 

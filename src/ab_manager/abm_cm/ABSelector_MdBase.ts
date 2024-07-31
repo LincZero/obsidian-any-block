@@ -39,7 +39,7 @@ function easySelector(
   header_line_match = list_text[mdRange.from_line].match(ABReg.reg_header)
   if (!header_line_match) return null
   if (header_line_match[1]!=mdRange.prefix) return null
-  mdRange.header = header_line_match[4]
+  mdRange.header = header_line_match[5]
   return mdRange
 }
 

@@ -13,7 +13,7 @@ import {MarkdownRenderChild, MarkdownRenderer} from 'obsidian'
 import { ABReplacer_CodeBlock } from "./ab_manager/abm_code/ABReplacer_CodeBlock"
 import { ABStateManager } from "./ab_manager/abm_cm/ABStateManager"
 import { ABSelector_PostHtml } from "./ab_manager/abm_html/ABSelector_PostHtml"
-import { ABConvertManager } from "./ab_converter/ABConvertManager"
+import { ABConvertManager } from "./ABConverter/ABConvertManager"
 import type { ABSettingInterface } from "./config/ABSettingTab"
 import { ABSettingTab, AB_SETTINGS } from "./config/ABSettingTab"
 

@@ -8,7 +8,7 @@ import {ABReg} from "src/config/ABReg"
 import {ConfDecoration, ConfSelect} from "src/config/ABSettingTab"
 import type AnyBlockPlugin from "../../main"
 import {ABReplacer_Render} from "./ABReplacer_Render"
-import {ABConvertManager} from "src/ab_converter/ABConvertManager"
+import {ABConvertManager} from "src/ABConverter/ABConvertManager"
 import { match } from 'assert'
 
 /**
@@ -120,7 +120,7 @@ function findABBlock_recurve(targetEl: HTMLElement){
       ) findABBlock_recurve(contentEl);
       continue
     }
-    const header_str = header_match[4]
+    const header_str = header_match[5]
 
     // 渲染
     //const newEl = targetEl.createDiv({cls: "ab-re-rendered"})
@@ -386,9 +386,9 @@ function getSourceMarkdown(
     if (!match_header) return range
     
     // （必须是最后一步，通过有无header来判断是否是ab块）
-    range.header = match_header[4]
+    range.header = match_header[5]
     return range
   }
   // console.warn("获取MarkdownSectionInformation失败，可能会产生bug") // 其实会return void，应该不会有bug
   return null
-};
+}

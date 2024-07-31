@@ -1,7 +1,7 @@
 import type {Editor, EditorPosition} from 'obsidian';
 import {EditorView, WidgetType} from "@codemirror/view"
 
-import {ABConvertManager} from "../../ab_converter/ABConvertManager"
+import {ABConvertManager} from "../../ABConverter/ABConvertManager"
 import type {MdSelectorRangeSpec} from "./ABSelector_Md"
 
 export class ABReplacer_Widget extends WidgetType {
