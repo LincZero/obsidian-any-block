@@ -23,9 +23,11 @@ npm run build
 
 ### 发布到社区 - 手动
 
-1. 记得检查更新 manifest.json 和 package.json 里的版本号 (发布才改，平时别乱改，ob社区仓库好像会自动发现你改了然后就更新过去)
-2. 更新到GitHub，代码推送更新，打包产物也更新到Release里
-3. 去Obsidian社区那个仓库里更新他的那个json里的版本号
+1. 打包产物更新到Release里
+2. 记得检查更新 manifest.json 和 package.json 里的版本号
+    (发布才改，并需要保证github release有东西了。平时别乱改，ob社区仓库好像会自动发现你改了然后就更新过去)
+3. 更新到GitHub，代码推送更新
+4. 不再需要去Obsidian社区那个仓库里更新他的那个json里的版本号 (你manifest.json修改了他那边会自动更新)
 
 ### 发布到社区 - Github Action 自动
 
