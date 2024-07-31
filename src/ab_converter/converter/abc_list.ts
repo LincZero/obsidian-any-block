@@ -5,13 +5,12 @@
  */
 
 // mermaid相关
-import mermaid from "mermaid"
-import {getID} from "src/utils/utils"
+//import mermaid from "mermaid"
+//import {getID} from "src/utils/utils"
 
 import { ABReg } from '../ABReg'
-import GeneratorBranchTable from "src/svelte/GeneratorBranchTable.svelte"
-import GeneratorListTable from "src/svelte/GeneratorListTable.svelte"
-import GeneratorTab from "src/svelte/GeneratorTab.svelte"
+import {ABConvert_IOType, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
+import {ABConvertManager} from "../ABConvertManager"
 
 // 通用列表数据，一个元素等于是一个列表项
 interface ListItem {
@@ -87,16 +86,16 @@ export class ListProcess{
   }
 
   /** 列表转mermaid流程图 */
-  static list2mermaid(text: string, div: HTMLDivElement) {
-    let list_itemInfo = this.list2data(text)
-    return this.data2mermaid(list_itemInfo, div)
-  }
+  //static list2mermaid(text: string, div: HTMLDivElement) {
+  //  let list_itemInfo = this.list2data(text)
+  //  return this.data2mermaid(list_itemInfo, div)
+  //}
 
   /** 列表转mermaid思维导图 */
-  static list2mindmap(text: string, div: HTMLDivElement) {
-    let list_itemInfo = this.list2data(text)
-    return this.data2mindmap(list_itemInfo, div)
-  }
+  //static list2mindmap(text: string, div: HTMLDivElement) {
+  //  let list_itemInfo = this.list2data(text)
+  //  return this.data2mindmap(list_itemInfo, div)
+  //}
 
   /** 去除列表的inline */
   static listXinline(text: string){
@@ -595,14 +594,41 @@ export class ListProcess{
         tableLine: prev_line    // 对应首行序列
       })
     }
-    new GeneratorBranchTable({
-      target: div,
-      props: {
-        list_tableInfo: list_tableInfo,
-        modeT: modeT,
-        prev_line: prev_line
+
+    // GeneratorBranchTable，原来是svelte
+    {
+      // 表格数据 组装成表格
+      const table = div
+      table.classList.add("ab-table", "ab-branch-table")
+      if (modeT) table.setAttribute("modeT", "true")
+      let thead
+      if(list_tableInfo[0].content.indexOf("< ")==0){ // 判断是否有表头
+        thead = document.createElement("thead"); table.appendChild(thead);
+        list_tableInfo[0].content=list_tableInfo[0].content.replace(/^\<\s/,"")
       }
-    })
+      const tbody = document.createElement("tbody"); table.appendChild(tbody);
+      for (let index_line=0; index_line<prev_line+1; index_line++){ // 遍历表格行，创建tr……
+        let is_head
+        let tr
+        if (index_line==0 && thead){ // 判断是否第一行&&是否有表头
+          tr = thead.createEl("tr")
+          is_head = true
+        }
+        else{
+          is_head = false
+          tr = document.createElement("tr"); tbody.appendChild(tr);
+        }
+        for (let item of list_tableInfo){                           // 遍历表格列，创建td
+          if (item.tableLine!=index_line) continue
+          let td = tr.createEl(is_head?"th":"td", {
+            attr:{"rowspan": item.tableRow}
+          })
+          td.addClass("markdown-rendered")
+          ABConvertManager.getInstance().m_renderMarkdownFn(item.content, td)
+        }
+      }
+    }
+
     return div
   }
 
@@ -617,7 +643,7 @@ export class ListProcess{
     is_folder=false
   ){
     // 组装成表格数据 (列表是深度优先)
-    let tr_line_level = [] // 表格行等级（树形表格独有）
+    let tr_line_level: number[] = [] // 表格行等级（树形表格独有）
     let list_tableInfo:List_TableItem = []
     let prev_line = -1   // 并存储后一行的序列!
     let prev_level = 999 // 上一行的等级
@@ -674,16 +700,84 @@ export class ListProcess{
       })
     }
 
-    new GeneratorListTable({
-      target: div,
-      props: {
-        list_tableInfo: list_tableInfo,
-        modeT: modeT,
-        prev_line: prev_line,
-        tr_line_level: tr_line_level,
-        is_folder: is_folder
+    // GeneratorListTable，原Svelte
+    {
+      // 表格数据 组装成表格
+      const table:HTMLDivElement = div;
+      table.classList.add("ab-table", "ab-list-table")
+      if (is_folder) table.classList.add("ab-list-folder")
+      if (modeT) table.setAttribute("modeT", "true")
+      let thead
+      if(list_tableInfo[0].content.indexOf("< ")==0){ // 判断是否有表头
+        thead = document.createElement("thead"); table.appendChild(thead);
+        list_tableInfo[0].content=list_tableInfo[0].content.replace(/^\<\s/,"")
       }
-    })
+      const tbody = document.createElement("tbody"); table.appendChild(tbody);
+      let prev_tr: HTMLElement|null = null   // 用来判断是否可以折叠
+      for (let index_line=0; index_line<prev_line+1; index_line++){ // 遍历表格行，创建tr……
+        let is_head
+        let tr: HTMLElement
+        // 行 - 表头行（即是否第一行&&是否有表头）
+        if (index_line==0 && thead){
+          tr = thead.createEl("tr", {
+            // attr: {"tr_level": tr_line_level[index_line]}
+          })
+          is_head = true
+        }
+        // 行 - 非表头行
+        else{
+          is_head = false
+          tr = document.createElement("tr"); tbody.appendChild(tr); tr.classList.add("ab-foldable-tr");
+            tr.setAttribute("tr_level", tr_line_level[index_line].toString()); tr.setAttribute("is_fold", "false"); tr.setAttribute("able_fold", "false");
+          // 判断上一个是否可折叠。不需要尾判断，最后一个肯定不能折叠
+          if (prev_tr 
+            && !isNaN(Number(prev_tr.getAttribute("tr_level"))) 
+            && Number(prev_tr.getAttribute("tr_level")) < tr_line_level[index_line]
+          ){
+            prev_tr.setAttribute("able_fold", "true")
+          }
+          prev_tr = tr
+        }
+        // 列 - 遍历表格列，创建td
+        for (let item of list_tableInfo){
+          if (item.tableLine!=index_line) continue
+          // md版
+          let td = document.createElement(is_head?"th":"td"); tr.appendChild(td); td.setAttribute("rowspan", item.tableRow.toString());
+          let td_cell = document.createElement("div"); td.appendChild(td_cell); td_cell.classList.add("ab-list-table-witharrow");
+          td_cell.classList.add("markdown-rendered")
+          ABConvertManager.getInstance().m_renderMarkdownFn(item.content, td_cell);
+        }
+      }
+
+      // 折叠列表格 事件绑定
+      const l_tr:NodeListOf<HTMLElement> = tbody.querySelectorAll("tr")
+      for (let i=0; i<l_tr.length; i++){
+        const tr = l_tr[i]
+        /*const tr_level = Number(tr.getAttribute("tr_level"))
+        if (isNaN(tr_level)) continue
+        const tr_isfold = tr.getAttribute("is_fold")
+        if (!tr_isfold) continue*/
+        tr.onclick = ()=>{
+          const tr_level = Number(tr.getAttribute("tr_level"))
+          if (isNaN(tr_level)) return
+          const tr_isfold = tr.getAttribute("is_fold")
+          if (!tr_isfold) return
+          let flag_do_fold = false  // 防止折叠最小层
+          for (let j=i+1; j<l_tr.length; j++){
+            const tr2 = l_tr[j]
+            const tr_level2 = Number(tr2.getAttribute("tr_level"))
+            if (isNaN(tr_level2)) break
+            if (tr_level2<=tr_level) break
+            // tr2.setAttribute("style", "display:"+(tr_isfold=="true"?"block":"none"))
+            (tr_isfold == "true") ? tr2.style.display = "" : tr2.style.display = "none"
+            flag_do_fold = true
+          }
+          if (flag_do_fold) tr.setAttribute("is_fold", tr_isfold=="true"?"false":"true")
+        }
+      }
+
+    }
+
     return div
   }
 
@@ -715,13 +809,48 @@ export class ListProcess{
     div: HTMLDivElement,
     modeT: boolean
   ){
-    new GeneratorTab({
-      target: div,
-      props: {
-        list_itemInfo: list_itemInfo,
-        modeT: modeT
+    // GeneratorTab，原svelte代码
+    {
+      const tab = div;
+      tab.classList.add("ab-tab-root")
+      if (modeT) tab.setAttribute("modeT", "true")
+      const ul = document.createElement("ul"); tab.appendChild(ul);
+      const content = document.createElement("div"); tab.appendChild(content);
+      let current_dom:HTMLElement|null = null
+      for (let i=0; i<list_itemInfo.length; i++){
+        const itemInfo = list_itemInfo[i]
+        if (!current_dom){            // 找开始标志
+          if (itemInfo.level==0){
+            const li = document.createElement("li"); ul.appendChild(li); li.classList.add("ab-tab-tab");
+              li.textContent = itemInfo.content.slice(0,20); li.setAttribute("is_activate", i==0?"true":"false");
+            current_dom = document.createElement("div"); content.appendChild(current_dom); current_dom.classList.add("ab-tab-content");
+              current_dom.setAttribute("style", i==0?"display:block":"display:none"); current_dom.setAttribute("is_activate", i==0?"true":"false");
+          }
+        }
+        else{                         // 找结束，不需要找标志，因为传过来的是二层一叉树
+          current_dom.classList.add("markdown-rendered")
+          ABConvertManager.getInstance().m_renderMarkdownFn(itemInfo.content, current_dom)
+          current_dom = null
+        }
       }
-    })
+      // 元素全部创建完再来绑按钮事件，不然有可能有问题
+      const lis:NodeListOf<HTMLLIElement> = tab.querySelectorAll(".ab-tab-tab")
+      const contents = tab.querySelectorAll(".ab-tab-content")
+      if (lis.length!=contents.length) console.warn("ab-tab-tab和ab-tab-content的数量不一致")
+      for (let i=0; i<lis.length; i++){
+        lis[i].onclick = ()=>{
+          for (let j=0; j<contents.length; j++){
+            lis[j].setAttribute("is_activate", "false")
+            contents[j].setAttribute("is_activate", "false")
+            contents[j].setAttribute("style", "display:none")
+          }
+          lis[i].setAttribute("is_activate", "true")
+          contents[i].setAttribute("is_activate", "true")
+          contents[i].setAttribute("style", "display:block")
+        }
+      }
+    }
+
     return div
   }
 
@@ -729,68 +858,68 @@ export class ListProcess{
    * ~~@bug 旧版bug（未内置mermaid）会闪一下~~ 
    * 然后注意一下mermaid的(项)不能有空格，或非法字符。空格我处理掉了，字符我先不管。算了，还是不处理空格吧
    */
-  private static data2mermaid(
-    list_itemInfo: List_ListItem, 
-    div: HTMLDivElement
-  ){
-    const html_mode = false    // @todo 暂时没有设置来切换这个开关
-
-    let list_line_content:string[] = ["graph LR"]
-    // let list_line_content:string[] = html_mode?['<pre class="mermaid">', "graph LR"]:["```mermaid", "graph LR"]
-    let prev_line_content = ""
-    let prev_level = 999
-    for (let i=0; i<list_itemInfo.length; i++){
-      if (list_itemInfo[i].level>prev_level){ // 向右正常加箭头
-        prev_line_content = prev_line_content+" --> "+list_itemInfo[i].content//.replace(/ /g, "_")
-      } else {                                // 换行，并……
-        list_line_content.push(prev_line_content)
-        prev_line_content = ""
-
-        for (let j=i; j>=0; j--){             // 回退到上一个比自己大的
-          if(list_itemInfo[j].level<list_itemInfo[i].level) {
-            prev_line_content = list_itemInfo[j].content//.replace(/ /g, "_")
-            break
-          }
-        }
-        if (prev_line_content) prev_line_content=prev_line_content+" --> "  // 如果有比自己大的
-        prev_line_content=prev_line_content+list_itemInfo[i].content//.replace(/ /g, "_")
-      }
-      prev_level = list_itemInfo[i].level
-    }
-    list_line_content.push(prev_line_content)
-    // list_line_content.push(html_mode?"</pre>":"```")
-
-    let text = list_line_content.join("\n")
-
-    //const child = new MarkdownRenderChild(div);
-    // div.addClass("markdown-rendered")
-    //MarkdownRenderer.renderMarkdown(text, div, "", child);
-    
-    mermaid.mermaidAPI.renderAsync("ab-mermaid-"+getID(), text, (svgCode:string)=>{
-      div.innerHTML = svgCode
-    })
-    
-    return div
-  }
+  //private static data2mermaid(
+  //  list_itemInfo: List_ListItem, 
+  //  div: HTMLDivElement
+  //){
+  //  const html_mode = false    // @todo 暂时没有设置来切换这个开关
+  //
+  //  let list_line_content:string[] = ["graph LR"]
+  //  // let list_line_content:string[] = html_mode?['<pre class="mermaid">', "graph LR"]:["```mermaid", "graph LR"]
+  //  let prev_line_content = ""
+  //  let prev_level = 999
+  //  for (let i=0; i<list_itemInfo.length; i++){
+  //    if (list_itemInfo[i].level>prev_level){ // 向右正常加箭头
+  //      prev_line_content = prev_line_content+" --> "+list_itemInfo[i].content//.replace(/ /g, "_")
+  //    } else {                                // 换行，并……
+  //      list_line_content.push(prev_line_content)
+  //      prev_line_content = ""
+  //
+  //      for (let j=i; j>=0; j--){             // 回退到上一个比自己大的
+  //        if(list_itemInfo[j].level<list_itemInfo[i].level) {
+  //          prev_line_content = list_itemInfo[j].content//.replace(/ /g, "_")
+  //          break
+  //        }
+  //      }
+  //      if (prev_line_content) prev_line_content=prev_line_content+" --> "  // 如果有比自己大的
+  //      prev_line_content=prev_line_content+list_itemInfo[i].content//.replace(/ /g, "_")
+  //    }
+  //    prev_level = list_itemInfo[i].level
+  //  }
+  //  list_line_content.push(prev_line_content)
+  //  // list_line_content.push(html_mode?"</pre>":"```")
+  //
+  //  let text = list_line_content.join("\n")
+  //
+  //  //const child = new MarkdownRenderChild(div);
+  //  // div.addClass("markdown-rendered")
+  //  //MarkdownRenderer.renderMarkdown(text, div, "", child);
+  //  
+  //  mermaid.mermaidAPI.renderAsync("ab-mermaid-"+getID(), text, (svgCode:string)=>{
+  //    div.innerHTML = svgCode
+  //  })
+  //  
+  //  return div
+  //}
 
   /** 列表数据转mermaid思维导图 */
-  private static data2mindmap(
-    list_itemInfo: List_ListItem, 
-    div: HTMLDivElement
-  ){
-    let list_newcontent:string[] = []
-    for (let item of list_itemInfo){
-      // 等级转缩进，以及"\n" 转化 <br/>
-      let str_indent = ""
-      for(let i=0; i<item.level; i++) str_indent+= " "
-      list_newcontent.push(str_indent+item.content.replace("\n","<br/>"))
-    }
-    const newcontent = "mindmap\n"+list_newcontent.join("\n")
-    mermaid.mermaidAPI.renderAsync("ab-mermaid-"+getID(), newcontent, (svgCode:string)=>{
-      div.innerHTML = svgCode
-    })
-    return div
-  }
+  //private static data2mindmap(
+  //  list_itemInfo: List_ListItem, 
+  //  div: HTMLDivElement
+  //){
+  //  let list_newcontent:string[] = []
+  //  for (let item of list_itemInfo){
+  //    // 等级转缩进，以及"\n" 转化 <br/>
+  //    let str_indent = ""
+  //    for(let i=0; i<item.level; i++) str_indent+= " "
+  //    list_newcontent.push(str_indent+item.content.replace("\n","<br/>"))
+  //  }
+  //  const newcontent = "mindmap\n"+list_newcontent.join("\n")
+  //  mermaid.mermaidAPI.renderAsync("ab-mermaid-"+getID(), newcontent, (svgCode:string)=>{
+  //    div.innerHTML = svgCode
+  //  })
+  //  return div
+  //}
 
   /** 列表数据转时间线 */
   /*private static data2timeline(

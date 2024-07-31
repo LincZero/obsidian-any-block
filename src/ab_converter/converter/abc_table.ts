@@ -1,11 +1,11 @@
 // mermaid相关
-import mermaid from "mermaid"
-import {getID} from "src/utils/utils"
+//import mermaid from "mermaid"
+//import {getID} from "src/utils/utils"
 
-import { ABReg } from 'src/config/ABReg'
-import GeneratorBranchTable from "src/svelte/GeneratorBranchTable.svelte"
-import GeneratorListTable from "src/svelte/GeneratorListTable.svelte"
-import GeneratorTab from "src/svelte/GeneratorTab.svelte"
+import { ABReg } from '../ABReg'
+//import GeneratorBranchTable from "../svelte/GeneratorBranchTable.svelte"
+//import GeneratorListTable from "../svelte/GeneratorListTable.svelte"
+//import GeneratorTab from "../svelte/GeneratorTab.svelte"
 
 // 通用表格数据，一个元素等于是一个单元格项
 // interface TableItem{

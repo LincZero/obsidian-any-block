@@ -15,7 +15,7 @@ import { ABConvertManager } from "../ABConvertManager"
 export enum ABConvert_IOType {
   text = "string",
   el = "HTMLElement",
-  el_text = "HTMLElementString",
+  el_text = "HTMLElementString"
 }
 type ABConvert_IOType2 = string|Element
 

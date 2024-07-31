@@ -18,9 +18,9 @@
  */
 
 // 仅用于提供document对象支持 (如果在Ob中则请注释掉他，用ob自带document对象的)
-// import jsdom from "jsdom"
-// const { JSDOM } = jsdom;
-// const { document } = (new JSDOM(`...`)).window;
+//import jsdom from "jsdom"
+//const { JSDOM } = jsdom;
+//const { document } = (new JSDOM(`...`)).window;
 
 // AB转换器容器
 import {
@@ -55,9 +55,9 @@ export class ABConvertManager {
     /// 环境打印
     // @ts-ignore 用于检查obsidian是否存在，不存在的话正常是飘红的
     if (typeof obsidian !== 'undefined') {
-      console.log('obsidian环境');
+      console.log('[environment]: obsidian');
     } else {
-      console.log('mdit环境，非obsidian环境');
+      console.log('[environment]: markdown-it, without obsidian');
     }
   }
 
