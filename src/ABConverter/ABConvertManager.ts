@@ -17,15 +17,6 @@
  * 不过我后来尝试按一个回答中那样指定了版本就可以了：npm install -D jsdom@4.2.0
  */
 
-// 仅用于提供document对象支持 (如果在Ob中则请注释掉他，用ob自带document对象的)
-//import jsdom from "jsdom"
-//const { JSDOM } = jsdom
-//const dom = new JSDOM(`<!DOCTYPE html><html><body></body></html>`)
-//global.window = dom.window
-//global.document = dom.window.document
-//global.NodeList = dom.window.NodeList
-//global.HTMLElement = dom.window.document
-
 // AB转换器容器
 import {
   ABConvert_IOEnum, 
