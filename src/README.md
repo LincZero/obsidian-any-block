@@ -23,7 +23,7 @@ npm run build
 
 ### 发布到社区 - 手动
 
-1. 记得检查更新 manifest.json 和 package.json 里的版本号
+1. 记得检查更新 manifest.json 和 package.json 里的版本号 (发布才改，平时别乱改，ob社区仓库好像会自动发现你改了然后就更新过去)
 2. 更新到GitHub，代码推送更新，打包产物也更新到Release里
 3. 去Obsidian社区那个仓库里更新他的那个json里的版本号
 
