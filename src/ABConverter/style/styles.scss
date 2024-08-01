@@ -37,6 +37,12 @@
     th, td { display: block; }
   }
 
+  // 修复ob新版本导致表格宽度减少
+  table {
+    display: table;
+    width: 100%;
+  }
+
   // 标签栏
   .ab-tab-root{
     border: solid royalblue 1px;
