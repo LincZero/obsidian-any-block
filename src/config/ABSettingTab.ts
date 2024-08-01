@@ -8,13 +8,19 @@ import {App, PluginSettingTab, Setting, Modal} from "obsidian"
 import type AnyBlockPlugin from "../main"
 import {ABConvertManager} from "src/ABConverter/ABConvertManager"
 import {ABConvert, type ABConvert_SpecUser} from "src/ABConverter/converter/ABConvert"
-import {} from "src/ABConverter/converter/abc_text"    // 加载所有处理器和选择器
-import {} from "src/ABConverter/converter/abc_list"    // ^
-import {} from "src/ABConverter/converter/abc_deco"    // ^
-import {} from "src/ABConverter/converter/abc_ex"      // ^
-import {} from "src/ABConverter/converter/abc_mermaid" // ^
-import {} from "src/ab_manager/abm_cm/ABSelector_MdBase"                // ^
-import {generateSelectorInfoTable} from "src/ab_manager/abm_cm/ABSelector_Md"  // ^
+
+// 加载所有转换器
+// (都是可选的。例如如果不想要mermaid部分，就将mermaid部分注释掉就可以了，插件大小就会由7MB变成200KB不到)
+// (当然，如果A转换器依赖B转换器，那么你导入A必然导入B)
+import {} from "src/ABConverter/converter/abc_text"
+import {} from "src/ABConverter/converter/abc_list"
+import {} from "src/ABConverter/converter/abc_deco"
+import {} from "src/ABConverter/converter/abc_ex"
+import {} from "src/ABConverter/converter/abc_mermaid"
+
+// 加载所有选择器
+import {} from "src/ab_manager/abm_cm/ABSelector_MdBase"
+import {generateSelectorInfoTable} from "src/ab_manager/abm_cm/ABSelector_Md"
 
 /** 设置值接口 */
 export interface ABSettingInterface {
