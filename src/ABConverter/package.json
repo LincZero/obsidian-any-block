@@ -1,0 +1,15 @@
+{
+  "name": "any-block-converter",
+  "version": "1.0.0",
+  "description": "```typescript\r import { ABConvertManager } from \"ABConvertManager\"",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "LincZero",
+  "license": "GNU Affero General Public License v3.0",
+  "dependencies": {
+    "@mermaid-js/mermaid-mindmap": "^9.3.0",
+    "mermaid": "^10.9.1"
+  }
+}

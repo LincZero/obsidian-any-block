@@ -27,7 +27,6 @@
 		"copyfiles": "^2.4.1",
 		"esbuild": "^0.14.47",
 		"esbuild-svelte": "^0.7.3",
-		"eslint-plugin-svelte3": "^4.0.0",
 		"obsidian": "latest",
 		"svelte": "^3.55.1",
 		"svelte-check": "^3.0.3",
@@ -37,8 +36,6 @@
 		"vite": "^4.1.1"
 	},
 	"dependencies": {
-		"@mermaid-js/mermaid-mindmap": "^9.3.0",
-		"html-to-md": "^0.8.3",
-		"mermaid": "^9.3.0"
+		"html-to-md": "^0.8.3"
 	}
 }

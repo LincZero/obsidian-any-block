@@ -81,18 +81,6 @@ export class ListProcess{
     return this.data2tab(data, div, modeT)
   }
 
-  /** 列表转mermaid流程图 */
-  //static list2mermaid(text: string, div: HTMLDivElement) {
-  //  let list_itemInfo = this.list2data(text)
-  //  return this.data2mermaid(list_itemInfo, div)
-  //}
-
-  /** 列表转mermaid思维导图 */
-  //static list2mindmap(text: string, div: HTMLDivElement) {
-  //  let list_itemInfo = this.list2data(text)
-  //  return this.data2mindmap(list_itemInfo, div)
-  //}
-
   /** 去除列表的inline */
   static listXinline(text: string){
     const data = this.list2data(text)
@@ -105,7 +93,7 @@ export class ListProcess{
    *  @param modeT: 保留缩进模式
    *  @param modeG: 识别符号 ` | `（该选项暂时不可用，0为不识别，1为识别为下一级，2为识别为同一级，转ultable时会用到选项2）
    */
-  private static list2data(text: string, modeT=false, modeG=true){
+  static list2data(text: string, modeT=false, modeG=true){
     if (modeT) return this.ullist2data(text)
 
     /** 内联补偿列表。只保留comp>0的项 */
@@ -842,73 +830,6 @@ export class ListProcess{
 
     return div
   }
-
-  /** 列表数据转mermaid流程图
-   * ~~@bug 旧版bug（未内置mermaid）会闪一下~~ 
-   * 然后注意一下mermaid的(项)不能有空格，或非法字符。空格我处理掉了，字符我先不管。算了，还是不处理空格吧
-   */
-  //private static data2mermaid(
-  //  list_itemInfo: List_ListItem, 
-  //  div: HTMLDivElement
-  //){
-  //  const html_mode = false    // @todo 暂时没有设置来切换这个开关
-  //
-  //  let list_line_content:string[] = ["graph LR"]
-  //  // let list_line_content:string[] = html_mode?['<pre class="mermaid">', "graph LR"]:["```mermaid", "graph LR"]
-  //  let prev_line_content = ""
-  //  let prev_level = 999
-  //  for (let i=0; i<list_itemInfo.length; i++){
-  //    if (list_itemInfo[i].level>prev_level){ // 向右正常加箭头
-  //      prev_line_content = prev_line_content+" --> "+list_itemInfo[i].content//.replace(/ /g, "_")
-  //    } else {                                // 换行，并……
-  //      list_line_content.push(prev_line_content)
-  //      prev_line_content = ""
-  //
-  //      for (let j=i; j>=0; j--){             // 回退到上一个比自己大的
-  //        if(list_itemInfo[j].level<list_itemInfo[i].level) {
-  //          prev_line_content = list_itemInfo[j].content//.replace(/ /g, "_")
-  //          break
-  //        }
-  //      }
-  //      if (prev_line_content) prev_line_content=prev_line_content+" --> "  // 如果有比自己大的
-  //      prev_line_content=prev_line_content+list_itemInfo[i].content//.replace(/ /g, "_")
-  //    }
-  //    prev_level = list_itemInfo[i].level
-  //  }
-  //  list_line_content.push(prev_line_content)
-  //  // list_line_content.push(html_mode?"</pre>":"```")
-  //
-  //  let text = list_line_content.join("\n")
-  //
-  //  //const child = new MarkdownRenderChild(div);
-  //  // div.addClass("markdown-rendered")
-  //  //MarkdownRenderer.renderMarkdown(text, div, "", child);
-  //  
-  //  mermaid.mermaidAPI.renderAsync("ab-mermaid-"+getID(), text, (svgCode:string)=>{
-  //    div.innerHTML = svgCode
-  //  })
-  //  
-  //  return div
-  //}
-
-  /** 列表数据转mermaid思维导图 */
-  //private static data2mindmap(
-  //  list_itemInfo: List_ListItem, 
-  //  div: HTMLDivElement
-  //){
-  //  let list_newcontent:string[] = []
-  //  for (let item of list_itemInfo){
-  //    // 等级转缩进，以及"\n" 转化 <br/>
-  //    let str_indent = ""
-  //    for(let i=0; i<item.level; i++) str_indent+= " "
-  //    list_newcontent.push(str_indent+item.content.replace("\n","<br/>"))
-  //  }
-  //  const newcontent = "mindmap\n"+list_newcontent.join("\n")
-  //  mermaid.mermaidAPI.renderAsync("ab-mermaid-"+getID(), newcontent, (svgCode:string)=>{
-  //    div.innerHTML = svgCode
-  //  })
-  //  return div
-  //}
 
   /** 列表数据转时间线 */
   /*private static data2timeline(

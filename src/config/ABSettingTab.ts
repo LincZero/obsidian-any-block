@@ -12,6 +12,7 @@ import {} from "src/ABConverter/converter/abc_text"    // 加载所有处理器�
 import {} from "src/ABConverter/converter/abc_list"    // ^
 import {} from "src/ABConverter/converter/abc_deco"    // ^
 import {} from "src/ABConverter/converter/abc_ex"      // ^
+import {} from "src/ABConverter/converter/abc_mermaid" // ^
 import {} from "src/ab_manager/abm_cm/ABSelector_MdBase"                // ^
 import {generateSelectorInfoTable} from "src/ab_manager/abm_cm/ABSelector_Md"  // ^
 

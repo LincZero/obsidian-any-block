@@ -9,15 +9,6 @@ import {ABConvertManager} from "../ABConvertManager"
 import {ABReg} from "../ABReg"
 import {ListProcess} from "./abc_list"
 
-// mermaid相关
-//import mermaid from "mermaid"
-//import mindmap from '@mermaid-js/mermaid-mindmap';
-//const initialize = mermaid.registerExternalDiagrams([mindmap]);
-//export const mermaid_init = async () => {
-//  await initialize;
-//};
-//import {getID} from "src/utils/utils"
-
 /**
  * 将registerABProcessor的调用分成两步是因为：
  * 1. 能方便在大纲里快速找到想要的处理器
@@ -382,61 +373,3 @@ const abc_list2tab = ABConvert.factory({
     return el
   }
 })
-
-// 纯组合，后续用别名模块替代
-//const abc_title2mindmap = ABConvert.factory({
-//  id: "title2mindmap",
-//  name: "标题到脑图",
-//  process_param: ABConvert_IOType.text,
-//  process_return: ABConvert_IOType.el,
-//  process: (el, header, content)=>{
-//    content = ListProcess.title2list(content, el)
-//    ListProcess.list2mindmap(content, el)
-//    return el
-//  }
-//})
-
-//const abc_list2mermaid = ABConvert.factory({
-//  id: "list2mermaid",
-//  name: "列表转mermaid流程图",
-//  process_param: ABConvert_IOType.text,
-//  process_return: ABConvert_IOType.el,
-//  process: (el, header, content)=>{
-//    ListProcess.list2mermaid(content, el)
-//    return el
-//  }
-//})
-
-//const abc_list2mindmap = ABConvert.factory({
-//  id: "list2mindmap",
-//  name: "列表转mermaid思维导图",
-//  process_param: ABConvert_IOType.text,
-//  process_return: ABConvert_IOType.el,
-//  process: (el, header, content)=>{
-//    ListProcess.list2mindmap(content, el)
-//    return el
-//  }
-//})
-
-//const abc_mermaid = ABConvert.factory({
-//  id: "mermaid",
-//  name: "新mermaid",
-//  match: /^mermaid(\((.*)\))?$/,
-//  default: "mermaid(graph TB)",
-//  detail: "由于需要兼容脑图，这里会使用插件内置的最新版mermaid",
-//  process_param: ABConvert_IOType.text,
-//  process_return: ABConvert_IOType.el,
-//  process: (el, header, content)=>{
-//    let matchs = content.match(/^mermaid(\((.*)\))?$/)
-//    if (!matchs) return el
-//    if (matchs[1]) content = matchs[2]+"\n"+content
-//
-//    ;(async (el:HTMLDivElement, header:string, content:string)=>{
-//      await mermaid_init()
-//      await mermaid.mermaidAPI.renderAsync("ab-mermaid-"+getID(), content, (svgCode: string)=>{
-//        el.innerHTML = svgCode
-//      });
-//    })(el, header, content)
-//    return el
-//  }
-//})
