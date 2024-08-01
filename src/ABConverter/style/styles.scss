@@ -70,19 +70,21 @@
 
   // 通用表格
   .ab-table{
-    td>p:first-child, // ob
+    td>p:first-child, // ob x 3
     th>p:first-child,
-    td>div>p:first-child, // mdit
+    .ab-list-table-witharrow>p:first-child,
+    td>div>p:first-child, // mdit x 3
     th>div>p:first-child,
-    .ab-list-table-witharrow>p:first-child
+    .ab-list-table-witharrow>div>p:first-child
     {
       margin-top: 0;
     }
-    td>p:last-child, // ob
+    td>p:last-child, // ob x 3
     th>p:last-child,
-    td>div>p:last-child, // mdit
+    .ab-list-table-witharrow>p:last-child,
+    td>div>p:last-child, // mdit x 3
     th>div>p:last-child,
-    .ab-list-table-witharrow>p:last-child{
+    .ab-list-table-witharrow>div>p:last-child{
       margin-bottom: 0;
     }
 
@@ -109,7 +111,7 @@
         height: 0;
       }
     }
-    .ab-foldable-tr[able_fold="true"][is_fold="true"]>td:first-child{
+    .ab-foldable-tr[able_fold="true"][is_fold="true"]>td:first-child{ // 箭头图标
       >div::before{
         top: 5px;
         left: 2px;
@@ -117,7 +119,7 @@
         border-left-color: #d9d9d9;
       }
     }
-    .ab-foldable-tr[able_fold="true"][is_fold="false"]>td:first-child{
+    .ab-foldable-tr[able_fold="true"][is_fold="false"]>td:first-child{ // 箭头图标
       >div::before{
         top: 9px;
         left: -1px;
