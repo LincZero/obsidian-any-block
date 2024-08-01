@@ -1,7 +1,3 @@
-// mermaid相关
-//import mermaid from "mermaid"
-//import {getID} from "src/utils/utils"
-
 import { ABReg } from '../ABReg'
 //import GeneratorBranchTable from "../svelte/GeneratorBranchTable.svelte"
 //import GeneratorListTable from "../svelte/GeneratorListTable.svelte"

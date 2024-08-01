@@ -4,10 +4,6 @@
  * 列表 -> html/列表
  */
 
-// mermaid相关
-//import mermaid from "mermaid"
-//import {getID} from "src/utils/utils"
-
 import { ABReg } from '../ABReg'
 import {ABConvert_IOEnum, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
 import {ABConvertManager} from "../ABConvertManager"
