@@ -48,12 +48,13 @@ export class ABConvertManager {
 
   /// 构造函数
   private constructor() {
-    /// 环境打印
+    /// 环境打印 (编译期打印)
     // @ts-ignore 用于检查obsidian是否存在，不存在的话正常是飘红的
-    if (typeof obsidian !== 'undefined') {
-      console.log('[environment]: obsidian');
+    if (typeof obsidian == 'undefined' && typeof app == 'undefined') {
+      // @ts-ignore
+      console.log('[environment]: markdown-it, without obsidian')
     } else {
-      console.log('[environment]: markdown-it, without obsidian');
+      console.log('[environment]: obsidian')
     }
   }
 
