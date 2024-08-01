@@ -70,14 +70,18 @@
 
   // 通用表格
   .ab-table{
-    td>p:first-child,
+    td>p:first-child, // ob
     th>p:first-child,
+    td>div>p:first-child, // mdit
+    th>div>p:first-child,
     .ab-list-table-witharrow>p:first-child
     {
       margin-top: 0;
     }
-    td>p:last-child,
+    td>p:last-child, // ob
     th>p:last-child,
+    td>div>p:last-child, // mdit
+    th>div>p:last-child,
     .ab-list-table-witharrow>p:last-child{
       margin-bottom: 0;
     }
