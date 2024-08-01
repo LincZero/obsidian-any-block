@@ -9,8 +9,9 @@
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
 		"dev2": "vite build --watch --mode=development",
-		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
-		"build2": "npx svelte-check && vite build --mode=production",
+		"build": "npm run copy_abc_style && tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+		"build2": "npm run copy_abc_style && npx svelte-check && vite build --mode=production",
+		"copy_abc_style": "copyfiles --flat ./src/ABConverter/style/styles.css ./",
 		"version": "node version-bump.mjs && git add manifest.json versions.json",
 		"bumpversion": "node version-bump.mjs && git add manifest.json versions.json"
 	},
@@ -23,6 +24,7 @@
 		"@typescript-eslint/eslint-plugin": "5.29.0",
 		"@typescript-eslint/parser": "5.29.0",
 		"builtin-modules": "3.3.0",
+		"copyfiles": "^2.4.1",
 		"esbuild": "^0.14.47",
 		"esbuild-svelte": "^0.7.3",
 		"eslint-plugin-svelte3": "^4.0.0",
