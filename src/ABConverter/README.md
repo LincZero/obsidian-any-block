@@ -68,3 +68,15 @@ ABConvertManager.getInstance().redefine_renderMarkdown((markdown: string, el: HT
 - `AnyBlockConvert`：`ABC`
 - `AnyBlockSelector`：`ABS`
 - `AnyBlockRender`：`ABR`
+
+## bug
+
+```typescript
+// TODO，onClick代码在mdit环境下按钮点击失效。测试代码如下
+const btn = document.createElement("button"); table.appendChild(btn); btn.textContent = "测试按钮1";
+btn.onclick = () => { console.log("btn.onclick") }
+const btndiv = document.createElement("div"); table.appendChild(btndiv);
+btndiv.innerHTML = `<button onclick="console.log('Button was clicked!')">测试按钮2</button>`
+// 发现mdit环境下，按钮1无法正常按动，而按钮2可以
+// 原因应该是：因为mdit环境下的document对象是jdsom创建的，假的。这个dom对象后面会被转化为html_str，onclick的信息就丢失了
+```
