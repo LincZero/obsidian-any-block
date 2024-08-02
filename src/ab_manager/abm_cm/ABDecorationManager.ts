@@ -66,7 +66,7 @@ export class ABDecorationManager{
         ".ab-line-list": { textDecoration: "underline 1px cyan" }
       }),
       EditorView.baseTheme({
-        ".ab-line-yellow": { textDecoration: "underline 1px yellow" }
+        ".ab-line-yellow": { textDecoration: "solid underline 1px rgba(0, 255, 0, 0.2)" }
       }),
       EditorView.baseTheme({
         ".ab-line-blue": { textDecoration: "underline 1px blue" }

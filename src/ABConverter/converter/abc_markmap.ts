@@ -29,7 +29,6 @@ function getID(length=16){
 // markmap about
 import { Transformer, builtInPlugins } from 'markmap-lib'
 const transformer = new Transformer();
-//import { fillTemplate } from 'markmap-render';
 //import { Markmap, loadCSS, loadJS } from 'markmap-view'
 
 const abc_list2mindmap = ABConvert.factory({
@@ -45,34 +44,48 @@ process: (el, header, content)=>{
 })
 
 function list2mindmap(markdown: string, div: HTMLDivElement) {
-	//const s1 = document.createElement('script'); document.head.appendChild(s1);
-	//s1.src = "https://cdn.jsdelivr.net/npm/d3";
-	const s2 = document.createElement('script'); document.head.appendChild(s2);
-	s2.type = "module";
-	s2.textContent = `
+	// 1. markdown解析 (markmap-lib)
+	const { root, features } = transformer.transform(markdown.trim()); // 1. transform Markdown
+	const assets = transformer.getUsedAssets(features); // 2. get assets (option1)
+	
+	// 2. html元素创建
+	const html_str = `<svg class="ab-markmap-svg" data-json='${JSON.stringify(root)}' style="width: 100%; height: 400px; border-style: double;"></svg>`
+	div.innerHTML = html_str
+
+	// 3. 渲染 - 用奇怪的方式实现但意外地成功了的版
+	let script_el: HTMLScriptElement|null = document.querySelector('script[script-id="ab-markmap-script"]');
+	if (script_el) script_el.remove();
+	script_el = document.createElement('script'); document.head.appendChild(script_el);
+	script_el.type = "module";
+	script_el.setAttribute("script-id", "ab-markmap-script");
+	script_el.textContent = `
 	import { Markmap, } from 'https://jspm.dev/markmap-view';
 	const mindmaps = document.querySelectorAll('.ab-markmap-svg'); // 注意一下这里的选择器
 	for(const mindmap of mindmaps) {
 		Markmap.create(mindmap,null,JSON.parse(mindmap.getAttribute('data-json')));
 	}`;
 
-	const id = "ab-markmap-" + getID();
+	// 3. 渲染 - 正经方法，但失效
+	// // if (assets.styles) loadCSS(assets.styles);
+	// // if (assets.scripts) loadJS(assets.scripts, { getMarkmap: () => {} });
+	// const mindmaps = document.querySelectorAll('.ab-markmap-svg'); // 注意一下这里的选择器
+	// for(const mindmap of mindmaps) {
+	// 	const datajson: string|null = mindmap.getAttribute('data-json')
+	// 	if (datajson === null) { console.error("ab-markmap-svg without data-json") }
+	// 	g_markmap = Markmap.create(mindmap as SVGElement, undefined, JSON.parse(datajson as string));
+	// };
 
-	// markmap-lib
-	// 1. transform Markdown
-	const { root, features } = transformer.transform(markdown.trim());
-	// 2. get assets (option1)
-	const assets = transformer.getUsedAssets(features);
-	
-	const html_str = `<svg class="ab-markmap-svg ${id}" data-json='${JSON.stringify(root)}' style="width: 100%; height: 400px; border-style: double;"></svg>`
-	div.innerHTML = html_str
-
-	// markmap-render，生成出来的是 `<html><body><style>` 这种类型
-	//const html_str = fillTemplate(root, assets);
-	// markmap-view
-	// 1. load assets
-	//if (assets.styles) loadCSS(assets.styles);
-	//if (assets.scripts) loadJS(assets.scripts, { getMarkmap: () => {} });
-	// 2. create markmap
-	//const markmap = Markmap.create("ab-markmap-"+getID(), undefined, root)
+	// 3. 渲染 - 正经方法，但失效
+	// const script_el = document.createElement('script'); document.head.appendChild(script_el);
+	// script_el.type = "module";
+	// script_el.textContent = `
+	// window.refresh = function() {
+	// 	import { Markmap, } from 'https://jspm.dev/markmap-view';
+	// 	const mindmaps = document.querySelectorAll('.ab-markmap-svg'); // 注意一下这里的选择器
+	// 	for(const mindmap of mindmaps) {
+	// 		Markmap.create(mindmap,null,JSON.parse(mindmap.getAttribute('data-json')));
+	// 	}
+	// 	console.log("方法555")
+	// }
+	// window.refresh()`;
 }
