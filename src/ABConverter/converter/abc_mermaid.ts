@@ -1,3 +1,9 @@
+/**
+ * AB转换器 - mermaid相关
+ * 
+ * (可选) 参考：在Ob插件中增加7.1MB
+ */
+
 import {ABConvert_IOEnum, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
 import {ABConvertManager} from "../ABConvertManager"
 import {ListProcess, type List_ListItem} from "./abc_list"

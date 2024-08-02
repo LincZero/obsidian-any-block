@@ -17,6 +17,7 @@ import {} from "src/ABConverter/converter/abc_list"
 import {} from "src/ABConverter/converter/abc_deco"
 import {} from "src/ABConverter/converter/abc_ex"
 import {} from "src/ABConverter/converter/abc_mermaid"
+import {} from "src/ABConverter/converter/abc_markmap"
 
 // 加载所有选择器
 import {} from "src/ab_manager/abm_cm/ABSelector_MdBase"

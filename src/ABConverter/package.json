@@ -10,6 +10,7 @@
   "license": "GNU Affero General Public License v3.0",
   "dependencies": {
     "@mermaid-js/mermaid-mindmap": "^9.3.0",
+    "markmap-lib": "^0.17.0",
     "mermaid": "^10.9.1"
   }
 }
