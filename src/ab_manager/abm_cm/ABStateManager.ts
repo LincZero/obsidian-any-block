@@ -67,6 +67,19 @@ export class ABStateManager{
     console.log(">>> ABStateManager, initialFileName:", this.initialFileName, "initRet:", ret)
 
     if (ret) this.setStateEffects()
+
+    // markmap渲染
+    let script_el: HTMLScriptElement|null = document.querySelector('script[script-id="ab-markmap-script"]');
+    if (script_el) script_el.remove();
+    script_el = document.createElement('script'); document.head.appendChild(script_el);
+    script_el.type = "module";
+    script_el.setAttribute("script-id", "ab-markmap-script");
+    script_el.textContent = `
+    import { Markmap, } from 'https://jspm.dev/markmap-view';
+    const mindmaps = document.querySelectorAll('.ab-markmap-svg'); // 注意一下这里的选择器
+    for(const mindmap of mindmaps) {
+      Markmap.create(mindmap,null,JSON.parse(mindmap.getAttribute('data-json')));
+    }`;
   }
 
   destructor() {

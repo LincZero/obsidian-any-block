@@ -3,13 +3,17 @@
  * 
  * (可选) 参考：在Ob插件中增加1.3MB
  * 
- * 局部渲染问题
+ * 使用注意项：本文件搜索 `markmap渲染`，然后根据该注释在你的主代码中添加一部分代码
+ * 
+ * 模块化难点，这个插件极难模块化
+ * 1. 内容不全体现在局部，局部渲染问题
  *     markmap是那种一个markdown文件渲染一个mindmap的类型，和我要局部渲染的不同。
  *     调用api得到的html_str是包含 `<html>`、`<script>` 的，没法作用在局部div上。
  *     然后我就想找一个有局部渲染mindmap的去参考：
  *     https://github.com/aleen42/gitbook-mindmaps/blob/master/src/mindmaps.js
  *     https://github.com/deiv/markdown-it-markmap/blob/master/src/index.js
  *		 https://github.com/NeroBlackstone/markdown-it-mindmap/blob/main/index.js
+ * 2. 需要在文章渲染完时出一个钩子调用 `Markmap.create`，若交由每个mindmap块处理一次则会出现重复渲染及慢的问题
  */
 
 import {ABConvert_IOEnum, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
@@ -52,40 +56,42 @@ function list2mindmap(markdown: string, div: HTMLDivElement) {
 	const html_str = `<svg class="ab-markmap-svg" data-json='${JSON.stringify(root)}' style="width: 100%; height: 400px; border-style: double;"></svg>`
 	div.innerHTML = html_str
 
-	// 3. 渲染 - 用奇怪的方式实现但意外地成功了的版
-	let script_el: HTMLScriptElement|null = document.querySelector('script[script-id="ab-markmap-script"]');
-	if (script_el) script_el.remove();
-	script_el = document.createElement('script'); document.head.appendChild(script_el);
-	script_el.type = "module";
-	script_el.setAttribute("script-id", "ab-markmap-script");
-	script_el.textContent = `
-	import { Markmap, } from 'https://jspm.dev/markmap-view';
-	const mindmaps = document.querySelectorAll('.ab-markmap-svg'); // 注意一下这里的选择器
-	for(const mindmap of mindmaps) {
-		Markmap.create(mindmap,null,JSON.parse(mindmap.getAttribute('data-json')));
-	}`;
+	// 3. markmap渲染 (本来打算模块化解决，但不行。若在ob环境，则在打开完文件的钩子/CM结束时触发一次下面代码)
+	{
+		// 1. script插入方式，可成功
+		// let script_el: HTMLScriptElement|null = document.querySelector('script[script-id="ab-markmap-script"]');
+		// if (script_el) script_el.remove();
+		// script_el = document.createElement('script'); document.head.appendChild(script_el);
+		// script_el.type = "module";
+		// script_el.setAttribute("script-id", "ab-markmap-script");
+		// script_el.textContent = `
+		// import { Markmap, } from 'https://jspm.dev/markmap-view';
+		// const mindmaps = document.querySelectorAll('.ab-markmap-svg'); // 注意一下这里的选择器
+		// for(const mindmap of mindmaps) {
+		// 	Markmap.create(mindmap,null,JSON.parse(mindmap.getAttribute('data-json')));
+		// }`;
 
-	// 3. 渲染 - 正经方法，但失效
-	// // if (assets.styles) loadCSS(assets.styles);
-	// // if (assets.scripts) loadJS(assets.scripts, { getMarkmap: () => {} });
-	// const mindmaps = document.querySelectorAll('.ab-markmap-svg'); // 注意一下这里的选择器
-	// for(const mindmap of mindmaps) {
-	// 	const datajson: string|null = mindmap.getAttribute('data-json')
-	// 	if (datajson === null) { console.error("ab-markmap-svg without data-json") }
-	// 	g_markmap = Markmap.create(mindmap as SVGElement, undefined, JSON.parse(datajson as string));
-	// };
+		// 2. npm mindmap-view 方法，失败
+		// // if (assets.styles) loadCSS(assets.styles);
+		// // if (assets.scripts) loadJS(assets.scripts, { getMarkmap: () => {} });
+		// const mindmaps = document.querySelectorAll('.ab-markmap-svg'); // 注意一下这里的选择器
+		// for(const mindmap of mindmaps) {
+		// 	const datajson: string|null = mindmap.getAttribute('data-json')
+		// 	if (datajson === null) { console.error("ab-markmap-svg without data-json") }
+		// 	g_markmap = Markmap.create(mindmap as SVGElement, undefined, JSON.parse(datajson as string));
+		// };
 
-	// 3. 渲染 - 正经方法，但失效
-	// const script_el = document.createElement('script'); document.head.appendChild(script_el);
-	// script_el.type = "module";
-	// script_el.textContent = `
-	// window.refresh = function() {
-	// 	import { Markmap, } from 'https://jspm.dev/markmap-view';
-	// 	const mindmaps = document.querySelectorAll('.ab-markmap-svg'); // 注意一下这里的选择器
-	// 	for(const mindmap of mindmaps) {
-	// 		Markmap.create(mindmap,null,JSON.parse(mindmap.getAttribute('data-json')));
-	// 	}
-	// 	console.log("方法555")
-	// }
-	// window.refresh()`;
+		// 3. script提供全局方法，失败
+		// const script_el = document.createElement('script'); document.head.appendChild(script_el);
+		// script_el.type = "module";
+		// script_el.textContent = `
+		// window.refresh = function() {
+		// 	import { Markmap, } from 'https://jspm.dev/markmap-view';
+		// 	const mindmaps = document.querySelectorAll('.ab-markmap-svg'); // 注意一下这里的选择器
+		// 	for(const mindmap of mindmaps) {
+		// 		Markmap.create(mindmap,null,JSON.parse(mindmap.getAttribute('data-json')));
+		// 	}
+		// }
+		// window.refresh()`;
+	}
 }
