@@ -13,7 +13,9 @@
  *     https://github.com/aleen42/gitbook-mindmaps/blob/master/src/mindmaps.js
  *     https://github.com/deiv/markdown-it-markmap/blob/master/src/index.js
  *		 https://github.com/NeroBlackstone/markdown-it-mindmap/blob/main/index.js
- * 2. 需要在文章渲染完时出一个钩子调用 `Markmap.create`，若交由每个mindmap块处理一次则会出现重复渲染及慢的问题
+ * 2. 渲染时间若交由每个mindmap块处理一次则会出现重复渲染及慢的问题。这里提供了一个btn手动渲染，而要自动渲染：
+ *    - 在Ob环境，需要在文章渲染完时出一个钩子调用 `Markmap.create`
+ *    - 在VuePress-Mdit环境，没有真正的document元素，而打开文件的钩子在mdit里面又没有，可能需要要vuepress插件解决
  */
 
 import {ABConvert_IOEnum, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
@@ -42,19 +44,35 @@ process_param: ABConvert_IOEnum.text,
 process_return: ABConvert_IOEnum.el,
 process: (el, header, content)=>{
 		content = ListProcess.title2list(content, el)
-		list2mindmap(content, el)
+		list2markmap(content, el)
 		return el
 	}
 })
 
-function list2mindmap(markdown: string, div: HTMLDivElement) {
+function list2markmap(markdown: string, div: HTMLDivElement) {
 	// 1. markdown解析 (markmap-lib)
 	const { root, features } = transformer.transform(markdown.trim()); // 1. transform Markdown
 	const assets = transformer.getUsedAssets(features); // 2. get assets (option1)
+
+	// (可选) 手动渲染按钮
+	const svg_btn = document.createElement("button"); div.appendChild(svg_btn); svg_btn.textContent = "ChickMe ReRender Markmap";
+  svg_btn.setAttribute("style", "background-color: argb(255, 125, 125, 0.5)");
+  svg_btn.setAttribute("onclick", `console.log("svg chick"); let script_el = document.querySelector('script[script-id="ab-markmap-script"]');
+	if (script_el) script_el.remove();
+	script_el = document.createElement('script'); document.head.appendChild(script_el);
+	script_el.type = "module";
+	script_el.setAttribute("script-id", "ab-markmap-script");
+	script_el.textContent = \`
+	import { Markmap, } from 'https://jspm.dev/markmap-view';
+	const mindmaps = document.querySelectorAll('.ab-markmap-svg');
+	for(const mindmap of mindmaps) {
+		Markmap.create(mindmap,null,JSON.parse(mindmap.getAttribute('data-json')));
+	}\``);
 	
-	// 2. html元素创建
+	// 2. html元素创建 (注意一下类名要被捕抓的)
+	const svg_div = document.createElement("div"); div.appendChild(svg_div);
 	const html_str = `<svg class="ab-markmap-svg" data-json='${JSON.stringify(root)}' style="width: 100%; height: 400px; border-style: double;"></svg>`
-	div.innerHTML = html_str
+	svg_div.innerHTML = html_str
 
 	// 3. markmap渲染 (本来打算模块化解决，但不行。若在ob环境，则在打开完文件的钩子/CM结束时触发一次下面代码)
 	{
