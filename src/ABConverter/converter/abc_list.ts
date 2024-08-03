@@ -8,19 +8,31 @@ import { ABReg } from '../ABReg'
 import {ABConvert_IOEnum, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
 import {ABConvertManager} from "../ABConvertManager"
 
-// 通用列表数据，一个元素等于是一个列表项
+/**
+ * 通用列表数据，一个元素等于是一个列表项
+ * 
+ * 例如：
+ * - a1
+ *   - a2
+ *   - a3
+ * to
+ * {
+ *   {a1, 0},
+ *   {a2, 2},
+ *   {a3, 2},
+ * }
+ * to (nomalization)
+ * {
+ *   {a1, 0},
+ *   {a2, 1},
+ *   {a3, 1},
+ * }
+ */
 interface ListItem {
   content: string;        // 内容
-  level: number;          // 级别
+  level: number;          // 级别 (缩进空格数/normalization后的递增等级数)
 }[]
 export type List_ListItem = ListItem[]
-
-// 通用表格数据，一个元素等于是一个单元格项
-interface TableItem extends ListItem{
-  tableRow: number,       // 跨行数
-  tableLine: number       // 对应首行序列
-}
-export type List_TableItem = TableItem[]
 
 export class ListProcess{
 
@@ -34,7 +46,7 @@ export class ListProcess{
   /** 列表转表格 */
   static list2table(text: string, div: HTMLDivElement, modeT=false): HTMLDivElement {
     let list_itemInfo = this.list2data(text)
-    return this.data2table(list_itemInfo, div, modeT)
+    return TableProcess.data2table(list_itemInfo, div, modeT)
   }
 
   /** 列表转列表 */
@@ -46,13 +58,13 @@ export class ListProcess{
   /** 列表转列表格 */
   static list2lt(text: string, div: HTMLDivElement, modeT=false) {
     let list_itemInfo = this.list2data(text, true)
-    return this.uldata2ultable(list_itemInfo, div, modeT)
+    return TableProcess.uldata2ultable(list_itemInfo, div, modeT)
   }
 
   /** 列表转树形目录 */
   static list2folder(text: string, div: HTMLDivElement, modeT=false) {
     let list_itemInfo = this.list2data(text, true)
-    return this.uldata2ultable(list_itemInfo, div, modeT, true)
+    return TableProcess.uldata2ultable(list_itemInfo, div, modeT, true)
   }
 
   /** 列表转二维表格 */
@@ -62,16 +74,18 @@ export class ListProcess{
     return this.data2table(list_itemInfo, div)*/
     //【new】
     let data = this.list2data(text)
+    console.log("data0",data)
     data = this.data_mL_2_2L(data)
+    console.log("data1",data)
     data = this.data_2L_2_mL1B(data)
-    return this.data2table(data, div, modeT)
+    return TableProcess.data2table(data, div, modeT)
   }
 
   /** 一级列表转时间线 */
   static list2timeline(text: string, div: HTMLDivElement, modeT=false) {
     let data = this.list2data(text)
     data = this.data_mL_2_2L(data)
-    return this.data2table(data, div, modeT)
+    return TableProcess.data2table(data, div, modeT)
   }
 
   /** 一级列表转标签栏 */
@@ -87,11 +101,12 @@ export class ListProcess{
     return this.data2list(data)
   }
 
-  /** 列表文本转列表数据 
-   *  @bug 不能跨缩进，后面再对异常缩进进行修复
-   *  @bug 内换行` | `可能有bug
-   *  @param modeT: 保留缩进模式
-   *  @param modeG: 识别符号 ` | `（该选项暂时不可用，0为不识别，1为识别为下一级，2为识别为同一级，转ultable时会用到选项2）
+  /** 
+   * 列表文本转列表数据 
+   * @bug 不能跨缩进，后面再对异常缩进进行修复
+   * @bug 内换行` | `可能有bug
+   * @param modeT: 保留缩进模式
+   * @param modeG: 识别符号 ` | `（该选项暂时不可用，0为不识别，1为识别为下一级，2为识别为同一级，转ultable时会用到选项2）
    */
   static list2data(text: string, modeT=false, modeG=true){
     if (modeT) return this.ullist2data(text)
@@ -536,8 +551,119 @@ export class ListProcess{
     return list_itemInfo2
   }
 
+  /** 列表数据转列表（看起来脱屁股放屁，但有时调试会需要）
+   * 另外还有个妙用：list2data + data2list = listXinline
+   */
+  private static data2list(
+    list_itemInfo: List_ListItem
+  ){
+    let list_newcontent:string[] = []
+    // 每一个level里的content处理
+    for (let item of list_itemInfo){
+      // 等级转缩进，以及"\n" 转化（这里像mindmap语法那样用<br>，要进行换行转缩进）
+      let str_indent = ""
+      for(let i=0; i<item.level; i++) str_indent+= " "
+      let list_content = item.content.split("\n")
+      for (let i=0; i<list_content.length; i++) {
+        if(i==0) list_newcontent.push(str_indent+"- "+list_content[i])
+        else list_newcontent.push(str_indent+"  "+list_content[i])
+      }
+    }
+    const newcontent = list_newcontent.join("\n")
+    return newcontent
+  }
+
+  /** 列表数据转标签栏 */
+  private static data2tab(
+    list_itemInfo: List_ListItem, 
+    div: HTMLDivElement,
+    modeT: boolean
+  ){
+    // GeneratorTab，原svelte代码
+    {
+      const tab = document.createElement("div"); div.appendChild(tab); tab.classList.add("ab-tab-root")
+      if (modeT) tab.setAttribute("modeT", "true")
+      const ul = document.createElement("ul"); tab.appendChild(ul);
+      const content = document.createElement("div"); tab.appendChild(content);
+      let current_dom:HTMLElement|null = null
+      for (let i=0; i<list_itemInfo.length; i++){
+        const itemInfo = list_itemInfo[i]
+        if (!current_dom){            // 找开始标志
+          if (itemInfo.level==0){
+            const li = document.createElement("li"); ul.appendChild(li); li.classList.add("ab-tab-tab");
+              li.textContent = itemInfo.content.slice(0,20); li.setAttribute("is_activate", i==0?"true":"false");
+            current_dom = document.createElement("div"); content.appendChild(current_dom); current_dom.classList.add("ab-tab-content");
+              current_dom.setAttribute("style", i==0?"display:block":"display:none"); current_dom.setAttribute("is_activate", i==0?"true":"false");
+          }
+        }
+        else{                         // 找结束，不需要找标志，因为传过来的是二层一叉树
+          current_dom.classList.add("markdown-rendered")
+          ABConvertManager.getInstance().m_renderMarkdownFn(itemInfo.content, current_dom)
+          current_dom = null
+        }
+      }
+      // 元素全部创建完再来绑按钮事件，不然有可能有问题
+      const lis:NodeListOf<HTMLLIElement> = tab.querySelectorAll(".ab-tab-tab")
+      const contents = tab.querySelectorAll(".ab-tab-content")
+      if (lis.length!=contents.length) console.warn("ab-tab-tab和ab-tab-content的数量不一致")
+      for (let i=0; i<lis.length; i++){
+        lis[i].onclick = ()=>{
+          for (let j=0; j<contents.length; j++){
+            lis[j].setAttribute("is_activate", "false")
+            contents[j].setAttribute("is_activate", "false")
+            contents[j].setAttribute("style", "display:none")
+          }
+          lis[i].setAttribute("is_activate", "true")
+          contents[i].setAttribute("is_activate", "true")
+          contents[i].setAttribute("style", "display:block")
+        }
+      }
+    }
+
+    return div
+  }
+
+  /** 列表数据转时间线 */
+  /*private static data2timeline(
+    list_itemInfo: List_ListInfo, 
+    div: HTMLDivElement
+  ){
+    
+  }*/
+}
+
+/**
+ * 通用表格数据，一个元素等于是一个单元格项 (th/td)
+ * 
+ * 例如：
+ * - a1
+ *   - a2
+ *     - a3
+ *   - b2
+ *     - b3
+ * to
+ * |a1|a2|a3|
+ * |^ |b2|b3|
+ * with
+ * {
+ *   // 前两列是ListItem来的东西
+ *   // 第2列是用来算第3列的，将第3列算出来后，即数据分析完后，第2列就没有用了
+ *   {a1, 无用, 2, 1},
+ *   {a2, 无用, 1, 1},
+ *   {a3, 无用, 1, 1},
+ *   {b2, 无用, 1, 2},
+ *   {b3, 无用, 1, 2},
+ * }
+ */
+interface TableItem extends ListItem{
+  tableRow: number,       // 跨行数
+  tableLine: number       // 对应首行序列
+}
+export type List_TableItem = TableItem[]
+
+export class TableProcess{
   /** 列表数据转表格 */
-  private static data2table(
+  static data2table(
     list_itemInfo: List_ListItem, 
     div: HTMLDivElement,
     modeT: boolean        // 是否转置
@@ -617,7 +743,7 @@ export class ListProcess{
    * 注意传入的列表数据应该符合：
    * 第一列等级为0、没有分叉
    */
-  private static uldata2ultable(
+  static uldata2ultable(
     list_itemInfo: List_ListItem, 
     div: HTMLDivElement,
     modeT: boolean,
@@ -758,84 +884,4 @@ export class ListProcess{
 
     return div
   }
-
-  /** 列表数据转列表（看起来脱屁股放屁，但有时调试会需要）
-   * 另外还有个妙用：list2data + data2list = listXinline
-   */
-  private static data2list(
-    list_itemInfo: List_ListItem
-  ){
-    let list_newcontent:string[] = []
-    // 每一个level里的content处理
-    for (let item of list_itemInfo){
-      // 等级转缩进，以及"\n" 转化（这里像mindmap语法那样用<br>，要进行换行转缩进）
-      let str_indent = ""
-      for(let i=0; i<item.level; i++) str_indent+= " "
-      let list_content = item.content.split("\n")
-      for (let i=0; i<list_content.length; i++) {
-        if(i==0) list_newcontent.push(str_indent+"- "+list_content[i])
-        else list_newcontent.push(str_indent+"  "+list_content[i])
-      }
-    }
-    const newcontent = list_newcontent.join("\n")
-    return newcontent
-  }
-
-  /** 列表数据转标签栏 */
-  private static data2tab(
-    list_itemInfo: List_ListItem, 
-    div: HTMLDivElement,
-    modeT: boolean
-  ){
-    // GeneratorTab，原svelte代码
-    {
-      const tab = document.createElement("div"); div.appendChild(tab); tab.classList.add("ab-tab-root")
-      if (modeT) tab.setAttribute("modeT", "true")
-      const ul = document.createElement("ul"); tab.appendChild(ul);
-      const content = document.createElement("div"); tab.appendChild(content);
-      let current_dom:HTMLElement|null = null
-      for (let i=0; i<list_itemInfo.length; i++){
-        const itemInfo = list_itemInfo[i]
-        if (!current_dom){            // 找开始标志
-          if (itemInfo.level==0){
-            const li = document.createElement("li"); ul.appendChild(li); li.classList.add("ab-tab-tab");
-              li.textContent = itemInfo.content.slice(0,20); li.setAttribute("is_activate", i==0?"true":"false");
-            current_dom = document.createElement("div"); content.appendChild(current_dom); current_dom.classList.add("ab-tab-content");
-              current_dom.setAttribute("style", i==0?"display:block":"display:none"); current_dom.setAttribute("is_activate", i==0?"true":"false");
-          }
-        }
-        else{                         // 找结束，不需要找标志，因为传过来的是二层一叉树
-          current_dom.classList.add("markdown-rendered")
-          ABConvertManager.getInstance().m_renderMarkdownFn(itemInfo.content, current_dom)
-          current_dom = null
-        }
-      }
-      // 元素全部创建完再来绑按钮事件，不然有可能有问题
-      const lis:NodeListOf<HTMLLIElement> = tab.querySelectorAll(".ab-tab-tab")
-      const contents = tab.querySelectorAll(".ab-tab-content")
-      if (lis.length!=contents.length) console.warn("ab-tab-tab和ab-tab-content的数量不一致")
-      for (let i=0; i<lis.length; i++){
-        lis[i].onclick = ()=>{
-          for (let j=0; j<contents.length; j++){
-            lis[j].setAttribute("is_activate", "false")
-            contents[j].setAttribute("is_activate", "false")
-            contents[j].setAttribute("style", "display:none")
-          }
-          lis[i].setAttribute("is_activate", "true")
-          contents[i].setAttribute("is_activate", "true")
-          contents[i].setAttribute("style", "display:block")
-        }
-      }
-    }
-
-    return div
-  }
-
-  /** 列表数据转时间线 */
-  /*private static data2timeline(
-    list_itemInfo: List_ListInfo, 
-    div: HTMLDivElement
-  ){
-    
-  }*/
 }
