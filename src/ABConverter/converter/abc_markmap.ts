@@ -71,7 +71,9 @@ function list2markmap(markdown: string, div: HTMLDivElement) {
 	
 	// 2. html元素创建 (注意一下类名要被捕抓的) // TODO 似乎是这里导致了`'`符号的异常
 	const svg_div = document.createElement("div"); div.appendChild(svg_div);
-	const html_str = `<svg class="ab-markmap-svg" data-json='${JSON.stringify(root)}' style="width: 100%; height: 400px; border-style: double;"></svg>`
+	let height_adapt = 100 + markdown.split("\n").length*25; // 仅大致估算px: 100 + (0~40)行 * 25 = [200~1000]。如果要准确估计，得自己解析一遍，麻烦
+	if (height_adapt>1000) height_adapt = 1000;
+	const html_str = `<svg class="ab-markmap-svg" data-json='${JSON.stringify(root)}' style="width: 100%; height: ${height_adapt}px; border-style: double;"></svg>`
 	svg_div.innerHTML = html_str
 
 	// 3. markmap渲染 (本来打算模块化解决，但不行。若在ob环境，则在打开完文件的钩子/CM结束时触发一次下面代码)
