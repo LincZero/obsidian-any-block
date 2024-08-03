@@ -1,13 +1,40 @@
 /**
  * 处理器_装饰版
  * 
- * html -> html
+ * html <-> html
+ * md_str <-> html
  */
 
 import {ABConvert_IOEnum, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
 import {ABConvertManager} from "../ABConvertManager"
 
 export const DECOProcessor = 0  // 用于模块化，防报错，其实没啥用
+
+const abc_md = ABConvert.factory({
+  id: "md",
+  name: "md",
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.el,
+  process: (el, header, content)=>{
+    const subEl = document.createElement("div"); el.appendChild(subEl); subEl.classList.add("markdown-rendered")
+    ABConvertManager.getInstance().m_renderMarkdownFn(content, subEl)
+    return el
+  }
+})
+
+const abc_text = ABConvert.factory({
+  id: "text",
+  name: "纯文本",
+  detail: "其实一般会更推荐用code()代替，那个更精确",
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.el,
+  process: (el, header, content)=>{
+    // 文本元素。pre不好用，这里还是得用<br>换行最好
+    // `<p>${content.split("\n").map(line=>{return "<span>"+line+"</span>"}).join("<br/>")}</p>`
+    el.innerHTML = `<p>${content.replace(/ /g, "&nbsp;").split("\n").join("<br/>")}</p>`
+    return el
+  }
+})
 
 const abc_fold = ABConvert.factory({
   id: "fold",

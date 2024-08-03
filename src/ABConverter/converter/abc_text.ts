@@ -1,13 +1,12 @@
 /**
  * 转换器_文字版
  * 
- * string -> string|HTMLElement
+ * md_str <-> md_str
  */
 
 import {ABConvert_IOEnum, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
 import {ABConvertManager} from "../ABConvertManager"
 import {ABReg} from "../ABReg"
-import {ListProcess} from "./abc_list"
 
 /**
  * 将registerABProcessor的调用分成两步是因为：
@@ -193,18 +192,6 @@ const abc_add = ABConvert.factory({
   }
 })
 
-const abc_title2list = ABConvert.factory({
-  id: "title2list",
-  name: "标题到列表",
-  process_param: ABConvert_IOEnum.text,
-  process_return: ABConvert_IOEnum.text,
-  detail: "也可以当作是更强大的列表解析器",
-  process: (el, header, content)=>{
-    content = ListProcess.title2list(content, el)
-    return content
-  }
-})
-
 const abc_listroot = ABConvert.factory({
   id: "listroot",
   name: "增加列表根",
@@ -222,42 +209,6 @@ const abc_listroot = ABConvert.factory({
   }
 })
 
-const abc_listXinline = ABConvert.factory({
-  id: "listXinline",
-  name: "列表消除内联换行",
-  process_param: ABConvert_IOEnum.text,
-  process_return: ABConvert_IOEnum.text,
-  process: (el, header, content)=>{
-    return ListProcess.listXinline(content)
-  }
-})
-
-const abc_md = ABConvert.factory({
-  id: "md",
-  name: "md",
-  process_param: ABConvert_IOEnum.text,
-  process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
-    const subEl = document.createElement("div"); el.appendChild(subEl); subEl.classList.add("markdown-rendered")
-    ABConvertManager.getInstance().m_renderMarkdownFn(content, subEl)
-    return el
-  }
-})
-
-const abc_text = ABConvert.factory({
-  id: "text",
-  name: "纯文本",
-  detail: "其实一般会更推荐用code()代替，那个更精确",
-  process_param: ABConvert_IOEnum.text,
-  process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
-    // 文本元素。pre不好用，这里还是得用<br>换行最好
-    // `<p>${content.split("\n").map(line=>{return "<span>"+line+"</span>"}).join("<br/>")}</p>`
-    el.innerHTML = `<p>${content.replace(/ /g, "&nbsp;").split("\n").join("<br/>")}</p>`
-    return el
-  }
-})
-
 const abc_callout = ABConvert.factory({
   id: "callout",
   name: "callout语法糖",
@@ -268,108 +219,5 @@ const abc_callout = ABConvert.factory({
   process_return: ABConvert_IOEnum.text,
   process: (el, header, content)=>{
     return "```ad-"+header.slice(1)+"\n"+content+"\n```"
-  }
-})
-
-// 纯组合，后续用别名模块替代
-const abc_title2table = ABConvert.factory({
-  id: "title2table",
-  name: "标题到表格",
-  process_param: ABConvert_IOEnum.text,
-  process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
-    content = ListProcess.title2list(content, el)
-    ListProcess.list2table(content, el)
-    return el
-  }
-})
-
-const abc_list2table = ABConvert.factory({
-  id: "list2table",
-  name: "列表转表格",
-  match: /list2(md)?table(T)?/,
-  default: "list2table",
-  process_param: ABConvert_IOEnum.text,
-  process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
-    const matchs = header.match(/list2(md)?table(T)?/)
-    if (!matchs) return el
-    ListProcess.list2table(content, el, matchs[2]=="T")
-    return el
-  }
-})
-
-const abc_list2lt = ABConvert.factory({
-  id: "list2lt",
-  name: "列表转列表表格",
-  match: /list2(md)?lt(T)?/,
-  default: "list2lt",
-  process_param: ABConvert_IOEnum.text,
-  process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
-    const matchs = header.match(/list2(md)?lt(T)?/)
-    if (!matchs) return el
-    ListProcess.list2lt(content, el, matchs[2]=="T")
-    return el
-  }
-})
-
-const abc_list2folder = ABConvert.factory({
-  id: "list2folder",
-  name: "列表转树状目录",
-  match: /list2(md)?folder(T)?/,
-  default: "list2folder",
-  process_param: ABConvert_IOEnum.text,
-  process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
-    const matchs = header.match(/list2(md)?folder(T)?/)
-    if (!matchs) return el
-    ListProcess.list2folder(content, el, matchs[2]=="T")
-    return el
-  }
-})
-
-const abc_list2ut = ABConvert.factory({
-  id: "list2ut",
-  name: "列表转二维表格",
-  match: /list2(md)?ut(T)?/,
-  default: "list2ut",
-  process_param: ABConvert_IOEnum.text,
-  process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
-    const matchs = header.match(/list2(md)?ut(T)?/)
-    if (!matchs) return el
-    ListProcess.list2ut(content, el, matchs[2]=="T")
-    return el
-  }
-})
-
-const abc_list2timeline = ABConvert.factory({
-  id: "list2timeline",
-  name: "一级列表转时间线",
-  match: /list2(md)?timeline(T)?/,
-  default: "list2mdtimeline",
-  process_param: ABConvert_IOEnum.text,
-  process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
-    const matchs = header.match(/list2(md)?timeline(T)?/)
-    if (!matchs) return el
-    ListProcess.list2timeline(content, el, matchs[2]=="T")
-    return el
-  }
-})
-
-const abc_list2tab = ABConvert.factory({
-  id: "list2tab",
-  name: "一级列表转标签栏",
-  match: /list2(md)?tab(T)?$/,
-  default: "list2mdtab",
-  process_param: ABConvert_IOEnum.text,
-  process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
-    const matchs = header.match(/list2(md)?tab(T)?$/)
-    if (!matchs) return el
-    ListProcess.list2tab(content, el, matchs[2]=="T")
-    return el
   }
 })

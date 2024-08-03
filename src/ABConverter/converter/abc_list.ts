@@ -1,7 +1,9 @@
 /**
  * 处理器_列表版
  * 
- * 列表 -> html/列表
+ * - md_str <-> 列表数据
+ * - 列表数据 <-> html
+ * - 表格数据 -> 列表数据
  */
 
 import { ABReg } from '../ABReg'
@@ -28,12 +30,13 @@ import {ABConvertManager} from "../ABConvertManager"
  *   {a3, 1},
  * }
  */
-interface ListItem {
+export interface ListItem {
   content: string;        // 内容
   level: number;          // 级别 (缩进空格数/normalization后的递增等级数)
 }[]
 export type List_ListItem = ListItem[]
 
+/// 一些列表相关的工具集
 export class ListProcess{
 
   /** title转列表 */
@@ -43,50 +46,11 @@ export class ListProcess{
     return this.data2list(list_itemInfo)
   }
 
-  /** 列表转表格 */
-  static list2table(text: string, div: HTMLDivElement, modeT=false): HTMLDivElement {
-    let list_itemInfo = this.list2data(text)
-    return TableProcess.data2table(list_itemInfo, div, modeT)
-  }
-
   /** 列表转列表 */
   /*static list2l(text: string, div: HTMLDivElement) {
     let list_itemInfo = this.list2data(text, true)
     return this.data2list(list_itemInfo)
   }*/
-
-  /** 列表转列表格 */
-  static list2lt(text: string, div: HTMLDivElement, modeT=false) {
-    let list_itemInfo = this.list2data(text, true)
-    return TableProcess.uldata2ultable(list_itemInfo, div, modeT)
-  }
-
-  /** 列表转树形目录 */
-  static list2folder(text: string, div: HTMLDivElement, modeT=false) {
-    let list_itemInfo = this.list2data(text, true)
-    return TableProcess.uldata2ultable(list_itemInfo, div, modeT, true)
-  }
-
-  /** 列表转二维表格 */
-  static list2ut(text: string, div: HTMLDivElement, modeT=false) {
-    //【old】
-    /*let list_itemInfo = this.old_ulist2data(text)
-    return this.data2table(list_itemInfo, div)*/
-    //【new】
-    let data = this.list2data(text)
-    console.log("data0",data)
-    data = this.data_mL_2_2L(data)
-    console.log("data1",data)
-    data = this.data_2L_2_mL1B(data)
-    return TableProcess.data2table(data, div, modeT)
-  }
-
-  /** 一级列表转时间线 */
-  static list2timeline(text: string, div: HTMLDivElement, modeT=false) {
-    let data = this.list2data(text)
-    data = this.data_mL_2_2L(data)
-    return TableProcess.data2table(data, div, modeT)
-  }
 
   /** 一级列表转标签栏 */
   static list2tab(text: string, div: HTMLDivElement, modeT=false) {
@@ -441,7 +405,7 @@ export class ListProcess{
    *  - 2\n   - 3
    *  - 2
    */
-  private static data_mL_2_2L(
+  static data_mL_2_2L(
     list_itemInfo: List_ListItem
   ){
     let list_itemInfo2: List_ListItem = []
@@ -526,7 +490,7 @@ export class ListProcess{
    *  - 2
    *   - 3
    */
-  private static data_2L_2_mL1B(
+  static data_2L_2_mL1B(
     list_itemInfo: List_ListItem
   ){
     let list_itemInfo2:List_ListItem = []
@@ -632,256 +596,39 @@ export class ListProcess{
   }*/
 }
 
-/**
- * 通用表格数据，一个元素等于是一个单元格项 (th/td)
- * 
- * 例如：
- * - a1
- *   - a2
- *     - a3
- *   - b2
- *     - b3
- * to
- * |a1|a2|a3|
- * |^ |b2|b3|
- * with
- * {
- *   // 前两列是ListItem来的东西
- *   // 第2列是用来算第3列的，将第3列算出来后，即数据分析完后，第2列就没有用了
- *   {a1, 无用, 2, 1},
- *   {a2, 无用, 1, 1},
- *   {a3, 无用, 1, 1},
- *   {b2, 无用, 1, 2},
- *   {b3, 无用, 1, 2},
- * }
- */
-interface TableItem extends ListItem{
-  tableRow: number,       // 跨行数
-  tableLine: number       // 对应首行序列
-}
-export type List_TableItem = TableItem[]
-
-export class TableProcess{
-  /** 列表数据转表格 */
-  static data2table(
-    list_itemInfo: List_ListItem, 
-    div: HTMLDivElement,
-    modeT: boolean        // 是否转置
-  ){
-    // 组装成表格数据 (列表是深度优先)
-    let list_tableInfo:List_TableItem = []
-    let prev_line = -1   // 并存储后一行的序列!
-    let prev_level = 999 // 上一行的等级
-    for (let i=0; i<list_itemInfo.length; i++){
-      let item = list_itemInfo[i]
-      
-      // 获取跨行数
-      let tableRow = 1
-      let row_level = list_itemInfo[i].level
-      for (let j=i+1; j<list_itemInfo.length; j++) {
-        if (list_itemInfo[j].level > row_level){                  // 在右侧，不换行
-          row_level = list_itemInfo[j].level
-        }
-        else if (list_itemInfo[j].level > list_itemInfo[i].level){// 换行但是不换item项的行
-          row_level = list_itemInfo[j].level
-          tableRow++
-        }
-        else break                                                // 换item项的行
-      }
-
-      // 获取所在行数。分换行（创建新行）和不换行，第一行总是创建新行
-      // 这里的if表示该换行了
-      if (item.level <= prev_level) {
-        prev_line++
-      }
-      prev_level = item.level
-
-      // 填写
-      list_tableInfo.push({
-        content: item.content,  // 内容
-        level: item.level,      // 级别
-        tableRow: tableRow,     // 跨行数
-        tableLine: prev_line    // 对应首行序列
-      })
-    }
-
-    // GeneratorBranchTable，原来是svelte
-    {
-      // 表格数据 组装成表格
-      const table = document.createElement("table"); div.appendChild(table); table.classList.add("ab-table", "ab-branch-table")
-      if (modeT) table.setAttribute("modeT", "true")
-      let thead
-      if(list_tableInfo[0].content.indexOf("< ")==0){ // 判断是否有表头
-        thead = document.createElement("thead"); table.appendChild(thead);
-        list_tableInfo[0].content=list_tableInfo[0].content.replace(/^\<\s/,"")
-      }
-      const tbody = document.createElement("tbody"); table.appendChild(tbody);
-      for (let index_line=0; index_line<prev_line+1; index_line++){ // 遍历表格行，创建tr……
-        let is_head
-        let tr
-        if (index_line==0 && thead){ // 判断是否第一行&&是否有表头
-          tr = document.createElement("tr"); thead.appendChild(tr);
-          is_head = true
-        }
-        else{
-          is_head = false
-          tr = document.createElement("tr"); tbody.appendChild(tr);
-        }
-        for (let item of list_tableInfo){                           // 遍历表格列，创建td
-          if (item.tableLine!=index_line) continue
-          let td = document.createElement(is_head?"th":"td"); tr.appendChild(td); td.setAttribute("rowspan", item.tableRow.toString());
-          td.classList.add("markdown-rendered")
-          ABConvertManager.getInstance().m_renderMarkdownFn(item.content, td)
-        }
-      }
-    }
-
-    return div
+const abc_title2list = ABConvert.factory({
+  id: "title2list",
+  name: "标题到列表",
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.text,
+  detail: "也可以当作是更强大的列表解析器",
+  process: (el, header, content)=>{
+    content = ListProcess.title2list(content, el)
+    return content
   }
+})
 
-  /** 列表格数据转列表格
-   * 注意传入的列表数据应该符合：
-   * 第一列等级为0、没有分叉
-   */
-  static uldata2ultable(
-    list_itemInfo: List_ListItem, 
-    div: HTMLDivElement,
-    modeT: boolean,
-    is_folder=false
-  ){
-    // 组装成表格数据 (列表是深度优先)
-    let tr_line_level: number[] = [] // 表格行等级（树形表格独有）
-    let list_tableInfo:List_TableItem = []
-    let prev_line = -1   // 并存储后一行的序列!
-    let prev_level = 999 // 上一行的等级
-    for (let i=0; i<list_itemInfo.length; i++){
-      let item = list_itemInfo[i]
-      let item_type:string = ""
-
-      // 获取所在行数。分换行（创建新行）和不换行，第一行总是创建新行
-      // 这里的if表示该换行了
-      if (item.level <= prev_level) {
-        prev_line++
-        if (item.level==0) {
-          /** @可优化 前面是列表级别转空格，现在是删除空格转回列表级别。这受限于Item格式 */
-          const matchs = item.content.match(/^((&nbsp;)*)/)
-          if (!matchs) return div
-          if (!matchs[1]) tr_line_level.push(0)
-          else tr_line_level.push(Math.round(matchs[1].length/6))
-          item.content = item.content.replace(/^((&nbsp;)*)/, "")
-          
-          // 由字符串前缀得出文件格式
-          if(is_folder){
-            const matchs = item.content.match(/^(=|~) /)
-            // 无类型/不显示图标的文件类型
-            if (!matchs){}
-            // 文件夹
-            else if (matchs[1]=="= "){
-              item_type = "folder"
-              item.content = item.content.replace(/^\= /, "")
-            }
-            // 根据后缀名决定
-            else if(matchs[1]="~ "){
-              const m_line = item.content.match(/^\~(.*)\.(.*)/)
-              if(!m_line) {}
-              else {
-                item_type = m_line[2]
-              }
-              item.content = item.content.replace(/^\~ /, "")
-            }
-          }
-        }
-        else {
-          tr_line_level.push(0)
-          console.warn("数据错误：列表格中跨行数据")
-        }
-      }
-      prev_level = item.level
-
-      // 填写
-      list_tableInfo.push({
-        content: item.content,
-        level: item.level,
-        tableRow: 1,
-        tableLine: prev_line
-      })
-    }
-
-    // GeneratorListTable，原Svelte
-    {
-      // 表格数据 组装成表格
-      const table = document.createElement("table"); div.appendChild(table); table.classList.add("ab-table", "ab-list-table")
-      if (is_folder) table.classList.add("ab-list-folder")
-      if (modeT) table.setAttribute("modeT", "true")
-      let thead
-      if(list_tableInfo[0].content.indexOf("< ")==0){ // 判断是否有表头
-        thead = document.createElement("thead"); table.appendChild(thead);
-        list_tableInfo[0].content=list_tableInfo[0].content.replace(/^\<\s/,"")
-      }
-      const tbody = document.createElement("tbody"); table.appendChild(tbody);
-      let prev_tr: HTMLElement|null = null   // 用来判断是否可以折叠
-      for (let index_line=0; index_line<prev_line+1; index_line++){ // 遍历表格行，创建tr……
-        let is_head
-        let tr: HTMLElement
-        // 行 - 表头行（即是否第一行&&是否有表头）
-        if (index_line==0 && thead){
-          tr = document.createElement("tr"); thead.appendChild(tr); // attr: {"tr_level": tr_line_level[index_line]}
-          is_head = true
-        }
-        // 行 - 非表头行
-        else{
-          is_head = false
-          tr = document.createElement("tr"); tbody.appendChild(tr); tr.classList.add("ab-foldable-tr");
-            tr.setAttribute("tr_level", tr_line_level[index_line].toString()); tr.setAttribute("is_fold", "false"); tr.setAttribute("able_fold", "false");
-          // 判断上一个是否可折叠。不需要尾判断，最后一个肯定不能折叠
-          if (prev_tr 
-            && !isNaN(Number(prev_tr.getAttribute("tr_level"))) 
-            && Number(prev_tr.getAttribute("tr_level")) < tr_line_level[index_line]
-          ){
-            prev_tr.setAttribute("able_fold", "true")
-          }
-          prev_tr = tr
-        }
-        // 列 - 遍历表格列，创建td
-        for (let item of list_tableInfo){
-          if (item.tableLine!=index_line) continue
-          // md版
-          let td = document.createElement(is_head?"th":"td"); tr.appendChild(td); td.setAttribute("rowspan", item.tableRow.toString());
-          let td_cell = document.createElement("div"); td.appendChild(td_cell); td_cell.classList.add("ab-list-table-witharrow");
-          td_cell.classList.add("markdown-rendered")
-          ABConvertManager.getInstance().m_renderMarkdownFn(item.content, td_cell);
-        }
-      }
-
-      // 折叠列表格 事件绑定
-      const l_tr:NodeListOf<HTMLElement> = tbody.querySelectorAll("tr")
-      for (let i=0; i<l_tr.length; i++){
-        const tr = l_tr[i]
-        /*const tr_level = Number(tr.getAttribute("tr_level"))
-        if (isNaN(tr_level)) continue
-        const tr_isfold = tr.getAttribute("is_fold")
-        if (!tr_isfold) continue*/
-        tr.onclick = ()=>{
-          const tr_level = Number(tr.getAttribute("tr_level"))
-          if (isNaN(tr_level)) return
-          const tr_isfold = tr.getAttribute("is_fold")
-          if (!tr_isfold) return
-          let flag_do_fold = false  // 防止折叠最小层
-          for (let j=i+1; j<l_tr.length; j++){
-            const tr2 = l_tr[j]
-            const tr_level2 = Number(tr2.getAttribute("tr_level"))
-            if (isNaN(tr_level2)) break
-            if (tr_level2<=tr_level) break
-            // tr2.setAttribute("style", "display:"+(tr_isfold=="true"?"block":"none"))
-            (tr_isfold == "true") ? tr2.style.display = "" : tr2.style.display = "none"
-            flag_do_fold = true
-          }
-          if (flag_do_fold) tr.setAttribute("is_fold", tr_isfold=="true"?"false":"true")
-        }
-      }
-
-    }
-
-    return div
+const abc_listXinline = ABConvert.factory({
+  id: "listXinline",
+  name: "列表消除内联换行",
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.text,
+  process: (el, header, content)=>{
+    return ListProcess.listXinline(content)
   }
-}
+})
+
+const abc_list2tab = ABConvert.factory({
+  id: "list2tab",
+  name: "一级列表转标签栏",
+  match: /list2(md)?tab(T)?$/,
+  default: "list2mdtab",
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.el,
+  process: (el, header, content)=>{
+    const matchs = header.match(/list2(md)?tab(T)?$/)
+    if (!matchs) return el
+    ListProcess.list2tab(content, el, matchs[2]=="T")
+    return el
+  }
+})

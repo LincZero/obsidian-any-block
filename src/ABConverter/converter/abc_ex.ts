@@ -1,5 +1,7 @@
 /**
- * 处理器_特殊版？
+ * 处理器_特殊
+ * 
+ * 这是一个demo: 教你如何写一个自己的转换器
  */
 
 import {ABConvert_IOEnum, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
