@@ -67,9 +67,8 @@ export class TableProcess{
     return TableProcess.data2table(list_itemInfo, div)*/
     //【new】
     let data = ListProcess.list2data(text)
-    console.log("data0",data)
+    data = ListProcess.data2strict(data).map((item: ListItem, index)=>{ return {content: item.content, level: item.level/2}})
     data = ListProcess.data_mL_2_2L(data)
-    console.log("data1",data)
     data = ListProcess.data_2L_2_mL1B(data)
     return TableProcess.data2table(data, div, modeT)
   }
@@ -77,6 +76,7 @@ export class TableProcess{
   /** 一级列表转时间线 */
   static list2timeline(text: string, div: HTMLDivElement, modeT=false) {
     let data = ListProcess.list2data(text)
+    data = ListProcess.data2strict(data).map((item: ListItem, index)=>{ return {content: item.content, level: item.level/2}})
     data = ListProcess.data_mL_2_2L(data)
     return TableProcess.data2table(data, div, modeT)
   }

@@ -39,6 +39,8 @@ export type List_ListItem = ListItem[]
 /// 一些列表相关的工具集
 export class ListProcess{
 
+  // ----------------------- str -> listData ------------------------
+  
   /** title转列表 */
   static title2list(text: string, div: HTMLDivElement): string {
     let list_itemInfo = this.title2data(text)
@@ -299,12 +301,16 @@ export class ListProcess{
     return list_itemInfo
   }
 
-  /** 列表数据严格化 */
-  private static data2strict(
+  /**
+   * 列表数据严格化/normalized
+   * 
+   * 主要是调整level：由空格数调整为递增等级，并乘以2。TODO 乘以2不对吧？
+   */
+  static data2strict(
     list_itemInfo: List_ListItem
-  ){
+  ): List_ListItem {
     let list_prev_level:number[] = [-999]
-    let list_itemInfo2:{content:string, level:number}[] = []
+    let list_itemInfo2:List_ListItem = []
     for (let itemInfo of list_itemInfo){
       // 找到在list_prev_level的位置，用new_level保存
       let new_level = 0
