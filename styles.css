@@ -3,7 +3,8 @@
   --pre-background-color: #1b1b1b;
 }
 
-/** 替换内容
+/**
+ * 替换内容
  * .ab-replace
  *   .ab-note
  *   .ab-button
@@ -39,6 +40,11 @@
   display: block;
 }
 
+.ab-note table {
+  display: table;
+  width: 100%;
+}
+
 .ab-note .ab-tab-root {
   border: solid royalblue 1px;
 }
@@ -72,13 +78,19 @@
 
 .ab-note .ab-table td > p:first-child,
 .ab-note .ab-table th > p:first-child,
-.ab-note .ab-table .ab-list-table-witharrow > p:first-child {
+.ab-note .ab-table .ab-list-table-witharrow > p:first-child,
+.ab-note .ab-table td > div > p:first-child,
+.ab-note .ab-table th > div > p:first-child,
+.ab-note .ab-table .ab-list-table-witharrow > div > p:first-child {
   margin-top: 0;
 }
 
 .ab-note .ab-table td > p:last-child,
 .ab-note .ab-table th > p:last-child,
-.ab-note .ab-table .ab-list-table-witharrow > p:last-child {
+.ab-note .ab-table .ab-list-table-witharrow > p:last-child,
+.ab-note .ab-table td > div > p:last-child,
+.ab-note .ab-table th > div > p:last-child,
+.ab-note .ab-table .ab-list-table-witharrow > div > p:last-child {
   margin-bottom: 0;
 }
 
@@ -104,6 +116,7 @@
   left: 2px;
   border: 6px solid transparent;
   border-left-color: #d9d9d9;
+  cursor: pointer;
 }
 
 .ab-note .ab-list-table .ab-foldable-tr[able_fold="true"][is_fold="false"] > td:first-child > div::before {
@@ -111,6 +124,7 @@
   left: -1px;
   border: 6px solid transparent;
   border-top-color: #d9d9d9;
+  cursor: pointer;
 }
 
 .ab-note .ab-list-table .ab-foldable-tr[tr_level="1"] > td:first-child {
