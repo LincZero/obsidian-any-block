@@ -91,7 +91,7 @@
   }
 
   // 通用表格
-  .ab-table{
+  table.ab-table{
     td>p:first-child, // ob x 3
     th>p:first-child,
     .ab-list-table-witharrow>p:first-child,
@@ -118,7 +118,7 @@
   }
 
   // 列表格
-  .ab-list-table{
+  table.ab-list-table{
     .ab-foldable-tr>td:first-child{
       >div{
         padding-left: 15px;
@@ -162,9 +162,116 @@
     .ab-foldable-tr[tr_level="8"]>td:first-child{padding-left: calc(8*12px);}
   }
 
+  // 首列重点表格
+  table.ab-table-fc {
+    td:first-child {
+      white-space: nowrap;
+      font-weight: 500;
+      vertical-align: top;
+    }
+  }
+
+  // 仿列表表格
+  table.ab-table-likelist {
+    td {
+      border: none;
+      padding-bottom: 10px;
+      vertical-align: top;
+    }
+    td:first-child {
+      padding-right: 8px;
+      padding-left: 20px;
+
+      position: relative;
+      &::before {
+        position: absolute;
+        top: 1em;
+        transform: translateY(-50%);
+        width: 5px;
+        height: 5px;
+        left: 6px;
+
+        content: '';
+        border-radius: 50%;
+        background-color: currentColor;
+      }
+      &::after {
+        content: "";
+        position: absolute;
+        top: 3px;
+        bottom: 5px;
+        right: 0;
+        //width: 1px;
+        //height: calc(100% - 6px);
+        border-right: 1px solid currentColor;
+        pointer-events: none;
+      }
+    }
+    td:nth-child(2) {
+      padding-left: 20px;
+      position: relative;
+      &::before {
+        position: absolute;
+        top: 1em;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 4px;
+        border: solid 1px;
+        left: 6px;
+
+        content: '';
+        border-radius: 50%;
+      }
+    }
+    td:last-child {
+      border: none;
+      &::after {
+        content: none;
+      }
+    }
+  }
+
+  // 时间线表格
+  table.ab-table-timeline {
+    td:first-child {
+      border: none;
+      border-left: none;
+      border-right: solid 2px;
+      padding-right: 20px;
+      color: orange;
+
+      position: relative;
+      &::after {
+        position: absolute;
+        top: 1em;
+        transform: translateY(-50%);
+        width: 10px;
+        height: 10px;
+        right: -8px;
+
+        content: '';
+        background-color: orange;
+        border-radius: 50%;
+        border: solid 2px;
+      }
+    }
+    td:nth-child(2) {
+      padding-left: 20px;
+    }
+    td:last-child {
+      border-right: none;
+    }
+    tr:first-child td {
+      border-top: none;
+    }
+    tr:last-child td {
+      border-bottom: none;
+    }
+  }
+
   // Folder
-  .ab-list-table.ab-list-folder{
-    border: none;
+  table.ab-list-table.ab-list-folder{
+    border: none !important;
     td{
       white-space: nowrap;
     }

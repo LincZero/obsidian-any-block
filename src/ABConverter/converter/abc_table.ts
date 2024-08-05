@@ -78,7 +78,10 @@ export class TableProcess{
     let data = ListProcess.list2data(text)
     data = ListProcess.data2strict(data).map((item: ListItem, index)=>{ return {content: item.content, level: item.level/2}})
     data = ListProcess.data_mL_2_2L(data)
-    return TableProcess.data2table(data, div, modeT)
+    div = TableProcess.data2table(data, div, modeT)
+    const table = div.querySelector("table")
+    if (table) table.classList.add("ab-table-fc", "ab-table-timeline")
+    return div 
   }
   
   /** 列表数据转表格 */
