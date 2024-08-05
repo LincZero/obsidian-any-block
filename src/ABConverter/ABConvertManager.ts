@@ -77,22 +77,22 @@ export class ABConvertManager {
   /// 处理器一览表 - 全部信息
   public generateConvertInfoTable(el: HTMLElement){
     const table_p: HTMLDivElement = document.createElement("div"); el.appendChild(table_p); table_p.classList.add("markdown-rendered", "ab-setting", "md-table-fig1");
-    const table: HTMLDivElement = document.createElement("table"); table_p.appendChild(table); table_p.classList.add("ab-setting","md-table-fig2");
+    const table: HTMLDivElement = document.createElement("table"); table_p.appendChild(table); table.classList.add("ab-setting","md-table-fig2");
     {
       const thead = document.createElement("thread"); table.appendChild(thead);
       const tr = document.createElement("tr"); thead.appendChild(tr);
-      let td;
-      td = document.createElement("td"); tr.appendChild(td); td.textContent = "处理器名";
-      td = document.createElement("td"); tr.appendChild(td); td.textContent = "下拉框默认项";
-      td = document.createElement("td"); tr.appendChild(td); td.textContent = "用途描述";
-      td = document.createElement("td"); tr.appendChild(td); td.textContent = "处理类型";
-      td = document.createElement("td"); tr.appendChild(td); td.textContent = "输出类型";
-      td = document.createElement("td"); tr.appendChild(td); td.textContent = "正则";
-      td = document.createElement("td"); tr.appendChild(td); td.textContent = "别名替换";
-      td = document.createElement("td"); tr.appendChild(td); td.textContent = "是否启用";
-      td = document.createElement("td"); tr.appendChild(td); td.textContent = "定义来源";
+      let th;
+      th = document.createElement("th"); tr.appendChild(th); th.textContent = "处理器名";
+      th = document.createElement("th"); tr.appendChild(th); th.textContent = "下拉框默认项";
+      th = document.createElement("th"); tr.appendChild(th); th.textContent = "用途描述";
+      th = document.createElement("th"); tr.appendChild(th); th.textContent = "处理类型";
+      th = document.createElement("th"); tr.appendChild(th); th.textContent = "输出类型";
+      th = document.createElement("th"); tr.appendChild(th); th.textContent = "正则";
+      th = document.createElement("th"); tr.appendChild(th); th.textContent = "别名替换";
+      th = document.createElement("th"); tr.appendChild(th); th.textContent = "是否启用";
+      th = document.createElement("th"); tr.appendChild(th); th.textContent = "定义来源";
     }
-    const tbody = document.createElement("tbody"); tbody.appendChild(tbody);
+    const tbody = document.createElement("tbody"); table.appendChild(tbody);
     for (let item of this.list_abConvert){
       const tr = document.createElement("tr"); tbody.appendChild(tr)
       let td

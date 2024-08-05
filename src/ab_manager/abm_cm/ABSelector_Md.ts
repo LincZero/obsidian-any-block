@@ -88,9 +88,9 @@ export function generateSelectorInfoTable(el: HTMLElement){
   {
     const thead = table.createEl("thead")
     const tr = thead.createEl("tr")
-    tr.createEl("td", {text: "选择器名"})
-    tr.createEl("td", {text: "首行正则"})
-    tr.createEl("td", {text: "是否启用"})
+    tr.createEl("th", {text: "选择器名"})
+    tr.createEl("th", {text: "首行正则"})
+    tr.createEl("th", {text: "是否启用"})
   }
   const tbody = table.createEl("tbody")
   for (let item of list_mdSelector){
