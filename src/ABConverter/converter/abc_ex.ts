@@ -49,3 +49,45 @@ const abc_faq = ABConvert.factory({
     return el
   }
 })
+
+const abc_info = ABConvert.factory({
+  id: "info",
+  name: "INFO",
+  match: "info",
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.el,
+  process: (el, header, content)=>{
+    const table_p: HTMLDivElement = document.createElement("div"); el.appendChild(table_p); table_p.classList.add("markdown-rendered", "ab-setting", "md-table-fig1");
+    const table: HTMLDivElement = document.createElement("table"); table_p.appendChild(table); table.classList.add("ab-setting","md-table-fig2");
+    {
+      const thead = document.createElement("thead"); table.appendChild(thead);
+      const tr = document.createElement("tr"); thead.appendChild(tr);
+      let th;
+      th = document.createElement("th"); tr.appendChild(th); th.textContent = "处理器名";
+      th = document.createElement("th"); tr.appendChild(th); th.textContent = "下拉框默认项";
+      th = document.createElement("th"); tr.appendChild(th); th.textContent = "用途描述";
+      th = document.createElement("th"); tr.appendChild(th); th.textContent = "处理类型";
+      th = document.createElement("th"); tr.appendChild(th); th.textContent = "输出类型";
+      th = document.createElement("th"); tr.appendChild(th); th.textContent = "正则";
+      th = document.createElement("th"); tr.appendChild(th); th.textContent = "别名替换";
+      th = document.createElement("th"); tr.appendChild(th); th.textContent = "是否启用";
+      th = document.createElement("th"); tr.appendChild(th); th.textContent = "定义来源";
+    }
+    const tbody = document.createElement("tbody"); table.appendChild(tbody);
+    for (let item of ABConvertManager.getInstance().list_abConvert){
+      const tr = document.createElement("tr"); tbody.appendChild(tr)
+      let td
+      td = document.createElement("td"); tr.appendChild(td); td.textContent = item.name;
+      td = document.createElement("td"); tr.appendChild(td); td.textContent = String(item.default);
+      td = document.createElement("td"); tr.appendChild(td); td.textContent = item.detail; td.setAttribute("style", "max-width:240px;overflow-x:auto;white-space:nowrap;");
+      // td = document.createElement("td"); tr.appendChild(td); td.textContent = item.is_render?"渲染":"文本";
+      td = document.createElement("td"); tr.appendChild(td); td.textContent = String(item.process_param);
+      td = document.createElement("td"); tr.appendChild(td); td.textContent = String(item.process_return);
+      td = document.createElement("td"); tr.appendChild(td); td.textContent = String(item.match);
+      td = document.createElement("td"); tr.appendChild(td); td.textContent = item.process_alias;
+      td = document.createElement("td"); tr.appendChild(td); td.textContent = item.is_disable?"禁用":"启用";
+      td = document.createElement("td"); tr.appendChild(td); td.textContent = item.register_from;
+    }
+    return el
+  }
+})

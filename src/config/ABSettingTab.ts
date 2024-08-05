@@ -82,7 +82,9 @@ export class ABSettingTab extends PluginSettingTab {
     containerEl.empty();
     let settings = this.plugin.settings
 
-		containerEl.createEl('h2', {text: '范围管理器'});
+		containerEl.createEl('p', {text: 'See Github and website for more details (更多使用方法详见Github及网站)'});
+
+    containerEl.createEl('h2', {text: 'Selector Manager (选择器的管理)'});
 
     this.selectorPanel = generateSelectorInfoTable(containerEl)
 
@@ -135,7 +137,7 @@ export class ABSettingTab extends PluginSettingTab {
         })
       })*/
 
-    containerEl.createEl('h2', {text: '查看所有注册指令'});
+    containerEl.createEl('h2', {text: 'Convert Manager (转换器的管理)'});
 
     new Setting(containerEl)
       .setName('添加新的注册指令')
@@ -149,11 +151,18 @@ export class ABSettingTab extends PluginSettingTab {
             settings.user_processor.push(result)
             await this.plugin.saveSettings();
             this.processorPanel.remove()
-            this.processorPanel = ABConvertManager.getInstance().generateConvertInfoTable(containerEl)
+
+            const div = containerEl.createEl("div");
+            ABConvertManager.autoABConvert(div, "info", "") // this.processorPanel = ABConvertManager.getInstance().generateConvertInfoTable(containerEl)
+            this.processorPanel = div
           }).open()
         })
       })
-    this.processorPanel = ABConvertManager.getInstance().generateConvertInfoTable(containerEl)
+
+    containerEl.createEl('p', {text: '下面是所有注册指令的查看'});
+    const div = containerEl.createEl("div");
+    ABConvertManager.autoABConvert(div, "info", "") // this.processorPanel = ABConvertManager.getInstance().generateConvertInfoTable(containerEl)
+    this.processorPanel = div
 	}
 }
 

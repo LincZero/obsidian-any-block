@@ -417,12 +417,13 @@
   }
 }
 
+// 设置面板中表格的滚动条翻转
 div.md-table-fig1{
   overflow-x:scroll;
   transform:scaleY(-1);
-}
-table.md-table-fig2{
-  overflow-x:scroll;
-  transform:scaleY(-1);
-  white-space: nowrap;
+  table.md-table-fig2{
+    overflow-x:scroll;
+    transform:scaleY(-1);
+    white-space: nowrap;
+  }
 }
