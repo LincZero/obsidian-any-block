@@ -54,44 +54,10 @@ function list2markmap(markdown: string, div: HTMLDivElement) {
 	const { root, features } = transformer.transform(markdown.trim()); // 1. transform Markdown
 	const assets = transformer.getUsedAssets(features); // 2. get assets (option1)
 
-	// (可选) 手动渲染按钮
-	const svg_btn = document.createElement("button"); div.appendChild(svg_btn); svg_btn.textContent = "ChickMe ReRender Markmap";
-  svg_btn.setAttribute("style", "background-color: argb(255, 125, 125, 0.5)");
-  svg_btn.setAttribute("onclick", `console.log("svg chick"); let script_el = document.querySelector('script[script-id="ab-markmap-script"]');
-	if (script_el) script_el.remove();
-	script_el = document.createElement('script'); document.head.appendChild(script_el);
-	script_el.type = "module";
-	script_el.setAttribute("script-id", "ab-markmap-script");
-	script_el.textContent = \`
-	import { Markmap, } from 'https://jspm.dev/markmap-view';
-	const mindmaps = document.querySelectorAll('.ab-markmap-svg');
-	for(const mindmap of mindmaps) {
-		Markmap.create(mindmap,null,JSON.parse(mindmap.getAttribute('data-json')));
-	}\``);
-	
-	// 2. html元素创建 (注意一下类名要被捕抓的) // TODO 似乎是这里导致了`'`符号的异常
-	const svg_div = document.createElement("div"); div.appendChild(svg_div);
-	let height_adapt = 100 + markdown.split("\n").length*25; // 仅大致估算px: 100 + (0~40)行 * 25 = [200~1000]。如果要准确估计，得自己解析一遍，麻烦
-	if (height_adapt>1000) height_adapt = 1000;
-	const html_str = `<svg class="ab-markmap-svg" data-json='${JSON.stringify(root)}' style="width: 100%; height: ${height_adapt}px; border-style: double;"></svg>`
-	svg_div.innerHTML = html_str
-
-	// 3. markmap渲染 (本来打算模块化解决，但不行。若在ob环境，则在打开完文件的钩子/CM结束时触发一次下面代码)
+	// 2. 渲染
 	{
-		// 1. script插入方式，可成功
-		// let script_el: HTMLScriptElement|null = document.querySelector('script[script-id="ab-markmap-script"]');
-		// if (script_el) script_el.remove();
-		// script_el = document.createElement('script'); document.head.appendChild(script_el);
-		// script_el.type = "module";
-		// script_el.setAttribute("script-id", "ab-markmap-script");
-		// script_el.textContent = `
-		// import { Markmap, } from 'https://jspm.dev/markmap-view';
-		// const mindmaps = document.querySelectorAll('.ab-markmap-svg'); // 注意一下这里的选择器
-		// for(const mindmap of mindmaps) {
-		// 	Markmap.create(mindmap,null,JSON.parse(mindmap.getAttribute('data-json')));
-		// }`;
-
-		// 2. npm mindmap-view 方法，失败
+		// 1. 四选一。自己渲 (优缺点见abc_mermaid的相似方法)
+		// npm mindmap-view 方法
 		// // if (assets.styles) loadCSS(assets.styles);
 		// // if (assets.scripts) loadJS(assets.scripts, { getMarkmap: () => {} });
 		// const mindmaps = document.querySelectorAll('.ab-markmap-svg'); // 注意一下这里的选择器
@@ -101,17 +67,36 @@ function list2markmap(markdown: string, div: HTMLDivElement) {
 		// 	g_markmap = Markmap.create(mindmap as SVGElement, undefined, JSON.parse(datajson as string));
 		// };
 
-		// 3. script提供全局方法，失败
-		// const script_el = document.createElement('script'); document.head.appendChild(script_el);
-		// script_el.type = "module";
-		// script_el.textContent = `
-		// window.refresh = function() {
-		// 	import { Markmap, } from 'https://jspm.dev/markmap-view';
-		// 	const mindmaps = document.querySelectorAll('.ab-markmap-svg'); // 注意一下这里的选择器
-		// 	for(const mindmap of mindmaps) {
-		// 		Markmap.create(mindmap,null,JSON.parse(mindmap.getAttribute('data-json')));
-		// 	}
-		// }
-		// window.refresh()`;
+		// 2. 四选一。这里给环境渲染 (优缺点见abc_mermaid的相似方法)
+		// ...
+
+		// 3. 四选一。这里不渲，交给上一层让上一层渲 (优缺点见abc_mermaid的相似方法)
+		// div.classList.add("ab-raw")
+		// div.innerHTML = `<div class="ab-raw-data" type-data="markmap" content-data='${markdown}'></div>`
+
+		// 4. 四选一。纯动态/手动渲染 (优缺点见abc_mermaid的相似方法)
+		const svg_btn = document.createElement("button"); div.appendChild(svg_btn); svg_btn.textContent = "ChickMe ReRender Markmap";
+		svg_btn.setAttribute("style", "background-color: argb(255, 125, 125, 0.5)");
+		svg_btn.setAttribute("onclick", `
+		console.log("markmap chick");
+		let script_el = document.querySelector('script[script-id="ab-markmap-script"]');
+		if (script_el) script_el.remove();
+		script_el = document.createElement('script'); document.head.appendChild(script_el);
+		script_el.type = "module";
+		script_el.setAttribute("script-id", "ab-markmap-script");
+		script_el.textContent = \`
+		import { Markmap, } from 'https://jspm.dev/markmap-view';
+		const mindmaps = document.querySelectorAll('.ab-markmap-svg');
+		for(const mindmap of mindmaps) {
+			Markmap.create(mindmap,null,JSON.parse(mindmap.getAttribute('data-json')));
+		}\``);
+		// TODO 似乎是这里导致了`'`符号的异常
+		const svg_div = document.createElement("div"); div.appendChild(svg_div);
+		let height_adapt = 100 + markdown.split("\n").length*25; // 仅大致估算px: 100 + (0~40)行 * 25 = [200~1000]。如果要准确估计，得自己解析一遍，麻烦
+		if (height_adapt>1000) height_adapt = 1000;
+		const html_str = `<svg class="ab-markmap-svg" data-json='${JSON.stringify(root)}' style="height: ${height_adapt}px;"></svg>`
+		svg_div.innerHTML = html_str
 	}
+
+	return div
 }

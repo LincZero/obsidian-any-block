@@ -52,6 +52,19 @@
     width: 100%;
   }
 
+  // 未渲染前的mermaid
+  pre.ab-mermaid-raw {
+    border: solid 1px;
+    border-radius: 6px;
+    margin-top: 0;
+  }
+  // 未渲染前的markmap
+  .ab-markmap-svg {
+    border: solid 1px;
+    border-radius: 6px;
+    width: 100%;
+  }
+
   // 标签栏
   .ab-tab-root{
     border: solid royalblue 1px;

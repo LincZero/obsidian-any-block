@@ -53,6 +53,18 @@
   width: 100%;
 }
 
+.ab-note pre.ab-mermaid-raw {
+  border: solid 1px;
+  border-radius: 6px;
+  margin-top: 0;
+}
+
+.ab-note .ab-markmap-svg {
+  border: solid 1px;
+  border-radius: 6px;
+  width: 100%;
+}
+
 .ab-note .ab-tab-root {
   border: solid royalblue 1px;
 }

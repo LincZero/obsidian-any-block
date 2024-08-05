@@ -274,7 +274,7 @@ export class ListProcess{
                                                                               // 保留缩进（列表格）
         for (let inline_i=0; inline_i<list_inline.length; inline_i++){
           if(inline_i==0) {                                                   // level为内联缩进
-            for (let i=0; i<level_inline; i++) list_inline[inline_i] = "&nbsp;&nbsp;" + list_inline[inline_i]
+            for (let i=0; i<level_inline; i++) list_inline[inline_i] = "&nbsp;" + list_inline[inline_i] // @bug。需要分开处理tab和space两种情况。这里统一坍塌成 "1"
             list_itemInfo.push({
               content: list_inline[inline_i],
               level: 0

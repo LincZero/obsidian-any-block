@@ -186,7 +186,7 @@ export class TableProcess{
           const matchs = item.content.match(/^((&nbsp;)*)/)
           if (!matchs) return div
           if (!matchs[1]) tr_line_level.push(0)
-          else tr_line_level.push(Math.round(matchs[1].length/6))
+          else tr_line_level.push(Math.round(matchs[1].length/6)) // 6就是`&nbsp;`，注意，前面的处理有问题，在这里无论是tab还是空格对只对应一个`&nbsp;`
           item.content = item.content.replace(/^((&nbsp;)*)/, "")
           
           // 由字符串前缀得出文件格式

@@ -101,6 +101,8 @@ ABConvertManager.getInstance().redefine_renderMarkdown((markdown: string, el: HT
 
 ## bug
 
+### onclick需要内嵌才生效
+
 ```typescript
 // TODO，onClick代码在mdit环境下按钮点击失效。测试代码如下
 const btn = document.createElement("button"); table.appendChild(btn); btn.textContent = "测试按钮1";
@@ -109,4 +111,17 @@ const btndiv = document.createElement("div"); table.appendChild(btndiv);
 btndiv.innerHTML = `<button onclick="console.log('Button was clicked!')">测试按钮2</button>`
 // 发现mdit环境下，按钮1无法正常按动，而按钮2可以
 // 原因应该是：因为mdit环境下的document对象是jdsom创建的，假的。这个dom对象后面会被转化为html_str，onclick的信息就丢失了
+```
+
+### mermaid找不到DOMPurify
+
+mermaid的一个未定义行为的报错 (不过修复了这个之后又说BBox找不到了)
+
+```typescript
+// 见：https://github.com/kkomelin/isomorphic-dompurify
+
+// 用
+import DOMPurify from "isomorphic-dompurify"
+// 替换
+import DOMPurify from "dompurify"
 ```
