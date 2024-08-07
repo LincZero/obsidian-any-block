@@ -217,7 +217,7 @@
 }
 
 .ab-note table.ab-list-table.ab-table-folder .ab-foldable-tr > td > div {
-  float: left;
+  display: inline-block;
 }
 
 .ab-note table.ab-list-table.ab-table-folder .ab-foldable-tr > td > div.ab-list-table-witharrow {

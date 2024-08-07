@@ -176,7 +176,8 @@
         vertical-align: top;
       }
       &>td>div{
-        float: left;
+        // float: left; (这个没办法让div下的div2和div3在同一行，用inline-block代替之)
+        display: inline-block;
         &.ab-list-table-witharrow {
           padding-left: 6px; // old 15
         }
