@@ -9,16 +9,6 @@ import type AnyBlockPlugin from "../main"
 import {ABConvertManager} from "src/ABConverter/ABConvertManager"
 import {ABConvert, type ABConvert_SpecUser} from "src/ABConverter/converter/ABConvert"
 
-// 加载所有转换器 (都是可选的)
-// (当然，如果A转换器依赖B转换器，那么你导入A必然导入B)
-import {} from "src/ABConverter/converter/abc_text"
-import {} from "src/ABConverter/converter/abc_list"
-import {} from "src/ABConverter/converter/abc_table"
-import {} from "src/ABConverter/converter/abc_deco"
-import {} from "src/ABConverter/converter/abc_ex"
-import {} from "src/ABConverter/converter/abc_mermaid" // 可选建议：7.1MB
-import {} from "src/ABConverter/converter/abc_markmap" // 可选建议：1.3MB
-
 // 加载所有选择器
 import {} from "src/ab_manager/abm_cm/ABSelector_MdBase"
 import {generateSelectorInfoTable} from "src/ab_manager/abm_cm/ABSelector_Md"

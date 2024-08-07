@@ -10,10 +10,23 @@
 import { Plugin } from "obsidian"
 import {MarkdownRenderChild, MarkdownRenderer} from 'obsidian'
 
+// 转换器模块
+import { ABConvertManager } from "./ABConverter/ABConvertManager"
+// 加载所有转换器 (都是可选的)
+// (当然，如果A转换器依赖B转换器，那么你导入A必然导入B)
+import {} from "src/ABConverter/converter/abc_text"
+import {} from "src/ABConverter/converter/abc_list"
+import {} from "src/ABConverter/converter/abc_table"
+import {} from "src/ABConverter/converter/abc_deco"
+import {} from "src/ABConverter/converter/abc_ex"
+import {} from "src/ABConverter/converter/abc_dir_tree" // 可选建议：
+import {} from "src/ABConverter/converter/abc_plantuml" // 可选建议：
+import {} from "src/ABConverter/converter/abc_mermaid"  // 可选建议：7.1MB
+import {} from "src/ABConverter/converter/abc_markmap"  // 可选建议：1.3MB
+
 import { ABReplacer_CodeBlock } from "./ab_manager/abm_code/ABReplacer_CodeBlock"
 import { ABStateManager } from "./ab_manager/abm_cm/ABStateManager"
 import { ABSelector_PostHtml } from "./ab_manager/abm_html/ABSelector_PostHtml"
-import { ABConvertManager } from "./ABConverter/ABConvertManager"
 import type { ABSettingInterface } from "./config/ABSettingTab"
 import { ABSettingTab, AB_SETTINGS } from "./config/ABSettingTab"
 
@@ -55,69 +68,6 @@ export default class AnyBlockPlugin extends Plugin {
        */
       // @ts-ignore 新接口，但旧接口似乎不支持
       MarkdownRenderer.render(app, markdown, el, "", new MarkdownRenderChild(el))
-
-      // 尝试修复重渲染导致相对路径图片失效的问题：
-      /*
-      新接口：
-      https://github.com/obsidianmd/obsidian-api/issues/120
-      https://github.com/marcusolsson/obsidian-projects/issues/427
-      https://github.com/marcusolsson/obsidian-projects/pull/742
-
-      // 正常情况：app://ac1edd3e6646569178bcbd629f95939550c7/D:/Path/Obsidian/MdNote_Special/png/addTitle.png?1676362717343
-      let file = this.app.workspace.getActiveFile()
-      const path = file?file.path:"nnn"
-      const absPath = file?file.vault.adapter.getName():"nnn"
-      // @ts-ignore error: Attribute "basePath" does not exist on Type "DataAdapter"
-      const basePath = file?file.vault.adapter.basePath:"nnn"
-      // @ts-ignore error: Attribute "basePath" does not exist on Type "DataAdapter"
-      const basePath2 = file?file.vault.adapter.basePath.replace(/\\/g, "/"):"nnn"
-      const resourcePath1 = file?file.vault.adapter.getResourcePath(path):"nnn"
-      // markdown is `![](./png/addTitle.png)` or `![[./png/addTitle.png]]`
-      MarkdownRenderer.renderMarkdown(markdown, el, path, new MarkdownRenderChild(el))
-      MarkdownRenderer.renderMarkdown(markdown, el, absPath, new MarkdownRenderChild(el))
-      MarkdownRenderer.renderMarkdown(markdown, el, absPath+"/path", new MarkdownRenderChild(el))
-      MarkdownRenderer.renderMarkdown(markdown, el, basePath, new MarkdownRenderChild(el))
-      MarkdownRenderer.renderMarkdown(markdown, el, basePath2, new MarkdownRenderChild(el))
-      MarkdownRenderer.renderMarkdown(markdown, el, basePath2+"/", new MarkdownRenderChild(el))
-      MarkdownRenderer.renderMarkdown(markdown, el, basePath2+"/"+path, new MarkdownRenderChild(el))
-      MarkdownRenderer.renderMarkdown(markdown, el, file?file.vault.adapter.getResourcePath(path):"nnn", new MarkdownRenderChild(el))
-      MarkdownRenderer.renderMarkdown(markdown, el, file?file.vault.adapter.getResourcePath(absPath):"nnn", new MarkdownRenderChild(el))
-      MarkdownRenderer.renderMarkdown(markdown, el, file?file.vault.adapter.getResourcePath(absPath+"/path"):"nnn", new MarkdownRenderChild(el))
-      MarkdownRenderer.renderMarkdown(markdown, el, file?file.vault.adapter.getResourcePath(basePath):"nnn", new MarkdownRenderChild(el))
-      MarkdownRenderer.renderMarkdown(markdown, el, file?file.vault.adapter.getResourcePath(basePath2):"nnn", new MarkdownRenderChild(el))
-      MarkdownRenderer.renderMarkdown(markdown, el, file?file.vault.adapter.getResourcePath(basePath2+"/"):"nnn", new MarkdownRenderChild(el))
-      MarkdownRenderer.renderMarkdown(markdown, el, file?file.vault.adapter.getResourcePath(basePath2+"/"+path):"nnn", new MarkdownRenderChild(el))
-
-      MarkdownRenderer.renderMarkdown(markdown, el, file?file.vault.adapter.getResourcePath(path).replace(/\?.*$/, ''):"nnn", new MarkdownRenderChild(el))
-      MarkdownRenderer.renderMarkdown(markdown, el, file?file.vault.adapter.getResourcePath(absPath).replace(/\?.*$/, ''):"nnn", new MarkdownRenderChild(el))
-      MarkdownRenderer.renderMarkdown(markdown, el, file?file.vault.adapter.getResourcePath(absPath+"/path").replace(/\?.*$/, ''):"nnn", new MarkdownRenderChild(el))
-      MarkdownRenderer.renderMarkdown(markdown, el, file?file.vault.adapter.getResourcePath(basePath).replace(/\?.*$/, ''):"nnn", new MarkdownRenderChild(el))
-      MarkdownRenderer.renderMarkdown(markdown, el, file?file.vault.adapter.getResourcePath(basePath2).replace(/\?.*$/, ''):"nnn", new MarkdownRenderChild(el))
-      MarkdownRenderer.renderMarkdown(markdown, el, file?file.vault.adapter.getResourcePath(basePath2+"/").replace(/\?.*$/, ''):"nnn", new MarkdownRenderChild(el))
-      MarkdownRenderer.renderMarkdown(markdown, el, file?file.vault.adapter.getResourcePath(basePath2+"/"+path).replace(/\?.*$/, ''):"nnn", new MarkdownRenderChild(el))
-      console.log(`renderMarkdown:
-        ${path}
-        ${absPath}
-        ${absPath+"/path"}
-        ${basePath}
-        ${basePath2}
-        ${basePath2+"/"}
-        ${basePath2+"/"+path}
-        ${file?file.vault.adapter.getResourcePath(path):"nnn"}
-        ${file?file.vault.adapter.getResourcePath(absPath):"nnn"}
-        ${file?file.vault.adapter.getResourcePath(absPath+"/path"):"nnn"}
-        ${file?file.vault.adapter.getResourcePath(basePath):"nnn"}
-        ${file?file.vault.adapter.getResourcePath(basePath2):"nnn"}
-        ${file?file.vault.adapter.getResourcePath(basePath2+"/"):"nnn"}
-        ${file?file.vault.adapter.getResourcePath(basePath2+"/"+path):"nnn"}
-        ${file?file.vault.adapter.getResourcePath(path).replace(/\?.*$/, ''):"nnn"}
-        ${file?file.vault.adapter.getResourcePath(absPath).replace(/\?.*$/, ''):"nnn"}
-        ${file?file.vault.adapter.getResourcePath(absPath+"/path").replace(/\?.*$/, ''):"nnn"}
-        ${file?file.vault.adapter.getResourcePath(basePath).replace(/\?.*$/, ''):"nnn"}
-        ${file?file.vault.adapter.getResourcePath(basePath2).replace(/\?.*$/, ''):"nnn"}
-        ${file?file.vault.adapter.getResourcePath(basePath2+"/").replace(/\?.*$/, ''):"nnn"}
-        ${file?file.vault.adapter.getResourcePath(basePath2+"/"+path).replace(/\?.*$/, ''):"nnn"}
-      `)*/
     })
 
     // 钩子组1 - 代码块

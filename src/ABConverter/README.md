@@ -5,7 +5,17 @@
 ### 使用流程
 
 ```typescript
+// 转换器模块
 import { ABConvertManager } from "ABConvertManager"
+// 加载所有转换器 (都是可选的)
+// (当然，如果A转换器依赖B转换器，那么你导入A必然导入B)
+import {} from "./ABConverter/converter/abc_text"
+import {} from "./ABConverter/converter/abc_list"
+import {} from "./ABConverter/converter/abc_table"
+import {} from "./ABConverter/converter/abc_deco"
+import {} from "./ABConverter/converter/abc_ex"
+import {} from "./ABConverter/converter/abc_mermaid" // 可选建议：7.1MB
+import {} from "./ABConverter/converter/abc_markmap" // 可选建议：1.3MB
 
 // 先注册默认渲染行为
 ABConvertManager.getInstance().redefine_renderMarkdown((markdown: string, el: HTMLElement): void => {...})
@@ -19,8 +29,10 @@ ABConvertManager.autoABConvert(el:HTMLDivElement, header:string, content:string)
 ```typescript
 ABConvertManager.getInstance().redefine_renderMarkdown((markdown: string, el: HTMLElement): void => {
     /**
-     * 原定义：
      * Renders markdown string to an HTML element.
+     * @deprecated - use {@link MarkdownRenderer.render}
+     * 
+     * 原定义： 
      * @param markdown - The markdown source code
      * @param el - The element to append to
      * @param sourcePath - The normalized path of this markdown file, used to resolve relative internal links
@@ -29,8 +41,21 @@ ABConvertManager.getInstance().redefine_renderMarkdown((markdown: string, el: HT
      * @param component - A parent component to manage the lifecycle of the rendered child components, if any
      *     一个父组件，用于管理呈现的子组件(如果有的话)的生命周期
      * @public
+     * 
      */
-    MarkdownRenderer.renderMarkdown(markdown, el, "", new MarkdownRenderChild(el))
+    //MarkdownRenderer.renderMarkdown(markdown, el, "", new MarkdownRenderChild(el))
+
+    /**
+     * Renders markdown string to an HTML element.
+     * @param app - A reference to the app object
+     * @param markdown - The markdown source code
+     * @param el - The element to append to
+     * @param sourcePath - The normalized path of this markdown file, used to resolve relative internal links
+     * @param component - A parent component to manage the lifecycle of the rendered child components.
+     * @public
+     */
+    // @ts-ignore 新接口，但旧接口似乎不支持
+    MarkdownRenderer.render(app, markdown, el, "", new MarkdownRenderChild(el))
 })
 ```
 
@@ -99,9 +124,14 @@ ABConvertManager.getInstance().redefine_renderMarkdown((markdown: string, el: HT
 1. 低通用级格式要实现对高通用级格式的互转
 2. 同通用级则实现其他同通用级格式对自己格式的转化
 
+## todo
+
+1. 别名模块，AnyBlockConverter 不应该最后强制输出html。最后补md的行为是ob的别名模块做的，不应该由abc来快
+2. PlantUML，感觉很多东西都好用多了
+
 ## bug
 
-### onclick需要内嵌才生效
+### mdit环境下onclick需要内嵌才生效
 
 ```typescript
 // TODO，onClick代码在mdit环境下按钮点击失效。测试代码如下
