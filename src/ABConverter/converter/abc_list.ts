@@ -50,7 +50,7 @@ export class ListProcess{
 
   /** 列表转列表 */
   /*static list2l(text: string, div: HTMLDivElement) {
-    let list_itemInfo = this.list2data(text, true)
+    let list_itemInfo = this.list2uldata(text, true)
     return this.data2list(list_itemInfo)
   }*/
 
@@ -71,12 +71,9 @@ export class ListProcess{
    * 列表文本转列表数据 
    * @bug 不能跨缩进，后面再对异常缩进进行修复
    * @bug 内换行` | `可能有bug
-   * @param modeT: 保留缩进模式
    * @param modeG: 识别符号 ` | `（该选项暂时不可用，0为不识别，1为识别为下一级，2为识别为同一级，转ultable时会用到选项2）
    */
-  static list2data(text: string, modeT=false, modeG=true){
-    if (modeT) return this.ullist2data(text)
-
+  static list2data(text: string, modeG=true){
     /** 内联补偿列表。只保留comp>0的项 */
     let list_inline_comp:{
       level:number,
@@ -262,7 +259,7 @@ export class ListProcess{
    * 
    * 第一列的level总为0
    */
-  private static ullist2data(text: string){
+  static list2uldata(text: string){
     let list_itemInfo:List_ListItem = []
     
     const list_text = text.split("\n")

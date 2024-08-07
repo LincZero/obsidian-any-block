@@ -3,8 +3,6 @@
  * 
  * md_str <-> md_str
  * md_str <-> html
- * 
- * 参考项目：https://github.com/yzhong52/ascii_tree/，不过这个项目是用rust写的
  */
 
 import {ABConvert_IOEnum, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
@@ -15,6 +13,7 @@ import { current_component } from "svelte/internal";
 /**
  * 通用目录数据
  * 
+ * @detail
  * 用于指导制表符，前缀的所有可能性：
  * 1. 根，无
  * 2. 非最后的文件，("│  "/"   ") * n + "├─ "
@@ -29,6 +28,8 @@ import { current_component } from "svelte/internal";
  * │     └─ b21
  * └─ c/
  *    └─ c1
+ * 
+ * 参考项目：https://github.com/yzhong52/ascii_tree/，不过这个项目是用rust写的，最后也没怎么参考到
  */
 export interface DirListItem extends ListItem {
   type: string;           // 类型 (folder/文件名后缀)
@@ -37,10 +38,11 @@ export interface DirListItem extends ListItem {
 }[]
 export type List_DirListItem = DirListItem[]
 
-/// listdata 转 dirdata
-/// TODO 未完成 with comment 功能
-/// TODO 未完成 is_last 功能
-/// TODO 未完成 每一项的……的数组记录
+/**
+ * listdata 转 dirdata
+ * 
+ * TODO 未完成 with comment 功能
+ */
 function listdata2dirdata(list: List_ListItem): List_DirListItem {
   // is_have_vbar[x]表示在该项的后面直到出现>x的level前，会出现x level
   // 用于控制 "|  " or "   "，以及 "├─ " or "└─ "
@@ -121,16 +123,5 @@ const abc_list2astreeH = ABConvert.factory({
     newContent = newContent.trimEnd()
 
     return newContent
-  }
-})
-
-const abc_list2dirtree = ABConvert.factory({
-  id: "list2dirtree",
-  name: "列表到目录树",
-  process_param: ABConvert_IOEnum.text,
-  process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
-      content = "Developing..."
-      return content
   }
 })

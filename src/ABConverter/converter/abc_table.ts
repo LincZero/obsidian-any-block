@@ -50,13 +50,13 @@ export class TableProcess{
 
   /** 列表转列表格 */
   static list2lt(text: string, div: HTMLDivElement, modeT=false) {
-    let list_itemInfo = ListProcess.list2data(text, true)
+    let list_itemInfo = ListProcess.list2uldata(text)
     return TableProcess.uldata2ultable(list_itemInfo, div, modeT)
   }
 
   /** 列表转树形目录 */
-  static list2folder(text: string, div: HTMLDivElement, modeT=false) {
-    let list_itemInfo = ListProcess.list2data(text, true)
+  static list2dt(text: string, div: HTMLDivElement, modeT=false) {
+    let list_itemInfo = ListProcess.list2uldata(text)
     return TableProcess.uldata2ultable(list_itemInfo, div, modeT, true)
   }
 
@@ -194,23 +194,16 @@ export class TableProcess{
           
           // 由字符串前缀得出文件格式
           if(is_folder){
-            const matchs = item.content.match(/^(=|~) /)
-            // 无类型/不显示图标的文件类型
-            if (!matchs){}
-            // 文件夹
-            else if (matchs[1]=="= "){
-              item_type = "folder"
-              item.content = item.content.replace(/^\= /, "")
+            let type: string;
+            if (item.content.endsWith("/")) {
+              type = "folder"
+            } else {
+              const parts = item.content.split('.');
+              if (parts.length === 0 || parts[parts.length - 1] === '') type = '';
+              else type = parts[parts.length - 1];
             }
-            // 根据后缀名决定
-            else if(matchs[1]="~ "){
-              const m_line = item.content.match(/^\~(.*)\.(.*)/)
-              if(!m_line) {}
-              else {
-                item_type = m_line[2]
-              }
-              item.content = item.content.replace(/^\~ /, "")
-            }
+
+            item_type = type
           }
         }
         else {
@@ -225,7 +218,8 @@ export class TableProcess{
         content: item.content,
         level: item.level,
         tableRow: 1,
-        tableLine: prev_line
+        tableLine: prev_line,
+        // tableColumn, // 不一定有
       })
     }
 
@@ -242,7 +236,9 @@ export class TableProcess{
       }
       const tbody = document.createElement("tbody"); table.appendChild(tbody);
       let prev_tr: HTMLElement|null = null   // 用来判断是否可以折叠
-      for (let index_line=0; index_line<prev_line+1; index_line++){ // 遍历表格行，创建tr……
+
+      // 遍历表格行，创建tr
+      for (let index_line=0; index_line<prev_line+1; index_line++){
         let is_head
         let tr: HTMLElement
         // 行 - 表头行（即是否第一行&&是否有表头）
@@ -264,7 +260,8 @@ export class TableProcess{
           }
           prev_tr = tr
         }
-        // 列 - 遍历表格列，创建td
+
+        // 遍历表格列，创建td
         for (let item of list_tableInfo){
           if (item.tableLine!=index_line) continue
           // md版
@@ -352,17 +349,17 @@ const abc_list2lt = ABConvert.factory({
   }
 })
 
-const abc_list2folder = ABConvert.factory({
-  id: "list2folder",
+const abc_list2dt = ABConvert.factory({
+  id: "list2dt",
   name: "列表转树状目录",
-  match: /list2(md)?folder(T)?/,
-  default: "list2folder",
+  match: /list2(md)?dt(T)?/,
+  default: "list2dt",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
   process: (el, header, content)=>{
-    const matchs = header.match(/list2(md)?folder(T)?/)
+    const matchs = header.match(/list2(md)?dt(T)?/)
     if (!matchs) return el
-    TableProcess.list2folder(content, el, matchs[2]=="T")
+    TableProcess.list2dt(content, el, matchs[2]=="T")
     return el
   }
 })
