@@ -35,8 +35,10 @@ import { type ListItem, type List_ListItem, ListProcess } from "./abc_list"
  * }
  */
 export interface TableItem extends ListItem{
-    tableRow: number,       // 跨行数
-    tableLine: number       // 对应首行序列
+    tableRowSpan: number,       // 跨行数
+    //tableColumnSpan: number,  // 跨列数
+    tableRow: number,           // 对应首行序列
+    //tableColum: number,       // 对应首列序列
 }
 export type List_TableItem = TableItem[]  
 
@@ -110,8 +112,8 @@ export class TableProcess{
       list_tableInfo.push({
         content: item.content,  // 内容
         level: item.level,      // 级别
-        tableRow: tableRow,     // 跨行数
-        tableLine: prev_line    // 对应首行序列
+        tableRowSpan: tableRow,     // 跨行数
+        tableRow: prev_line    // 对应首行序列
       })
     }
 
@@ -138,155 +140,12 @@ export class TableProcess{
           tr = document.createElement("tr"); tbody.appendChild(tr);
         }
         for (let item of list_tableInfo){                           // 遍历表格列，创建td
-          if (item.tableLine!=index_line) continue
-          let td = document.createElement(is_head?"th":"td"); tr.appendChild(td); td.setAttribute("rowspan", item.tableRow.toString());
+          if (item.tableRow!=index_line) continue
+          let td = document.createElement(is_head?"th":"td"); tr.appendChild(td); td.setAttribute("rowspan", item.tableRowSpan.toString());
           td.classList.add("markdown-rendered")
           ABConvertManager.getInstance().m_renderMarkdownFn(item.content, td)
         }
       }
-    }
-
-    return div
-  }
-
-  /** 列表格数据转列表格
-   * 注意传入的列表数据应该符合：
-   * 第一列等级为0、没有分叉
-   */
-  static uldata2ultable(
-    list_itemInfo: List_ListItem, 
-    div: HTMLDivElement,
-    modeT: boolean,
-    is_folder=false
-  ){
-    // 组装成表格数据 (列表是深度优先)
-    let tr_line_level: number[] = [] // 表格行等级（树形表格独有）
-    let list_tableInfo:List_TableItem = []
-    let prev_line = -1   // 并存储后一行的序列!
-    let prev_level = 999 // 上一行的等级
-    for (let i=0; i<list_itemInfo.length; i++){
-      let item = list_itemInfo[i]
-      let item_type:string = ""
-
-      // 获取所在行数。分换行（创建新行）和不换行，第一行总是创建新行
-      // 这里的if表示该换行了
-      if (item.level <= prev_level) {
-        prev_line++
-        if (item.level==0) {
-          /** @可优化 前面是列表级别转空格，现在是删除空格转回列表级别。这受限于Item格式 */
-          const matchs = item.content.match(/^((&nbsp;)*)/)
-          if (!matchs) return div
-          if (!matchs[1]) tr_line_level.push(0)
-          else tr_line_level.push(Math.round(matchs[1].length/6)) // 6就是`&nbsp;`，注意，前面的处理有问题，在这里无论是tab还是空格对只对应一个`&nbsp;`
-          item.content = item.content.replace(/^((&nbsp;)*)/, "")
-          
-          // 由字符串前缀得出文件格式
-          if(is_folder){
-            let type: string;
-            if (item.content.endsWith("/")) {
-              type = "folder"
-            } else {
-              const parts = item.content.split('.');
-              if (parts.length === 0 || parts[parts.length - 1] === '') type = '';
-              else type = parts[parts.length - 1];
-            }
-
-            item_type = type
-          }
-        }
-        else {
-          tr_line_level.push(0)
-          console.warn("数据错误：列表格中跨行数据")
-        }
-      }
-      prev_level = item.level
-
-      // 填写
-      list_tableInfo.push({
-        content: item.content,
-        level: item.level,
-        tableRow: 1,
-        tableLine: prev_line,
-        // tableColumn, // 不一定有
-      })
-    }
-
-    // GeneratorListTable，原Svelte
-    {
-      // 表格数据 组装成表格
-      const table = document.createElement("table"); div.appendChild(table); table.classList.add("ab-table", "ab-list-table")
-      if (is_folder) table.classList.add("ab-list-folder")
-      if (modeT) table.setAttribute("modeT", "true")
-      let thead
-      if(list_tableInfo[0].content.indexOf("< ")==0){ // 判断是否有表头
-        thead = document.createElement("thead"); table.appendChild(thead);
-        list_tableInfo[0].content=list_tableInfo[0].content.replace(/^\<\s/,"")
-      }
-      const tbody = document.createElement("tbody"); table.appendChild(tbody);
-      let prev_tr: HTMLElement|null = null   // 用来判断是否可以折叠
-
-      // 遍历表格行，创建tr
-      for (let index_line=0; index_line<prev_line+1; index_line++){
-        let is_head
-        let tr: HTMLElement
-        // 行 - 表头行（即是否第一行&&是否有表头）
-        if (index_line==0 && thead){
-          tr = document.createElement("tr"); thead.appendChild(tr); // attr: {"tr_level": tr_line_level[index_line]}
-          is_head = true
-        }
-        // 行 - 非表头行
-        else{
-          is_head = false
-          tr = document.createElement("tr"); tbody.appendChild(tr); tr.classList.add("ab-foldable-tr");
-            tr.setAttribute("tr_level", tr_line_level[index_line].toString()); tr.setAttribute("is_fold", "false"); tr.setAttribute("able_fold", "false");
-          // 判断上一个是否可折叠。不需要尾判断，最后一个肯定不能折叠
-          if (prev_tr 
-            && !isNaN(Number(prev_tr.getAttribute("tr_level"))) 
-            && Number(prev_tr.getAttribute("tr_level")) < tr_line_level[index_line]
-          ){
-            prev_tr.setAttribute("able_fold", "true")
-          }
-          prev_tr = tr
-        }
-
-        // 遍历表格列，创建td
-        for (let item of list_tableInfo){
-          if (item.tableLine!=index_line) continue
-          // md版
-          let td = document.createElement(is_head?"th":"td"); tr.appendChild(td); td.setAttribute("rowspan", item.tableRow.toString());
-          let td_cell = document.createElement("div"); td.appendChild(td_cell); td_cell.classList.add("ab-list-table-witharrow");
-          td_cell.classList.add("markdown-rendered")
-          ABConvertManager.getInstance().m_renderMarkdownFn(item.content, td_cell);
-        }
-      }
-
-      // 折叠列表格 事件绑定
-      const l_tr:NodeListOf<HTMLElement> = tbody.querySelectorAll("tr")
-      for (let i=0; i<l_tr.length; i++){
-        const tr = l_tr[i]
-        /*const tr_level = Number(tr.getAttribute("tr_level"))
-        if (isNaN(tr_level)) continue
-        const tr_isfold = tr.getAttribute("is_fold")
-        if (!tr_isfold) continue*/
-        tr.onclick = ()=>{
-          const tr_level = Number(tr.getAttribute("tr_level"))
-          if (isNaN(tr_level)) return
-          const tr_isfold = tr.getAttribute("is_fold")
-          if (!tr_isfold) return
-          let flag_do_fold = false  // 防止折叠最小层
-          for (let j=i+1; j<l_tr.length; j++){
-            const tr2 = l_tr[j]
-            const tr_level2 = Number(tr2.getAttribute("tr_level"))
-            if (isNaN(tr_level2)) break
-            if (tr_level2<=tr_level) break
-            // tr2.setAttribute("style", "display:"+(tr_isfold=="true"?"block":"none"))
-            (tr_isfold == "true") ? tr2.style.display = "" : tr2.style.display = "none"
-            flag_do_fold = true
-          }
-          if (flag_do_fold) tr.setAttribute("is_fold", tr_isfold=="true"?"false":"true")
-        }
-      }
-
     }
 
     return div
