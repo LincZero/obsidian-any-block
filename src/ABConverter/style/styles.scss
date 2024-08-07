@@ -187,15 +187,13 @@
         fill: lightgoldenrodyellow;
       }
       // 边框处理
-      // td:first-child {
-      //   border-left: none;
-      // }
-      // td:last-child {
-      //   border-right: none;
-      // }
+      td:first-child {
+        border: none;
+      }
       td {
         border-left: none;
         border-right: none;
+        border-bottom: none;
       }
     }
   }

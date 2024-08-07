@@ -230,9 +230,14 @@
   fill: lightgoldenrodyellow;
 }
 
+.ab-note table.ab-list-table.ab-table-folder .ab-foldable-tr td:first-child {
+  border: none;
+}
+
 .ab-note table.ab-list-table.ab-table-folder .ab-foldable-tr td {
   border-left: none;
   border-right: none;
+  border-bottom: none;
 }
 
 .ab-note table.ab-table-fc td:first-child {

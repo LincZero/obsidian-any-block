@@ -100,7 +100,7 @@ export class DirProcess{
         // 第一列，需处理文件扩展名
         let type = "";
         if (column_index==0) {
-          if (list_column_item[column_index].endsWith("/")) {
+          if (list_column_item[column_index].trimEnd().endsWith("/")) {
             type = "folder"
           } else {
             const parts = list_column_item[column_index].split('.');
