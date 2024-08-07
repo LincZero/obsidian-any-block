@@ -131,7 +131,7 @@
   height: 0;
 }
 
-.ab-note table.ab-list-table .ab-foldable-tr[able_fold="true"][is_fold="true"] > td:first-child > div::before {
+.ab-note table.ab-list-table .ab-foldable-tr[able_fold="true"][is_fold="true"] > td:first-child > div:first-child::before {
   top: 5px;
   left: 2px;
   border: 6px solid transparent;
@@ -139,7 +139,7 @@
   cursor: pointer;
 }
 
-.ab-note table.ab-list-table .ab-foldable-tr[able_fold="true"][is_fold="false"] > td:first-child > div::before {
+.ab-note table.ab-list-table .ab-foldable-tr[able_fold="true"][is_fold="false"] > td:first-child > div:first-child::before {
   top: 9px;
   left: -1px;
   border: 6px solid transparent;
@@ -209,6 +209,30 @@
 
 .ab-note table.ab-list-table .ab-foldable-tr[tr_level="16"] > td:first-child {
   padding-left: calc(16*12px);
+}
+
+.ab-note table.ab-list-table.ab-table-folder .ab-foldable-tr td:first-child {
+  white-space: nowrap;
+  vertical-align: top;
+}
+
+.ab-note table.ab-list-table.ab-table-folder .ab-foldable-tr > td > div {
+  float: left;
+}
+
+.ab-note table.ab-list-table.ab-table-folder .ab-foldable-tr > td > div.ab-list-table-witharrow {
+  padding-left: 6px;
+}
+
+.ab-note table.ab-list-table.ab-table-folder .ab-foldable-tr .ab-list-table-svg svg {
+  width: 14px;
+  height: 14px;
+  fill: lightgoldenrodyellow;
+}
+
+.ab-note table.ab-list-table.ab-table-folder .ab-foldable-tr td {
+  border-left: none;
+  border-right: none;
 }
 
 .ab-note table.ab-table-fc td:first-child {
@@ -312,14 +336,6 @@
 
 .ab-note table.ab-table-timeline tr:last-child td {
   border-bottom: none;
-}
-
-.ab-note table.ab-list-table.ab-list-folder {
-  border: none !important;
-}
-
-.ab-note table.ab-list-table.ab-list-folder td {
-  white-space: nowrap;
 }
 
 .ab-note .markdown-rendered.ab-faq-content p:first-child {

@@ -151,8 +151,7 @@ export class TableProcess{
     return div
   }
 }
-  
-  
+
 // 纯组合，后续用别名模块替代
 const abc_title2table = ABConvert.factory({
   id: "title2table",

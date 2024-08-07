@@ -134,7 +134,7 @@
       }
     }
     .ab-foldable-tr[able_fold="true"][is_fold="true"]>td:first-child{ // 箭头图标
-      >div::before{
+      >div:first-child::before{
         top: 5px;
         left: 2px;
         border: 6px solid transparent;
@@ -143,7 +143,7 @@
       }
     }
     .ab-foldable-tr[able_fold="true"][is_fold="false"]>td:first-child{ // 箭头图标
-      >div::before{
+      >div:first-child::before{
         top: 9px;
         left: -1px;
         border: 6px solid transparent;
@@ -168,6 +168,36 @@
     .ab-foldable-tr[tr_level="14"]>td:first-child{padding-left: calc(14*12px);}
     .ab-foldable-tr[tr_level="15"]>td:first-child{padding-left: calc(15*12px);}
     .ab-foldable-tr[tr_level="16"]>td:first-child{padding-left: calc(16*12px);}
+
+    // Folder
+    &.ab-table-folder .ab-foldable-tr{
+      td:first-child {
+        white-space: nowrap;
+        vertical-align: top;
+      }
+      &>td>div{
+        float: left;
+        &.ab-list-table-witharrow {
+          padding-left: 6px; // old 15
+        }
+      }
+      .ab-list-table-svg svg{
+        width: 14px;
+        height: 14px;
+        fill: lightgoldenrodyellow;
+      }
+      // 边框处理
+      // td:first-child {
+      //   border-left: none;
+      // }
+      // td:last-child {
+      //   border-right: none;
+      // }
+      td {
+        border-left: none;
+        border-right: none;
+      }
+    }
   }
 
   // 首列重点表格
@@ -274,14 +304,6 @@
     }
     tr:last-child td {
       border-bottom: none;
-    }
-  }
-
-  // Folder
-  table.ab-list-table.ab-list-folder{
-    border: none !important;
-    td{
-      white-space: nowrap;
     }
   }
 
