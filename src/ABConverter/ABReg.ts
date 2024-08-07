@@ -42,4 +42,6 @@ export const ABReg = {
 
   reg_emptyline_noprefix:/^\s*$/,
   reg_indentline_noprefix:/^\s+?\S/,
+
+  inline_split: "| ", // 内联切分
 }

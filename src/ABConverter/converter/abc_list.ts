@@ -48,12 +48,6 @@ export class ListProcess{
     return this.data2list(list_itemInfo)
   }
 
-  /** 列表转列表 */
-  /*static list2l(text: string, div: HTMLDivElement) {
-    let list_itemInfo = this.list2uldata(text, true)
-    return this.data2list(list_itemInfo)
-  }*/
-
   /** 一级列表转标签栏 */
   static list2tab(text: string, div: HTMLDivElement, modeT=false) {
     let data = this.list2data(text)
@@ -116,7 +110,7 @@ export class ListProcess{
     for (let line of list_text) {                                             // 每行
       const m_line = line.match(ABReg.reg_list_noprefix)
       if (m_line) {
-        let list_inline: string[] = m_line[4].split("| ") // 内联分行
+        let list_inline: string[] = m_line[4].split(ABReg.inline_split) // 内联分行
         /** @bug  制表符长度是1而非4 */
         let level_inline: number = m_line[1].length
         let inline_comp = update_inline_comp(level_inline, list_inline.length-1)
@@ -250,51 +244,6 @@ export class ListProcess{
       }
     }
     
-    return list_itemInfo
-  }
-
-  /** 列表文本转列表表格数据
-   * 只能通过“|”符号实现跨列
-   * 所以这种是没有合并单元格
-   * 
-   * 第一列的level总为0
-   */
-  static list2uldata(text: string){
-    let list_itemInfo:List_ListItem = []
-    
-    const list_text = text.split("\n")
-    for (let line of list_text) {                                             // 每行
-      const m_line = line.match(ABReg.reg_list_noprefix)
-      if (m_line) {
-        let list_inline: string[] = m_line[4].split("| ") // 内联分行
-        let level_inline: number = m_line[1].length
-                                                                              // 保留缩进（列表格）
-        for (let inline_i=0; inline_i<list_inline.length; inline_i++){
-          if(inline_i==0) {                                                   // level为内联缩进
-            for (let i=0; i<level_inline; i++) list_inline[inline_i] = "&nbsp;" + list_inline[inline_i] // @bug。需要分开处理tab和space两种情况。这里统一坍塌成 "1"
-            list_itemInfo.push({
-              content: list_inline[inline_i],
-              level: 0
-            })
-          }
-          else{                                 // level为table的列数
-            list_itemInfo.push({
-              content: list_inline[inline_i],
-              level: level_inline+inline_i
-            })
-          }
-        }
-      }
-      else{                                                                   // 内换行
-        let itemInfo = list_itemInfo.pop()
-        if(itemInfo){
-          list_itemInfo.push({
-            content: itemInfo.content+"\n"+line.trim(),
-            level: itemInfo.level
-          })
-        }
-      }
-    }
     return list_itemInfo
   }
 

@@ -48,18 +48,6 @@ export class TableProcess{
     return TableProcess.data2table(list_itemInfo, div, modeT)
   }
 
-  /** 列表转列表格 */
-  static list2lt(text: string, div: HTMLDivElement, modeT=false) {
-    let list_itemInfo = ListProcess.list2uldata(text)
-    return TableProcess.uldata2ultable(list_itemInfo, div, modeT)
-  }
-
-  /** 列表转树形目录 */
-  static list2dt(text: string, div: HTMLDivElement, modeT=false) {
-    let list_itemInfo = ListProcess.list2uldata(text)
-    return TableProcess.uldata2ultable(list_itemInfo, div, modeT, true)
-  }
-
   /** 列表转二维表格 */
   static list2ut(text: string, div: HTMLDivElement, modeT=false) {
     //【old】
@@ -330,36 +318,6 @@ const abc_list2table = ABConvert.factory({
     const matchs = header.match(/list2(md)?table(T)?/)
     if (!matchs) return el
     TableProcess.list2table(content, el, matchs[2]=="T")
-    return el
-  }
-})
-
-const abc_list2lt = ABConvert.factory({
-  id: "list2lt",
-  name: "列表转列表表格",
-  match: /list2(md)?lt(T)?/,
-  default: "list2lt",
-  process_param: ABConvert_IOEnum.text,
-  process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
-    const matchs = header.match(/list2(md)?lt(T)?/)
-    if (!matchs) return el
-    TableProcess.list2lt(content, el, matchs[2]=="T")
-    return el
-  }
-})
-
-const abc_list2dt = ABConvert.factory({
-  id: "list2dt",
-  name: "列表转树状目录",
-  match: /list2(md)?dt(T)?/,
-  default: "list2dt",
-  process_param: ABConvert_IOEnum.text,
-  process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
-    const matchs = header.match(/list2(md)?dt(T)?/)
-    if (!matchs) return el
-    TableProcess.list2dt(content, el, matchs[2]=="T")
     return el
   }
 })
