@@ -44,7 +44,7 @@ export class ListProcess{
   /** title转列表 */
   static title2list(text: string, div: HTMLDivElement): string {
     let list_itemInfo = this.title2data(text)
-    list_itemInfo = this.data2strict(list_itemInfo)
+    list_itemInfo = this.data2strict(list_itemInfo).map((item: ListItem, index)=>{ return {content: item.content, level: item.level*2}})
     return this.data2list(list_itemInfo)
   }
 
@@ -304,7 +304,7 @@ export class ListProcess{
   /**
    * 列表数据严格化/normalized
    * 
-   * 主要是调整level：由空格数调整为递增等级，并乘以2。TODO 乘以2不对吧？
+   * 主要是调整level：由空格数调整为递增等级，并乘以2
    */
   static data2strict(
     list_itemInfo: List_ListItem
@@ -335,7 +335,7 @@ export class ListProcess{
       // 更新列表数据。这里需要深拷贝而非直接修改原数组，方便调试和避免错误
       list_itemInfo2.push({
         content: itemInfo.content,
-        level: (new_level-1)*2 // 记得要算等级要减去序列为0这个占位元素
+        level: (new_level-1) // 记得要算等级要减去序列为0这个占位元素
       })
     }
     return list_itemInfo2
