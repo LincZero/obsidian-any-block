@@ -19,11 +19,11 @@ This is a **【no new syntax, non-intrusive, extensible】** Markdown block exte
 - en
 	- Related links：tutorial、use skill、contribution、secondary development
 	- [Online Wiki - github.io](https://linczero.github.io/MdNote_Public/%E4%BA%A7%E5%93%81%E6%96%87%E6%A1%A3/AnyBlock/)
-	- [Online Effects warrior - github.io](README.show.md)
+	- [Online Effects warrior - github.io](https://linczero.github.io/MdNote_Public/%E4%BA%A7%E5%93%81%E6%96%87%E6%A1%A3/AnyBlock/README.show.md)
 - zh
 	- 相关链接：教程、使用技能、贡献、二次开发
 	- [在线文档 - github.io](https://linczero.github.io/MdNote_Public/%E4%BA%A7%E5%93%81%E6%96%87%E6%A1%A3/AnyBlock/)
-	- [在线效果展示 - github.io](README.show.md)
+	- [在线效果展示 - github.io](https://linczero.github.io/MdNote_Public/%E4%BA%A7%E5%93%81%E6%96%87%E6%A1%A3/AnyBlock/README.show.md)
 
 ## Effects warrior (效果展示)
 

@@ -88,16 +88,16 @@ export function generateSelectorInfoTable(el: HTMLElement){
   {
     const thead = table.createEl("thead")
     const tr = thead.createEl("tr")
-    tr.createEl("th", {text: "选择器名"})
-    tr.createEl("th", {text: "首行正则"})
-    tr.createEl("th", {text: "是否启用"})
+    tr.createEl("th", {text: "Selector Name"})
+    tr.createEl("th", {text: "First-line Regular"})
+    tr.createEl("th", {text: "Enable"})
   }
   const tbody = table.createEl("tbody")
   for (let item of list_mdSelector){
     const tr = tbody.createEl("tr")
     tr.createEl("td", {text: item.name})
     tr.createEl("td", {text: String(item.match)})
-    tr.createEl("td", {text: item.is_disable?"禁用":"启用"})
+    tr.createEl("td", {text: item.is_disable?"No":"Yes"})
   }
   return table_p
 }
