@@ -102,7 +102,7 @@ const mdSelector_headtail:MdSelectorSpecSimp = {
     return mdRange
   }
 }
-registerMdSelector(mdSelector_headtail)
+//registerMdSelector(mdSelector_headtail)
 
 /**
  * 列表选择器
