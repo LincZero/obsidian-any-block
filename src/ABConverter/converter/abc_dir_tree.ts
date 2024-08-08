@@ -204,10 +204,27 @@ export class DirProcess{
       const l_tr:NodeListOf<HTMLElement> = tbody.querySelectorAll("tr")
       for (let i=0; i<l_tr.length; i++){
         const tr = l_tr[i]
-        //const tr_level = Number(tr.getAttribute("tr_level"))
-        //if (isNaN(tr_level)) continue
-        //const tr_isfold = tr.getAttribute("is_fold")
-        //if (!tr_isfold) continue
+        // 1. 二选一，嵌入内联onclick，mdit使用
+        //tr.setAttribute("onclick", `
+        //  const tr = this
+        //  const l_tr = tr.parentNode.querySelectorAll("tr")
+        //  const i = ${i}
+        //  const tr_level = Number(tr.getAttribute("tr_level"))
+        //  if (isNaN(tr_level)) return
+        //  const tr_isfold = tr.getAttribute("is_fold")
+        //  if (!tr_isfold) return
+        //  let flag_do_fold = false  // 防止折叠最小层
+        //  for (let j=i+1; j<l_tr.length; j++){
+        //    const tr2 = l_tr[j]
+        //    const tr_level2 = Number(tr2.getAttribute("tr_level"))
+        //    if (isNaN(tr_level2)) break
+        //    if (tr_level2<=tr_level) break
+        //    (tr_isfold == "true") ? tr2.style.display = "" : tr2.style.display = "none"
+        //    flag_do_fold = true
+        //  }
+        //  if (flag_do_fold) tr.setAttribute("is_fold", tr_isfold=="true"?"false":"true")
+        //`)
+        // 2. 二选一，正常绑定方法，ob使用
         tr.onclick = ()=>{
           const tr_level = Number(tr.getAttribute("tr_level"))
           if (isNaN(tr_level)) return
@@ -219,7 +236,6 @@ export class DirProcess{
             const tr_level2 = Number(tr2.getAttribute("tr_level"))
             if (isNaN(tr_level2)) break
             if (tr_level2<=tr_level) break
-            // tr2.setAttribute("style", "display:"+(tr_isfold=="true"?"block":"none"))
             (tr_isfold == "true") ? tr2.style.display = "" : tr2.style.display = "none"
             flag_do_fold = true
           }
