@@ -22,6 +22,27 @@ const abc_list2jsontext = ABConvert.factory({
   }
 })
 
+const abc_list2pumlWBS = ABConvert.factory({
+  id: "list2pumlWBS",
+  name: "列表到puml工作分解结构",
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.el,
+  process: (el, header, content)=>{
+    const listdata:List_ListItem = ListProcess.list2data(content)
+    let newContent = "@startwbs\n"
+    for (let item of listdata) {
+      if (item.content.startsWith("< "))
+        newContent += "*".repeat(item.level+1) + "< " + item.content.slice(2,) + "\n"
+      else
+        newContent += "*".repeat(item.level+1) + " " + item.content + "\n"
+    }
+    newContent += "@endwbs"
+
+    render_pumlText(newContent, el)
+    return el
+  }
+})
+
 const abc_list2pumlMindmap = ABConvert.factory({
   id: "list2pumlMindmap",
   name: "列表到puml思维导图",
