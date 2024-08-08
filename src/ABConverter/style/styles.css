@@ -119,6 +119,10 @@
   border: solid #363636 1px;
 }
 
+.ab-note table.ab-table tr {
+  background: none;
+}
+
 .ab-note table.ab-list-table .ab-foldable-tr > td:first-child > div {
   padding-left: 15px;
   position: relative;

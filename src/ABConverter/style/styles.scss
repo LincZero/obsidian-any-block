@@ -115,6 +115,12 @@
       padding: 2px 5px;
       border: solid #363636 1px;
     }
+
+    // 取消自带的隔行表格着色
+    // tr:nth-child(2n+1)
+    tr {
+      background: none;
+    }
   }
 
   // 列表格
