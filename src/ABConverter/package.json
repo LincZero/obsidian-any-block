@@ -11,6 +11,10 @@
   "dependencies": {
     "@mermaid-js/mermaid-mindmap": "^9.3.0",
     "markmap-lib": "^0.17.0",
-    "mermaid": "^10.9.1"
+    "mermaid": "^10.9.1",
+    "plantuml-encoder": "^1.4.0"
+  },
+  "devDependencies": {
+    "@types/plantuml-encoder": "^1.4.2"
   }
 }
