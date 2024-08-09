@@ -23,6 +23,7 @@ import {
   type ABConvert_IOType, 
   ABConvert
 } from './converter/ABConvert'
+import {ABReg} from "./ABReg"
  
 /**
   * AB转换器的管理器。注意：使用前必须先执行：`redefine_renderMarkdown`
@@ -98,12 +99,13 @@ export class ABConvertManager {
    * @detail ab转换器能根据header和content来将有段txt文本转换为html元素
    * @param el 最后的渲染结果
    * @param header 转换方式
-   * @param content 要转换的初始文本
+   * @param content 要转换的初始文本 (无前缀版本，前缀在选择器环节已经删除了)
    * @return 等于el，无用，后面可以删了
    */
   public static autoABConvert(el:HTMLDivElement, header:string, content:string): void{
     let prev_result:ABConvert_IOType = content             // 上次转换后的结果
     let prev_type: ABConvert_IOEnum = ABConvert_IOEnum.text // 上次转换后的结果的类型
+    header = this.autoABConvert_natureLanguage(el, header, content);
     let list_header = header.split("|")
     prev_result = this.autoABConvert_runConvert(el, list_header, prev_result, prev_type)
 
@@ -187,5 +189,93 @@ export class ABConvertManager {
       }
     }
     return prev_result
+  }
+  
+  /**
+   * 自然语言转指令
+   * 
+   * @detail
+   * 将自然语言指令头，转化为指令头
+   * 
+   * 是否绑定到处理器？旧版本通过alias选项设置，但V3版本不要
+   * 
+   * - 优点
+   *   - 而是作为一个单独的模块，与实际解耦
+   *   - 符合原则：关于用于语法糖操作，都应存在一个单独的语法糖模块进行处理，而不应与业务代码耦合
+   * - 缺点
+   *   - 新的处理器声明自然语言触发的语法糖。但是可以通过同时增加 “新的处理器” + “新的自然语言替换” 来解决
+   * 
+   * TODO：
+   * - 这些别名系统，需要能够显示出来，应该要用json括一下
+   * - 性能优化，如果匹配了再replace，且提前退出
+   * - 仅匹配开头会不会性能好点
+   * 
+   * @returns
+   * new header
+   */
+  private static autoABConvert_natureLanguage (el:HTMLDivElement, header:string, content:string): string{
+    // 列表
+    if (ABReg.reg_list_noprefix.test(content.trimStart())) {
+      header = "(list 140lne)|" + header // 用于标识，仅头部可以被转化，不允许二次转化
+
+      header = header.replace("(list 140lne)|flow", "list2mermaid");
+      header = header.replace("(list 140lne)|流程图", "list2mermaid");
+      header = header.replace("(list 140lne)|思维导图", "list2markmap");
+      header = header.replace("(list 140lne)|mindmap", "list2mindmap");
+      header = header.replace("(list 140lne)|脑图", "list2markmap");
+
+      header = header.replace("(list 140lne)|multiWayTable", "list2table");
+      header = header.replace("(list 140lne)|multiCrossTable", "list2table");
+      header = header.replace("(list 140lne)|crossTable", "list2table");
+      header = header.replace("(list 140lne)|多叉表格", "list2table");
+      header = header.replace("(list 140lne)|多叉表", "list2table");
+      header = header.replace("(list 140lne)|跨行表格", "list2table");
+      header = header.replace("(list 140lne)|跨行表", "list2table");
+
+      header = header.replace("(list 140lne)|listTable", "list2lt");
+      header = header.replace("(list 140lne)|treeTable", "list2lt");
+      header = header.replace("(list 140lne)|listGrid", "list2lt");
+      header = header.replace("(list 140lne)|treeGrid", "list2lt");
+      header = header.replace("(list 140lne)|列表格", "list2lt");
+      header = header.replace("(list 140lne)|树形表", "list2lt");
+      header = header.replace("(list 140lne)|树形表格", "list2lt");
+      header = header.replace("(list 140lne)|dirTree", "list2dt");
+      header = header.replace("(list 140lne)|dir", "list2dt");
+      header = header.replace("(list 140lne)|目录", "list2dt");
+      header = header.replace("(list 140lne)|目录树", "list2dt");
+
+      header = header.replace("(list 140lne)|时间线", "list2timeline");
+      header = header.replace("(list 140lne)|仿列表", "list2table|addClass(ab-table-fc)|addClass(ab-table-likelist)");
+
+      header = header.replace("(list 140lne)|", "");
+    }
+
+    // 代码块
+    else if (ABReg.reg_code_noprefix.test(content.trimStart())) {
+      header = "(code 140lne)|" + header
+      header = header.replace("(code 140lne)|X", "Xcode");
+      header = header.replace("(code 140lne)|", "");
+    }
+
+    // 代码块
+    else if (ABReg.reg_quote_noprefix.test(content.trimStart())) {
+      header = "(quote 140lne)|" + header
+      header = header.replace("(quote 140lne)|X", "Xquote");
+      header = header.replace("(quote 140lne)|", "");
+    }
+
+    // 首尾
+    else if (ABReg.reg_headtail_noprefix.test(content.trimStart())) {}
+
+    // 通用 // TODO，和上面不同，这里应该需要for循环，直到没有被处理的：
+    {
+      header = "(general 140lne)|" + header
+      header = header.replace("(general 140lne)|黑幕", "heimu");
+      header = header.replace("(general 140lne)|折叠", "fold");
+      header = header.replace("(general 140lne)|滚动", "scroll");
+      header = header.replace("(general 140lne)|超出折叠", "overfold");
+      header = header.replace("(general 140lne)|", "");
+    }
+    return header
   }
 }
