@@ -379,13 +379,18 @@ function getSourceMarkdown(
     }
 
     // 找头部header
-    /** @todo 需要重写，一方面头部有可能在上上行 */
-    if (lineStart==0) return range
-    if (list_text[lineStart-1].indexOf(range.prefix)!=0) return range
-    const match_header = list_text[lineStart-1].replace(range.prefix, "").match(ABReg.reg_header)
-    if (!match_header) return range
-    
+    let match_header
+    if (lineStart==0) { // 1. 没有上行
+      return range
+    } else if (lineStart>2 && list_text[lineStart-1].trim()=="") { // 2. 找上上行
+      if (list_text[lineStart-2].indexOf(range.prefix)!=0) return range
+      match_header = list_text[lineStart-2].replace(range.prefix, "").match(ABReg.reg_header)
+    } else { // 3. 找上一行
+      if (lineStart>1 && list_text[lineStart-1].indexOf(range.prefix)!=0 && list_text[lineStart-1].trim()=="") return range
+      match_header = list_text[lineStart-1].replace(range.prefix, "").match(ABReg.reg_header)
+    }
     // （必须是最后一步，通过有无header来判断是否是ab块）
+    if (!match_header) return range
     range.header = match_header[5]
     return range
   }

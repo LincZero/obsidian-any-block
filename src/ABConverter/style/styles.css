@@ -501,8 +501,9 @@ div.md-table-fig1 {
   transform: scaleY(-1);
 }
 
-div.md-table-fig1 table.md-table-fig2 {
+div.md-table-fig1 table.ab-setting.md-table-fig2 {
   overflow-x: scroll;
+  text-overflow: clip !important;
   transform: scaleY(-1);
   white-space: nowrap;
 }
