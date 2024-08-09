@@ -76,9 +76,9 @@ const mdSelector_headtail:MdSelectorSpecSimp = {
   id: "headtail",
   name: "头尾选择器",
   detail: "以`:::`开头和结尾，处理器名写在第一个`:::`的后面，不需要加`[]`。其实就和代码块差不多，这也是VuePress的一个md扩展语法",
-  match: ABReg.reg_headtail,
+  match: ABReg.reg_mdit_head,
   selector: (list_text, from_line)=>{
-    let mdRangeTmp = easySelector_headtail(list_text, from_line, "headtail", ABReg.reg_headtail)
+    let mdRangeTmp = easySelector_headtail(list_text, from_line, "headtail", ABReg.reg_mdit_head)
     if (!mdRangeTmp) return null
     const mdRange = mdRangeTmp
     // 开头找到了，现在开始找结束。不需要循环尾处理器
@@ -92,7 +92,7 @@ const mdSelector_headtail:MdSelectorSpecSimp = {
       if (ABReg.reg_emptyline_noprefix.test(line2)) {continue}
       last_nonempty = i
       // 结束
-      if (ABReg.reg_headtail_noprefix.test(line2)) {last_nonempty = i; break}
+      if (ABReg.reg_mdit_tail_noprefix.test(line2)) {last_nonempty = i; break}
     }
     mdRange.to_line = last_nonempty+1
     mdRange.content = list_text
@@ -102,7 +102,7 @@ const mdSelector_headtail:MdSelectorSpecSimp = {
     return mdRange
   }
 }
-//registerMdSelector(mdSelector_headtail)
+registerMdSelector(mdSelector_headtail)
 
 /**
  * 列表选择器

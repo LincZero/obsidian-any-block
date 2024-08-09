@@ -246,6 +246,8 @@ export class ABConvertManager {
       header = header.replace("(list 140lne)|dir", "list2dt");
       header = header.replace("(list 140lne)|目录", "list2dt");
       header = header.replace("(list 140lne)|目录树", "list2dt");
+      header = header.replace("(list 140lne)|wbs", "list2pumlWBS");
+      header = header.replace("(list 140lne)|工作分解图", "list2pumlWBS");
 
       header = header.replace("(list 140lne)|timeline", "list2timeline");
       header = header.replace("(list 140lne)|时间线", "list2timeline");
@@ -270,10 +272,20 @@ export class ABConvertManager {
     }
 
     // 首尾
-    else if (ABReg.reg_headtail_noprefix.test(content.trimStart())) {}
+    else if (ABReg.reg_mdit_head_noprefix.test(content.trimStart())) {
+      console.log("debug1",header)
+      header = "(::: 140lne)|" + header.trimStart()
+      header = header.replace("(::: 140lne)|info", "add([!info])|quote");
+      header = header.replace("(::: 140lne)|warn", "add([!warning])|quote");
+      header = header.replace("(::: 140lne)|warning", "add([!warning])|quote");
+      header = header.replace("(::: 140lne)|error", "add([!error])|quote");
+      header = header.replace("(::: 140lne)|", "");
+      console.log("debug2",header)
+    }
 
     // 通用，一般是装饰处理器
     {
+      console.log("debug3",header)
       header = "(general 140lne)|" + header
       header = header.replace("|黑幕", "|add_class(ab-deco-heimu)"); 
       header = header.replace("|折叠", "|fold");

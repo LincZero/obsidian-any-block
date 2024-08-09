@@ -54,7 +54,8 @@ export function autoMdSelector(
       if (selecotr.match.test(line)) {
         let sim:MdSelectorRangeSpecSimp|null = selecotr.selector(list_text, i)
         if (!sim) continue
-        // 语法糖
+        // 语法糖 // TODO 要被新的语法系统给替换掉
+        // 而且这里应该用selecotr.id吧
         if (sim.selector=="list") if (sim.header.indexOf("2")==0) sim.header="list"+sim.header
         if (sim.selector=="title") {
           if (sim.header.indexOf("2")==0) sim.header="title"+sim.header
