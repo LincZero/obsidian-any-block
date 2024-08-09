@@ -220,9 +220,12 @@ export class ABConvertManager {
 
       header = header.replace("(list 140lne)|flow", "list2mermaid");
       header = header.replace("(list 140lne)|流程图", "list2mermaid");
-      header = header.replace("(list 140lne)|思维导图", "list2markmap");
-      header = header.replace("(list 140lne)|mindmap", "list2mindmap");
-      header = header.replace("(list 140lne)|脑图", "list2markmap");
+      header = header.replace("(list 140lne)|mindmap", "list2pumlMindmap");
+      header = header.replace("(list 140lne)|思维导图", "list2pumlMindmap");
+      header = header.replace("(list 140lne)|脑图", "list2pumlMindmap");
+      header = header.replace("(list 140lne)|mdMindmap", "list2markmap");
+      header = header.replace("(list 140lne)|md思维导图", "list2markmap");
+      header = header.replace("(list 140lne)|md脑图", "list2markmap");
 
       header = header.replace("(list 140lne)|multiWayTable", "list2table");
       header = header.replace("(list 140lne)|multiCrossTable", "list2table");
@@ -244,7 +247,9 @@ export class ABConvertManager {
       header = header.replace("(list 140lne)|目录", "list2dt");
       header = header.replace("(list 140lne)|目录树", "list2dt");
 
+      header = header.replace("(list 140lne)|timeline", "list2timeline");
       header = header.replace("(list 140lne)|时间线", "list2timeline");
+      header = header.replace("(list 140lne)|fakeList", "list2table|addClass(ab-table-fc)|addClass(ab-table-likelist)");
       header = header.replace("(list 140lne)|仿列表", "list2table|addClass(ab-table-fc)|addClass(ab-table-likelist)");
 
       header = header.replace("(list 140lne)|", "");
@@ -267,13 +272,13 @@ export class ABConvertManager {
     // 首尾
     else if (ABReg.reg_headtail_noprefix.test(content.trimStart())) {}
 
-    // 通用 // TODO，和上面不同，这里应该需要for循环，直到没有被处理的：
+    // 通用，一般是装饰处理器
     {
       header = "(general 140lne)|" + header
-      header = header.replace("(general 140lne)|黑幕", "heimu");
-      header = header.replace("(general 140lne)|折叠", "fold");
-      header = header.replace("(general 140lne)|滚动", "scroll");
-      header = header.replace("(general 140lne)|超出折叠", "overfold");
+      header = header.replace("|黑幕", "|add_class(ab-deco-heimu)"); 
+      header = header.replace("|折叠", "|fold");
+      header = header.replace("|滚动", "|scroll");
+      header = header.replace("|超出折叠", "|overfold");
       header = header.replace("(general 140lne)|", "");
     }
     return header
