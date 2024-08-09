@@ -143,7 +143,7 @@ export class ABSettingTab extends PluginSettingTab {
             this.processorPanel.remove()
 
             const div = containerEl.createEl("div");
-            ABConvertManager.autoABConvert(div, "info", "") // this.processorPanel = ABConvertManager.getInstance().generateConvertInfoTable(containerEl)
+            ABConvertManager.autoABConvert(div, "info", "", "null_content") // this.processorPanel = ABConvertManager.getInstance().generateConvertInfoTable(containerEl)
             this.processorPanel = div
           }).open()
         })
@@ -151,7 +151,7 @@ export class ABSettingTab extends PluginSettingTab {
 
     containerEl.createEl('p', {text: '下面是所有注册指令的查看'});
     const div = containerEl.createEl("div");
-    ABConvertManager.autoABConvert(div, "info", "") // this.processorPanel = ABConvertManager.getInstance().generateConvertInfoTable(containerEl)
+    ABConvertManager.autoABConvert(div, "info", "", "null_content") // this.processorPanel = ABConvertManager.getInstance().generateConvertInfoTable(containerEl)
     this.processorPanel = div
 	}
 }

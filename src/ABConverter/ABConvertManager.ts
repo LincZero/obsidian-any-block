@@ -100,12 +100,13 @@ export class ABConvertManager {
    * @param el 最后的渲染结果
    * @param header 转换方式
    * @param content 要转换的初始文本 (无前缀版本，前缀在选择器环节已经删除了)
+   * @param selectorName 选择器名，空表示未知
    * @return 等于el，无用，后面可以删了
    */
-  public static autoABConvert(el:HTMLDivElement, header:string, content:string): void{
+  public static autoABConvert(el:HTMLDivElement, header:string, content:string, selectorName:string = ""): void{
     let prev_result:ABConvert_IOType = content             // 上次转换后的结果
     let prev_type: ABConvert_IOEnum = ABConvert_IOEnum.text // 上次转换后的结果的类型
-    header = this.autoABConvert_natureLanguage(el, header, content);
+    header = this.autoABConvert_natureLanguage(el, header, content, selectorName);
     let list_header = header.split("|")
     prev_result = this.autoABConvert_runConvert(el, list_header, prev_result, prev_type)
 
@@ -213,9 +214,18 @@ export class ABConvertManager {
    * @returns
    * new header
    */
-  private static autoABConvert_natureLanguage (el:HTMLDivElement, header:string, content:string): string{
+  private static autoABConvert_natureLanguage (el:HTMLDivElement, header:string, content:string, selectorName:string): string{
+    // 首尾
+    if (selectorName == "headtail") { // `:::`不在正文里，这个判断不到：if (ABReg.reg_mdit_head_noprefix.test(content.trimStart()))
+      header = "(::: 140lne)|" + header.trimStart()
+      header = header.replace("(::: 140lne)|info", "add([!info])|quote");
+      header = header.replace("(::: 140lne)|warn", "add([!warning])|quote");
+      header = header.replace("(::: 140lne)|warning", "add([!warning])|quote");
+      header = header.replace("(::: 140lne)|error", "add([!error])|quote");
+      header = header.replace("(::: 140lne)|", "");
+    }
     // 列表
-    if (ABReg.reg_list_noprefix.test(content.trimStart())) {
+    else if (selectorName == "list" || ABReg.reg_list_noprefix.test(content.trimStart())) {
       header = "(list 140lne)|" + header // 用于标识，仅头部可以被转化，不允许二次转化
 
       header = header.replace("(list 140lne)|flow", "list2mermaid");
@@ -258,34 +268,21 @@ export class ABConvertManager {
     }
 
     // 代码块
-    else if (ABReg.reg_code_noprefix.test(content.trimStart())) {
+    else if (selectorName == "code" || ABReg.reg_code_noprefix.test(content.trimStart())) {
       header = "(code 140lne)|" + header
       header = header.replace("(code 140lne)|X", "Xcode");
       header = header.replace("(code 140lne)|", "");
     }
 
-    // 代码块
-    else if (ABReg.reg_quote_noprefix.test(content.trimStart())) {
+    // 引用块
+    else if (selectorName == "quote" || ABReg.reg_quote_noprefix.test(content.trimStart())) {
       header = "(quote 140lne)|" + header
       header = header.replace("(quote 140lne)|X", "Xquote");
       header = header.replace("(quote 140lne)|", "");
     }
 
-    // 首尾
-    else if (ABReg.reg_mdit_head_noprefix.test(content.trimStart())) {
-      console.log("debug1",header)
-      header = "(::: 140lne)|" + header.trimStart()
-      header = header.replace("(::: 140lne)|info", "add([!info])|quote");
-      header = header.replace("(::: 140lne)|warn", "add([!warning])|quote");
-      header = header.replace("(::: 140lne)|warning", "add([!warning])|quote");
-      header = header.replace("(::: 140lne)|error", "add([!error])|quote");
-      header = header.replace("(::: 140lne)|", "");
-      console.log("debug2",header)
-    }
-
     // 通用，一般是装饰处理器
     {
-      console.log("debug3",header)
       header = "(general 140lne)|" + header
       header = header.replace("|黑幕", "|add_class(ab-deco-heimu)"); 
       header = header.replace("|折叠", "|fold");

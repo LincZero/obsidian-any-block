@@ -127,7 +127,7 @@ function findABBlock_recurve(targetEl: HTMLElement){
     const newEl = document.createElement("div")
     newEl.addClass("ab-re-rendered")
     headerEl.parentNode?.insertBefore(newEl, headerEl.nextSibling)
-    ABConvertManager.autoABConvert(newEl, header_str, html2md(contentEl.innerHTML))
+    ABConvertManager.autoABConvert(newEl, header_str, html2md(contentEl.innerHTML), "postHtml")
 
     contentEl.hide()
     headerEl.hide()
@@ -162,7 +162,7 @@ function replaceABBlock(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext
     if (range.header.indexOf("2")==0) range.header="list"+range.header
   }
 
-  ctx.addChild(new ABReplacer_Render(targetEl, range.header, range.content));
+  ctx.addChild(new ABReplacer_Render(targetEl, range.header, range.content, range.selector));
 }
 
 /**

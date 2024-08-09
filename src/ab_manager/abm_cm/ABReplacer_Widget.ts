@@ -29,7 +29,7 @@ export class ABReplacer_Widget extends WidgetType {
 
     // 内容替换元素
     let dom_note = this.div.createEl("div", {cls: ["ab-note", "drop-shadow"]});
-    ABConvertManager.autoABConvert(dom_note, this.rangeSpec.header, this.rangeSpec.content)
+    ABConvertManager.autoABConvert(dom_note, this.rangeSpec.header, this.rangeSpec.content, this.rangeSpec.selector)
 
     // 编辑按钮
     if (this.global_editor){

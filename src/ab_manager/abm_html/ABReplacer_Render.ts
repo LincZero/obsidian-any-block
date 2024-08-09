@@ -4,12 +4,14 @@ import { ABConvertManager } from "../../ABConverter/ABConvertManager"
 export class ABReplacer_Render extends MarkdownRenderChild {
   content: string;
   header: string;
+  selectorName: string;
 
   // 构造函数，override。这里就是新增了一个text参数而已，其他不变
-  constructor(containerEl: HTMLElement, header: string, content: string) {
+  constructor(containerEl: HTMLElement, header: string, content: string, selectorName: string = "replacer_default") {
     super(containerEl);
     this.header = header;
     this.content = content;
+    this.selectorName = selectorName;
   }
 
   /**
@@ -38,7 +40,7 @@ export class ABReplacer_Render extends MarkdownRenderChild {
     let dom_replaceEl = dom_note.createDiv({
       cls: ["ab-replaceEl"]
     })
-    ABConvertManager.autoABConvert(dom_replaceEl, this.header, this.content)
+    ABConvertManager.autoABConvert(dom_replaceEl, this.header, this.content, this.selectorName)
     this.containerEl.replaceWith(div);
     
     // 下拉框格式部分
@@ -72,7 +74,7 @@ export class ABReplacer_Render extends MarkdownRenderChild {
       const new_dom_replaceEl = dom_note.createDiv({
         cls: ["ab-replaceEl"]
       })
-      ABConvertManager.autoABConvert(new_dom_replaceEl, new_header, this.content)
+      ABConvertManager.autoABConvert(new_dom_replaceEl, new_header, this.content, this.selectorName)
       dom_replaceEl.replaceWith(new_dom_replaceEl);
       dom_replaceEl = new_dom_replaceEl
     }
