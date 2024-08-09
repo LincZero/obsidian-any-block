@@ -507,3 +507,136 @@ div.md-table-fig1 table.ab-setting.md-table-fig2 {
   transform: scaleY(-1);
   white-space: nowrap;
 }
+
+.ab-custom-text-red {
+  color: red;
+}
+
+.ab-custom-text-orange {
+  color: orange;
+}
+
+.ab-custom-text-yellow {
+  color: yellow;
+}
+
+.ab-custom-text-green {
+  color: green;
+}
+
+.ab-custom-text-cyan {
+  color: cyan;
+}
+
+.ab-custom-text-blue {
+  color: blue;
+}
+
+.ab-custom-text-purple {
+  color: purple;
+}
+
+.ab-custom-text-white {
+  color: white;
+}
+
+.ab-custom-text-black {
+  color: black;
+}
+
+.ab-custom-bg-red {
+  background-color: red;
+}
+
+.ab-custom-bg-orange {
+  background-color: orange;
+}
+
+.ab-custom-bg-yellow {
+  background-color: yellow;
+}
+
+.ab-custom-bg-green {
+  background-color: green;
+}
+
+.ab-custom-bg-cyan {
+  background-color: cyan;
+}
+
+.ab-custom-bg-blue {
+  background-color: blue;
+}
+
+.ab-custom-bg-purple {
+  background-color: purple;
+}
+
+.ab-custom-bg-white {
+  background-color: white;
+}
+
+.ab-custom-bg-black {
+  background-color: black;
+}
+
+.ab-custom-dire-top {
+  vertical-align: top;
+}
+
+.ab-custom-dire-down {
+  vertical-align: bottom;
+}
+
+.ab-custom-dire-left {
+  text-align: left;
+}
+
+.ab-custom-dire-right {
+  text-align: right;
+}
+
+.ab-custom-dire-center {
+  vertical-align: middle;
+  text-align: center;
+}
+
+.ab-custom-dire-hcenter {
+  text-align: center;
+}
+
+.ab-custom-dire-vcenter {
+  vertical-align: middle;
+}
+
+.ab-custom-dire-justify {
+  text-align: justify;
+}
+
+.ab-custom-font-large {
+  font-size: large;
+}
+
+.ab-custom-font-largex {
+  font-size: x-large;
+}
+
+.ab-custom-font-largexx {
+  font-size: xx-large;
+}
+
+.ab-custom-font-small {
+  font-size: small;
+}
+
+.ab-custom-font-smallx {
+  font-size: x-small;
+}
+
+.ab-custom-font-smallxx {
+  font-size: xx-small;
+}
+
+.ab-custom-font-bold {
+  font-weight: bold;
+}

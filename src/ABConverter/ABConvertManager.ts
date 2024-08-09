@@ -288,6 +288,40 @@ export class ABConvertManager {
       header = header.replace("|折叠", "|fold");
       header = header.replace("|滚动", "|scroll");
       header = header.replace("|超出折叠", "|overfold");
+      // 便捷样式
+      header = header.replace("|红字", "|addClass(ab-custom-text-red)");
+      header = header.replace("|橙字", "|addClass(ab-custom-text-orange)");
+      header = header.replace("|黄字", "|addClass(ab-custom-text-yellow)");
+      header = header.replace("|绿字", "|addClass(ab-custom-text-green)");
+      header = header.replace("|青字", "|addClass(ab-custom-text-cyan)");
+      header = header.replace("|蓝字", "|addClass(ab-custom-text-blue)");
+      header = header.replace("|紫字", "|addClass(ab-custom-text-purple)");
+      header = header.replace("|白字", "|addClass(ab-custom-text-white)");
+      header = header.replace("|黑字", "|addClass(ab-custom-text-black)");
+      header = header.replace("|红底", "|addClass(ab-custom-bg-red)");
+      header = header.replace("|橙底", "|addClass(ab-custom-bg-orange)");
+      header = header.replace("|黄底", "|addClass(ab-custom-bg-yellow)");
+      header = header.replace("|绿底", "|addClass(ab-custom-bg-green)");
+      header = header.replace("|青底", "|addClass(ab-custom-bg-cyan)");
+      header = header.replace("|蓝底", "|addClass(ab-custom-bg-blue)");
+      header = header.replace("|紫底", "|addClass(ab-custom-bg-purple)");
+      header = header.replace("|白底", "|addClass(ab-custom-bg-white)");
+      header = header.replace("|黑底", "|addClass(ab-custom-bg-black)");
+      header = header.replace("|靠上", "|addClass(ab-custom-dire-top)");
+      header = header.replace("|靠下", "|addClass(ab-custom-dire-down)");
+      header = header.replace("|靠左", "|addClass(ab-custom-dire-left)");
+      header = header.replace("|靠右", "|addClass(ab-custom-dire-right)");
+      header = header.replace("|居中", "|addClass(ab-custom-dire-center)");
+      header = header.replace("|水平居中", "|addClass(ab-custom-dire-hcenter)");
+      header = header.replace("|垂直居中", "|addClass(ab-custom-dire-vcenter)");
+      header = header.replace("|两端对齐", "|addClass(ab-custom-dire-justify)");
+      header = header.replace("|大字", "|addClass(ab-custom-font-large)");
+      header = header.replace("|超大字", "|addClass(ab-custom-font-largex)");
+      header = header.replace("|超超大字", "|addClass(ab-custom-font-largexx)");
+      header = header.replace("|小字", "|addClass(ab-custom-font-small)");
+      header = header.replace("|超小字", "|addClass(ab-custom-font-smallx)");
+      header = header.replace("|超超小字", "|addClass(ab-custom-font-smallxx)");
+      header = header.replace("|加粗", "|addClass(ab-custom-font-bold)");
       header = header.replace("(general 140lne)|", "");
     }
     return header

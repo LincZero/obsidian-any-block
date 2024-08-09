@@ -155,6 +155,7 @@ async function data2mindmap(
 // 通过mermaid块里的内容来渲染mermaid块
 async function render_mermaidText(mermaidText: string, div: HTMLElement) {
   // 1. 四选一。自己渲
+  // 当前ob使用
   // - 优点: 最快，无需通过二次转换
   // - 缺点: abc模块要内置mermaid
   // - 选用：目前的ob环境中用是最好。vuepress-mdit中则有另一个bug：https://github.com/mermaid-js/mermaid/issues/5204
@@ -168,6 +169,7 @@ async function render_mermaidText(mermaidText: string, div: HTMLElement) {
   // ABConvertManager.getInstance().m_renderMarkdownFn("```mermaid\n"+mermaidText+"\n```", div)
 
   // 3. 四选一。这里不渲，交给上一层让上一层渲
+  // 当前mdit选用
   // - 优点：abc模块无需重复内置mermaid。对于mdit，能避免输出格式必须为html
   // - 缺点：这和ab的接口设计是冲突的，属于是取巧临时使用，后面要规范一下。另一方面，不知道为什么这种方案容易爆内存 (markmap那边也这样用也没事，就mermaid这边会)
   // - 选用：mdit可以用这种，dev环境的最佳策略

@@ -63,6 +63,7 @@ const abc_list2pumlMindmap = ABConvert.factory({
 
 async function render_pumlText(text: string, div: HTMLElement) {
     // 1. 四选一。自己渲 (优缺点见abc_mermaid的相似方法)
+    // 当前mdit和ob使用
     var encoded = plantumlEncoder.encode(text)
     let url = 'http://www.plantuml.com/plantuml/img/' + encoded
     div.innerHTML = `<img src="${url}">`

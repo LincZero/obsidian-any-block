@@ -206,7 +206,8 @@ export class DirProcess{
       const l_tr:NodeListOf<HTMLElement> = tbody.querySelectorAll("tr")
       for (let i=0; i<l_tr.length; i++){
         const tr = l_tr[i]
-        // 1. 二选一，嵌入内联onclick，mdit使用
+        // 1. 二选一，嵌入内联onclick
+        // 当前mdit使用
         //tr.setAttribute("onclick", `
         //  const tr = this
         //  const l_tr = tr.parentNode.querySelectorAll("tr")
@@ -226,7 +227,8 @@ export class DirProcess{
         //  }
         //  if (flag_do_fold) tr.setAttribute("is_fold", tr_isfold=="true"?"false":"true")
         //`)
-        // 2. 二选一，正常绑定方法，ob使用
+        // 2. 二选一，正常绑定方法
+        // 当前ob使用
         tr.onclick = ()=>{
           const tr_level = Number(tr.getAttribute("tr_level"))
           if (isNaN(tr_level)) return

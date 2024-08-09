@@ -71,10 +71,12 @@ function list2markmap(markdown: string, div: HTMLDivElement) {
 		// ...
 
 		// 3. 四选一。这里不渲，交给上一层让上一层渲 (优缺点见abc_mermaid的相似方法)
+		// 当前mdit使用
 		// div.classList.add("ab-raw")
 		// div.innerHTML = `<div class="ab-raw-data" type-data="markmap" content-data='${markdown}'></div>`
 
-		// 4. 四选一。纯动态/手动渲染 (优缺点见abc_mermaid的相似方法)
+		// 4. 四选一。纯动态/手动渲染 (优缺点见abc_mermaid的相似方法)。
+		// 当前ob使用
 		const svg_btn = document.createElement("button"); div.appendChild(svg_btn); svg_btn.textContent = "ChickMe ReRender Markmap";
 		svg_btn.setAttribute("style", "background-color: argb(255, 125, 125, 0.5)");
 		svg_btn.setAttribute("onclick", `
