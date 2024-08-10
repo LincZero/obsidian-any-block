@@ -218,10 +218,15 @@ export class ABConvertManager {
     // 首尾
     if (selectorName == "headtail") { // `:::`不在正文里，这个判断不到：if (ABReg.reg_mdit_head_noprefix.test(content.trimStart()))
       header = "(::: 140lne)|" + header.trimStart()
+      // callout/alert
       header = header.replace("(::: 140lne)|info", "add([!info])|quote");
       header = header.replace("(::: 140lne)|warn", "add([!warning])|quote");
       header = header.replace("(::: 140lne)|warning", "add([!warning])|quote");
       header = header.replace("(::: 140lne)|error", "add([!error])|quote");
+      // mdit-container migration
+      header = header.replace("(::: 140lne)|tabs", "mditTabs");
+      header = header.replace("(::: 140lne)|demo", "mditDemo");
+      header = header.replace("(::: 140lne)|abDemo", "mditABDemo");
       header = header.replace("(::: 140lne)|", "");
     }
     // 列表

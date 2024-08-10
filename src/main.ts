@@ -20,6 +20,7 @@ import {} from "src/ABConverter/converter/abc_table"
 import {} from "src/ABConverter/converter/abc_dir_tree"
 import {} from "src/ABConverter/converter/abc_deco"
 import {} from "src/ABConverter/converter/abc_ex"
+import {} from "src/ABConverter/converter/abc_mdit_container"
 import {} from "src/ABConverter/converter/abc_plantuml" // 可选建议：
 import {} from "src/ABConverter/converter/abc_mermaid"  // 可选建议：7.1MB
 import {} from "src/ABConverter/converter/abc_markmap"  // 可选建议：1.3MB

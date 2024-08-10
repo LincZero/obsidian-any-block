@@ -36,6 +36,28 @@ export interface ListItem {
 }[]
 export type List_ListItem = ListItem[]
 
+/**
+ * 二列列表，特征是level只有0和1
+ * 
+ * @detail
+ * 通常用于：
+ * - 二层一叉树
+ *     - dirTree的初处理
+ *     - Tabs
+ *     - TimeLine
+ *     - 仿列表
+ *     - ...
+ * - 二层多叉树
+ *     - fc-table (首列重要树)
+ *     - ...
+ * 
+ *  (但由于是新类型，有的还没有用上)
+ */
+export interface C2ListItem extends ListItem {
+  level: 0|1;
+}[]
+export type List_C2ListItem = C2ListItem[]
+
 /// 一些列表相关的工具集
 export class ListProcess{
 
@@ -490,25 +512,25 @@ export class ListProcess{
   }
 
   /** 列表数据转标签栏 */
-  private static data2tab(
+  static data2tab(
     list_itemInfo: List_ListItem, 
     div: HTMLDivElement,
     modeT: boolean
   ){
     // GeneratorTab，原svelte代码
     {
-      const tab = document.createElement("div"); div.appendChild(tab); tab.classList.add("ab-tab-root")
+      const tab = document.createElement("div"); div.appendChild(tab); tab.classList.add("ab-tab-root");
       if (modeT) tab.setAttribute("modeT", "true")
-      const ul = document.createElement("ul"); tab.appendChild(ul);
-      const content = document.createElement("div"); tab.appendChild(content);
+      const nav = document.createElement("div"); tab.appendChild(nav); nav.classList.add("ab-tab-nav");
+      const content = document.createElement("div"); tab.appendChild(content); content.classList.add("ab-tab-content")
       let current_dom:HTMLElement|null = null
       for (let i=0; i<list_itemInfo.length; i++){
         const itemInfo = list_itemInfo[i]
         if (!current_dom){            // 找开始标志
           if (itemInfo.level==0){
-            const li = document.createElement("li"); ul.appendChild(li); li.classList.add("ab-tab-tab");
-              li.textContent = itemInfo.content.slice(0,20); li.setAttribute("is_activate", i==0?"true":"false");
-            current_dom = document.createElement("div"); content.appendChild(current_dom); current_dom.classList.add("ab-tab-content");
+            const nav_item = document.createElement("button"); nav.appendChild(nav_item); nav_item.classList.add("ab-tab-nav-item");
+              nav_item.textContent = itemInfo.content.slice(0,20); nav_item.setAttribute("is_activate", i==0?"true":"false");
+            current_dom = document.createElement("div"); content.appendChild(current_dom); current_dom.classList.add("ab-tab-content-item");
               current_dom.setAttribute("style", i==0?"display:block":"display:none"); current_dom.setAttribute("is_activate", i==0?"true":"false");
           }
         }
@@ -519,10 +541,12 @@ export class ListProcess{
         }
       }
       // 元素全部创建完再来绑按钮事件，不然有可能有问题
-      const lis:NodeListOf<HTMLLIElement> = tab.querySelectorAll(".ab-tab-tab")
-      const contents = tab.querySelectorAll(".ab-tab-content")
-      if (lis.length!=contents.length) console.warn("ab-tab-tab和ab-tab-content的数量不一致")
+      const lis:NodeListOf<HTMLButtonElement> = tab.querySelectorAll(".ab-tab-nav-item")
+      const contents = tab.querySelectorAll(".ab-tab-content-item")
+      if (lis.length!=contents.length) console.warn("ab-tab-nav-item和ab-tab-content-item的数量不一致")
       for (let i=0; i<lis.length; i++){
+        // 1. 二选一，常规绑定
+        // ob选用
         lis[i].onclick = ()=>{
           for (let j=0; j<contents.length; j++){
             lis[j].setAttribute("is_activate", "false")
@@ -533,6 +557,25 @@ export class ListProcess{
           contents[i].setAttribute("is_activate", "true")
           contents[i].setAttribute("style", "display:block")
         }
+        // 2. 二选一，
+        // mdit选用
+        // lis[i].setAttribute("onclick",`
+        //   const i = ${i}
+        //   const tab_current = this
+        //   const tab_nav = this.parentNode
+        //   const tab_root = tab_nav.parentNode
+        //   const tab_content = tab_root.querySelector(".ab-tab-content")
+        //   const tab_nav_items = tab_nav.querySelectorAll(".ab-tab-nav-item")
+        //   const tab_content_items = tab_content.querySelectorAll(".ab-tab-content-item")
+        //   for (let j=0; j<tab_content_items.length; j++){
+        //     tab_nav_items[j].setAttribute("is_activate", "false")
+        //     tab_content_items[j].setAttribute("is_activate", "false")
+        //     tab_content_items[j].setAttribute("style", "display:none")
+        //   }
+        //   tab_current.setAttribute("is_activate", "true")
+        //   tab_content_items[i].setAttribute("is_activate", "true")
+        //   tab_content_items[i].setAttribute("style", "display:block")
+        // `)
       }
     }
 
