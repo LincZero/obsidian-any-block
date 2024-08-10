@@ -73,8 +73,8 @@ export class ListProcess{
   /** 一级列表转标签栏 */
   static list2tab(text: string, div: HTMLDivElement, modeT=false) {
     let data = this.list2data(text)
-    data = this.data_mL_2_2L1B(data)
-    return this.data2tab(data, div, modeT)
+    let newData: List_C2ListItem = this.data_mL_2_2L1B(data)
+    return this.data2tab(newData, div, modeT)
   }
 
   /** 去除列表的inline */
@@ -309,7 +309,12 @@ export class ListProcess{
     return list_itemInfo2
   }
 
-  /** 多层树转二层一叉树
+  /**
+   * 多层树转二层一叉树
+   * 
+   * @detail
+   * 特点是level只有0和1两种
+   * 
    * example:
    * - 1
    *  - 2
@@ -321,15 +326,12 @@ export class ListProcess{
    */
   private static data_mL_2_2L1B(
     list_itemInfo: List_ListItem
-  ){
-    let list_itemInfo2: List_ListItem = []
-    let level1 = -1
-    let level2 = -1
+  ): List_C2ListItem{
+    let list_itemInfo2: List_C2ListItem = []
+    const level1:0 = 0
+    const level2:1 = 1
     let flag_leve2 = false  // 表示触发过level2，当遇到level1会重置
     for (let itemInfo of list_itemInfo) {
-      if (level1<0) {                                             // 未配置level1
-        level1=0//itemInfo.level;
-      }
       if (level1>=itemInfo.level){                                // 是level1
         list_itemInfo2.push({
           content: itemInfo.content.trim(),
@@ -337,9 +339,6 @@ export class ListProcess{
         })
         flag_leve2 = false
         continue
-      }
-      if (level2<0) {                                             // 未配置level2
-        level2=1//itemInfo.level;
       }
       if (true){                                                  // 是level2/level2+/level2-
         if (!flag_leve2){                                           // 新建
