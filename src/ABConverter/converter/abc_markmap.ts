@@ -39,15 +39,26 @@ const transformer = new Transformer();
 
 const abc_list2mindmap = ABConvert.factory({
 id: "list2markmap",
-name: "标题到脑图 (markmap)",
+name: "列表到脑图 (markmap)",
 process_param: ABConvert_IOEnum.text,
 process_return: ABConvert_IOEnum.el,
 process: (el, header, content)=>{
-		content = ListProcess.title2list(content, el)
 		list2markmap(content, el)
 		return el
 	}
 })
+
+const abc_title2mindmap = ABConvert.factory({
+	id: "title2markmap",
+	name: "标题到脑图 (markmap)",
+	process_param: ABConvert_IOEnum.text,
+	process_return: ABConvert_IOEnum.el,
+	process: (el, header, content)=>{
+			content = ListProcess.title2list(content, el)
+			list2markmap(content, el)
+			return el
+		}
+	})
 
 function list2markmap(markdown: string, div: HTMLDivElement) {
 	// 1. markdown解析 (markmap-lib)

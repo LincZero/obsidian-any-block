@@ -43,6 +43,7 @@ export class ListProcess{
   
   /** title转列表 */
   static title2list(text: string, div: HTMLDivElement): string {
+    if (!text.trimStart().startsWith("#")) return text // fix: 不知道为什么，有时title2list会重复执行两遍，并且第二边会拿第一遍的结果来二次转化，这会出现bug
     let list_itemInfo = this.title2data(text)
     list_itemInfo = this.data2strict(list_itemInfo).map((item: ListItem, index)=>{ return {content: item.content, level: item.level*2}})
     return this.data2list(list_itemInfo)
@@ -128,12 +129,22 @@ export class ListProcess{
     return list_itemInfo
   }
 
-  // 标题大纲转列表数据（@todo 正文的level+10，要减掉）
+  /**
+   * 标题大纲转列表数据（@todo 正文的level+10，要减掉）
+   * 
+   * @detail
+   * 这里要将标题、正文、列表 的等级合为一块，所以存在偏移值：
+   * 
+   * 1. 标题等级,  = `#`个数-10,    取值[-9,-4]
+   * 2. 正文等级,  = 0,              取值[+1,+Infi]
+   * 3. 列表等级,  = `(.*)-`个数+1,  取值[0]
+   * 
+   */
   private static title2data(text: string){
     let list_itemInfo:List_ListItem = []
 
     const list_text = text.split("\n")
-    let mul_mode:string = ""      // 多行模式，para或list或title或空
+    let mul_mode:"title"|"para"|"list"|"" = ""                // 多行模式，标题/正文/列表/空
     for (let line of list_text) {
       const match_heading = line.match(ABReg.reg_heading_noprefix)
       const match_list = line.match(ABReg.reg_list_noprefix)
@@ -141,11 +152,11 @@ export class ListProcess{
         removeTailBlank()
         list_itemInfo.push({
           content: match_heading[4],
-          level: match_heading[1].length-10
+          level: (match_heading[3].length-1)-10
         })
         mul_mode = "title"
       }
-      else if (match_list && !match_list[1]){                 // 2. 列表层级（只识别根处）
+      else if (match_list){                                   // 2. 列表层级 ~~（只识别根处）~~
         removeTailBlank()
         list_itemInfo.push({
           content: match_list[4],
@@ -315,19 +326,20 @@ export class ListProcess{
     return list_itemInfo2
   }
 
-  /** 列表数据转列表（看起来脱屁股放屁，但有时调试会需要）
-   * 另外还有个妙用：list2data + data2list = listXinline
+  /**
+   * 列表数据转列表（看起来脱屁股放屁，但有时调试会需要）
+   * 
+   * - title2list会用到
+   * - 妙用：list2data + data2list = listXinline
    */
   private static data2list(
     list_itemInfo: List_ListItem
   ){
-    let list_newcontent:string[] = []
+    let list_newcontent:string[] = [] // 传入参数以列表项为单位，这个以行为单位
     // 每一个level里的content处理
     for (let item of list_itemInfo){
-      // 等级转缩进，以及"\n" 转化（这里像mindmap语法那样用<br>，要进行换行转缩进）
-      let str_indent = ""
-      for(let i=0; i<item.level; i++) str_indent+= " "
-      let list_content = item.content.split("\n")
+      const str_indent = " ".repeat(item.level) // 缩进数
+      let list_content = item.content.split("\n") // 一个列表项可能有多个行
       for (let i=0; i<list_content.length; i++) {
         if(i==0) list_newcontent.push(str_indent+"- "+list_content[i])
         else list_newcontent.push(str_indent+"  "+list_content[i])
