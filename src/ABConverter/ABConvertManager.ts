@@ -237,6 +237,15 @@ export class ABConvertManager {
     else if (selectorName == "list" || ABReg.reg_list_noprefix.test(content.trimStart())
       || selectorName == "title" || ABReg.reg_heading_noprefix.test(content.trimStart())
     ) {
+      if (selectorName == "title" || ABReg.reg_heading_noprefix.test(content.trimStart())) {
+        header = "(title 140lne)|" + header
+        header = header.replace("(title 140lne)|标签页", "title2tab");
+        header = header.replace("(title 140lne)|分栏", "title2col");
+        header = header.replace("(title 140lne)|卡片", "title2card");
+        header = header.replace("(title 140lne)|", "");
+      }
+      const old_list_header = header
+
       header = "(list 140lne)|" + header // 用于标识，仅头部可以被转化，不允许二次转化
 
       header = header.replace("(list 140lne)|flow", "list2mermaid");
@@ -283,11 +292,10 @@ export class ABConvertManager {
 
       header = header.replace("(list 140lne)|", "");
 
-      // @TODO fix bug:
-      // 我发现 [title2list|list2card] 会出bug，但直接 [卡片] 却不会，按理说这两者应该等价才对啊……很奇怪
-      // `:::abdemo` 也是，重渲染似乎会出现问题？ 不过重渲染走的似乎是postHtml的后处理器？
-      if (selectorName == "title" || ABReg.reg_heading_noprefix.test(content.trimStart())) {
-        header = "title2list|" + header
+      if (old_list_header!=header) { // 中间转化成功过
+        if (selectorName == "title" || ABReg.reg_heading_noprefix.test(content.trimStart())) {
+          header = "title2list|" + header
+        }
       }
     }
 

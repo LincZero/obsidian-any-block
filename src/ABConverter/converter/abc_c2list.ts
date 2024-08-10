@@ -183,6 +183,52 @@ export class C2ListProcess{
   }
 
   /**
+   * 标题大纲转列表数据（@todo 正文的level+10，要减掉）
+   * 
+   * @detail
+   * 为什么要直接转，而不能title2list来复用
+   * 因为title2list会损失标题信息
+   */
+  static title2c2data(text: string){
+    let list_itemInfo:List_C2ListItem = []
+    const list_text = text.trimStart().split("\n")
+
+    // 获取最大的标题级别
+    const first_match = list_text[0].match(ABReg.reg_heading_noprefix)
+    if (!first_match || first_match[1]) {
+      console.error("不是标题内容:", list_text[0])
+      return list_itemInfo
+    }
+    const root_title_level:number = first_match[3].length-1 // 第一个标题(也是最大级别的标题的)的`#`的个数
+    
+    // 循环填充
+    let current_content:string = ""
+    for (let line of list_text) {
+      const match_heading = line.match(ABReg.reg_heading_noprefix)
+      if (match_heading && !match_heading[1] && (match_heading[3].length-1)<=root_title_level){ // 遇到同等标题
+        add_current_content()
+        list_itemInfo.push({
+          content: match_heading[4],
+          level: 0
+        })
+      } else {
+        current_content += line+"\n"
+      }
+    }
+    add_current_content()
+    return list_itemInfo
+
+    function add_current_content(){ // 刷新写入缓存的尾调用
+      if (current_content.trim()=="") return
+      list_itemInfo.push({
+        content: current_content,
+        level: 1
+      })
+      current_content = ""
+    }
+  }
+
+  /**
    * 两列列表数据转标签栏
    */
   static c2data2tab(
@@ -284,6 +330,19 @@ const abc_list2tab = ABConvert.factory({
   }
 })
 
+const abc_title2tab = ABConvert.factory({
+  id: "title2tab",
+  name: "标题转标签栏",
+  match: "title2tab",
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.el,
+  process: (el, header, content)=>{
+    let data = C2ListProcess.title2c2data(content)
+    C2ListProcess.c2data2tab(data, el, false)
+    return el
+  }
+})
+
 const abc_list2col = ABConvert.factory({
   id: "list2col",
   name: "一级列表转分栏",
@@ -300,6 +359,20 @@ const abc_list2col = ABConvert.factory({
   }
 })
 
+const abc_title2col = ABConvert.factory({
+  id: "title2col",
+  name: "标题转分栏",
+  match: "title2col",
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.el,
+  process: (el, header, content)=>{
+    let data = C2ListProcess.title2c2data(content)
+    C2ListProcess.c2data2items(data, el)
+    el.querySelector("div")?.classList.add("ab-col")
+    return el
+  }
+})
+
 const abc_list2card = ABConvert.factory({
   id: "list2card",
   name: "一级列表转卡片",
@@ -310,6 +383,22 @@ const abc_list2card = ABConvert.factory({
     let data = ListProcess.list2data(content)
     let c2listData: List_C2ListItem = C2ListProcess.data_mL_2_2L1B(data)
     C2ListProcess.c2data2items(c2listData, el)
+    el.querySelector("div")?.classList.add("ab-card")
+    return el
+  }
+})
+
+const abc_title2card = ABConvert.factory({
+  id: "title2card",
+  name: "标题转卡片",
+  match: "title2card",
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.el,
+  process: (el, header, content)=>{
+    console.log("title2card", content)
+    let data = C2ListProcess.title2c2data(content)
+    C2ListProcess.c2data2items(data, el)
+    console.log(data, "pp", content)
     el.querySelector("div")?.classList.add("ab-card")
     return el
   }

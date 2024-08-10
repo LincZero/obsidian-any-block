@@ -17,13 +17,7 @@ function mditTabs2listdata(content:string, reg: RegExp): List_C2ListItem {
     let line_content = list_line[line_index]
     const line_match = line_content.match(reg)
     if (line_match) {
-      if (content_item.trim() != "") { // 尾调用
-        list_c2listItem.push({
-          content: content_item,
-          level: 1
-        })
-        content_item = ""
-      }
+      add_current_content()
       list_c2listItem.push({
         content: line_match[1].trim(),
         level: 0
@@ -34,15 +28,18 @@ function mditTabs2listdata(content:string, reg: RegExp): List_C2ListItem {
       content_item += line_content + "\n"
     }
   }
-  if (content_item.trim() != "") { // 尾调用
+  add_current_content()
+
+  return list_c2listItem
+
+  function add_current_content() { // 刷新写入缓存的尾调用
+    if (content_item.trim() == "") return
     list_c2listItem.push({
       content: content_item,
       level: 1
     })
     content_item = ""
   }
-
-  return list_c2listItem
 }
 
 const abc_mditTabs = ABConvert.factory({

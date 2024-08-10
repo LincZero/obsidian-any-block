@@ -43,7 +43,7 @@ export class ListProcess{
   
   /** title转列表 */
   static title2list(text: string, div: HTMLDivElement): string {
-    if (!text.trimStart().startsWith("#")) return text // fix: 不知道为什么，有时title2list会重复执行两遍，并且第二边会拿第一遍的结果来二次转化，这会出现bug
+    if (!text.trimStart().startsWith("#")) return text // 不让重复调用
     let list_itemInfo = this.title2data(text)
     list_itemInfo = this.data2strict(list_itemInfo).map((item: ListItem, index)=>{ return {content: item.content, level: item.level*2}})
     return this.data2list(list_itemInfo)
