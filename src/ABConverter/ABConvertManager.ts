@@ -224,13 +224,17 @@ export class ABConvertManager {
       header = header.replace("(::: 140lne)|warning", "add([!warning])|quote");
       header = header.replace("(::: 140lne)|error", "add([!error])|quote");
       // mdit-container migration
+      header = header.replace("(::: 140lne)|标签", "mditTabs");
       header = header.replace("(::: 140lne)|tabs", "mditTabs");
       header = header.replace("(::: 140lne)|demo", "mditDemo");
       header = header.replace("(::: 140lne)|abDemo", "mditABDemo");
       header = header.replace("(::: 140lne)|", "");
     }
-    // 列表
-    else if (selectorName == "list" || ABReg.reg_list_noprefix.test(content.trimStart())) {
+
+    // 列表/标题块
+    else if (selectorName == "list" || ABReg.reg_list_noprefix.test(content.trimStart())
+      || selectorName == "title" || ABReg.reg_heading_noprefix.test(content.trimStart())
+    ) {
       header = "(list 140lne)|" + header // 用于标识，仅头部可以被转化，不允许二次转化
 
       header = header.replace("(list 140lne)|flow", "list2mermaid");
@@ -242,9 +246,11 @@ export class ABConvertManager {
       header = header.replace("(list 140lne)|md思维导图", "list2markmap");
       header = header.replace("(list 140lne)|md脑图", "list2markmap");
 
+      header = header.replace("(list 140lne)|table", "list2table");
       header = header.replace("(list 140lne)|multiWayTable", "list2table");
       header = header.replace("(list 140lne)|multiCrossTable", "list2table");
       header = header.replace("(list 140lne)|crossTable", "list2table");
+      header = header.replace("(list 140lne)|表格", "list2table");
       header = header.replace("(list 140lne)|多叉表格", "list2table");
       header = header.replace("(list 140lne)|多叉表", "list2table");
       header = header.replace("(list 140lne)|跨行表格", "list2table");
@@ -269,7 +275,13 @@ export class ABConvertManager {
       header = header.replace("(list 140lne)|fakeList", "list2table|addClass(ab-table-fc)|addClass(ab-table-likelist)");
       header = header.replace("(list 140lne)|仿列表", "list2table|addClass(ab-table-fc)|addClass(ab-table-likelist)");
 
+      header = header.replace("(list 140lne)|标签页", "list2tab");
+
       header = header.replace("(list 140lne)|", "");
+
+      if (selectorName == "title" || ABReg.reg_heading_noprefix.test(content.trimStart())) {
+        header = "title2list|" + header
+      }
     }
 
     // 代码块
