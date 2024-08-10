@@ -4,17 +4,17 @@
 
 import {ABConvert_IOEnum, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
 import {ABConvertManager} from "../ABConvertManager"
-import {ListProcess, type List_C2ListItem} from "./abc_list"
+import {C2ListProcess, type List_C2ListItem} from "./abc_c2list"
 import {ABReg} from "../ABReg"
 
 /// 按mdit-tabs的标准转化为二列列表数据
-function mditTabs2listdata(content:string): List_C2ListItem {
+function mditTabs2listdata(content:string, reg: RegExp): List_C2ListItem {
     let list_line = content.split("\n")
     let content_item: string = ""
     let list_c2listItem: List_C2ListItem = []
     for (let line_index=0; line_index<list_line.length; line_index++) {
         let line_content = list_line[line_index]
-        const line_match = line_content.match(/^@tab(.*)$/)
+        const line_match = line_content.match(reg)
         if (line_match) {
             if (content_item.trim() != "") { // 尾调用
                 list_c2listItem.push({
@@ -50,8 +50,8 @@ const abc_mditTabs = ABConvert.factory({
     process_param: ABConvert_IOEnum.text,
     process_return: ABConvert_IOEnum.el,
     process: (el, header, content)=>{
-        let listdata: List_C2ListItem = mditTabs2listdata(content)
-        ListProcess.data2tab(listdata, el, false)
+        let c2listdata: List_C2ListItem = mditTabs2listdata(content, /^@tab(.*)$/)
+        C2ListProcess.c2data2tab(c2listdata, el, false)
         return el
     }
 })
@@ -74,8 +74,32 @@ const abc_mditABDemo = ABConvert.factory({
     process_param: ABConvert_IOEnum.text,
     process_return: ABConvert_IOEnum.el,
     process: (el, header, content)=>{
-        const newContent = `@tab show\n${content}\n@tab withoutPlugin\n(cancelPluginFlag)${content.trimStart()}\n@tab mdSource\n~~~~~md\n${content}\n~~~~~`
+        const newContent = `@tab show\n${content}\n@tab withoutPlugin\n(noPlugin)${content.trimStart()}\n@tab mdSource\n~~~~~md\n${content}\n~~~~~`
         abc_mditTabs.process(el, header, newContent)
+        return el
+    }
+})
+
+const abc_midt_co = ABConvert.factory({
+    id: "mditCo",
+    name: "mdit分栏",
+    process_param: ABConvert_IOEnum.text,
+    process_return: ABConvert_IOEnum.el,
+    process: (el, header, content)=>{
+        let c2listdata: List_C2ListItem = mditTabs2listdata(content, /^@Co(.*)$/)
+        C2ListProcess.c2data2tab(c2listdata, el, false)
+        return el
+    }
+})
+
+const abc_midt_card = ABConvert.factory({
+    id: "mditCard",
+    name: "mdit卡片",
+    process_param: ABConvert_IOEnum.text,
+    process_return: ABConvert_IOEnum.el,
+    process: (el, header, content)=>{
+        let c2listdata: List_C2ListItem = mditTabs2listdata(content, /^@Card(.*)$/)
+        C2ListProcess.c2data2tab(c2listdata, el, false)
         return el
     }
 })

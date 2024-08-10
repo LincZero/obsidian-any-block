@@ -107,7 +107,7 @@
   background-color: var(--ab-tab-root-bg-color);
   color: var(--ab-tab-root-tx-color);
   border-top: none;
-  padding: 5px 20px;
+  padding: 10px 20px;
 }
 
 .ab-note table.ab-table {

@@ -10,6 +10,7 @@ import { ABReg } from '../ABReg'
 import {ABConvert_IOEnum, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
 import {ABConvertManager} from "../ABConvertManager"
 import { type ListItem, type List_ListItem, ListProcess } from "./abc_list"
+import { type C2ListItem, type List_C2ListItem, C2ListProcess } from "./abc_c2list"
 
 /**
  * 通用表格数据，一个元素等于是一个单元格项 (th/td)
@@ -58,7 +59,7 @@ export class TableProcess{
     //【new】
     let data = ListProcess.list2data(text)
     data = ListProcess.data2strict(data)
-    data = ListProcess.data_mL_2_2L(data)
+    data = C2ListProcess.data_mL_2_2L(data)
     data = ListProcess.data_2L_2_mL1B(data)
     return TableProcess.data2table(data, div, modeT)
   }
@@ -67,7 +68,7 @@ export class TableProcess{
   static list2timeline(text: string, div: HTMLDivElement, modeT=false) {
     let data = ListProcess.list2data(text)
     data = ListProcess.data2strict(data)
-    data = ListProcess.data_mL_2_2L(data)
+    data = C2ListProcess.data_mL_2_2L(data)
     div = TableProcess.data2table(data, div, modeT)
     const table = div.querySelector("table")
     if (table) table.classList.add("ab-table-fc", "ab-table-timeline")

@@ -16,6 +16,7 @@ import { ABConvertManager } from "./ABConverter/ABConvertManager"
 // (当然，如果A转换器依赖B转换器，那么你导入A必然导入B)
 import {} from "src/ABConverter/converter/abc_text"
 import {} from "src/ABConverter/converter/abc_list"
+import {} from "src/ABConverter/converter/abc_c2list"
 import {} from "src/ABConverter/converter/abc_table"
 import {} from "src/ABConverter/converter/abc_dir_tree"
 import {} from "src/ABConverter/converter/abc_deco"
