@@ -514,6 +514,40 @@
   font-weight: bold;
 }
 
+.ab-note .ab-items {
+  --ab-tab-root-bg-color: #0d1117;
+  --ab-tab-root-bd-color: #34343f;
+  --ab-tab-root-tx-color: #9e9e9e;
+}
+
+.ab-note .ab-items.ab-col {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.ab-note .ab-items.ab-col .ab-items-item {
+  flex: 1 0 calc(33.33% - 1rem);
+  box-sizing: border-box;
+  padding: 10px;
+}
+
+.ab-note .ab-items.ab-card {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.ab-note .ab-items.ab-card .ab-items-item {
+  flex: 1 0 calc(25% - 1rem);
+  box-sizing: border-box;
+  color: var(--ab-tab-root-tx-color);
+  background-color: var(--ab-tab-root-bg-color);
+  border: solid 2px var(--ab-tab-root-bd-color);
+  box-shadow: #34343f;
+  padding: 10px;
+}
+
 div.md-table-fig1 {
   overflow-x: scroll;
   transform: scaleY(-1);

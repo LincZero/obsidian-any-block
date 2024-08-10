@@ -228,6 +228,8 @@ export class ABConvertManager {
       header = header.replace("(::: 140lne)|tabs", "mditTabs");
       header = header.replace("(::: 140lne)|demo", "mditDemo");
       header = header.replace("(::: 140lne)|abDemo", "mditABDemo");
+      header = header.replace("(::: 140lne)|分栏", "mditCol");
+      header = header.replace("(::: 140lne)|卡片", "mditCard");
       header = header.replace("(::: 140lne)|", "");
     }
 
@@ -276,9 +278,14 @@ export class ABConvertManager {
       header = header.replace("(list 140lne)|仿列表", "list2table|addClass(ab-table-fc)|addClass(ab-table-likelist)");
 
       header = header.replace("(list 140lne)|标签页", "list2tab");
+      header = header.replace("(list 140lne)|分栏", "list2col");
+      header = header.replace("(list 140lne)|卡片", "list2card");
 
       header = header.replace("(list 140lne)|", "");
 
+      // @TODO fix bug:
+      // 我发现 [title2list|list2card] 会出bug，但直接 [卡片] 却不会，按理说这两者应该等价才对啊……很奇怪
+      // `:::abdemo` 也是，重渲染似乎会出现问题？ 不过重渲染走的似乎是postHtml的后处理器？
       if (selectorName == "title" || ABReg.reg_heading_noprefix.test(content.trimStart())) {
         header = "title2list|" + header
       }

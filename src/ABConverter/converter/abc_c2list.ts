@@ -39,13 +39,6 @@ export class C2ListProcess{
 
   // ----------------------- str -> listData ------------------------
 
-  /** 一级列表转标签栏 */
-  static list2tab(text: string, div: HTMLDivElement, modeT=false) {
-    let data = ListProcess.list2data(text)
-    let c2list: List_C2ListItem = this.data_mL_2_2L1B(data)
-    return this.c2data2tab(c2list, div, modeT)
-  }
-
   /**
    * 多层树转二层一叉树
    * 
@@ -61,7 +54,7 @@ export class C2ListProcess{
    * - 1
    *  - 2\n   - 3\n  - 2
    */
-  private static data_mL_2_2L1B(
+  static data_mL_2_2L1B(
     list_itemInfo: List_ListItem
   ): List_C2ListItem{
     let list_itemInfo2: List_C2ListItem = []
@@ -262,15 +255,15 @@ export class C2ListProcess{
     return div
   }
 
-  /**
-   * 两列列表数据转分栏
-   */
-  static c2data2co(
-    list_itemInfo: List_C2ListItem, 
-    div: HTMLDivElement,
-    modeT: boolean
-  ){
-    return div
+  /// 将二列列表转 `容器-元素` 结构
+  static c2data2items(c2listdata:List_C2ListItem, el:HTMLElement): HTMLElement {
+    const col = document.createElement("div"); el.appendChild(col); col.classList.add("ab-items")
+    for (let item of c2listdata) {
+      if (item.level == 0) continue
+      const col_item = document.createElement("div"); col.appendChild(col_item); col_item.classList.add("ab-items-item")
+      ABConvertManager.getInstance().m_renderMarkdownFn(item.content, col_item)
+    }
+    return el
   }
 }
 
@@ -284,7 +277,40 @@ const abc_list2tab = ABConvert.factory({
   process: (el, header, content)=>{
     const matchs = header.match(/list2(md)?tab(T)?$/)
     if (!matchs) return el
-    C2ListProcess.list2tab(content, el, matchs[2]=="T")
+    let data = ListProcess.list2data(content)
+    let c2listData: List_C2ListItem = C2ListProcess.data_mL_2_2L1B(data)
+    C2ListProcess.c2data2tab(c2listData, el, matchs[2]=="T")
+    return el
+  }
+})
+
+const abc_list2col = ABConvert.factory({
+  id: "list2col",
+  name: "一级列表转分栏",
+  match: "list2col",
+  default: "list2mdtab",
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.el,
+  process: (el, header, content)=>{
+    let data = ListProcess.list2data(content)
+    let c2listData: List_C2ListItem = C2ListProcess.data_mL_2_2L1B(data)
+    C2ListProcess.c2data2items(c2listData, el)
+    el.querySelector("div")?.classList.add("ab-col")
+    return el
+  }
+})
+
+const abc_list2card = ABConvert.factory({
+  id: "list2card",
+  name: "一级列表转卡片",
+  match: "list2card",
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.el,
+  process: (el, header, content)=>{
+    let data = ListProcess.list2data(content)
+    let c2listData: List_C2ListItem = C2ListProcess.data_mL_2_2L1B(data)
+    C2ListProcess.c2data2items(c2listData, el)
+    el.querySelector("div")?.classList.add("ab-card")
     return el
   }
 })
