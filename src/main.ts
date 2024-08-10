@@ -8,23 +8,10 @@
  */
 
 import { Plugin } from "obsidian"
-import {MarkdownRenderChild, MarkdownRenderer} from 'obsidian'
+import { MarkdownRenderChild, MarkdownRenderer } from 'obsidian'
 
 // 转换器模块
-import { ABConvertManager } from "./ABConverter/ABConvertManager"
-// 加载所有转换器 (都是可选的)
-// (当然，如果A转换器依赖B转换器，那么你导入A必然导入B)
-import {} from "src/ABConverter/converter/abc_text"
-import {} from "src/ABConverter/converter/abc_list"
-import {} from "src/ABConverter/converter/abc_c2list"
-import {} from "src/ABConverter/converter/abc_table"
-import {} from "src/ABConverter/converter/abc_dir_tree"
-import {} from "src/ABConverter/converter/abc_deco"
-import {} from "src/ABConverter/converter/abc_ex"
-import {} from "src/ABConverter/converter/abc_mdit_container"
-import {} from "src/ABConverter/converter/abc_plantuml" // 可选建议：
-import {} from "src/ABConverter/converter/abc_mermaid"  // 可选建议：7.1MB
-import {} from "src/ABConverter/converter/abc_markmap"  // 可选建议：1.3MB
+import { ABConvertManager } from "src/ABConverter/index"
 
 import { ABReplacer_CodeBlock } from "./ab_manager/abm_code/ABReplacer_CodeBlock"
 import { ABStateManager } from "./ab_manager/abm_cm/ABStateManager"
