@@ -215,23 +215,27 @@ export class ABConvertManager {
    * new header
    */
   private static autoABConvert_natureLanguage (el:HTMLDivElement, header:string, content:string, selectorName:string): string{
+    // 分词。方便仅使用正则而不用splic("|")就能判断识别的是完整的词而不是一部分
+    if (!header.trimEnd().endsWith("|")) header = header + "|"
+    if (!header.trimStart().startsWith("|")) header = "|" + header
+
     // 首尾
     if (selectorName == "headtail") { // `:::`不在正文里，这个判断不到：if (ABReg.reg_mdit_head_noprefix.test(content.trimStart()))
-      header = "(::: 140lne)|" + header.trimStart()
+      header = "|::: 140lne" + header.trimStart()
       // callout/alert
-      header = header.replace("(::: 140lne)|info", "add([!info])|quote");
-      header = header.replace("(::: 140lne)|note", "add([!note])|quote");
-      header = header.replace("(::: 140lne)|warn", "add([!warning])|quote");
-      header = header.replace("(::: 140lne)|warning", "add([!warning])|quote");
-      header = header.replace("(::: 140lne)|error", "add([!error])|quote");
+      header = header.replace(/^\|::: 140lne\|info\|/, "|add([!info])|quote|");
+      header = header.replace(/^\|::: 140lne\|note\|/, "|add([!note])|quote|");
+      header = header.replace(/^\|::: 140lne\|warn\|/, "|add([!warning])|quote|");
+      header = header.replace(/^\|::: 140lne\|warning\|/, "|add([!warning])|quote|");
+      header = header.replace(/^\|::: 140lne\|error\|/, "|add([!error])|quote|");
       // mdit-container migration
-      header = header.replace("(::: 140lne)|标签", "mditTabs");
-      header = header.replace("(::: 140lne)|tabs", "mditTabs");
-      header = header.replace("(::: 140lne)|demo", "mditDemo");
-      header = header.replace("(::: 140lne)|abDemo", "mditABDemo");
-      header = header.replace("(::: 140lne)|分栏", "mditCol");
-      header = header.replace("(::: 140lne)|卡片", "mditCard");
-      header = header.replace("(::: 140lne)|", "");
+      header = header.replace(/^\|::: 140lne\|标签\|/, "|mditTabs|");
+      header = header.replace(/^\|::: 140lne\|tabs\|/, "|mditTabs|");
+      header = header.replace(/^\|::: 140lne\|demo\|/, "|mditDemo|");
+      header = header.replace(/^\|::: 140lne\|abDemo\|/, "|mditABDemo|");
+      header = header.replace(/^\|::: 140lne\|分栏\|/, "|mditCol|");
+      header = header.replace(/^\|::: 140lne\|卡片\|/, "|mditCard|");
+      header = header.replace(/^\|::: 140lne/, "");
     }
 
     // 列表/标题块
@@ -239,124 +243,124 @@ export class ABConvertManager {
       || selectorName == "title" || ABReg.reg_heading_noprefix.test(content.trimStart())
     ) {
       if (selectorName == "title" || ABReg.reg_heading_noprefix.test(content.trimStart())) {
-        header = "(title 140lne)|" + header
-        header = header.replace("(title 140lne)|标签页", "title2tab");
-        header = header.replace("(title 140lne)|分栏", "title2col");
-        header = header.replace("(title 140lne)|卡片", "title2card");
-        header = header.replace("(title 140lne)|", "");
+        header = "|title 140lne" + header
+        header = header.replace(/^\|title 140lne\|标签页\|/, "|title2tab|");
+        header = header.replace(/^\|title 140lne\|分栏\|/, "|title2col|");
+        header = header.replace(/^\|title 140lne\|卡片\|/, "|title2card|");
+        header = header.replace(/^\|title 140lne/, "");
       }
       const old_list_header = header
 
-      header = "(list 140lne)|" + header // 用于标识，仅头部可以被转化，不允许二次转化
+      header = "|list 140lne" + header // 用于标识，仅头部可以被转化，不允许二次转化
 
-      header = header.replace("(list 140lne)|flow", "list2mermaid");
-      header = header.replace("(list 140lne)|流程图", "list2mermaid");
-      header = header.replace("(list 140lne)|mindmap", "list2pumlMindmap");
-      header = header.replace("(list 140lne)|思维导图", "list2pumlMindmap");
-      header = header.replace("(list 140lne)|脑图", "list2pumlMindmap");
-      header = header.replace("(list 140lne)|mdMindmap", "list2markmap");
-      header = header.replace("(list 140lne)|md思维导图", "list2markmap");
-      header = header.replace("(list 140lne)|md脑图", "list2markmap");
+      header = header.replace(/^\|list 140lne\|flow\|/, "|list2mermaid|");
+      header = header.replace(/^\|list 140lne\|流程图\|/, "|list2mermaid|");
+      header = header.replace(/^\|list 140lne\|mindmap\|/, "|list2pumlMindmap|");
+      header = header.replace(/^\|list 140lne\|思维导图\|/, "|list2pumlMindmap|");
+      header = header.replace(/^\|list 140lne\|脑图\|/, "|list2pumlMindmap|");
+      header = header.replace(/^\|list 140lne\|mdMindmap\|/, "|list2markmap|");
+      header = header.replace(/^\|list 140lne\|md思维导图\|/, "|list2markmap|");
+      header = header.replace(/^\|list 140lne\|md脑图\|/, "|list2markmap|");
 
-      header = header.replace("(list 140lne)|table", "list2table");
-      header = header.replace("(list 140lne)|multiWayTable", "list2table");
-      header = header.replace("(list 140lne)|multiCrossTable", "list2table");
-      header = header.replace("(list 140lne)|crossTable", "list2table");
-      header = header.replace("(list 140lne)|表格", "list2table");
-      header = header.replace("(list 140lne)|多叉表格", "list2table");
-      header = header.replace("(list 140lne)|多叉表", "list2table");
-      header = header.replace("(list 140lne)|跨行表格", "list2table");
-      header = header.replace("(list 140lne)|跨行表", "list2table");
+      header = header.replace(/^\|list 140lne\|table\|/, "|list2table|");
+      header = header.replace(/^\|list 140lne\|multiWayTable\|/, "|list2table|");
+      header = header.replace(/^\|list 140lne\|multiCrossTable\|/, "|list2table|");
+      header = header.replace(/^\|list 140lne\|crossTable\|/, "|list2table|");
+      header = header.replace(/^\|list 140lne\|表格\|/, "|list2table|");
+      header = header.replace(/^\|list 140lne\|多叉表格\|/, "|list2table|");
+      header = header.replace(/^\|list 140lne\|多叉表\|/, "|list2table|");
+      header = header.replace(/^\|list 140lne\|跨行表格\|/, "|list2table|");
+      header = header.replace(/^\|list 140lne\|跨行表\|/, "|list2table|");
 
-      header = header.replace("(list 140lne)|listTable", "list2lt");
-      header = header.replace("(list 140lne)|treeTable", "list2lt");
-      header = header.replace("(list 140lne)|listGrid", "list2lt");
-      header = header.replace("(list 140lne)|treeGrid", "list2lt");
-      header = header.replace("(list 140lne)|列表格", "list2lt");
-      header = header.replace("(list 140lne)|树形表", "list2lt");
-      header = header.replace("(list 140lne)|树形表格", "list2lt");
-      header = header.replace("(list 140lne)|dirTree", "list2dt");
-      header = header.replace("(list 140lne)|dir", "list2dt");
-      header = header.replace("(list 140lne)|目录", "list2dt");
-      header = header.replace("(list 140lne)|目录树", "list2dt");
-      header = header.replace("(list 140lne)|目录结构", "list2dt");
-      header = header.replace("(list 140lne)|wbs", "list2pumlWBS");
-      header = header.replace("(list 140lne)|工作分解图", "list2pumlWBS");
+      header = header.replace(/^\|list 140lne\|listTable\|/, "|list2lt|");
+      header = header.replace(/^\|list 140lne\|treeTable\|/, "|list2lt|");
+      header = header.replace(/^\|list 140lne\|listGrid\|/, "|list2lt|");
+      header = header.replace(/^\|list 140lne\|treeGrid\|/, "|list2lt|");
+      header = header.replace(/^\|list 140lne\|列表格\|/, "|list2lt|");
+      header = header.replace(/^\|list 140lne\|树形表\|/, "|list2lt|");
+      header = header.replace(/^\|list 140lne\|树形表格\|/, "|list2lt|");
+      header = header.replace(/^\|list 140lne\|dirTree\|/, "|list2dt|");
+      header = header.replace(/^\|list 140lne\|dir\|/, "|list2dt|");
+      header = header.replace(/^\|list 140lne\|目录\|/, "|list2dt|");
+      header = header.replace(/^\|list 140lne\|目录树\|/, "|list2dt|");
+      header = header.replace(/^\|list 140lne\|目录结构\|/, "|list2dt|");
+      header = header.replace(/^\|list 140lne\|wbs\|/, "|list2pumlWBS|");
+      header = header.replace(/^\|list 140lne\|工作分解图\|/, "|list2pumlWBS|");
 
-      header = header.replace("(list 140lne)|timeline", "list2timeline");
-      header = header.replace("(list 140lne)|时间线", "list2timeline");
-      header = header.replace("(list 140lne)|fakeList", "list2table|addClass(ab-table-fc)|addClass(ab-table-likelist)");
-      header = header.replace("(list 140lne)|仿列表", "list2table|addClass(ab-table-fc)|addClass(ab-table-likelist)");
+      header = header.replace(/^\|list 140lne\|timeline\|/, "|list2timeline|");
+      header = header.replace(/^\|list 140lne\|时间线\|/, "|list2timeline|");
+      header = header.replace(/^\|list 140lne\|fakeList\|/, "|list2table|addClass(ab-table-fc)|addClass(ab-table-likelist)|");
+      header = header.replace(/^\|list 140lne\|仿列表\|/, "|list2table|addClass(ab-table-fc)|addClass(ab-table-likelist)|");
 
-      header = header.replace("(list 140lne)|标签页", "list2tab");
-      header = header.replace("(list 140lne)|分栏", "list2col");
-      header = header.replace("(list 140lne)|卡片", "list2card");
+      header = header.replace(/^\|list 140lne\|标签页\|/, "|list2tab|");
+      header = header.replace(/^\|list 140lne\|分栏\|/, "|list2col|");
+      header = header.replace(/^\|list 140lne\|卡片\|/, "|list2card|");
 
-      header = header.replace("(list 140lne)|", "");
+      header = header.replace(/^\|list 140lne/, "");
 
       if (old_list_header!=header) { // 中间转化成功过
         if (selectorName == "title" || ABReg.reg_heading_noprefix.test(content.trimStart())) {
-          header = "title2list|" + header
+          header = "|title2list" + header
         }
       }
     }
 
     // 代码块
     else if (selectorName == "code" || ABReg.reg_code_noprefix.test(content.trimStart())) {
-      header = "(code 140lne)|" + header
-      header = header.replace("(code 140lne)|X", "Xcode");
-      header = header.replace("(code 140lne)|", "");
+      header = "|code 140lne" + header
+      header = header.replace(/\|code 140lne\|X\|/, "|Xcode|");
+      header = header.replace(/\|code 140lne/, "");
     }
 
     // 引用块
     else if (selectorName == "quote" || ABReg.reg_quote_noprefix.test(content.trimStart())) {
-      header = "(quote 140lne)|" + header
-      header = header.replace("(quote 140lne)|X", "Xquote");
-      header = header.replace("(quote 140lne)|", "");
+      header = "|quote 140lne" + header
+      header = header.replace(/quote 140lne|X\|/, "|Xquote|");
+      header = header.replace(/qutoe 140lne/, "");
     }
 
     // 通用，一般是装饰处理器
     {
-      header = "(general 140lne)|" + header
-      header = header.replace("|黑幕", "|add_class(ab-deco-heimu)"); 
-      header = header.replace("|折叠", "|fold");
-      header = header.replace("|滚动", "|scroll");
-      header = header.replace("|超出折叠", "|overfold");
+      header = "|general 140lne" + header
+      header = header.replace(/\|黑幕\|/, "|add_class(ab-deco-heimu)|"); 
+      header = header.replace(/\|折叠\|/, "|fold|");
+      header = header.replace(/\|滚动\|/, "|scroll|");
+      header = header.replace(/\|超出折叠\|/, "|overfold|");
       // 便捷样式
-      header = header.replace("|红字", "|addClass(ab-custom-text-red)");
-      header = header.replace("|橙字", "|addClass(ab-custom-text-orange)");
-      header = header.replace("|黄字", "|addClass(ab-custom-text-yellow)");
-      header = header.replace("|绿字", "|addClass(ab-custom-text-green)");
-      header = header.replace("|青字", "|addClass(ab-custom-text-cyan)");
-      header = header.replace("|蓝字", "|addClass(ab-custom-text-blue)");
-      header = header.replace("|紫字", "|addClass(ab-custom-text-purple)");
-      header = header.replace("|白字", "|addClass(ab-custom-text-white)");
-      header = header.replace("|黑字", "|addClass(ab-custom-text-black)");
-      header = header.replace("|红底", "|addClass(ab-custom-bg-red)");
-      header = header.replace("|橙底", "|addClass(ab-custom-bg-orange)");
-      header = header.replace("|黄底", "|addClass(ab-custom-bg-yellow)");
-      header = header.replace("|绿底", "|addClass(ab-custom-bg-green)");
-      header = header.replace("|青底", "|addClass(ab-custom-bg-cyan)");
-      header = header.replace("|蓝底", "|addClass(ab-custom-bg-blue)");
-      header = header.replace("|紫底", "|addClass(ab-custom-bg-purple)");
-      header = header.replace("|白底", "|addClass(ab-custom-bg-white)");
-      header = header.replace("|黑底", "|addClass(ab-custom-bg-black)");
-      header = header.replace("|靠上", "|addClass(ab-custom-dire-top)");
-      header = header.replace("|靠下", "|addClass(ab-custom-dire-down)");
-      header = header.replace("|靠左", "|addClass(ab-custom-dire-left)");
-      header = header.replace("|靠右", "|addClass(ab-custom-dire-right)");
-      header = header.replace("|居中", "|addClass(ab-custom-dire-center)");
-      header = header.replace("|水平居中", "|addClass(ab-custom-dire-hcenter)");
-      header = header.replace("|垂直居中", "|addClass(ab-custom-dire-vcenter)");
-      header = header.replace("|两端对齐", "|addClass(ab-custom-dire-justify)");
-      header = header.replace("|大字", "|addClass(ab-custom-font-large)");
-      header = header.replace("|超大字", "|addClass(ab-custom-font-largex)");
-      header = header.replace("|超超大字", "|addClass(ab-custom-font-largexx)");
-      header = header.replace("|小字", "|addClass(ab-custom-font-small)");
-      header = header.replace("|超小字", "|addClass(ab-custom-font-smallx)");
-      header = header.replace("|超超小字", "|addClass(ab-custom-font-smallxx)");
-      header = header.replace("|加粗", "|addClass(ab-custom-font-bold)");
-      header = header.replace("(general 140lne)|", "");
+      header = header.replace(/\|红字\|/, "|addClass(ab-custom-text-red)|");
+      header = header.replace(/\|橙字\|/, "|addClass(ab-custom-text-orange)|");
+      header = header.replace(/\|黄字\|/, "|addClass(ab-custom-text-yellow)|");
+      header = header.replace(/\|绿字\|/, "|addClass(ab-custom-text-green)|");
+      header = header.replace(/\|青字\|/, "|addClass(ab-custom-text-cyan)|");
+      header = header.replace(/\|蓝字\|/, "|addClass(ab-custom-text-blue)|");
+      header = header.replace(/\|紫字\|/, "|addClass(ab-custom-text-purple)|");
+      header = header.replace(/\|白字\|/, "|addClass(ab-custom-text-white)|");
+      header = header.replace(/\|黑字\|/, "|addClass(ab-custom-text-black)|");
+      header = header.replace(/\|红底\|/, "|addClass(ab-custom-bg-red)|");
+      header = header.replace(/\|橙底\|/, "|addClass(ab-custom-bg-orange)|");
+      header = header.replace(/\|黄底\|/, "|addClass(ab-custom-bg-yellow)|");
+      header = header.replace(/\|绿底\|/, "|addClass(ab-custom-bg-green)|");
+      header = header.replace(/\|青底\|/, "|addClass(ab-custom-bg-cyan)|");
+      header = header.replace(/\|蓝底\|/, "|addClass(ab-custom-bg-blue)|");
+      header = header.replace(/\|紫底\|/, "|addClass(ab-custom-bg-purple)|");
+      header = header.replace(/\|白底\|/, "|addClass(ab-custom-bg-white)|");
+      header = header.replace(/\|黑底\|/, "|addClass(ab-custom-bg-black)|");
+      header = header.replace(/\|靠上\|/, "|addClass(ab-custom-dire-top)|");
+      header = header.replace(/\|靠下\|/, "|addClass(ab-custom-dire-down)|");
+      header = header.replace(/\|靠左\|/, "|addClass(ab-custom-dire-left)|");
+      header = header.replace(/\|靠右\|/, "|addClass(ab-custom-dire-right)|");
+      header = header.replace(/\|居中\|/, "|addClass(ab-custom-dire-center)|");
+      header = header.replace(/\|水平居中\|/, "|addClass(ab-custom-dire-hcenter)|");
+      header = header.replace(/\|垂直居中\|/, "|addClass(ab-custom-dire-vcenter)|");
+      header = header.replace(/\|两端对齐\|/, "|addClass(ab-custom-dire-justify)|");
+      header = header.replace(/\|大字\|/, "|addClass(ab-custom-font-large)|");
+      header = header.replace(/\|超大字\|/, "|addClass(ab-custom-font-largex)|");
+      header = header.replace(/\|超超大字\|/, "|addClass(ab-custom-font-largexx)|");
+      header = header.replace(/\|小字\|/, "|addClass(ab-custom-font-small)|");
+      header = header.replace(/\|超小字\|/, "|addClass(ab-custom-font-smallx)|");
+      header = header.replace(/\|超超小字\|/, "|addClass(ab-custom-font-smallxx)|");
+      header = header.replace(/\|加粗\|/, "|addClass(ab-custom-font-bold)|");
+      header = header.replace(/\|general 140lne/, "");
     }
     return header
   }
