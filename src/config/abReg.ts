@@ -47,5 +47,5 @@ export const ABReg = {
   reg_emptyline_noprefix:/^\s*$/,
   reg_indentline_noprefix:/^\s+?\S/,
 
-  inline_split: /\| |,  |\.  |， |:  |：  /, // 内联切分。除`|`外，半角符号+两空格，或全角符号+一空格
+  inline_split: /\| |,  |， |\.  |:  |： /, // 内联切分。除`|`外，半角符号+两空格，或全角符号+一空格
 }

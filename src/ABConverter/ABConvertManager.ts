@@ -220,6 +220,7 @@ export class ABConvertManager {
       header = "(::: 140lne)|" + header.trimStart()
       // callout/alert
       header = header.replace("(::: 140lne)|info", "add([!info])|quote");
+      header = header.replace("(::: 140lne)|note", "add([!note])|quote");
       header = header.replace("(::: 140lne)|warn", "add([!warning])|quote");
       header = header.replace("(::: 140lne)|warning", "add([!warning])|quote");
       header = header.replace("(::: 140lne)|error", "add([!error])|quote");
@@ -278,6 +279,7 @@ export class ABConvertManager {
       header = header.replace("(list 140lne)|dir", "list2dt");
       header = header.replace("(list 140lne)|目录", "list2dt");
       header = header.replace("(list 140lne)|目录树", "list2dt");
+      header = header.replace("(list 140lne)|目录结构", "list2dt");
       header = header.replace("(list 140lne)|wbs", "list2pumlWBS");
       header = header.replace("(list 140lne)|工作分解图", "list2pumlWBS");
 
