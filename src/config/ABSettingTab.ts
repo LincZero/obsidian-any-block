@@ -72,7 +72,13 @@ export class ABSettingTab extends PluginSettingTab {
     containerEl.empty();
     let settings = this.plugin.settings
     containerEl.createEl('h1', {text: 'AnyBlock'});
-		containerEl.createEl('p', {text: 'See Github and website for more details (更多使用方法详见Github及网站)'});
+		const div_url = containerEl.createEl('div');
+    div_url.innerHTML = `See 
+    <a href="https://linczero.github.io/MdNote_Public/ProductDoc/AnyBlock/README.show.html">website</a>
+    /
+    <a href="https://github.com/LincZero/obsidian-any-block">github</a>
+    for more details (更多使用方法详见Github及网站)
+    `;
     containerEl.createEl('hr', {attr: {"style": "border-color:#9999ff"}})
 
     // 选择器管理
