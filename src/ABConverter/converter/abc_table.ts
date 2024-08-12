@@ -64,7 +64,7 @@ export class TableProcess{
     return TableProcess.data2table(data, div, modeT)
   }
 
-  /** 一级列表转时间线 */
+  /** 列表转时间线 */
   static list2timeline(text: string, div: HTMLDivElement, modeT=false) {
     let data = ListProcess.list2data(text)
     data = ListProcess.data2strict(data)
@@ -142,7 +142,8 @@ export class TableProcess{
         }
         for (let item of list_tableInfo){                           // 遍历表格列，创建td
           if (item.tableRow!=index_line) continue
-          let td = document.createElement(is_head?"th":"td"); tr.appendChild(td); td.setAttribute("rowspan", item.tableRowSpan.toString());
+          let td = document.createElement(is_head?"th":"td"); tr.appendChild(td);
+            td.setAttribute("rowspan", item.tableRowSpan.toString()); td.setAttribute("col_index", item.level.toString())
           td.classList.add("markdown-rendered")
           ABConvertManager.getInstance().m_renderMarkdownFn(item.content, td)
         }
@@ -181,6 +182,19 @@ const abc_list2table = ABConvert.factory({
   }
 })
 
+const abc_list2c2table = ABConvert.factory({
+  id: "list2c2t",
+  name: "列表转二列表格",
+  match: "list2c2t",
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.el,
+  process: (el, header, content)=>{
+    let data = C2ListProcess.list2c2data(content)
+    TableProcess.data2table(data, el, false)
+    return el
+  }
+})
+
 const abc_list2ut = ABConvert.factory({
   id: "list2ut",
   name: "列表转二维表格",
@@ -198,7 +212,7 @@ const abc_list2ut = ABConvert.factory({
 
 const abc_list2timeline = ABConvert.factory({
   id: "list2timeline",
-  name: "一级列表转时间线",
+  name: "列表转时间线",
   match: /list2(md)?timeline(T)?/,
   default: "list2mdtimeline",
   process_param: ABConvert_IOEnum.text,

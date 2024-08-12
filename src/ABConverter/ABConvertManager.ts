@@ -229,11 +229,15 @@ export class ABConvertManager {
       header = header.replace(/^\|::: 140lne\|warning\|/, "|add([!warning])|quote|");
       header = header.replace(/^\|::: 140lne\|error\|/, "|add([!error])|quote|");
       // mdit-container migration
-      header = header.replace(/^\|::: 140lne\|标签\|/, "|mditTabs|");
+      header = header.replace(/^\|::: 140lne\|tab\|/, "|mditTabs|");
       header = header.replace(/^\|::: 140lne\|tabs\|/, "|mditTabs|");
+      header = header.replace(/^\|::: 140lne\|标签\|/, "|mditTabs|");
+      header = header.replace(/^\|::: 140lne\|标签页\|/, "|mditTabs|");
       header = header.replace(/^\|::: 140lne\|demo\|/, "|mditDemo|");
       header = header.replace(/^\|::: 140lne\|abDemo\|/, "|mditABDemo|");
+      header = header.replace(/^\|::: 140lne\|col\|/, "|mditCol|");
       header = header.replace(/^\|::: 140lne\|分栏\|/, "|mditCol|");
+      header = header.replace(/^\|::: 140lne\|card\|/, "|mditCard|");
       header = header.replace(/^\|::: 140lne\|卡片\|/, "|mditCard|");
       header = header.replace(/^\|::: 140lne/, "");
     }
@@ -244,8 +248,13 @@ export class ABConvertManager {
     ) {
       if (selectorName == "title" || ABReg.reg_heading_noprefix.test(content.trimStart())) {
         header = "|title 140lne" + header
+        header = header.replace(/^\|title 140lne\|tab\|/, "|title2tab|");
+        header = header.replace(/^\|title 140lne\|tabs\|/, "|title2tab|");
+        header = header.replace(/^\|title 140lne\|标签\|/, "|title2tab|");
         header = header.replace(/^\|title 140lne\|标签页\|/, "|title2tab|");
+        header = header.replace(/^\|title 140lne\|Col\|/, "|title2col|");
         header = header.replace(/^\|title 140lne\|分栏\|/, "|title2col|");
+        header = header.replace(/^\|title 140lne\|Card\|/, "|title2card|");
         header = header.replace(/^\|title 140lne\|卡片\|/, "|title2card|");
         header = header.replace(/^\|title 140lne/, "");
       }
@@ -298,8 +307,14 @@ export class ABConvertManager {
       header = header.replace(/^\|list 140lne\|时间线\|/, "|list2timeline|");
       header = header.replace(/^\|list 140lne\|fakeList\|/, "|list2table|addClass(ab-table-fc)|addClass(ab-table-likelist)|");
       header = header.replace(/^\|list 140lne\|仿列表\|/, "|list2table|addClass(ab-table-fc)|addClass(ab-table-likelist)|");
+
+      header = header.replace(/^\|list 140lne\|tab\|/, "|list2tab|");
+      header = header.replace(/^\|list 140lne\|tabs\|/, "|list2tab|");
+      header = header.replace(/^\|list 140lne\|标签\|/, "|list2tab|");
       header = header.replace(/^\|list 140lne\|标签页\|/, "|list2tab|");
+      header = header.replace(/^\|list 140lne\|Col\|/, "|list2col|");
       header = header.replace(/^\|list 140lne\|分栏\|/, "|list2col|");
+      header = header.replace(/^\|list 140lne\|Card\|/, "|list2card|");
       header = header.replace(/^\|list 140lne\|卡片\|/, "|list2card|");
 
       header = header.replace(/^\|list 140lne/, "");

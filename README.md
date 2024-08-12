@@ -22,7 +22,7 @@ This is a **【Syntax free, Extensible、Powerful and flexible、Multi-platform�
 ## Multi-Language (多语言)
 
 - en
-	- Language issues: Documentation is multilingual (en /en), don't worry
+	- Language issues: Documentation is multilingual (zh/en), don't worry
 	- Alternate site links：When the website link to this article fails, try replacing `linczero.github.io` with `linczero-github-io.pages.dev` in the url
 - zh
 	- 语言问题：文档是多语言的（zh/en），不用担心

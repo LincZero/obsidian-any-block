@@ -114,20 +114,20 @@
   border-collapse: collapse;
 }
 
-.ab-note table.ab-table td > p:first-child,
-.ab-note table.ab-table th > p:first-child,
+.ab-note table.ab-table td > p:first-child, .ab-note table.ab-table th > p:first-child,
+.ab-note table.ab-table td > ul:first-child, .ab-note table.ab-table th > ul:first-child,
 .ab-note table.ab-table .ab-list-table-witharrow > p:first-child,
-.ab-note table.ab-table td > div > p:first-child,
-.ab-note table.ab-table th > div > p:first-child,
+.ab-note table.ab-table td > div > p:first-child, .ab-note table.ab-table th > div > p:first-child,
+.ab-note table.ab-table td > div > ul:first-child, .ab-note table.ab-table th > div > ul:first-child,
 .ab-note table.ab-table .ab-list-table-witharrow > div > p:first-child {
   margin-top: 0;
 }
 
-.ab-note table.ab-table td > p:last-child,
-.ab-note table.ab-table th > p:last-child,
+.ab-note table.ab-table td > p:last-child, .ab-note table.ab-table th > p:last-child,
+.ab-note table.ab-table td > ul:last-child, .ab-note table.ab-table th > ul:last-child,
 .ab-note table.ab-table .ab-list-table-witharrow > p:last-child,
-.ab-note table.ab-table td > div > p:last-child,
-.ab-note table.ab-table th > div > p:last-child,
+.ab-note table.ab-table td > div > p:last-child, .ab-note table.ab-table th > div > p:last-child,
+.ab-note table.ab-table td > div > ul:last-child, .ab-note table.ab-table th > div > ul:last-child,
 .ab-note table.ab-table .ab-list-table-witharrow > div > p:last-child {
   margin-bottom: 0;
 }
@@ -141,31 +141,33 @@
   background: none;
 }
 
-.ab-note table.ab-table.ab-table-likelist td {
+.ab-note .ab-branch-table.ab-table-likelist td {
   border: none;
   padding-bottom: 10px;
   vertical-align: top;
+  box-sizing: border-box;
 }
 
-.ab-note table.ab-table.ab-table-likelist td:first-child {
+.ab-note .ab-branch-table.ab-table-likelist td[col_index="0"] {
   padding-right: 8px;
   padding-left: 20px;
   position: relative;
 }
 
-.ab-note table.ab-table.ab-table-likelist td:first-child::before {
+.ab-note .ab-branch-table.ab-table-likelist td[col_index="0"]::before {
   position: absolute;
-  top: 1em;
+  top: 14px;
   transform: translateY(-50%);
   width: 5px;
   height: 5px;
+  border: none;
   left: 6px;
   content: '';
   border-radius: 50%;
   background-color: currentColor;
 }
 
-.ab-note table.ab-table.ab-table-likelist td:first-child::after {
+.ab-note .ab-branch-table.ab-table-likelist td[col_index="0"]::after {
   content: "";
   position: absolute;
   top: 3px;
@@ -173,31 +175,6 @@
   right: 0;
   border-right: 1px solid currentColor;
   pointer-events: none;
-}
-
-.ab-note table.ab-table.ab-table-likelist td:nth-child(2) {
-  padding-left: 20px;
-  position: relative;
-}
-
-.ab-note table.ab-table.ab-table-likelist td:nth-child(2)::before {
-  position: absolute;
-  top: 1em;
-  transform: translateY(-50%);
-  width: 4px;
-  height: 4px;
-  border: solid 1px;
-  left: 6px;
-  content: '';
-  border-radius: 50%;
-}
-
-.ab-note table.ab-table.ab-table-likelist td:last-child {
-  border: none;
-}
-
-.ab-note table.ab-table.ab-table-likelist td:last-child::after {
-  content: none;
 }
 
 .ab-note table.ab-list-table .ab-foldable-tr > td:first-child > div {

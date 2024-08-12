@@ -183,7 +183,53 @@ export class C2ListProcess{
   }
 
   /**
-   * 标题大纲转列表数据（@todo 正文的level+10，要减掉）
+   * 列表转二列列表数据
+   * 
+   * @detail
+   * 为什么要直接转，而不能list2data|data2c2data来复用
+   * 因为会损失信息
+   */
+  static list2c2data(text: string){
+    let list_itemInfo:List_C2ListItem = []
+    const list_text = text.trimStart().split("\n")
+
+    // 获取最大的标题级别
+    const first_match = list_text[0].match(ABReg.reg_list_noprefix)
+    if (!first_match || first_match[1]) {
+      console.error("不是列表内容:", list_text[0])
+      return list_itemInfo
+    }
+    const root_list_level:number = first_match[1].length // 第一个列表(也是缩进最小)的 `- ` 前空格数
+    
+    // 循环填充
+    let current_content:string = ""
+    for (let line of list_text) {
+      const match_list = line.match(ABReg.reg_list_noprefix)
+      if (match_list && !match_list[1] && match_list[1].length<=root_list_level){ // 遇到同等标题
+        add_current_content()
+        list_itemInfo.push({
+          content: match_list[4],
+          level: 0
+        })
+      } else {
+        current_content += line+"\n"
+      }
+    }
+    add_current_content()
+    return list_itemInfo
+
+    function add_current_content(){ // 刷新写入缓存的尾调用
+      if (current_content.trim()=="") return
+      list_itemInfo.push({
+        content: current_content,
+        level: 1
+      })
+      current_content = ""
+    }
+  }
+
+  /**
+   * 标题大纲转列表数据
    * 
    * @detail
    * 为什么要直接转，而不能title2list来复用
@@ -315,7 +361,7 @@ export class C2ListProcess{
 
 const abc_list2tab = ABConvert.factory({
   id: "list2tab",
-  name: "一级列表转标签栏",
+  name: "列表转标签栏",
   match: /list2(md)?tab(T)?$/,
   default: "list2mdtab",
   process_param: ABConvert_IOEnum.text,
@@ -375,7 +421,7 @@ const abc_title2col = ABConvert.factory({
 
 const abc_list2card = ABConvert.factory({
   id: "list2card",
-  name: "一级列表转卡片",
+  name: "列表转卡片",
   match: "list2card",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
