@@ -11,8 +11,12 @@ import {ABReplacer_Render} from "./ABReplacer_Render"
 import {ABConvertManager} from "src/ABConverter/ABConvertManager"
 import { match } from 'assert'
 
+let last_el: HTMLElement;
+let last_mdSrc: HTMLSelectorRangeSpec | null;
 /**
  * Html处理器
+ * 
+ * @detail
  * 被调用的可能：
  *   1. 全局html会分为多个块，会被每个块调用一次
  *      多换行会切分块、块类型不同也会切分（哪怕之间没有空行）
@@ -32,42 +36,55 @@ export class ABSelector_PostHtml{
     el: HTMLElement, 
     ctx: MarkdownPostProcessorContext
   ) {
-    //console.log(" -- ABPosthtmlManager.processor")  // TODO 有个可能导致性能缺陷的问题：实时模式这里居然会被调用？有必要不再走一遍吗
-
     // 设置里不启用，直接关了
     if (this.settings.decoration_render==ConfDecoration.none) return
 
     // 获取el对应的源md
-    const mdSrc = getSourceMarkdown(el, ctx)
+    const mdSrc: HTMLSelectorRangeSpec | null = getSourceMarkdown(el, ctx)
     
     // 1. RenderMarkdown引起的调用（需要嵌套寻找）
     if (!mdSrc) {
+      console.log(" -- ABPosthtmlManager.processor, called by 'ReRender'");
       if (!el.classList.contains("markdown-rendered")) return
       findABBlock_recurve(el)
-      // 并修复RenderMarkdown引起的图片错误
-      // fixing_img(el)
     }
     // 2. html渲染模式的逐个切割块调用（需要跨切割块寻找）
+    // 一个文档会被切割成成div stream，这是一个div数组，每个数组元素会在这里走一遍。即分步渲染，有益于性能优化
+    // 其中，每一个div项，一般el.children都是只有一层的，特殊情况是p-br的情况
     else{
-      for (const subEl of el.children) {                          // 这个如果是块的话一般就一层，多层应该是p-br的情况
+      // console.log(" -- ABPosthtmlManager.processor, called by 'ReadMode'
+      for (const subEl of el.children) {
         findABBlock_cross(subEl as HTMLElement, ctx)
       }
+      last_el = el
+      last_mdSrc = mdSrc
 
-      // 结束，开启全局选择器
-      if (mdSrc.to_line==mdSrc.content.split("\n").length){
-        findABBlock_global(el, ctx)
-        return
-      }
-      else if (el.classList.contains("mod-footer")){
-        findABBlock_global(el, ctx)
-        return
-      }
+      // 弃用
+      // 
+      // 以前是分两个场景：
+      // - 情景一：每次有元素进来时，均执行 findABBlock_cross
+      // - 情景二：当div_stream的所有元素进来后，执行 findABBlock_global
+      // 
+      // 然后场景二就运行这个：
+      // if (mdSrc.to_line==mdSrc.content.split("\n").length // 失效，新版本似乎没有这个
+      //   || el.classList.contains("mod-footer")            // 失效，新版本似乎没有这个
+      //   || mdSrc.content.trim() == "[end]"                // 手动声明文档结尾，仅调试使用
+      // ){
+      //   console.log(" -- ABPosthtmlManager.processor, called by 'ReadMode'. And End");
+      //   findABBlock_global(el, ctx)
+      // } else {
+      //   console.log(" -- ABPosthtmlManager.processor, called by 'ReadMode'. And During");
+      // }
     }
   }
 }
 
 /**
- * 找ab块 - 递归版 
+ * 找ab块 - 递归版
+ * 
+ * @detail
+ * 
+ * called by 'ReRender'，每次被重渲染时从外部进入一次
  * 特点
  *  1. 递归调用
  */
@@ -84,30 +101,26 @@ function findABBlock_recurve(targetEl: HTMLElement){
 
   // replaceABBlock(targetEl, ctx)
   // console.log("hook 准备再渲染", targetEl)
-  for(let i=0; i<targetEl.children.length; i++){  // start form 0，因为可以递归，该层不一定需要header
-    const contentEl = targetEl.children[i] as HTMLDivElement
-    let headerEl
-    headerEl = i==0?null:targetEl.children[i-1] as HTMLElement|null
-    
-    // 寻找正体
-    
-    /** @todo （首尾选择器的header较特殊，另外处理） */
-    /*if (subEl instanceof HTMLParagraphElement){
-      const m_headtail = subEl.getText().match(ABReg.reg_headtail)
-      if (!m_headtail) return
-      
-    } */
 
+  // 遍历Elements
+  for(let i=0; i<targetEl.children.length; i++){  // start form 0，因为可以递归，该层不一定需要header
+    // 1. 寻找正体 (列表/代码块/引用块/表格)
+    const contentEl = targetEl.children[i] as HTMLDivElement
     if (!(contentEl instanceof HTMLUListElement
       || contentEl instanceof HTMLQuoteElement
       || contentEl instanceof HTMLPreElement
       || contentEl instanceof HTMLTableElement
     )) continue
+    // @todo （首尾选择器的header较特殊，另外处理）
+    // if (subEl instanceof HTMLParagraphElement){
+    //   const m_headtail = subEl.getText().match(ABReg.reg_headtail)
+    //   if (!m_headtail) return
+    //   
+    // }
     
-    // 寻找头部
-    // console.log("hook 寻找头部")
+    // 2. 寻找头部 (查看正体的上面是不是AB选择头)
+    const headerEl = i==0?null:targetEl.children[i-1] as HTMLElement|null
     if(i==0 || !(headerEl instanceof HTMLParagraphElement)) {
-      // console.log("hook 没有头部")
       if(contentEl instanceof HTMLUListElement
         || contentEl instanceof HTMLQuoteElement
       ) findABBlock_recurve(contentEl);
@@ -122,19 +135,24 @@ function findABBlock_recurve(targetEl: HTMLElement){
     }
     const header_str = header_match[5]
 
-    // 渲染
+    // 3. 渲染，元素替换
     //const newEl = targetEl.createDiv({cls: "ab-re-rendered"})
     const newEl = document.createElement("div")
     newEl.addClass("ab-re-rendered")
     headerEl.parentNode?.insertBefore(newEl, headerEl.nextSibling)
     ABConvertManager.autoABConvert(newEl, header_str, html2md(contentEl.innerHTML), "postHtml")
-
     contentEl.hide()
     headerEl.hide()
   }
 }
 
-/** 找ab块 - 跨切割块版
+/**
+ * 找ab块 - 跨切割块版
+ * 
+ * @detail
+ * 
+ * called by 'ReadMode1'，在同一个文档里处理多次
+ * 
  * 特点：
  *  1. 跨越AB优化的切割块来寻找
  *  2. 只为在根部的AB块，使用 MarkdownRenderChild 进行渲染
@@ -148,27 +166,34 @@ function findABBlock_cross(targetEl: HTMLElement, ctx: MarkdownPostProcessorCont
   ) {
     replaceABBlock(targetEl, ctx)
   }
-}
 
-/** 尝试转化el
- * 判断是否有header并替换元素
- */
-function replaceABBlock(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext){
-  const range = getSourceMarkdown(targetEl, ctx)
-  if (!range || !range.header) return false
+  /**
+   * 尝试转化el
+   * 判断是否有header并替换元素
+   */
+  function replaceABBlock(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext){
+    // 检查头部
+    const range = getSourceMarkdown(targetEl, ctx)
+    if (!range || !range.header) return false
 
-  // 语法糖
-  if (range.selector=="list"){
-    if (range.header.indexOf("2")==0) range.header="list"+range.header
+    // 语法糖 TODO 将弃用
+    if (range.selector=="list"){
+      if (range.header.indexOf("2")==0) range.header="list"+range.header
+    }
+
+    // 渲染
+    ctx.addChild(new ABReplacer_Render(targetEl, range.header, range.content, range.selector));
+    last_el.hide()
   }
-
-  ctx.addChild(new ABReplacer_Render(targetEl, range.header, range.content, range.selector));
 }
 
 /**
- * 找AB块 - 全局选择器版，在同一个文档里只渲染一次
+ * (已弃用) 找AB块 - 全局选择器版
  * 
  * @detail
+ * 
+ * called by 'ReadMode2'，在同一个文档里只在最后处理一次
+ * 
  * 失败经验1：
  *      if (pEl.getAttribute("ab-title-flag")=="true")
  *      pEl.setAttribute("ab-title-flag", "true") // f这个好像会被清除掉
@@ -189,7 +214,7 @@ function replaceABBlock(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext
  * div/cEl是文档的根div，类型总为div
  * content/sub/(cEl.children)是有可能为p table这些元素的东西
  */
-function findABBlock_global(
+/*function findABBlock_global(
   el: HTMLElement, 
   ctx: MarkdownPostProcessorContext
 ){
@@ -285,13 +310,13 @@ function findABBlock_global(
       prev_from_line = 0
       prev_heading_level = 0
       prev_el = null
-      i-- /** 回溯一步，@bug 下一个标题的header行会被上一个隐藏 */
+      i-- // 回溯一步，@bug 下一个标题的header行会被上一个隐藏
     }
   }
-  if (prev_heading_level > 0){ /** 循环尾调用（@attention 注意：有个.mod-footer，所以不能用最后一个!）*/
+  if (prev_heading_level > 0){ // 循环尾调用（@attention 注意：有个.mod-footer，所以不能用最后一个!）
     const i = pageEl.children.length-1
     // 渲染
-    const cEl_last = pageEl.children[i-1] as HTMLElement /** @bug 可能有bug，这里直接猜使用倒数第二个 */
+    const cEl_last = pageEl.children[i-1] as HTMLElement // @bug 可能有bug，这里直接猜使用倒数第二个
     const mdSrc_last = getSourceMarkdown(cEl_last, ctx)
     if (!mdSrc_last) {
       console.warn("标题选择器结束时发生意外情况")
@@ -302,7 +327,7 @@ function findABBlock_global(
       .slice(prev_from_line, mdSrc_last.to_line).join("\n");
     if(prev_el) ctx.addChild(new ABReplacer_Render(prev_el, header, content));
   }
-}
+}*/
 
 interface HTMLSelectorRangeSpec {
   from_line: number,// 替换范围
