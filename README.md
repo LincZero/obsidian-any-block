@@ -1,10 +1,24 @@
 # README
 
-This is a **【no new syntax, non-intrusive, extensible】** Markdown block extension rendering plugin
+## Lightspot (亮点)
 
-（这是一个 **【无需新语法、无入侵式、可扩展】** 的 Markdown 块扩展渲染插件）
+This is a **【Syntax free, Extensible、Powerful and flexible、Multi-platform】** Markdown block extension rendering plugin
 
-### Multi-Language (多语言)
+（这是一个 **【无语法、可扩展、灵活强大、多平台】** 的 Markdown 块扩展渲染插件）
+
+- Syntax free (无语法)
+    - No new syntax、Syntax-free intrusion (没有新语法、没有语法入侵)
+	- 这也导致没有过度的插件依赖。我认为好的插件不应该导致 —— 当你用了一段时间插件后，离开该插件会导致原来的内容变形，不可读或维护
+- Extensible (可扩展性)
+    - Facilitate secondary development （插件方便二次开发）
+- Powerful and flexible (灵活且强大)
+    - 选择器：选择范围灵活，六种方式，简单易用。处理器：丰富多样、功能强大、扩展性强
+- Multi-platform (多平台)
+    - Obsidian
+	- Blogs such as vuepress/vitepress that support markdown-it parsing
+	- V3版本重构并迁移到markdown-it插件，可以使Obsidian和你发布的VuePress/VitePress保持高度一致性（至于在VuePress上的效果如何，可以点击上面的第一个链接查看）
+
+## Multi-Language (多语言)
 
 - en
 	- Language issues: Documentation is multilingual (en /en), don't worry
@@ -14,7 +28,7 @@ This is a **【no new syntax, non-intrusive, extensible】** Markdown block exte
 	- 备用网站链接：如果网站失效，则将网站链接部分的 `linczero.github.io` 替换成 `linczero-github-io.pages.dev` 就可以了
 	  （**本文的默认网站链接指向 github.io，如果国内有不能访问的朋友，那么大概率需要做这一步**）
 
-### More Links (相关链接)
+## More Links (相关链接)
 
 - en
 	- Related links：tutorial、use skill、contribution、secondary development
