@@ -253,6 +253,7 @@ export class ABConvertManager {
 
       header = "|list 140lne" + header // 用于标识，仅头部可以被转化，不允许二次转化
 
+      // 多叉多层树
       header = header.replace(/^\|list 140lne\|flow\|/, "|list2mermaid|");
       header = header.replace(/^\|list 140lne\|流程图\|/, "|list2mermaid|");
       header = header.replace(/^\|list 140lne\|mindmap\|/, "|list2pumlMindmap|");
@@ -261,7 +262,11 @@ export class ABConvertManager {
       header = header.replace(/^\|list 140lne\|mdMindmap\|/, "|list2markmap|");
       header = header.replace(/^\|list 140lne\|md思维导图\|/, "|list2markmap|");
       header = header.replace(/^\|list 140lne\|md脑图\|/, "|list2markmap|");
-
+      header = header.replace(/^\|list 140lne\|wbs\|/, "|list2pumlWBS|");
+      header = header.replace(/^\|list 140lne\|工作分解图\|/, "|list2pumlWBS|");
+      header = header.replace(/^\|list 140lne\|工作分解结构\|/, "|list2pumlWBS|");
+      header = header.replace(/^\|list 140lne\|分解图\|/, "|list2pumlWBS|");
+      header = header.replace(/^\|list 140lne\|分解结构\|/, "|list2pumlWBS|");
       header = header.replace(/^\|list 140lne\|table\|/, "|list2table|");
       header = header.replace(/^\|list 140lne\|multiWayTable\|/, "|list2table|");
       header = header.replace(/^\|list 140lne\|multiCrossTable\|/, "|list2table|");
@@ -272,6 +277,7 @@ export class ABConvertManager {
       header = header.replace(/^\|list 140lne\|跨行表格\|/, "|list2table|");
       header = header.replace(/^\|list 140lne\|跨行表\|/, "|list2table|");
 
+      // 先二层再多层树
       header = header.replace(/^\|list 140lne\|listTable\|/, "|list2lt|");
       header = header.replace(/^\|list 140lne\|treeTable\|/, "|list2lt|");
       header = header.replace(/^\|list 140lne\|listGrid\|/, "|list2lt|");
@@ -284,14 +290,12 @@ export class ABConvertManager {
       header = header.replace(/^\|list 140lne\|目录\|/, "|list2dt|");
       header = header.replace(/^\|list 140lne\|目录树\|/, "|list2dt|");
       header = header.replace(/^\|list 140lne\|目录结构\|/, "|list2dt|");
-      header = header.replace(/^\|list 140lne\|wbs\|/, "|list2pumlWBS|");
-      header = header.replace(/^\|list 140lne\|工作分解图\|/, "|list2pumlWBS|");
-
+      
+      // 二层树
       header = header.replace(/^\|list 140lne\|timeline\|/, "|list2timeline|");
       header = header.replace(/^\|list 140lne\|时间线\|/, "|list2timeline|");
       header = header.replace(/^\|list 140lne\|fakeList\|/, "|list2table|addClass(ab-table-fc)|addClass(ab-table-likelist)|");
       header = header.replace(/^\|list 140lne\|仿列表\|/, "|list2table|addClass(ab-table-fc)|addClass(ab-table-likelist)|");
-
       header = header.replace(/^\|list 140lne\|标签页\|/, "|list2tab|");
       header = header.replace(/^\|list 140lne\|分栏\|/, "|list2col|");
       header = header.replace(/^\|list 140lne\|卡片\|/, "|list2card|");

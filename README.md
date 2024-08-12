@@ -53,6 +53,10 @@ timeline (时间线)
 
 ![](./docs/zh/png/Pasted%20image%2020240808203455.png)
 
+tabs & card (标签页和卡片)
+
+![](./docs/zh/png/tag%20and%20card.png)
+
 mermaid flow (mermaid流程图)
 
 ![](./docs/zh/png/Pasted%20image%2020240808203517.png)
