@@ -285,6 +285,8 @@ export class ABConvertManager {
       header = header.replace(/^\|list 140lne\|列表格\|/, "|list2lt|");
       header = header.replace(/^\|list 140lne\|树形表\|/, "|list2lt|");
       header = header.replace(/^\|list 140lne\|树形表格\|/, "|list2lt|");
+      header = header.replace(/^\|list 140lne\|list\|/, "|list2lt|addClass(ab-listtable-likelist)|");
+      header = header.replace(/^\|list 140lne\|列表\|/, "|list2lt|addClass(ab-listtable-likelist)|");
       header = header.replace(/^\|list 140lne\|dirTree\|/, "|list2dt|");
       header = header.replace(/^\|list 140lne\|dir\|/, "|list2dt|");
       header = header.replace(/^\|list 140lne\|目录\|/, "|list2dt|");

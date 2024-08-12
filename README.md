@@ -12,7 +12,8 @@ This is a **【Syntax free, Extensible、Powerful and flexible、Multi-platform�
 - Extensible (可扩展性)
     - Facilitate secondary development （插件方便二次开发）
 - Powerful and flexible (灵活且强大)
-    - 选择器：选择范围灵活，六种方式，简单易用。处理器：丰富多样、功能强大、扩展性强
+    - 选择器：选择范围灵活，六种方式，简单易用
+	- 处理器：丰富多样、功能强大、扩展性强
 - Multi-platform (多平台)
     - Obsidian
 	- Blogs such as vuepress/vitepress that support markdown-it parsing
@@ -51,7 +52,15 @@ This is a **【Syntax free, Extensible、Powerful and flexible、Multi-platform�
 
 ![](./docs/zh/png/Pasted%20image%2020240808203143.png)
 
+Optimized list (优化列表)
+
+The essence is "listtable" based on the addition of a mock list style (本质是 "列表格" 的基础上增加仿列表样式)
+
+![](./docs/zh/png/listtable_likelist.png)
+
 Dir Tree (目录树)
+
+The essence is "listtable" based on the addition of imitation directory style (本质是"列表格"的基础上增加仿目录样式)
 
 ![](./docs/zh/png/Pasted%20image%2020240808203216.png)
 

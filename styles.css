@@ -141,6 +141,65 @@
   background: none;
 }
 
+.ab-note table.ab-table.ab-table-likelist td {
+  border: none;
+  padding-bottom: 10px;
+  vertical-align: top;
+}
+
+.ab-note table.ab-table.ab-table-likelist td:first-child {
+  padding-right: 8px;
+  padding-left: 20px;
+  position: relative;
+}
+
+.ab-note table.ab-table.ab-table-likelist td:first-child::before {
+  position: absolute;
+  top: 1em;
+  transform: translateY(-50%);
+  width: 5px;
+  height: 5px;
+  left: 6px;
+  content: '';
+  border-radius: 50%;
+  background-color: currentColor;
+}
+
+.ab-note table.ab-table.ab-table-likelist td:first-child::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  bottom: 5px;
+  right: 0;
+  border-right: 1px solid currentColor;
+  pointer-events: none;
+}
+
+.ab-note table.ab-table.ab-table-likelist td:nth-child(2) {
+  padding-left: 20px;
+  position: relative;
+}
+
+.ab-note table.ab-table.ab-table-likelist td:nth-child(2)::before {
+  position: absolute;
+  top: 1em;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  border: solid 1px;
+  left: 6px;
+  content: '';
+  border-radius: 50%;
+}
+
+.ab-note table.ab-table.ab-table-likelist td:last-child {
+  border: none;
+}
+
+.ab-note table.ab-table.ab-table-likelist td:last-child::after {
+  content: none;
+}
+
 .ab-note table.ab-list-table .ab-foldable-tr > td:first-child > div {
   padding-left: 15px;
   position: relative;
@@ -169,68 +228,109 @@
   cursor: pointer;
 }
 
+.ab-note table.ab-list-table .ab-foldable-tr[tr_level="0"] > td:first-child {
+  padding-left: calc(0*24px);
+}
+
 .ab-note table.ab-list-table .ab-foldable-tr[tr_level="1"] > td:first-child {
-  padding-left: calc(1*12px);
+  padding-left: calc(1*24px);
 }
 
 .ab-note table.ab-list-table .ab-foldable-tr[tr_level="2"] > td:first-child {
-  padding-left: calc(2*12px);
+  padding-left: calc(2*24px);
 }
 
 .ab-note table.ab-list-table .ab-foldable-tr[tr_level="3"] > td:first-child {
-  padding-left: calc(3*12px);
+  padding-left: calc(3*24px);
 }
 
 .ab-note table.ab-list-table .ab-foldable-tr[tr_level="4"] > td:first-child {
-  padding-left: calc(4*12px);
+  padding-left: calc(4*24px);
 }
 
 .ab-note table.ab-list-table .ab-foldable-tr[tr_level="5"] > td:first-child {
-  padding-left: calc(5*12px);
+  padding-left: calc(5*24px);
 }
 
 .ab-note table.ab-list-table .ab-foldable-tr[tr_level="6"] > td:first-child {
-  padding-left: calc(6*12px);
+  padding-left: calc(6*24px);
 }
 
 .ab-note table.ab-list-table .ab-foldable-tr[tr_level="7"] > td:first-child {
-  padding-left: calc(7*12px);
+  padding-left: calc(7*24px);
 }
 
 .ab-note table.ab-list-table .ab-foldable-tr[tr_level="8"] > td:first-child {
-  padding-left: calc(8*12px);
+  padding-left: calc(8*24px);
 }
 
 .ab-note table.ab-list-table .ab-foldable-tr[tr_level="9"] > td:first-child {
-  padding-left: calc(9*12px);
+  padding-left: calc(9*24px);
 }
 
 .ab-note table.ab-list-table .ab-foldable-tr[tr_level="10"] > td:first-child {
-  padding-left: calc(10*12px);
+  padding-left: calc(10*24px);
 }
 
 .ab-note table.ab-list-table .ab-foldable-tr[tr_level="11"] > td:first-child {
-  padding-left: calc(11*12px);
+  padding-left: calc(11*24px);
 }
 
 .ab-note table.ab-list-table .ab-foldable-tr[tr_level="12"] > td:first-child {
-  padding-left: calc(12*12px);
+  padding-left: calc(12*24px);
 }
 
 .ab-note table.ab-list-table .ab-foldable-tr[tr_level="13"] > td:first-child {
-  padding-left: calc(13*12px);
+  padding-left: calc(13*24px);
 }
 
 .ab-note table.ab-list-table .ab-foldable-tr[tr_level="14"] > td:first-child {
-  padding-left: calc(14*12px);
+  padding-left: calc(14*24px);
 }
 
 .ab-note table.ab-list-table .ab-foldable-tr[tr_level="15"] > td:first-child {
-  padding-left: calc(15*12px);
+  padding-left: calc(15*24px);
 }
 
 .ab-note table.ab-list-table .ab-foldable-tr[tr_level="16"] > td:first-child {
-  padding-left: calc(16*12px);
+  padding-left: calc(16*24px);
+}
+
+.ab-note table.ab-list-table.ab-listtable-likelist {
+  margin-left: 24px;
+}
+
+.ab-note table.ab-list-table.ab-listtable-likelist td {
+  border: none;
+  vertical-align: top;
+}
+
+.ab-note table.ab-list-table.ab-listtable-likelist .ab-foldable-tr > td:first-child > .ab-list-table-witharrow {
+  padding: 0 !important;
+  padding-right: 8px;
+  padding-left: 20px;
+  position: relative;
+}
+
+.ab-note table.ab-list-table.ab-listtable-likelist .ab-foldable-tr > td:first-child > .ab-list-table-witharrow::before {
+  border: solid 1px !important;
+  background: none !important;
+  width: 6px !important;
+  height: 6px !important;
+  box-sizing: border-box;
+  position: absolute;
+  top: 12px !important;
+  transform: translateY(-50%) !important;
+  left: -14px !important;
+  content: '';
+  border-radius: 50%;
+}
+
+.ab-note table.ab-list-table.ab-listtable-likelist .ab-foldable-tr[tr_level="0"] > td:first-child > .ab-list-table-witharrow::before {
+  border: 0 !important;
+  background-color: currentColor !important;
+  width: 6px !important;
+  height: 6px !important;
 }
 
 .ab-note table.ab-list-table.ab-table-folder .ab-foldable-tr td:first-child {
@@ -266,65 +366,6 @@
   white-space: nowrap;
   font-weight: 500;
   vertical-align: top;
-}
-
-.ab-note table.ab-table-likelist td {
-  border: none;
-  padding-bottom: 10px;
-  vertical-align: top;
-}
-
-.ab-note table.ab-table-likelist td:first-child {
-  padding-right: 8px;
-  padding-left: 20px;
-  position: relative;
-}
-
-.ab-note table.ab-table-likelist td:first-child::before {
-  position: absolute;
-  top: 1em;
-  transform: translateY(-50%);
-  width: 5px;
-  height: 5px;
-  left: 6px;
-  content: '';
-  border-radius: 50%;
-  background-color: currentColor;
-}
-
-.ab-note table.ab-table-likelist td:first-child::after {
-  content: "";
-  position: absolute;
-  top: 3px;
-  bottom: 5px;
-  right: 0;
-  border-right: 1px solid currentColor;
-  pointer-events: none;
-}
-
-.ab-note table.ab-table-likelist td:nth-child(2) {
-  padding-left: 20px;
-  position: relative;
-}
-
-.ab-note table.ab-table-likelist td:nth-child(2)::before {
-  position: absolute;
-  top: 1em;
-  transform: translateY(-50%);
-  width: 4px;
-  height: 4px;
-  border: solid 1px;
-  left: 6px;
-  content: '';
-  border-radius: 50%;
-}
-
-.ab-note table.ab-table-likelist td:last-child {
-  border: none;
-}
-
-.ab-note table.ab-table-likelist td:last-child::after {
-  content: none;
 }
 
 .ab-note table.ab-table-timeline td:first-child {

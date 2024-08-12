@@ -140,61 +140,163 @@
     tr {
       background: none;
     }
+
+    // 仿列表样式的普通表格 // TODO 第一列是选不好的，得js那边给 “真-第一列” 进行标记
+    &.ab-table-likelist {
+      td {
+        border: none;
+        padding-bottom: 10px;
+        vertical-align: top;
+      }
+      td:first-child {
+        padding-right: 8px;
+        padding-left: 20px;
+
+        position: relative;
+        &::before {
+          position: absolute;
+          top: 1em;
+          transform: translateY(-50%);
+          width: 5px;
+          height: 5px;
+          left: 6px;
+
+          content: '';
+          border-radius: 50%;
+          background-color: currentColor;
+        }
+        &::after {
+          content: "";
+          position: absolute;
+          top: 3px;
+          bottom: 5px;
+          right: 0;
+          //width: 1px;
+          //height: calc(100% - 6px);
+          border-right: 1px solid currentColor;
+          pointer-events: none;
+        }
+      }
+      td:nth-child(2) {
+        padding-left: 20px;
+        position: relative;
+        &::before {
+          position: absolute;
+          top: 1em;
+          transform: translateY(-50%);
+          width: 4px;
+          height: 4px;
+          border: solid 1px;
+          left: 6px;
+
+          content: '';
+          border-radius: 50%;
+        }
+      }
+      td:last-child {
+        border: none;
+        &::after {
+          content: none;
+        }
+      }
+    }
   }
 
   // 列表格
   table.ab-list-table{
-    .ab-foldable-tr>td:first-child{
-      >div{
-        padding-left: 15px;
-        position: relative;
+    // 通用
+    .ab-foldable-tr {
+      &>td:first-child{
+        >div{
+          padding-left: 15px;
+          position: relative;
+        }
       }
-    }
-    .ab-foldable-tr[able_fold="true"]>td:first-child{
-      >div::before{
-        content: "";
-        position: absolute;
-        width: 0;
-        height: 0;
+      &[able_fold="true"]>td:first-child{
+        >div::before{
+          content: "";
+          position: absolute;
+          width: 0;
+          height: 0;
+        }
       }
-    }
-    .ab-foldable-tr[able_fold="true"][is_fold="true"]>td:first-child{ // 箭头图标
-      >div:first-child::before{
-        top: 5px;
-        left: 2px;
-        border: 6px solid transparent;
-        border-left-color: #d9d9d9;
-        cursor: pointer;
+      &[able_fold="true"][is_fold="true"]>td:first-child{ // 箭头图标
+        >div:first-child::before{
+          top: 5px;
+          left: 2px;
+          border: 6px solid transparent;
+          border-left-color: #d9d9d9;
+          cursor: pointer;
+        }
       }
-    }
-    .ab-foldable-tr[able_fold="true"][is_fold="false"]>td:first-child{ // 箭头图标
-      >div:first-child::before{
-        top: 9px;
-        left: -1px;
-        border: 6px solid transparent;
-        border-top-color: #d9d9d9;
-        cursor: pointer;
+      &[able_fold="true"][is_fold="false"]>td:first-child{ // 箭头图标
+        >div:first-child::before{
+          top: 9px;
+          left: -1px;
+          border: 6px solid transparent;
+          border-top-color: #d9d9d9;
+          cursor: pointer;
+        }
       }
+      // 缩进
+      &[tr_level="0"]>td:first-child{padding-left: calc(0*24px);}
+      &[tr_level="1"]>td:first-child{padding-left: calc(1*24px);}
+      &[tr_level="2"]>td:first-child{padding-left: calc(2*24px);}
+      &[tr_level="3"]>td:first-child{padding-left: calc(3*24px);}
+      &[tr_level="4"]>td:first-child{padding-left: calc(4*24px);}
+      &[tr_level="5"]>td:first-child{padding-left: calc(5*24px);}
+      &[tr_level="6"]>td:first-child{padding-left: calc(6*24px);}
+      &[tr_level="7"]>td:first-child{padding-left: calc(7*24px);}
+      &[tr_level="8"]>td:first-child{padding-left: calc(8*24px);}
+      &[tr_level="9"]>td:first-child{padding-left: calc(9*24px);}
+      &[tr_level="10"]>td:first-child{padding-left: calc(10*24px);}
+      &[tr_level="11"]>td:first-child{padding-left: calc(11*24px);}
+      &[tr_level="12"]>td:first-child{padding-left: calc(12*24px);}
+      &[tr_level="13"]>td:first-child{padding-left: calc(13*24px);}
+      &[tr_level="14"]>td:first-child{padding-left: calc(14*24px);}
+      &[tr_level="15"]>td:first-child{padding-left: calc(15*24px);}
+      &[tr_level="16"]>td:first-child{padding-left: calc(16*24px);}
     }
-    // 缩进
-    .ab-foldable-tr[tr_level="1"]>td:first-child{padding-left: calc(1*12px);}
-    .ab-foldable-tr[tr_level="2"]>td:first-child{padding-left: calc(2*12px);}
-    .ab-foldable-tr[tr_level="3"]>td:first-child{padding-left: calc(3*12px);}
-    .ab-foldable-tr[tr_level="4"]>td:first-child{padding-left: calc(4*12px);}
-    .ab-foldable-tr[tr_level="5"]>td:first-child{padding-left: calc(5*12px);}
-    .ab-foldable-tr[tr_level="6"]>td:first-child{padding-left: calc(6*12px);}
-    .ab-foldable-tr[tr_level="7"]>td:first-child{padding-left: calc(7*12px);}
-    .ab-foldable-tr[tr_level="8"]>td:first-child{padding-left: calc(8*12px);}
-    .ab-foldable-tr[tr_level="9"]>td:first-child{padding-left: calc(9*12px);}
-    .ab-foldable-tr[tr_level="10"]>td:first-child{padding-left: calc(10*12px);}
-    .ab-foldable-tr[tr_level="11"]>td:first-child{padding-left: calc(11*12px);}
-    .ab-foldable-tr[tr_level="12"]>td:first-child{padding-left: calc(12*12px);}
-    .ab-foldable-tr[tr_level="13"]>td:first-child{padding-left: calc(13*12px);}
-    .ab-foldable-tr[tr_level="14"]>td:first-child{padding-left: calc(14*12px);}
-    .ab-foldable-tr[tr_level="15"]>td:first-child{padding-left: calc(15*12px);}
-    .ab-foldable-tr[tr_level="16"]>td:first-child{padding-left: calc(16*12px);}
 
-    // Folder
+    // 仿列表样式的列表格
+    &.ab-listtable-likelist {
+      margin-left: 24px;
+      td {
+        border: none;
+        vertical-align: top;
+      }
+      // 覆盖列表格的部分样式
+      .ab-foldable-tr>td:first-child>.ab-list-table-witharrow {
+        padding: 0 !important;
+        padding-right: 8px;
+        padding-left: 20px;
+        position: relative;
+        &::before {
+          border: solid 1px !important;
+          background: none !important;
+          width: 6px !important;
+          height: 6px !important;
+  
+          box-sizing: border-box;
+          position: absolute;
+          top: 12px !important;
+          transform: translateY(-50%) !important;
+          left: -14px !important;
+          content: '';
+          border-radius: 50%;
+        }
+      }
+      .ab-foldable-tr[tr_level="0"]>td:first-child>.ab-list-table-witharrow {
+        &::before {
+          border: 0 !important;
+          background-color: currentColor !important;
+          width: 6px !important;
+          height: 6px !important;
+        }
+      }
+    }
+
+    // 仿目录结构的列表格
     &.ab-table-folder .ab-foldable-tr{
       td:first-child {
         white-space: nowrap;
@@ -230,66 +332,6 @@
       white-space: nowrap;
       font-weight: 500;
       vertical-align: top;
-    }
-  }
-
-  // 仿列表表格
-  table.ab-table-likelist {
-    td {
-      border: none;
-      padding-bottom: 10px;
-      vertical-align: top;
-    }
-    td:first-child {
-      padding-right: 8px;
-      padding-left: 20px;
-
-      position: relative;
-      &::before {
-        position: absolute;
-        top: 1em;
-        transform: translateY(-50%);
-        width: 5px;
-        height: 5px;
-        left: 6px;
-
-        content: '';
-        border-radius: 50%;
-        background-color: currentColor;
-      }
-      &::after {
-        content: "";
-        position: absolute;
-        top: 3px;
-        bottom: 5px;
-        right: 0;
-        //width: 1px;
-        //height: calc(100% - 6px);
-        border-right: 1px solid currentColor;
-        pointer-events: none;
-      }
-    }
-    td:nth-child(2) {
-      padding-left: 20px;
-      position: relative;
-      &::before {
-        position: absolute;
-        top: 1em;
-        transform: translateY(-50%);
-        width: 4px;
-        height: 4px;
-        border: solid 1px;
-        left: 6px;
-
-        content: '';
-        border-radius: 50%;
-      }
-    }
-    td:last-child {
-      border: none;
-      &::after {
-        content: none;
-      }
     }
   }
 
