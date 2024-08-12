@@ -44,7 +44,7 @@ export class ABSelector_PostHtml{
     
     // 1. RenderMarkdown引起的调用（需要嵌套寻找）
     if (!mdSrc) {
-      console.log(" -- ABPosthtmlManager.processor, called by 'ReRender'");
+      // console.log(" -- ABPosthtmlManager.processor, called by 'ReRender'");
       if (!el.classList.contains("markdown-rendered")) return
       findABBlock_recurve(el)
     }
