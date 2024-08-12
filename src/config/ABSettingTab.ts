@@ -71,15 +71,18 @@ export class ABSettingTab extends PluginSettingTab {
 		const {containerEl} = this;
     containerEl.empty();
     let settings = this.plugin.settings
-
+    containerEl.createEl('h1', {text: 'AnyBlock'});
 		containerEl.createEl('p', {text: 'See Github and website for more details (更多使用方法详见Github及网站)'});
+    containerEl.createEl('hr', {attr: {"style": "border-color:#9999ff"}})
 
+    // 选择器管理
     containerEl.createEl('h2', {text: 'Selector Manager (选择器的管理)'});
-
+    containerEl.createEl('p', {text: 'This section is for query only and cannot be edited (这一部分仅供查询不可编辑)'})
     this.selectorPanel = generateSelectorInfoTable(containerEl)
+    containerEl.createEl('hr', {attr: {"style": "border-color:#9999ff"}})
 
+    // 装饰管理器
     /*containerEl.createEl('h2', {text: '装饰管理器'});
-
     new Setting(containerEl)
       .setName('源码模式中启用')
       .setDesc('推荐：不启用')
@@ -95,7 +98,6 @@ export class ABSettingTab extends PluginSettingTab {
           await this.plugin.saveSettings();    
         })
       })
-
     new Setting(containerEl)
       .setName('实时模式中启用')
       .setDesc('推荐：启用块装饰/线装饰')
@@ -111,7 +113,6 @@ export class ABSettingTab extends PluginSettingTab {
           await this.plugin.saveSettings(); 
         })
       })
-
     new Setting(containerEl)
       .setName('渲染模式中启用')
       .setDesc('推荐：启用块装饰')
@@ -127,11 +128,13 @@ export class ABSettingTab extends PluginSettingTab {
         })
       })*/
 
-    containerEl.createEl('h2', {text: 'Convert Manager (转换器的管理)'});
-
+    // 别名系统的管理
+    containerEl.createEl('h2', {text: 'AliasSystem Manager (别名系统的管理)'});
+    containerEl.createEl('p', {text: 'Come will be deprecated in the future! Switch to a new alias system. (该项未来将弃用! 换用新的别名系统)'});
+    containerEl.createEl('p', {text: 'To delete or modify an addition, open the "data.json" file. (添加后要删除或修改请打开data.json文件.)'});
     new Setting(containerEl)
-      .setName('添加新的注册指令')
-      .setDesc('@todo: 添加后要删除或修改请打开data.json文件夹')
+      .setName('Add a new registration instruction')
+      .setDesc(`添加新的注册指令`)
       .addButton(component => {
         component
         .setIcon("plus-circle")
@@ -148,8 +151,13 @@ export class ABSettingTab extends PluginSettingTab {
           }).open()
         })
       })
+      containerEl.createEl('hr', {attr: {"style": "border-color:#9999ff"}})
 
-    containerEl.createEl('p', {text: '下面是所有注册指令的查看'});
+    // 转换器的管理
+    containerEl.createEl('h2', {text: 'Convertor Manager (转换器的管理)'});
+    containerEl.createEl('p', {text: 'This section is for query only and cannot be edited (这一部分仅供查询不可编辑)'})
+    containerEl.createEl('p', {text: 'It can also be viewed in the main page using the `[info]` processor'});
+    containerEl.createEl('p', {text: '这部分内容也可以使用 `[info]` 处理器在主页面中查看'});
     const div = containerEl.createEl("div");
     ABConvertManager.autoABConvert(div, "info", "", "null_content") // this.processorPanel = ABConvertManager.getInstance().generateConvertInfoTable(containerEl)
     this.processorPanel = div
@@ -176,10 +184,11 @@ class ABProcessorModal extends Modal {
 
   onOpen() {	// onOpen() 方法在对话框打开时被调用，它负责创建对话框中的内容。想要获取更多信息，可以查阅 HTML elements。
     let { contentEl } = this;
-    contentEl.setText("自定义处理器");
+    contentEl.setText("Custom processor (自定义处理器)");
+    contentEl.createEl("p", {text: ""})
     new Setting(contentEl)
-      .setName("处理器唯一id")
-      .setDesc("不与其他处理器冲突即可")
+      .setName("ProcessorId")
+      .setDesc("处理器唯一id, 不与其他处理器冲突即可")
       .addText((text)=>{
         text.onChange((value) => {
           this.args.id = value
@@ -187,7 +196,8 @@ class ABProcessorModal extends Modal {
       })
 
     new Setting(contentEl)
-      .setName("注册器名字")
+      .setName("ProcessorName")
+      .setDesc("注册器名，可以乱填，给自己看的")
       .addText((text)=>{
         text.onChange((value) => {
         this.args.name = value
@@ -195,8 +205,8 @@ class ABProcessorModal extends Modal {
     })
 
     new Setting(contentEl)
-      .setName("注册器匹配名")
-      .setDesc("用/包括起来则表示正则")
+      .setName("Processor matching rule")
+      .setDesc("注册器匹配名 (用/包括起来则表示正则)")
       .addText((text)=>{
         text.onChange((value) => {
         this.args.match = value
@@ -204,8 +214,8 @@ class ABProcessorModal extends Modal {
     })
 
     new Setting(contentEl)
-      .setName("注册器替换为")
-      .setDesc("用/包括起来则判断为正则")
+      .setName("Processor replacement")
+      .setDesc("注册器替换为 (用/包括起来则判断为正则)")
       .addText((text)=>{
         text.onChange((value) => {
         this.args.process_alias = value
@@ -215,7 +225,7 @@ class ABProcessorModal extends Modal {
     new Setting(contentEl)
       .addButton(btn => {
         btn
-        .setButtonText("提交")
+        .setButtonText("Submit (提交)")
         .setCta() // 这个不知道什么意思
         .onClick(() => {
           if(this.args.id && this.args.name && this.args.match && this.args.process_alias){
