@@ -548,13 +548,13 @@
   padding: 10px;
 }
 
-.ab-note .ab-items.ab-card {
+.ab-note .ab-items.ab-card1 {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
 }
 
-.ab-note .ab-items.ab-card .ab-items-item {
+.ab-note .ab-items.ab-card1 .ab-items-item {
   flex: 1 0 calc(25% - 1rem);
   box-sizing: border-box;
   color: var(--ab-tab-root-tx-color);
@@ -562,6 +562,41 @@
   border: solid 2px var(--ab-tab-root-bd-color);
   box-shadow: #34343f;
   padding: 10px;
+}
+
+.ab-note .ab-items.ab-card {
+  column-count: 4;
+  column-gap: 10px;
+}
+
+.ab-note .ab-items.ab-card .ab-items-item {
+  break-inside: avoid-column;
+  box-sizing: border-box;
+  color: var(--ab-tab-root-tx-color);
+  background-color: var(--ab-tab-root-bg-color);
+  border: solid 2px var(--ab-tab-root-bd-color);
+  box-shadow: #34343f;
+  padding: 5px 10px;
+  margin-bottom: 10px;
+}
+
+.ab-note .ab-items.ab-card3 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 1rem;
+  grid-template-rows: masonry;
+}
+
+.ab-note .ab-items.ab-card3 .ab-items-item {
+  width: 100%;
+  display: block;
+  box-sizing: border-box;
+  color: var(--ab-tab-root-tx-color);
+  background-color: var(--ab-tab-root-bg-color);
+  border: solid 2px var(--ab-tab-root-bd-color);
+  box-shadow: #34343f;
+  padding: 5px 10px;
+  margin-bottom: 0.8rem;
 }
 
 div.md-table-fig1 {

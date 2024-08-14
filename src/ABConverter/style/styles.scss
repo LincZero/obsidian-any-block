@@ -538,19 +538,62 @@
         padding: 10px;
       }
     }
-    // 卡片
-    &.ab-card{
+    // 卡片 (对齐, flex布局)
+    &.ab-card1{
       display: flex; // Flexbox 布局
       flex-wrap: wrap; // 元素换行显示
       gap: 1rem; // 间隙
       .ab-items-item {
         flex: 1 0 calc(25% - 1rem); // 每个项目的宽度大约为容器的 33.33%，减去间隙的一半
+
         box-sizing: border-box; // 确保 padding 和 border 不影响元素的实际大小
         color: var(--ab-tab-root-tx-color);
         background-color: var(--ab-tab-root-bg-color);
         border: solid 2px var(--ab-tab-root-bd-color);
         box-shadow: #34343f;
         padding: 10px;
+      }
+    }
+    // 卡片 (瀑布流, column-count方式)
+    &.ab-card{
+      // 列数。其中ob默认700px宽，我定义的小宽度是800，大宽度是1100。假设一列加边框200px较好
+      column-count: 4; // css不支持查询ab.card的宽度，只能查屏幕，这个得让js来
+      // @media (max-width: 1400px) { column-count: 6; }
+      // @media (max-width: 1200px) { column-count: 5; }
+      // @media (max-width: 1000px) { column-count: 4; }
+      // @media (max-width: 800px) { column-count: 3; }
+      // @media (max-width: 600px) { column-count: 2; }
+      // @media (max-width: 400px) { column-count: 1; }
+      column-gap: 10px; // 列间距
+      .ab-items-item {
+        break-inside: avoid-column; // 防止单个元素被拆分到多列
+
+        box-sizing: border-box; // 确保 padding 和 border 不影响元素的实际大小
+        color: var(--ab-tab-root-tx-color);
+        background-color: var(--ab-tab-root-bg-color);
+        border: solid 2px var(--ab-tab-root-bd-color);
+        box-shadow: #34343f;
+        padding: 5px 10px;
+        margin-bottom: 10px;
+      }
+    }
+    // 卡片 (瀑布流, grid网格顺序，但兼容性有问题)
+    &.ab-card3 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-gap: 1rem; // 间隙
+      grid-template-rows: masonry; // 兼容有问题，只有火狐支持，还tm的要开选项
+      .ab-items-item {
+        width: 100%;
+        display: block;
+
+        box-sizing: border-box; // 确保 padding 和 border 不影响元素的实际大小
+        color: var(--ab-tab-root-tx-color);
+        background-color: var(--ab-tab-root-bg-color);
+        border: solid 2px var(--ab-tab-root-bd-color);
+        box-shadow: #34343f;
+        padding: 5px 10px;
+        margin-bottom: 0.8rem;
       }
     }
   }
