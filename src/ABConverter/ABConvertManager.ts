@@ -252,9 +252,9 @@ export class ABConvertManager {
         header = header.replace(/^\|title 140lne\|tabs\|/, "|title2tab|");
         header = header.replace(/^\|title 140lne\|标签\|/, "|title2tab|");
         header = header.replace(/^\|title 140lne\|标签页\|/, "|title2tab|");
-        header = header.replace(/^\|title 140lne\|Col\|/, "|title2col|");
+        header = header.replace(/^\|title 140lne\|col\|/, "|title2col|");
         header = header.replace(/^\|title 140lne\|分栏\|/, "|title2col|");
-        header = header.replace(/^\|title 140lne\|Card\|/, "|title2card|");
+        header = header.replace(/^\|title 140lne\|card\|/, "|title2card|");
         header = header.replace(/^\|title 140lne\|卡片\|/, "|title2card|");
         header = header.replace(/^\|title 140lne/, "");
       }
@@ -312,9 +312,9 @@ export class ABConvertManager {
       header = header.replace(/^\|list 140lne\|tabs\|/, "|list2tab|");
       header = header.replace(/^\|list 140lne\|标签\|/, "|list2tab|");
       header = header.replace(/^\|list 140lne\|标签页\|/, "|list2tab|");
-      header = header.replace(/^\|list 140lne\|Col\|/, "|list2col|");
+      header = header.replace(/^\|list 140lne\|col\|/, "|list2col|");
       header = header.replace(/^\|list 140lne\|分栏\|/, "|list2col|");
-      header = header.replace(/^\|list 140lne\|Card\|/, "|list2card|");
+      header = header.replace(/^\|list 140lne\|card\|/, "|list2card|");
       header = header.replace(/^\|list 140lne\|卡片\|/, "|list2card|");
 
       header = header.replace(/^\|list 140lne/, "");

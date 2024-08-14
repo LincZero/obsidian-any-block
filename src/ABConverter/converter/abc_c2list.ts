@@ -349,11 +349,18 @@ export class C2ListProcess{
 
   /// 将二列列表转 `容器-元素` 结构
   static c2data2items(c2listdata:List_C2ListItem, el:HTMLElement): HTMLElement {
-    const col = document.createElement("div"); el.appendChild(col); col.classList.add("ab-items")
+    const el_items = document.createElement("div"); el.appendChild(el_items); el_items.classList.add("ab-items")
+    let el_item:HTMLElement|null = null;
     for (let item of c2listdata) {
-      if (item.level == 0) continue
-      const col_item = document.createElement("div"); col.appendChild(col_item); col_item.classList.add("ab-items-item")
-      ABConvertManager.getInstance().m_renderMarkdownFn(item.content, col_item)
+      if (item.level == 0) {
+        el_item = document.createElement("div"); el_items.appendChild(el_item); el_item.classList.add("ab-items-item")
+        const el_title = document.createElement("div"); el_item.appendChild(el_title); el_title.classList.add("ab-items-title")
+        ABConvertManager.getInstance().m_renderMarkdownFn(item.content, el_title)
+      } else {
+        if (!el_item) continue;
+        const el_content = document.createElement("div"); el_item.appendChild(el_content); el_content.classList.add("ab-items-content")
+        ABConvertManager.getInstance().m_renderMarkdownFn(item.content, el_content)
+      }
     }
     return el
   }
