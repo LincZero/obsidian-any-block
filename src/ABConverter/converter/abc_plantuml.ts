@@ -28,7 +28,8 @@ const abc_list2pumlWBS = ABConvert.factory({
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
   process: (el, header, content)=>{
-    const listdata:List_ListItem = ListProcess.list2data(content)
+    let listdata:List_ListItem = ListProcess.list2data(content)
+    listdata = ListProcess.data2strict(listdata)
     let newContent = "@startwbs\n"
     for (let item of listdata) {
       if (item.content.startsWith("< "))
@@ -49,7 +50,8 @@ const abc_list2pumlMindmap = ABConvert.factory({
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
   process: (el, header, content)=>{
-    const listdata:List_ListItem = ListProcess.list2data(content)
+    let listdata:List_ListItem = ListProcess.list2data(content)
+    listdata = ListProcess.data2strict(listdata)
     let newContent = "@startmindmap\n"
     for (let item of listdata) {
       newContent += "*".repeat(item.level+1) + " " + item.content + "\n"
