@@ -111,7 +111,11 @@ function findABBlock_recurve(targetEl: HTMLElement){
       || contentEl instanceof HTMLPreElement
       || contentEl instanceof HTMLTableElement
     )) continue
-    // @todo （首尾选择器的header较特殊，另外处理）
+
+    // TODO 头部选择器不是一个块，要特殊处理
+    // || contentEl instanceof HTMLHeadingElement
+
+    // TODO 首尾选择器不是一个块，要特殊处理
     // if (subEl instanceof HTMLParagraphElement){
     //   const m_headtail = subEl.getText().match(ABReg.reg_headtail)
     //   if (!m_headtail) return
@@ -397,7 +401,7 @@ function getSourceMarkdown(
       else range.prefix = match[1]
     }
     else if (sectionEl instanceof HTMLTableElement) {
-      range.selector = "heading"
+      range.selector = "table"
       const match = list_content[0].match(ABReg.reg_table)
       if (!match) return range
       else range.prefix = match[1]
