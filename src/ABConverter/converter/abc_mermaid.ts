@@ -155,16 +155,18 @@ async function data2mindmap(
 // 通过mermaid块里的内容来渲染mermaid块
 async function render_mermaidText(mermaidText: string, div: HTMLElement) {
   // 1. 四选一。自己渲
-  // 当前ob使用
+  // full-ob使用
   // - 优点: 最快，无需通过二次转换
-  // - 缺点: abc模块要内置mermaid
+  // - 缺点: abc模块要内置mermaid，旧版插件使用是因为当时的obsidian内置的mermaid版本太老了
   // - 选用：目前的ob环境中用是最好。vuepress-mdit中则有另一个bug：https://github.com/mermaid-js/mermaid/issues/5204
   // - 补充：废弃函数：mermaid.mermaidAPI.renderAsync("ab-mermaid-"+getID(), mermaidText, (svgCode:string)=>{ div.innerHTML = svgCode })
   const { svg } = await mermaid.render("ab-mermaid-"+getID(), mermaidText)
   div.innerHTML = svg
 
   // 2. 四选一。在这里给环境渲
-  // - 优点：abc模块无需重复内置mermaid，缺点是二次转换在ob里会造成卡顿，在mdit里似乎id会有问题
+  // - 优点：abc模块无需重复内置mermaid
+  // - 缺点：在ob里中，一个mermaid块的变更会导致所在页面内的所有mermaid一起变更，在mdit里似乎id会有问题
+  // min-ob使用
   // div.classList.add("markdown-rendered")
   // ABConvertManager.getInstance().m_renderMarkdownFn("```mermaid\n"+mermaidText+"\n```", div)
 

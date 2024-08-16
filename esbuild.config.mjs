@@ -1,8 +1,8 @@
 import esbuild from "esbuild";
 import process from "process";
 import builtins from 'builtin-modules'
-import esbuildSvelte from "esbuild-svelte";		// 可能会报错，需要将`??`改成一般的三元运算符
-import sveltePreprocess from "svelte-preprocess";
+// import esbuildSvelte from "esbuild-svelte";		// 可能会报错，需要将`??`改成一般的三元运算符
+// import sveltePreprocess from "svelte-preprocess";
 
 const banner =
 `/*
@@ -15,10 +15,10 @@ const prod = (process.argv[2] === 'production');
 
 esbuild.build({
 	plugins: [
-		esbuildSvelte({
-			compilerOptions: { css: true },
-			preprocess: sveltePreprocess(),
-		})
+		// esbuildSvelte({
+		// 	compilerOptions: { css: true },
+		// 	preprocess: sveltePreprocess(),
+		// })
 	],
 	banner: {
 		js: banner,
@@ -33,7 +33,7 @@ esbuild.build({
 		'@codemirror/commands',
 		'@codemirror/language',
 		'@codemirror/lint',
-		'@codemirror/search',
+		// '@codemirror/search',
 		'@codemirror/state',
 		'@codemirror/view',
 		'@lezer/common',

@@ -29,8 +29,6 @@
 		"esbuild-svelte": "^0.7.3",
 		"obsidian": "latest",
 		"svelte": "^3.55.1",
-		"svelte-check": "^3.0.3",
-		"svelte-preprocess": "^5.0.1",
 		"tslib": "2.4.0",
 		"typescript": "4.7.4",
 		"vite": "^4.1.1"
