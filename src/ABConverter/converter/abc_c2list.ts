@@ -9,7 +9,7 @@
 import { ABReg } from '../ABReg'
 import {ABConvert_IOEnum, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
 import {ABConvertManager} from "../ABConvertManager"
-import {ListProcess, type ListItem, type List_ListItem} from "./abc_list"
+import type {ListItem, List_ListItem} from "./abc_list"
 
 
 /**
@@ -376,8 +376,7 @@ const abc_list2tab = ABConvert.factory({
   process: (el, header, content)=>{
     const matchs = header.match(/list2(md)?tab(T)?$/)
     if (!matchs) return el
-    let data = ListProcess.list2data(content)
-    let c2listData: List_C2ListItem = C2ListProcess.data_mL_2_2L1B(data)
+    const c2listData = C2ListProcess.list2c2data(content)
     C2ListProcess.c2data2tab(c2listData, el, matchs[2]=="T")
     return el
   }
@@ -404,8 +403,7 @@ const abc_list2col = ABConvert.factory({
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
   process: (el, header, content)=>{
-    let data = ListProcess.list2data(content)
-    let c2listData: List_C2ListItem = C2ListProcess.data_mL_2_2L1B(data)
+    const c2listData = C2ListProcess.list2c2data(content)
     C2ListProcess.c2data2items(c2listData, el)
     el.querySelector("div")?.classList.add("ab-col")
     return el
@@ -433,8 +431,7 @@ const abc_list2card = ABConvert.factory({
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
   process: (el, header, content)=>{
-    let data = ListProcess.list2data(content)
-    let c2listData: List_C2ListItem = C2ListProcess.data_mL_2_2L1B(data)
+    const c2listData = C2ListProcess.list2c2data(content)
     C2ListProcess.c2data2items(c2listData, el)
     el.querySelector("div")?.classList.add("ab-card")
     return el
