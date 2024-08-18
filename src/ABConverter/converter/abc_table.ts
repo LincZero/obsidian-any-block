@@ -66,9 +66,7 @@ export class TableProcess{
 
   /** 列表转时间线 */
   static list2timeline(text: string, div: HTMLDivElement, modeT=false) {
-    let data = ListProcess.list2data(text)
-    data = ListProcess.data2strict(data)
-    data = C2ListProcess.data_mL_2_2L(data)
+    let data = C2ListProcess.list2c2data(text)
     div = TableProcess.data2table(data, div, modeT)
     const table = div.querySelector("table")
     if (table) table.classList.add("ab-table-fc", "ab-table-timeline")
