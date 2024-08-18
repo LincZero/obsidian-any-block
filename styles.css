@@ -72,7 +72,6 @@
 }
 
 .ab-note .ab-tab-root .ab-tab-nav {
-  height: 40px;
   box-sizing: border-box;
   border: 2px solid var(--ab-tab-root-bd-color);
   background-color: var(--ab-tab-root-bd-color);
