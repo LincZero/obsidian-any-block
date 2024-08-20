@@ -202,7 +202,8 @@ export class C2ListProcess{
     const root_list_level:number = first_match[1].length // 第一个列表(也是缩进最小)的 `- ` 前空格数
     
     // 循环填充
-    let current_content:string = ""
+    let current_content:string = "" // level1的子内容
+    let current_content_prefix:string = "" // level1的子内容的前缀
     for (let line of list_text) {
       const match_list = line.match(ABReg.reg_list_noprefix)
       if (match_list && !match_list[1] && match_list[1].length<=root_list_level){ // 遇到同等标题
@@ -211,8 +212,15 @@ export class C2ListProcess{
           content: match_list[4],
           level: 0
         })
-      } else {
-        current_content += line+"\n"
+      } else { // 子内容
+        if (current_content.trim()=="") { // 第一行的子内容前缀提取
+          if (match_list && match_list[1]) current_content_prefix = match_list[1]
+          else current_content_prefix = ""
+        }
+        if (line.startsWith(current_content_prefix)) { // 子内容前缀去除
+          line = line.substring(current_content_prefix.length);
+        }
+        current_content += line+"\n" // 子内容拼接
       }
     }
     add_current_content()
