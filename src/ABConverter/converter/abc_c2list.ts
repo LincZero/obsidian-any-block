@@ -453,7 +453,6 @@ const abc_title2card = ABConvert.factory({
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
   process: (el, header, content)=>{
-    console.log("title2card", content)
     let data = C2ListProcess.title2c2data(content)
     C2ListProcess.c2data2items(data, el)
     console.log(data, "pp", content)

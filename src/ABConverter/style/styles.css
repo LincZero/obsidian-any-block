@@ -598,6 +598,38 @@
   margin-bottom: 0.8rem;
 }
 
+.ab-note .ab-items.ab-col1 {
+  column-count: 1 !important;
+}
+
+.ab-note .ab-items.ab-col2 {
+  column-count: 2 !important;
+}
+
+.ab-note .ab-items.ab-col3 {
+  column-count: 3 !important;
+}
+
+.ab-note .ab-items.ab-col4 {
+  column-count: 4 !important;
+}
+
+.ab-note .ab-items.ab-col5 {
+  column-count: 5 !important;
+}
+
+.ab-note .ab-items.ab-col6 {
+  column-count: 6 !important;
+}
+
+.ab-note .ab-items.ab-col7 {
+  column-count: 7 !important;
+}
+
+.ab-note .ab-items.ab-col8 {
+  column-count: 8 !important;
+}
+
 div.md-table-fig1 {
   overflow-x: scroll;
   transform: scaleY(-1);

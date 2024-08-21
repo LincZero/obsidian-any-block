@@ -596,6 +596,14 @@
         margin-bottom: 0.8rem;
       }
     }
+    &.ab-col1 { column-count: 1 !important; }
+    &.ab-col2 { column-count: 2 !important; }
+    &.ab-col3 { column-count: 3 !important; }
+    &.ab-col4 { column-count: 4 !important; }
+    &.ab-col5 { column-count: 5 !important; }
+    &.ab-col6 { column-count: 6 !important; }
+    &.ab-col7 { column-count: 7 !important; }
+    &.ab-col8 { column-count: 8 !important; }
   }
 }
 

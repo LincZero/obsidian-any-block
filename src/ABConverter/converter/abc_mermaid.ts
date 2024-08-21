@@ -158,7 +158,7 @@ async function render_mermaidText(mermaidText: string, div: HTMLElement) {
   // full-ob使用
   // - 优点: 最快，无需通过二次转换
   // - 缺点: abc模块要内置mermaid，旧版插件使用是因为当时的obsidian内置的mermaid版本太老了
-  // - 选用：目前的ob环境中用是最好。vuepress-mdit中则有另一个bug：https://github.com/mermaid-js/mermaid/issues/5204
+  // - 选用：目前的ob环境中用是最好。vuepress-mdit中则有另一个bug，DOMPurify丢失：https://github.com/mermaid-js/mermaid/issues/5204
   // - 补充：废弃函数：mermaid.mermaidAPI.renderAsync("ab-mermaid-"+getID(), mermaidText, (svgCode:string)=>{ div.innerHTML = svgCode })
   const { svg } = await mermaid.render("ab-mermaid-"+getID(), mermaidText)
   div.innerHTML = svg
