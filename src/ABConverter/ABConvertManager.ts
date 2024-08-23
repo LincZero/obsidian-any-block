@@ -96,7 +96,13 @@ export class ABConvertManager {
   
   /**
    * 自动寻找相匹配的ab处理器进行处理
-   * @detail ab转换器能根据header和content来将有段txt文本转换为html元素
+   * 
+   * @detail
+   *     ab转换器能根据header和content来将有段txt文本转换为html元素
+   *     主要分三个过程：
+   *     1. 预处理
+   *     2. 递归处理
+   *     3. 尾处理 (其实尾处理也可以归到预处理那)
    * @param el 最后的渲染结果
    * @param header 转换方式
    * @param content 要转换的初始文本 (无前缀版本，前缀在选择器环节已经删除了)
@@ -104,19 +110,13 @@ export class ABConvertManager {
    * @return 等于el，无用，后面可以删了
    */
   public static autoABConvert(el:HTMLDivElement, header:string, content:string, selectorName:string = ""): void{
-    let prev_result:ABConvert_IOType = content             // 上次转换后的结果
+    let prev_result: ABConvert_IOType = content             // 上次转换后的结果，初始必为string
     let prev_type: ABConvert_IOEnum = ABConvert_IOEnum.text // 上次转换后的结果的类型
-    header = this.autoABConvert_natureLanguage(el, header, content, selectorName);
+
+    header = this.autoABConvert_first(el, header, selectorName, prev_result as string, prev_type);
     let list_header = header.split("|")
     prev_result = this.autoABConvert_runConvert(el, list_header, prev_result, prev_type)
-
-    // 尾处理。如果还是text内容，则给一个md渲染器
-    if (typeof(prev_result) == "string" && prev_type == ABConvert_IOEnum.text) {
-      const subEl = document.createElement("div"); el.appendChild(subEl); subEl.classList.add("markdown-rendered");
-      ABConvertManager.getInstance().m_renderMarkdownFn(prev_result, subEl);
-      prev_type = ABConvert_IOEnum.el
-      prev_result = el
-    }
+    this.autoABConvert_last(el, header, selectorName, prev_result, prev_type)
   }
 
   /**
@@ -193,7 +193,7 @@ export class ABConvertManager {
   }
   
   /**
-   * 自然语言转指令
+   * 子函数，预处理，主要进行自然语言转指令
    * 
    * @detail
    * 将自然语言指令头，转化为指令头
@@ -214,7 +214,7 @@ export class ABConvertManager {
    * @returns
    * new header
    */
-  private static autoABConvert_natureLanguage (el:HTMLDivElement, header:string, content:string, selectorName:string): string{
+  private static autoABConvert_first (el:HTMLDivElement, header:string, selectorName:string, content:string, prev_type: ABConvert_IOEnum = ABConvert_IOEnum.text): string{
     // 分词。方便仅使用正则而不用splic("|")就能判断识别的是完整的词而不是一部分
     if (!header.trimEnd().endsWith("|")) header = header + "|"
     if (!header.trimStart().startsWith("|")) header = "|" + header
@@ -386,5 +386,26 @@ export class ABConvertManager {
       header = header.replace(/\|general 140lne/, "");
     }
     return header
+  }
+
+  /**
+   * 子函数，后处理/尾处理，主要进行末尾追加指令
+   */
+  private static autoABConvert_last (el:HTMLDivElement, header:string, selectorName:string, prev_result: ABConvert_IOType, prev_type: ABConvert_IOEnum){
+    // text内容，则给一个md渲染器
+    if (typeof(prev_result) == "string" && prev_type == ABConvert_IOEnum.text) {
+      const subEl = document.createElement("div"); el.appendChild(subEl); subEl.classList.add("markdown-rendered");
+      ABConvertManager.getInstance().m_renderMarkdownFn(prev_result, subEl);
+      prev_type = ABConvert_IOEnum.el
+      prev_result = el
+    }
+    // json内容/数组内容，则用代码块表示
+    else if (typeof(prev_result) == "string" && prev_type == ABConvert_IOEnum.json) {
+      const code_str:string = "```json\n" + prev_result + "\n```\n"
+      const subEl = document.createElement("div"); el.appendChild(subEl); subEl.classList.add("markdown-rendered");
+      ABConvertManager.getInstance().m_renderMarkdownFn(code_str, subEl);
+      prev_type = ABConvert_IOEnum.el
+      prev_result = el
+    }
   }
 }

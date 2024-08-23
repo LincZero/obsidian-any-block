@@ -6,6 +6,9 @@
  */
 
 import { ABConvertManager } from "../ABConvertManager"
+import type { List_C2ListItem } from "./abc_c2list"
+import type { List_ListItem } from "./abc_list"
+import type { List_TableItem } from "./abc_table"
 
 /**
  * ab处理器子接口
@@ -15,9 +18,19 @@ import { ABConvertManager } from "../ABConvertManager"
 export enum ABConvert_IOEnum {
   text = "string",
   el = "HTMLElement",
-  el_text = "HTMLElementString"
+  el_text = "HTMLElementString",
+  json = "json",
+  list_strem = "",
+  c2list_strem = "",
 }
-export type ABConvert_IOType = string|HTMLElement|void // TODO null是旧的别名系统，以后要删掉
+export type ABConvert_IOType =
+  string|           // text/el_text
+  HTMLElement|      // html元素
+  void|             // TODO void是旧的别名系统，以后要删掉
+  List_ListItem|    // 多叉树 数据流
+  List_C2ListItem|  // 二层树 数据流
+  List_TableItem|   // 表格用 数据流
+  Object            // json对象
 
 /**
  * AB转换器的抽象基类
