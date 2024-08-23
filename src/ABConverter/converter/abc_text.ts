@@ -19,7 +19,7 @@ const abc_quote = ABConvert.factory({
   name: "增加引用块",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.text,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): string=>{
     return content.split("\n").map((line)=>{return "> "+line}).join("\n")
   }
 })
@@ -32,7 +32,7 @@ const abc_code = ABConvert.factory({
   detail: "不加`()`表示用原文本的第一行作为代码类型，括号类型为空表示代码类型为空",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.text,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): string=>{
     let matchs = header.match(/^code(\((.*)\))?$/)
     if (!matchs) return content
     if (matchs[1]) content = matchs[2]+"\n"+content
@@ -45,7 +45,7 @@ const abc_Xquote = ABConvert.factory({
   name: "去除引用块",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.text,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): string=>{
     return content.split("\n").map(line=>{
       return line.replace(/^>\s/, "")
     }).join("\n")
@@ -60,7 +60,7 @@ const abc_Xcode = ABConvert.factory({
   detail: "参数为是否移除代码类型, 默认为false。记法: code|Xcode或code()|Xcode(true)内容不变",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.text,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): string=>{
     let matchs = header.match(/^Xcode(\((true|false)\))?$/)
     if (!matchs) return content
     let remove_flag:boolean
@@ -101,14 +101,14 @@ const abc_X = ABConvert.factory({
   name: "去除代码或引用块",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.text,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): string=>{
     let flag = ""
     for (let line of content.split("\n")){
       if (ABReg.reg_code.test(line)) {flag="code";break}
       else if (ABReg.reg_quote.test(line)) {flag="quote";break}
     }
-    if (flag=="code") return abc_Xcode.process(el, header, content)
-    else if (flag=="quote") return abc_Xquote.process(el, header, content)
+    if (flag=="code") return abc_Xcode.process(el, header, content) as string
+    else if (flag=="quote") return abc_Xquote.process(el, header, content) as string
     return content
   }
 })
@@ -143,7 +143,7 @@ const abc_slice = ABConvert.factory({
   detail: "和js的slice方法是一样的",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.text,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): string=>{
     // slice好像不怕溢出或交错，会自动变空数组。就很省心，不用判断太多的东西
     const list_match = header.match(/^slice\((\s*\d+\s*)(,\s*-?\d+\s*)?\)$/)
     if (!list_match) return content
@@ -168,7 +168,7 @@ const abc_add = ABConvert.factory({
   detail: "增添. 参数2为行序, 默认0, 行尾-1。会插行增添",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.text,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): string=>{
     const list_match = header.match(/^add\((.*?)(,\s*-?\d+\s*)?\)$/)
     if (!list_match) return content
     if (!list_match[1]) return content
@@ -199,7 +199,7 @@ const abc_listroot = ABConvert.factory({
   default: "listroot(root)",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.text,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): string=>{
     const list_match = header.match(/^listroot\((.*)\)$/)
     if (!list_match) return content
     const arg1 = list_match[1].trim()
@@ -217,7 +217,7 @@ const abc_callout = ABConvert.factory({
   detail: "需要obsidian 0.14版本以上来支持callout语法",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.text,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): string=>{
     return "```ad-"+header.slice(1)+"\n"+content+"\n```"
   }
 })

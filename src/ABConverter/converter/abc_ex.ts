@@ -13,7 +13,7 @@ const abc_faq = ABConvert.factory({
   match: "FAQ",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): HTMLElement=>{
     const e_faq:HTMLElement = document.createElement("div"); el.appendChild(e_faq); e_faq.classList.add("ab-faq");
     const list_content:string[] = content.split("\n");
 
@@ -56,7 +56,7 @@ const abc_info = ABConvert.factory({
   match: "info",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): HTMLElement=>{
     const table_p: HTMLDivElement = document.createElement("div"); el.appendChild(table_p); table_p.classList.add("markdown-rendered", "ab-setting", "md-table-fig1");
     const table: HTMLDivElement = document.createElement("table"); table_p.appendChild(table); table.classList.add("ab-setting","md-table-fig2");
     {

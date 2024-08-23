@@ -167,7 +167,7 @@ const abc_title2table = ABConvert.factory({
   name: "标题到表格",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): HTMLElement=>{
     content = ListProcess.title2list(content, el)
     TableProcess.list2table(content, el)
     return el
@@ -181,7 +181,7 @@ const abc_list2table = ABConvert.factory({
   default: "list2table",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): HTMLElement=>{
     const matchs = header.match(/list2(md)?table(T)?/)
     if (!matchs) return el
     TableProcess.list2table(content, el, matchs[2]=="T")
@@ -195,7 +195,7 @@ const abc_list2c2table = ABConvert.factory({
   match: "list2c2t",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): HTMLElement=>{
     let data = C2ListProcess.list2c2data(content)
     TableProcess.data2table(data, el, false)
     return el
@@ -209,7 +209,7 @@ const abc_list2ut = ABConvert.factory({
   default: "list2ut",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): HTMLElement=>{
     const matchs = header.match(/list2(md)?ut(T)?/)
     if (!matchs) return el
     TableProcess.list2ut(content, el, matchs[2]=="T")
@@ -224,7 +224,7 @@ const abc_list2timeline = ABConvert.factory({
   default: "list2mdtimeline",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): HTMLElement=>{
     const matchs = header.match(/list2(md)?timeline(T)?/)
     if (!matchs) return el
     TableProcess.list2timeline(content, el, matchs[2]=="T")
@@ -239,7 +239,7 @@ const abc_title2timeline = ABConvert.factory({
   default: "title2mdtimeline",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): HTMLElement=>{
     const matchs = header.match(/title2(md)?timeline(T)?/)
     if (!matchs) return el
     TableProcess.title2timeline(content, el, matchs[2]=="T")

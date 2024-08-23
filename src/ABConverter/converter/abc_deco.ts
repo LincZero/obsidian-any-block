@@ -15,7 +15,7 @@ const abc_md = ABConvert.factory({
   name: "md",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): HTMLElement=>{
     const subEl = document.createElement("div"); el.appendChild(subEl); subEl.classList.add("markdown-rendered")
     ABConvertManager.getInstance().m_renderMarkdownFn(content, subEl)
     return el
@@ -28,7 +28,7 @@ const abc_text = ABConvert.factory({
   detail: "其实一般会更推荐用code()代替，那个更精确",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): HTMLElement=>{
     // 文本元素。pre不好用，这里还是得用<br>换行最好
     // `<p>${content.split("\n").map(line=>{return "<span>"+line+"</span>"}).join("<br/>")}</p>`
     el.innerHTML = `<p>${content.replace(/ /g, "&nbsp;").split("\n").join("<br/>")}</p>`
@@ -41,7 +41,7 @@ const abc_fold = ABConvert.factory({
   name: "折叠",
   process_param: ABConvert_IOEnum.el,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: HTMLElement): HTMLElement=>{
     if(el.children.length!=1) return el
     const sub_el = el.children[0] as HTMLElement
     sub_el.remove()
@@ -76,7 +76,7 @@ const abc_scroll = ABConvert.factory({
   default: "scroll(460)",
   process_param: ABConvert_IOEnum.el,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: HTMLElement): HTMLElement=>{
     // 找参数
     const matchs = header.match(/^scroll(\((\d+)\))?(T)?$/)
     if (!matchs) return el
@@ -85,7 +85,7 @@ const abc_scroll = ABConvert.factory({
     else{
       if (!matchs[2]) return el
       arg1 = Number(matchs[2])
-      if (isNaN(arg1)) return
+      if (isNaN(arg1)) return el
     }
     // 修改元素
     if(el.children.length!=1) return el
@@ -110,7 +110,7 @@ const abc_overfold = ABConvert.factory({
   default: "overfold(380)",
   process_param: ABConvert_IOEnum.el,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: HTMLElement): HTMLElement=>{
     // 找参数
     const matchs = header.match(/^overfold(\((\d+)\))?$/)
     if (!matchs) return el
@@ -119,7 +119,7 @@ const abc_overfold = ABConvert.factory({
     else{
       if (!matchs[2]) return el
       arg1 = Number(matchs[2])
-      if (isNaN(arg1)) return
+      if (isNaN(arg1)) return el
     }
     // 修改元素
     if(el.children.length!=1) return el
@@ -160,7 +160,7 @@ const abc_addClass = ABConvert.factory({
   match: /^addClass\((.*)\)$/,
   process_param: ABConvert_IOEnum.el,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: HTMLElement): HTMLElement=>{
     const matchs = header.match(/^addClass\((.*)\)$/)
     if (!matchs || !matchs[1]) return el
     if(el.children.length!=1) return el
@@ -177,7 +177,7 @@ const abc_addDiv = ABConvert.factory({
   match: /^addDiv\((.*)\)$/,
   process_param: ABConvert_IOEnum.el,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: HTMLElement): HTMLElement=>{
     const matchs = header.match(/^addDiv\((.*)\)$/)
     if (!matchs || !matchs[1]) return el
     const arg1 = matchs[1]
@@ -206,7 +206,7 @@ const abc_title = ABConvert.factory({
   detail: "若直接处理代码或表格块，则会有特殊风格",
   process_param: ABConvert_IOEnum.el,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: HTMLElement): HTMLElement=>{
     const matchs = header.match(/^#(.*)/)
     if (!matchs || !matchs[1]) return el
     const arg1 = matchs[1]

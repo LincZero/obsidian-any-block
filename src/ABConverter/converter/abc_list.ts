@@ -356,7 +356,7 @@ const abc_title2list = ABConvert.factory({
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.text,
   detail: "也可以当作是更强大的列表解析器",
-  process: (el, header, content)=>{
+  process: (el, header, content: string): string=>{
     content = ListProcess.title2list(content, el)
     return content
   }
@@ -367,7 +367,7 @@ const abc_listXinline = ABConvert.factory({
   name: "列表消除内联换行",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.text,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): string=>{
     return ListProcess.listXinline(content)
   }
 })

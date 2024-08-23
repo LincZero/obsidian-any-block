@@ -381,7 +381,7 @@ const abc_list2tab = ABConvert.factory({
   default: "list2mdtab",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): HTMLElement=>{
     const matchs = header.match(/list2(md)?tab(T)?$/)
     if (!matchs) return el
     const c2listData = C2ListProcess.list2c2data(content)
@@ -396,7 +396,7 @@ const abc_title2tab = ABConvert.factory({
   match: "title2tab",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): HTMLElement=>{
     let data = C2ListProcess.title2c2data(content)
     C2ListProcess.c2data2tab(data, el, false)
     return el
@@ -410,7 +410,7 @@ const abc_list2col = ABConvert.factory({
   default: "list2mdtab",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): HTMLElement=>{
     const c2listData = C2ListProcess.list2c2data(content)
     C2ListProcess.c2data2items(c2listData, el)
     el.querySelector("div")?.classList.add("ab-col")
@@ -424,7 +424,7 @@ const abc_title2col = ABConvert.factory({
   match: "title2col",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): HTMLElement=>{
     let data = C2ListProcess.title2c2data(content)
     C2ListProcess.c2data2items(data, el)
     el.querySelector("div")?.classList.add("ab-col")
@@ -438,7 +438,7 @@ const abc_list2card = ABConvert.factory({
   match: "list2card",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): HTMLElement=>{
     const c2listData = C2ListProcess.list2c2data(content)
     C2ListProcess.c2data2items(c2listData, el)
     el.querySelector("div")?.classList.add("ab-card")
@@ -452,7 +452,7 @@ const abc_title2card = ABConvert.factory({
   match: "title2card",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): HTMLElement=>{
     let data = C2ListProcess.title2c2data(content)
     C2ListProcess.c2data2items(data, el)
     console.log(data, "pp", content)

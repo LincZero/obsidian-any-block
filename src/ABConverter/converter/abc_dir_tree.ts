@@ -260,7 +260,7 @@ const abc_list2lt = ABConvert.factory({
   default: "list2lt",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): HTMLElement=>{
     const matchs = header.match(/list2(md)?lt(T)?/)
     if (!matchs) return el
     DirProcess.list2lt(content, el, matchs[2]=="T")
@@ -275,7 +275,7 @@ const abc_list2dt = ABConvert.factory({
   default: "list2dt",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): HTMLElement=>{
     const matchs = header.match(/list2(md)?dt(T)?/)
     if (!matchs) return el
     DirProcess.list2dt(content, el, matchs[2]=="T")
@@ -378,7 +378,7 @@ const abc_list2astreeH = ABConvert.factory({
   name: "列表到sacii目录树",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.text,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): string=>{
     let listdata: List_ListItem = ListProcess.list2data(content)
     listdata = ListProcess.data2strict(listdata)
     const dirlistdata: List_DirListItem = listdata2dirdata(listdata)

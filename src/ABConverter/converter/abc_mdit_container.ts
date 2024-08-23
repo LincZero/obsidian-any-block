@@ -47,7 +47,7 @@ const abc_mditTabs = ABConvert.factory({
   name: "mdit标签页",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): HTMLElement=>{
     let c2listdata: List_C2ListItem = mditTabs2listdata(content, /^@tab(.*)$/)
     C2ListProcess.c2data2tab(c2listdata, el, false)
     return el
@@ -59,7 +59,7 @@ const abc_mditDemo = ABConvert.factory({
   name: "mdit展示对比",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): HTMLElement=>{
     const newContent = `@tab show\n${content}\n@tab mdSource\n~~~~~md\n${content}\n~~~~~`
     abc_mditTabs.process(el, header, newContent)
     return el
@@ -71,7 +71,7 @@ const abc_mditABDemo = ABConvert.factory({
   name: "AnyBlock转用展示对比",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): HTMLElement=>{
     const newContent = `@tab show\n${content}\n@tab withoutPlugin\n(noPlugin)${content.trimStart()}\n@tab mdSource\n~~~~~md\n${content}\n~~~~~`
     abc_mditTabs.process(el, header, newContent)
     return el
@@ -88,7 +88,7 @@ const abc_midt_co = ABConvert.factory({
   name: "mdit分栏",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): HTMLElement=>{
     let c2listdata: List_C2ListItem = mditTabs2listdata(content, /^@[a-zA-Z](.*)$/)
     C2ListProcess.c2data2items(c2listdata, el)
     el.querySelector("div")?.classList.add("ab-col")
@@ -101,7 +101,7 @@ const abc_midt_card = ABConvert.factory({
   name: "mdit卡片",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): HTMLElement=>{
     let c2listdata: List_C2ListItem = mditTabs2listdata(content, /^@[a-zA-Z](.*)$/)
     C2ListProcess.c2data2items(c2listdata, el)
     el.querySelector("div")?.classList.add("ab-card")

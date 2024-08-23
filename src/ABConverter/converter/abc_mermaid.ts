@@ -34,7 +34,7 @@ const abc_title2mindmap = ABConvert.factory({
   name: "标题到脑图",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): HTMLElement=>{
     content = ListProcess.title2list(content, el)
     list2mindmap(content, el)
     return el
@@ -46,7 +46,7 @@ const abc_list2mermaid = ABConvert.factory({
   name: "列表转mermaid流程图",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): HTMLElement=>{
     list2mermaid(content, el)
     return el
   }
@@ -57,7 +57,7 @@ const abc_list2mindmap = ABConvert.factory({
   name: "列表转mermaid思维导图",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: (el, header, content: string): HTMLElement=>{
     list2mindmap(content, el)
     return el
   }
@@ -71,11 +71,12 @@ const abc_mermaid = ABConvert.factory({
   detail: "由于需要兼容脑图，这里会使用插件内置的最新版mermaid",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content)=>{
+  process: async (el, header, content: string): Promise<HTMLElement>=>{
     let matchs = content.match(/^mermaid(\((.*)\))?$/)
     if (!matchs) return el
     if (matchs[1]) content = matchs[2]+"\n"+content
-    return render_mermaidText(content, el)
+    const el2 = render_mermaidText(content, el)
+    return el2
   }
 })
 

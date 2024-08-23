@@ -42,7 +42,7 @@ id: "list2markmap",
 name: "列表到脑图 (markmap)",
 process_param: ABConvert_IOEnum.text,
 process_return: ABConvert_IOEnum.el,
-process: (el, header, content)=>{
+process: (el, header, content: string): HTMLElement=>{
 		list2markmap(content, el)
 		return el
 	}
@@ -53,7 +53,7 @@ const abc_title2mindmap = ABConvert.factory({
 	name: "标题到脑图 (markmap)",
 	process_param: ABConvert_IOEnum.text,
 	process_return: ABConvert_IOEnum.el,
-	process: (el, header, content)=>{
+	process: (el, header, content: string): HTMLElement=>{
 			content = ListProcess.title2list(content, el)
 			list2markmap(content, el)
 			return el
