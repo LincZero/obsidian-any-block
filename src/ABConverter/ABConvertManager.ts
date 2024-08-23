@@ -248,6 +248,8 @@ export class ABConvertManager {
     ) {
       if (selectorName == "title" || ABReg.reg_heading_noprefix.test(content.trimStart())) {
         header = "|title 140lne" + header
+        header = header.replace(/^\|title 140lne\|timeline\|/, "|title2timeline|");
+        header = header.replace(/^\|title 140lne\|时间线\|/, "|title2timeline|");
         header = header.replace(/^\|title 140lne\|tab\|/, "|title2tab|");
         header = header.replace(/^\|title 140lne\|tabs\|/, "|title2tab|");
         header = header.replace(/^\|title 140lne\|标签\|/, "|title2tab|");
@@ -303,11 +305,11 @@ export class ABConvertManager {
       header = header.replace(/^\|list 140lne\|目录结构\|/, "|list2dt|");
       
       // 二层树
-      header = header.replace(/^\|list 140lne\|timeline\|/, "|list2timeline|");
-      header = header.replace(/^\|list 140lne\|时间线\|/, "|list2timeline|");
       header = header.replace(/^\|list 140lne\|fakeList\|/, "|list2table|addClass(ab-table-fc)|addClass(ab-table-likelist)|");
       header = header.replace(/^\|list 140lne\|仿列表\|/, "|list2table|addClass(ab-table-fc)|addClass(ab-table-likelist)|");
 
+      header = header.replace(/^\|list 140lne\|timeline\|/, "|list2timeline|");
+      header = header.replace(/^\|list 140lne\|时间线\|/, "|list2timeline|");
       header = header.replace(/^\|list 140lne\|tab\|/, "|list2tab|");
       header = header.replace(/^\|list 140lne\|tabs\|/, "|list2tab|");
       header = header.replace(/^\|list 140lne\|标签\|/, "|list2tab|");

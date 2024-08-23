@@ -72,7 +72,16 @@ export class TableProcess{
     if (table) table.classList.add("ab-table-fc", "ab-table-timeline")
     return div 
   }
-  
+
+  /** 标题转时间线 */
+  static title2timeline(text: string, div: HTMLDivElement, modeT=false) {
+    let data = C2ListProcess.title2c2data(text)
+    div = TableProcess.data2table(data, div, modeT)
+    const table = div.querySelector("table")
+    if (table) table.classList.add("ab-table-fc", "ab-table-timeline")
+    return div 
+  }
+
   /** 列表数据转表格 */
   static data2table(
     list_itemInfo: List_ListItem, 
@@ -219,6 +228,21 @@ const abc_list2timeline = ABConvert.factory({
     const matchs = header.match(/list2(md)?timeline(T)?/)
     if (!matchs) return el
     TableProcess.list2timeline(content, el, matchs[2]=="T")
+    return el
+  }
+})
+
+const abc_title2timeline = ABConvert.factory({
+  id: "title2timeline",
+  name: "标题转时间线",
+  match: /title2(md)?timeline(T)?/,
+  default: "title2mdtimeline",
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.el,
+  process: (el, header, content)=>{
+    const matchs = header.match(/title2(md)?timeline(T)?/)
+    if (!matchs) return el
+    TableProcess.title2timeline(content, el, matchs[2]=="T")
     return el
   }
 })
