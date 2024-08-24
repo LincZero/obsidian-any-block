@@ -15,15 +15,14 @@ import type { List_TableItem } from "./abc_table"
  * 
  * @detail
  * TODO 待增加一个list和json专用格式
- * 注意：后面的值必须是 typeof() 的结果。用来检查处理器的声明参数/返回值和实际参数/返回值是否一致
  */
 export enum ABConvert_IOEnum {
-  text = "string",
-  el = "HTMLElement",
-  // el_text = "string",
-  json = "string",
-  list_strem = "array",
-  c2list_strem = "array",
+  text = "string", // string
+  el = "HTMLElement", // HTMLElement
+  // el_text = "string", // string
+  json = "json_string", // string
+  list_strem = "array", // object
+  c2list_strem = "array2", // object  
 }
 export type ABConvert_IOType =
   string|           // text/el_text

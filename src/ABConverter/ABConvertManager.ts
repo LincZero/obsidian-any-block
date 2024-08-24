@@ -110,13 +110,18 @@ export class ABConvertManager {
    * @return 等于el，无用，后面可以删了
    */
   public static autoABConvert(el:HTMLDivElement, header:string, content:string, selectorName:string = ""): void{
-    let prev_result: ABConvert_IOType = content             // 上次转换后的结果，初始必为string
-    let prev_type: ABConvert_IOEnum = ABConvert_IOEnum.text // 上次转换后的结果的类型
+    let prev_result: ABConvert_IOType = content               // 上次转换后的结果，初始必为string
+    let prev_type: string = "string"                          // 上次转换后的结果的类型 (类型检测而来)
+    let prev_type2: ABConvert_IOEnum = ABConvert_IOEnum.text  // 上次转换后的结果的类型 (接口声明而来)
+    let prev_processor;                                       // 上一次转换的处理器
+    let prev = {                                              // 组合在一起是为了引用传参
+      prev_result, prev_type, prev_type2, prev_processor
+    }
 
-    header = this.autoABConvert_first(el, header, selectorName, prev_result as string, prev_type);
+    header = this.autoABConvert_first(el, header, selectorName, prev_result as string);
     let list_header = header.split("|")
-    prev_result = this.autoABConvert_runConvert(el, list_header, prev_result, prev_type)
-    this.autoABConvert_last(el, header, selectorName, prev_result, prev_type)
+    prev_result = this.autoABConvert_runConvert(el, list_header, prev)
+    this.autoABConvert_last(el, header, selectorName, prev)
   }
 
   /**
@@ -124,10 +129,11 @@ export class ABConvertManager {
    * @param el 
    * @param list_header 
    * @param prev_result 上次转换后的结果
-   * @param prev_type   上次转换后的结果的类型
+   * @param prev_type   上次转换后的结果的类型 (类型检测而来, typeof类型)
+   * @param prev_type2  上次转换后的结果的类型 (接口声明而来, IOEnum类型)
    * @returns           递归转换后的结果
    */
-  private static autoABConvert_runConvert(el:HTMLDivElement, list_header:string[], prev_result:ABConvert_IOType, prev_type:ABConvert_IOEnum):ABConvert_IOType{
+  private static autoABConvert_runConvert(el:HTMLDivElement, list_header:string[], prev:any):any{
     // 循环header组，直到遍历完文本处理器或遇到渲染处理器
     for (let item_header of list_header){
       for (let abReplaceProcessor of ABConvertManager.getInstance().list_abConvert){
@@ -151,44 +157,49 @@ export class ABConvertManager {
               alias = alias.replace(RegExp(`%${i}`), matchs[i]) /** @bug 按理应该用`(?<!\\)%${i}`，但ob不支持正则的向前查找 */
             }
           })()
-          prev_result = this.autoABConvert_runConvert(el, alias.split("|"), prev_result, prev_type)
+          prev.prev_result = this.autoABConvert_runConvert(el, alias.split("|"), prev)
         }
         // 若不是，使用process方法
         else if(abReplaceProcessor.process){
           // (1) 检查输入类型
-          if (abReplaceProcessor.process_param != prev_type){
+          if (abReplaceProcessor.process_param != prev.prev_type2){
             // TODO，后面要被别名系统替换掉，`html->html` 的输入源是md时，里面插入一个md转换器
-            if (abReplaceProcessor.process_param==ABConvert_IOEnum.el && typeof(prev_result) == "string" && prev_type==ABConvert_IOEnum.text){
+            if (abReplaceProcessor.process_param==ABConvert_IOEnum.el && typeof(prev.prev_result) == "string" && prev.prev_type2==ABConvert_IOEnum.text){
               const subEl: HTMLDivElement = document.createElement("div"); el.appendChild(subEl); subEl.classList.add("markdown-rendered");
-              ABConvertManager.getInstance().m_renderMarkdownFn(prev_result, subEl);
-              prev_type = ABConvert_IOEnum.el
-              prev_result = el
+              ABConvertManager.getInstance().m_renderMarkdownFn(prev.prev_result, subEl);
+              prev.prev_result = el
+              prev.prev_type = typeof(prev.prev_result)
+              prev.prev_type2 = ABConvert_IOEnum.el
+              prev.prev_processor = "md"
             }
             else{
-              console.warn(`处理器输入类型错误, id:${abReplaceProcessor.id}, virtualParam:${abReplaceProcessor.process_param}, realParam${prev_type}`);
+              console.warn(`处理器输入类型错误, id:${abReplaceProcessor.id}, virtualParam:${abReplaceProcessor.process_param}, realParam${prev.prev_type}`);
               break
             }
           }
 
           // (2) 执行处理器
-          prev_result = abReplaceProcessor.process(el, item_header, prev_result)
+          prev.prev_result = abReplaceProcessor.process(el, item_header, prev.prev_result)
+          prev.prev_type = typeof(prev.prev_result)
+          prev.prev_type2 = abReplaceProcessor.process_return as ABConvert_IOEnum
+          prev.prev_processor = abReplaceProcessor.process
 
           // (3) 检查输出类型
-          if(typeof(prev_result) == "string"){prev_type = ABConvert_IOEnum.text}
+          // if(typeof(prev_result) == "string"){prev_type = ABConvert_IOEnum.text}
           // 下行换成了下下行。因为下行在mdit/jsdom环境可能报错：Right-hand side of 'instanceof' is not callable
           //else if (prev_result instanceof HTMLElement){prev_type = ABConvert_IOType.el}
-          else if (typeof(prev_result) == "object"){prev_type = ABConvert_IOEnum.el}
-          else {
-            console.warn(`处理器输出类型错误, id:${abReplaceProcessor.id}, virtualReturn:${abReplaceProcessor.process_return}, realReturn${prev_type}`);
-            break
-          }
+          // else if (typeof(prev_result) == "object"){prev_type = ABConvert_IOEnum.el}
+          // else {
+          //   console.warn(`处理器输出类型错误, id:${abReplaceProcessor.id}, virtualReturn:${abReplaceProcessor.process_return}, realReturn${prev_type}`);
+          //   break
+          // }
         }
         else{
           console.warn("处理器必须实现process或process_alias方法")
         }
       }
     }
-    return prev_result
+    return prev
   }
   
   /**
@@ -390,21 +401,33 @@ export class ABConvertManager {
   /**
    * 子函数，后处理/尾处理，主要进行末尾追加指令
    */
-  private static autoABConvert_last (el:HTMLDivElement, header:string, selectorName:string, prev_result: ABConvert_IOType, prev_type: ABConvert_IOEnum){
+  private static autoABConvert_last (el:HTMLDivElement, header:string, selectorName:string, prev:any):any{
     // text内容，则给一个md渲染器
-    if (typeof(prev_result) == "string" && prev_type == ABConvert_IOEnum.text) {
+    if (prev.prev_type == "string" && prev.prev_type2 == ABConvert_IOEnum.text) {
       const subEl = document.createElement("div"); el.appendChild(subEl); subEl.classList.add("markdown-rendered");
-      ABConvertManager.getInstance().m_renderMarkdownFn(prev_result, subEl);
-      prev_type = ABConvert_IOEnum.el
-      prev_result = el
+      ABConvertManager.getInstance().m_renderMarkdownFn(prev.prev_result as string, subEl);
+      prev.prev_result = el; prev.prev_type = "object"; prev.prev_type2 = ABConvert_IOEnum.el; prev.process = "md";
     }
     // json内容/数组内容，则用代码块表示
-    else if (typeof(prev_result) == "string" && prev_type == ABConvert_IOEnum.json) {
-      const code_str:string = "```json\n" + prev_result + "\n```\n"
+    else if (prev.prev_type == "string" && prev.prev_type2 == ABConvert_IOEnum.json) {
+      const code_str:string = "```json\n" + prev.prev_result + "\n```\n"
+      const subEl = document.createElement("div"); el.appendChild(subEl); subEl.classList.add("markdown-rendered");
+      prev.prev_type = "object"; prev.prev_type2 = ABConvert_IOEnum.el
+      prev.prev_result = el; prev.prev_type = "object"; prev.prev_type2 = ABConvert_IOEnum.el; prev.process = "show_json";
+    }
+    // 数组流，用代码块表示
+    else if (prev.prev_type == "object" && (prev.prev_type2 == ABConvert_IOEnum.list_strem || prev.prev_type2 == ABConvert_IOEnum.c2list_strem)) {
+      const code_str:string = "```json\n" + JSON.stringify(prev.prev_result, null, 2) + "\n```\n"
       const subEl = document.createElement("div"); el.appendChild(subEl); subEl.classList.add("markdown-rendered");
       ABConvertManager.getInstance().m_renderMarkdownFn(code_str, subEl);
-      prev_type = ABConvert_IOEnum.el
-      prev_result = el
+      prev.prev_result = el; prev.prev_type = "object"; prev.prev_type2 = ABConvert_IOEnum.el; prev.process = "show_listStream";
     }
+    else if (prev.prev_type == "object" && prev.prev_type2 == ABConvert_IOEnum.el) {
+      return prev
+    }
+    else {
+      console.warn("other type in tail, can not tail processor:", prev.prev_type, prev.prev_type2, prev.prev_result)
+    }
+    return prev
   }
 }
