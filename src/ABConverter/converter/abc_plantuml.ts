@@ -12,13 +12,14 @@ import {ListProcess, type List_ListItem} from "./abc_list"
 import plantumlEncoder from "plantuml-encoder"
 
 const abc_list2jsontext = ABConvert.factory({
-  id: "list2jsontext",
-  name: "列表到json文本",
+  id: "json2pumlEl",
+  name: "json到可视化",
   process_param: ABConvert_IOEnum.text,
-  process_return: ABConvert_IOEnum.text,
-  process: (el, header, content: string): string=>{
-    content = "Developing..."
-    return content
+  process_return: ABConvert_IOEnum.el,
+  process: (el, header, content: string): HTMLElement=>{
+    content = "@startjson\n" + content + "\n@endjson\n"
+    render_pumlText(content, el)
+    return el
   }
 })
 

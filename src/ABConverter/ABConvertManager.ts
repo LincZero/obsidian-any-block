@@ -135,7 +135,7 @@ export class ABConvertManager {
    */
   private static autoABConvert_runConvert(el:HTMLDivElement, list_header:string[], prev:any):any{
     // 循环header组，直到遍历完文本处理器或遇到渲染处理器
-    for (let item_header of list_header){
+    for (let item_header of list_header){ // TODO 因为可能被插入新的“中间自动转换器”，要么for替换成递归，要么都在头部预处理时弄完
       for (let abReplaceProcessor of ABConvertManager.getInstance().list_abConvert){
         // 通过header寻找处理器
         if (typeof(abReplaceProcessor.match)=='string'){if (abReplaceProcessor.match!=item_header) continue}
@@ -163,14 +163,24 @@ export class ABConvertManager {
         else if(abReplaceProcessor.process){
           // (1) 检查输入类型
           if (abReplaceProcessor.process_param != prev.prev_type2){
-            // TODO，后面要被别名系统替换掉，`html->html` 的输入源是md时，里面插入一个md转换器
-            if (abReplaceProcessor.process_param==ABConvert_IOEnum.el && typeof(prev.prev_result) == "string" && prev.prev_type2==ABConvert_IOEnum.text){
+            // TODO，两个自动处理器，后面要被别名系统替换掉
+            if (abReplaceProcessor.process_param==ABConvert_IOEnum.el &&
+              prev.prev_type2==ABConvert_IOEnum.text
+            ){ // 需要输入html，实际输入md，则插入一个md->html
               const subEl: HTMLDivElement = document.createElement("div"); el.appendChild(subEl); subEl.classList.add("markdown-rendered");
               ABConvertManager.getInstance().m_renderMarkdownFn(prev.prev_result, subEl);
               prev.prev_result = el
               prev.prev_type = typeof(prev.prev_result)
               prev.prev_type2 = ABConvert_IOEnum.el
               prev.prev_processor = "md"
+            }
+            else if (abReplaceProcessor.process_param==ABConvert_IOEnum.text &&
+              (prev.prev_type2==ABConvert_IOEnum.list_strem || prev.prev_type2==ABConvert_IOEnum.c2list_strem)
+            ) { // 需要输入text，实际输入object，则插入一个object->text
+              prev.prev_result = JSON.stringify(prev.prev_result, null, 2)
+              prev.prev_type = typeof(prev.prev_result)
+              prev.prev_type2 = ABConvert_IOEnum.text
+              prev.prev_processor = "stream to text"
             }
             else{
               console.warn(`处理器输入类型错误, id:${abReplaceProcessor.id}, virtualParam:${abReplaceProcessor.process_param}, realParam${prev.prev_type}`);
