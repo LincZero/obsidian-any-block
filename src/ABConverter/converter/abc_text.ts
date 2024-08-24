@@ -55,17 +55,17 @@ const abc_Xquote = ABConvert.factory({
 const abc_Xcode = ABConvert.factory({
   id: "Xcode",
   name: "去除代码块",
-  match: /^Xcode(\((true|false)\))?$/,
+  match: /^Xcode(\((true|false|)\))?$/,
   default: "Xcode(true)",
-  detail: "参数为是否移除代码类型, 默认为false。记法: code|Xcode或code()|Xcode(true)内容不变",
+  detail: "参数为是否移除代码类型, Xcode默认为false, Xcode默认为true。记法: code|Xcode 或 code()|Xcode()内容不变",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.text,
   process: (el, header, content: string): string=>{
-    let matchs = header.match(/^Xcode(\((true|false)\))?$/)
+    let matchs = header.match(/^Xcode(\((true|false|)\))?$/)
     if (!matchs) return content
     let remove_flag:boolean
     if (matchs[1]=="") remove_flag=false
-    else remove_flag= (matchs[2]=="true")
+    else remove_flag= (matchs[2]!="false")
     let list_content = content.split("\n")
     // 开始去除
     let code_flag = ""
