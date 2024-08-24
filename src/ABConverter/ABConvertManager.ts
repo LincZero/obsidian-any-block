@@ -182,8 +182,14 @@ export class ABConvertManager {
               prev.prev_type2 = ABConvert_IOEnum.text
               prev.prev_processor = "stream to text"
             }
+            else if (abReplaceProcessor.process_param==ABConvert_IOEnum.text &&
+              prev.prev_type2==ABConvert_IOEnum.json
+            ) {
+              prev.prev_type2 = ABConvert_IOEnum.text
+              prev.prev_processor = "json to text"
+            }
             else{
-              console.warn(`处理器输入类型错误, id:${abReplaceProcessor.id}, virtualParam:${abReplaceProcessor.process_param}, realParam${prev.prev_type}`);
+              console.warn(`处理器输入类型错误, id:${abReplaceProcessor.id}, virtualParam:${abReplaceProcessor.process_param}, realParam:${prev.prev_type2}`);
               break
             }
           }
@@ -422,11 +428,13 @@ export class ABConvertManager {
     else if (prev.prev_type == "string" && prev.prev_type2 == ABConvert_IOEnum.json) {
       const code_str:string = "```json\n" + prev.prev_result + "\n```\n"
       const subEl = document.createElement("div"); el.appendChild(subEl); subEl.classList.add("markdown-rendered");
-      prev.prev_type = "object"; prev.prev_type2 = ABConvert_IOEnum.el
+      ABConvertManager.getInstance().m_renderMarkdownFn(code_str, subEl);
       prev.prev_result = el; prev.prev_type = "object"; prev.prev_type2 = ABConvert_IOEnum.el; prev.process = "show_json";
     }
     // 数组流，用代码块表示
-    else if (prev.prev_type == "object" && (prev.prev_type2 == ABConvert_IOEnum.list_strem || prev.prev_type2 == ABConvert_IOEnum.c2list_strem)) {
+    else if (prev.prev_type == "object" &&
+      (prev.prev_type2 == ABConvert_IOEnum.list_strem || prev.prev_type2 == ABConvert_IOEnum.c2list_strem || prev.prev_type2 == ABConvert_IOEnum.json)
+    ) {
       const code_str:string = "```json\n" + JSON.stringify(prev.prev_result, null, 2) + "\n```\n"
       const subEl = document.createElement("div"); el.appendChild(subEl); subEl.classList.add("markdown-rendered");
       ABConvertManager.getInstance().m_renderMarkdownFn(code_str, subEl);

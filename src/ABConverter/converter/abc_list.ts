@@ -9,6 +9,7 @@
 import { ABReg } from '../ABReg'
 import {ABConvert_IOEnum, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
 import {ABConvertManager} from "../ABConvertManager"
+import { children, current_component } from 'svelte/internal';
 
 /**
  * 通用列表数据，一个元素等于是一个列表项
@@ -35,6 +36,12 @@ export interface ListItem {
   level: number;          // 级别 (缩进空格数/normalization后的递增等级数)
 }[]
 export type List_ListItem = ListItem[]
+
+// 列表节点结构
+export type listNodes = {
+  content: string;
+  children: listNodes[];
+}
 
 /// 一些列表相关的工具集
 export class ListProcess{
@@ -113,6 +120,92 @@ export class ListProcess{
       }
     }
     return list_itemInfo
+  }
+
+  /**
+   * listStream结构 转 树型结构
+   * 
+   * @detail
+   * 与list2data不同，这里仅识别 `: ` 作为分割符
+   * 
+   * @param text
+   * @return
+   * {
+   *   content: string;        // 内容
+   *   level: number;          // 级别 (缩进空格数)
+   * }
+   * to
+   * {
+   *   content: string
+   *   children: []
+   * }
+   */
+  static list2listnode(text: string): listNodes[]{
+    let data: List_ListItem = ListProcess.list2data(text, false)
+    data = ListProcess.data2strict(data)
+    let nodes: listNodes[] = []
+    let prev_nodes: listNodes[] = [] // 缓存每个level的最新节点
+
+    let current_data: listNodes
+    for (let index = 0; index<data.length; index++) {
+      // 当前节点
+      const item = data[index]
+      current_data = {
+        content: item.content,
+        children: []
+      }
+      prev_nodes[item.level] = current_data
+
+      // 放入节点树的对应位置中
+      if (item.level>=1 && prev_nodes.hasOwnProperty(item.level-1)) {
+        prev_nodes[item.level-1].children.push(current_data)
+      } else if (item.level==0) {
+        nodes.push(current_data)
+      } else {
+        console.error(`list数据不合规，没有正规化. level:${item.level}, prev_nodes:${prev_nodes}`)
+        return nodes
+      }
+    }
+    return nodes
+  }
+
+  static list2json(text: string): object{
+    let data: List_ListItem = ListProcess.list2data(text, false)
+    data = ListProcess.data2strict(data)
+    let nodes: {[key: string]: object} = {}         // 节点树
+    let prev_nodes: {[key: string]: object}[] = []  // 缓存每个level的最新节点
+
+    // 第一次变换，所有节点为 "key": {...} 形式
+    for (let index = 0; index<data.length; index++) {
+      // 当前节点
+      const item = data[index]
+      const current_key: string = item.content
+      const current_value: {[key: string]: object} = {}
+      prev_nodes[item.level] = current_value
+
+      // 放入节点树的对应位置中
+      if (item.level>=1 && prev_nodes.hasOwnProperty(item.level-1)) {
+        let lastItem = prev_nodes[item.level-1]
+        if (typeof lastItem != "object" || Array.isArray(lastItem)) {
+          console.error(`list数据不合规，父节点的value值不是{}类型`)
+          return nodes
+        }
+        lastItem[current_key] = current_value
+      } else if (item.level==0) {
+        nodes[current_key] = current_value
+      } else {
+        console.error(`list数据不合规，没有正规化. level:${item.level}, prev_nodes:${prev_nodes}`)
+        return nodes
+      }
+    }
+
+    // 第二次变换，节点 "k:v": {空} 展开为 "k": "v"
+    // ...
+    
+    // 第三次变换，部分转列表
+    // ...
+
+    return nodes
   }
 
   /**
@@ -376,6 +469,30 @@ const abc_listdata2strict = ABConvert.factory({
   process_return: ABConvert_IOEnum.list_strem,
   process: (el, header, content: List_ListItem): List_ListItem=>{
     return ListProcess.data2strict(content)
+  }
+})
+
+export const abc_list2listnode = ABConvert.factory({
+  id: "list2listnode",
+  name: "列表到listnode (beta)",
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.json,
+  detail: "列表到listnode",
+  process: (el, header, content: string): string=>{
+    const data: listNodes[] = ListProcess.list2listnode(content)
+    return JSON.stringify(data, null, 2) // TMP
+  }
+})
+
+export const abc_list2json = ABConvert.factory({
+  id: "list2json",
+  name: "列表到json (beta)",
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.json,
+  detail: "列表到json",
+  process: (el, header, content: string): string=>{
+    const data: object = ListProcess.list2json(content)
+    return JSON.stringify(data, null, 2) // TMP
   }
 })
 
