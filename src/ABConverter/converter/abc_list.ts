@@ -40,20 +40,6 @@ export type List_ListItem = ListItem[]
 export class ListProcess{
 
   // ----------------------- str -> listData ------------------------
-  
-  /** title转列表 */
-  static title2list(text: string, div: HTMLDivElement): string {
-    if (!text.trimStart().startsWith("#")) return text // 不让重复调用
-    let list_itemInfo = this.title2data(text)
-    list_itemInfo = this.data2strict(list_itemInfo).map((item: ListItem, index)=>{ return {content: item.content, level: item.level*2}})
-    return this.data2list(list_itemInfo)
-  }
-
-  /** 去除列表的inline */
-  static listXinline(text: string){
-    const data = this.list2data(text)
-    return this.data2list(data)
-  }
 
   /** 
    * 列表文本转列表数据 
@@ -140,7 +126,7 @@ export class ListProcess{
    * 3. 列表等级,  = `(.*)-`个数+1,  取值[0]
    * 
    */
-  private static title2data(text: string){
+  static title2data(text: string){
     let list_itemInfo:List_ListItem = []
 
     const list_text = text.split("\n")
@@ -332,7 +318,7 @@ export class ListProcess{
    * - title2list会用到
    * - 妙用：list2data + data2list = listXinline
    */
-  private static data2list(
+  static data2list(
     list_itemInfo: List_ListItem
   ){
     let list_newcontent:string[] = [] // 传入参数以列表项为单位，这个以行为单位
@@ -350,24 +336,71 @@ export class ListProcess{
   }
 }
 
-const abc_title2list = ABConvert.factory({
+export const abc_list2listdata = ABConvert.factory({
+  id: "list2listdata",
+  name: "列表到listdata",
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.list_strem,
+  detail: "列表到listdata",
+  process: (el, header, content: string): List_ListItem=>{
+    return ListProcess.list2data(content) as List_ListItem
+  }
+})
+
+export const abc_title2listdata = ABConvert.factory({
+  id: "title2listdata",
+  name: "标题到listdata",
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.list_strem,
+  detail: "标题到listdata",
+  process: (el, header, content: string): List_ListItem=>{
+    return ListProcess.title2data(content) as List_ListItem
+  }
+})
+
+const abc_listdata2list = ABConvert.factory({
+  id: "listdata2list",
+  name: "listdata到列表",
+  process_param: ABConvert_IOEnum.list_strem,
+  process_return: ABConvert_IOEnum.text,
+  detail: "listdata到列表",
+  process: (el, header, content: List_ListItem): string=>{
+    return ListProcess.data2list(content) as string
+  }
+})
+
+const abc_listdata2strict = ABConvert.factory({
+  id: "listdata2strict",
+  name: "listdata严格化",
+  process_param: ABConvert_IOEnum.list_strem,
+  process_return: ABConvert_IOEnum.list_strem,
+  process: (el, header, content: List_ListItem): List_ListItem=>{
+    return ListProcess.data2strict(content)
+  }
+})
+
+// TODO 仅组合，应用别名替换
+export const abc_title2list = ABConvert.factory({
   id: "title2list",
   name: "标题到列表",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.text,
   detail: "也可以当作是更强大的列表解析器",
   process: (el, header, content: string): string=>{
-    content = ListProcess.title2list(content, el)
-    return content
+    let data: List_ListItem = abc_title2listdata.process(el, header, content) as List_ListItem
+    data = (abc_listdata2strict.process(el, header, data) as List_ListItem).map((item: ListItem, index)=>{ return {content: item.content, level: item.level*2}})
+    return abc_listdata2list.process(el, header, data) as string
   }
 })
 
+// TODO 仅组合，应用别名替换
 const abc_listXinline = ABConvert.factory({
   id: "listXinline",
   name: "列表消除内联换行",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.text,
   process: (el, header, content: string): string=>{
-    return ListProcess.listXinline(content)
+    const data: List_ListItem = abc_list2listdata.process(el, header, content) as List_ListItem;
+    return abc_listdata2list.process(el, header, data) as string
   }
 })

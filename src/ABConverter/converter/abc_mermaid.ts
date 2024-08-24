@@ -34,10 +34,23 @@ const abc_title2mindmap = ABConvert.factory({
   name: "标题到脑图",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
-  process: (el, header, content: string): HTMLElement=>{
-    content = ListProcess.title2list(content, el)
-    list2mindmap(content, el)
-    return el
+  process: async (el, header, content: string): Promise<HTMLElement>=>{
+    const data = ListProcess.title2data(content) as List_ListItem
+    const el2 = await data2mindmap(data, el)
+    return el2
+  }
+})
+
+// 纯组合，后续用别名模块替代
+const abc_list2mindmap = ABConvert.factory({
+  id: "list2mindmap",
+  name: "列表转mermaid思维导图",
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.el,
+  process: async (el, header, content: string): Promise<HTMLElement>=>{
+    const data = ListProcess.list2data(content) as List_ListItem
+    const el2 = await data2mindmap(data, el)
+    return el2
   }
 })
 
@@ -48,17 +61,6 @@ const abc_list2mermaid = ABConvert.factory({
   process_return: ABConvert_IOEnum.el,
   process: (el, header, content: string): HTMLElement=>{
     list2mermaid(content, el)
-    return el
-  }
-})
-
-const abc_list2mindmap = ABConvert.factory({
-  id: "list2mindmap",
-  name: "列表转mermaid思维导图",
-  process_param: ABConvert_IOEnum.text,
-  process_return: ABConvert_IOEnum.el,
-  process: (el, header, content: string): HTMLElement=>{
-    list2mindmap(content, el)
     return el
   }
 })
@@ -87,12 +89,6 @@ function list2mermaid(text: string, div: HTMLDivElement) {
   let list_itemInfo = ListProcess.list2data(text)
   let mermaidText = data2mermaidText(list_itemInfo)
   return render_mermaidText(mermaidText, div)
-}
-
-/** 列表转mermaid思维导图 */
-function list2mindmap(text: string, div: HTMLDivElement) {
-  let list_itemInfo = ListProcess.list2data(text)
-  return data2mindmap(list_itemInfo, div)
 }
 
 /** 列表数据转mermaid流程图

@@ -42,13 +42,13 @@ const abc_fold = ABConvert.factory({
   process_param: ABConvert_IOEnum.el,
   process_return: ABConvert_IOEnum.el,
   process: (el, header, content: HTMLElement): HTMLElement=>{
-    if(el.children.length!=1) return el
-    const sub_el = el.children[0] as HTMLElement
+    if(content.children.length!=1) return content
+    const sub_el = content.children[0] as HTMLElement
     sub_el.remove()
     sub_el.setAttribute("is_hide", "true")
     sub_el.classList.add("ab-deco-fold-content")
     sub_el.style.display = "none"
-    const mid_el = document.createElement("div"); el.appendChild(mid_el); mid_el.classList.add("ab-deco-fold");
+    const mid_el = document.createElement("div"); content.appendChild(mid_el); mid_el.classList.add("ab-deco-fold");
     const sub_button = document.createElement("div"); mid_el.appendChild(sub_button); sub_button.classList.add("ab-deco-fold-button"); sub_button.textContent = "展开";
     sub_button.onclick = ()=>{
       const is_hide = sub_el.getAttribute("is_hide")
@@ -65,7 +65,7 @@ const abc_fold = ABConvert.factory({
     }
     mid_el.appendChild(sub_button)
     mid_el.appendChild(sub_el)
-    return el
+    return content
   }
 })
 
@@ -79,19 +79,19 @@ const abc_scroll = ABConvert.factory({
   process: (el, header, content: HTMLElement): HTMLElement=>{
     // 找参数
     const matchs = header.match(/^scroll(\((\d+)\))?(T)?$/)
-    if (!matchs) return el
+    if (!matchs) return content
     let arg1
     if (!matchs[1]) arg1=460  // 默认值
     else{
-      if (!matchs[2]) return el
+      if (!matchs[2]) return content
       arg1 = Number(matchs[2])
-      if (isNaN(arg1)) return el
+      if (isNaN(arg1)) return content
     }
     // 修改元素
-    if(el.children.length!=1) return el
-    const sub_el = el.children[0]
+    if(content.children.length!=1) return content
+    const sub_el = content.children[0]
     sub_el.remove()
-    const mid_el = document.createElement("div"); el.appendChild(mid_el); mid_el.classList.add("ab-deco-scroll");
+    const mid_el = document.createElement("div"); content.appendChild(mid_el); mid_el.classList.add("ab-deco-scroll");
     if (!matchs[3]){
       mid_el.classList.add("ab-deco-scroll-y")
       mid_el.setAttribute("style", `max-height: ${arg1}px`)
@@ -99,7 +99,7 @@ const abc_scroll = ABConvert.factory({
       mid_el.classList.add("ab-deco-scroll-x")
     }
     mid_el.appendChild(sub_el)
-    return el
+    return content
   }
 })
 
@@ -113,19 +113,19 @@ const abc_overfold = ABConvert.factory({
   process: (el, header, content: HTMLElement): HTMLElement=>{
     // 找参数
     const matchs = header.match(/^overfold(\((\d+)\))?$/)
-    if (!matchs) return el
+    if (!matchs) return content
     let arg1:number
     if (!matchs[1]) arg1=460  // 默认值
     else{
-      if (!matchs[2]) return el
+      if (!matchs[2]) return content
       arg1 = Number(matchs[2])
-      if (isNaN(arg1)) return el
+      if (isNaN(arg1)) return content
     }
     // 修改元素
-    if(el.children.length!=1) return el
-    const sub_el = el.children[0]
+    if(content.children.length!=1) return content
+    const sub_el = content.children[0]
     sub_el.remove()
-    const mid_el = document.createElement("div"); el.appendChild(mid_el); mid_el.classList.add("ab-deco-overfold");
+    const mid_el = document.createElement("div"); content.appendChild(mid_el); mid_el.classList.add("ab-deco-overfold");
     const sub_button = document.createElement("div"); mid_el.appendChild(sub_button); sub_button.classList.add("ab-deco-overfold-button"); sub_button.textContent = "展开";
     sub_el.classList.add("ab-deco-overfold-content")
     mid_el.appendChild(sub_el)
@@ -148,7 +148,7 @@ const abc_overfold = ABConvert.factory({
       }
     }
 
-    return el
+    return content
   }
 })
 
@@ -162,11 +162,11 @@ const abc_addClass = ABConvert.factory({
   process_return: ABConvert_IOEnum.el,
   process: (el, header, content: HTMLElement): HTMLElement=>{
     const matchs = header.match(/^addClass\((.*)\)$/)
-    if (!matchs || !matchs[1]) return el
-    if(el.children.length!=1) return el
-    const sub_el = el.children[0]
+    if (!matchs || !matchs[1]) return content
+    if(content.children.length!=1) return content
+    const sub_el = content.children[0]
     sub_el.classList.add(String(matchs[1]))
-    return el
+    return content
   }
 })
 
@@ -179,18 +179,19 @@ const abc_addDiv = ABConvert.factory({
   process_return: ABConvert_IOEnum.el,
   process: (el, header, content: HTMLElement): HTMLElement=>{
     const matchs = header.match(/^addDiv\((.*)\)$/)
-    if (!matchs || !matchs[1]) return el
+    if (!matchs || !matchs[1]) return content
     const arg1 = matchs[1]
     // 修改元素
-    if(el.children.length!=1) return el
-    const sub_el = el.children[0]
+    if(content.children.length!=1) return content
+    const sub_el = content.children[0]
     sub_el.remove()
-    const mid_el = document.createElement("div"); el.appendChild(mid_el); mid_el.classList.add(arg1)
+    const mid_el = document.createElement("div"); content.appendChild(mid_el); mid_el.classList.add(arg1)
     mid_el.appendChild(sub_el)
-    return el
+    return content
   }
 })
 
+// TODO 应用新别名系统替换
 const abc_heimu = ABConvert.factory({
   id: "heimu",
   name: "黑幕",
@@ -208,15 +209,15 @@ const abc_title = ABConvert.factory({
   process_return: ABConvert_IOEnum.el,
   process: (el, header, content: HTMLElement): HTMLElement=>{
     const matchs = header.match(/^#(.*)/)
-    if (!matchs || !matchs[1]) return el
+    if (!matchs || !matchs[1]) return content
     const arg1 = matchs[1]
 
     // 修改元素
-    if(el.children.length!=1) return el
-    const sub_el = el.children[0] as HTMLElement
+    if(content.children.length!=1) return content
+    const sub_el = content.children[0] as HTMLElement
     sub_el.remove()
     sub_el.classList.add("ab-deco-title-content")
-    const mid_el = document.createElement("div"); el.appendChild(mid_el); mid_el.classList.add("ab-deco-title");
+    const mid_el = document.createElement("div"); content.appendChild(mid_el); mid_el.classList.add("ab-deco-title");
     const sub_title = document.createElement("div"); mid_el.appendChild(sub_title); sub_title.classList.add("ab-deco-title-title");
     const p_el = document.createElement("p"); sub_title.appendChild(p_el); p_el.textContent = arg1;
     mid_el.appendChild(sub_title)
@@ -246,6 +247,6 @@ const abc_title = ABConvert.factory({
     }
     else if (sub_el instanceof HTMLUListElement){title_type = "ul"}
     sub_title.setAttribute("title-type", title_type)
-    return el
+    return content
   }
 })

@@ -155,10 +155,9 @@ export class ABConvertManager {
         }
         // 若不是，使用process方法
         else if(abReplaceProcessor.process){
-          // 检查输入类型
-          // 允许自动插入一个md->html的转换器
-          // TODO，后面要被别名系统替换掉，`html->html` 的输入源是md时，里面插入一个md转换器
+          // (1) 检查输入类型
           if (abReplaceProcessor.process_param != prev_type){
+            // TODO，后面要被别名系统替换掉，`html->html` 的输入源是md时，里面插入一个md转换器
             if (abReplaceProcessor.process_param==ABConvert_IOEnum.el && typeof(prev_result) == "string" && prev_type==ABConvert_IOEnum.text){
               const subEl: HTMLDivElement = document.createElement("div"); el.appendChild(subEl); subEl.classList.add("markdown-rendered");
               ABConvertManager.getInstance().m_renderMarkdownFn(prev_result, subEl);
@@ -166,21 +165,21 @@ export class ABConvertManager {
               prev_result = el
             }
             else{
-              console.warn("处理器参数类型错误", abReplaceProcessor.id, abReplaceProcessor.process_param, prev_type);
+              console.warn(`处理器输入类型错误, id:${abReplaceProcessor.id}, virtualParam:${abReplaceProcessor.process_param}, realParam${prev_type}`);
               break
             }
           }
 
-          // 执行处理器
+          // (2) 执行处理器
           prev_result = abReplaceProcessor.process(el, item_header, prev_result)
 
-          // 检查输出类型
+          // (3) 检查输出类型
           if(typeof(prev_result) == "string"){prev_type = ABConvert_IOEnum.text}
           // 下行换成了下下行。因为下行在mdit/jsdom环境可能报错：Right-hand side of 'instanceof' is not callable
           //else if (prev_result instanceof HTMLElement){prev_type = ABConvert_IOType.el}
           else if (typeof(prev_result) == "object"){prev_type = ABConvert_IOEnum.el}
           else {
-            console.warn("处理器输出类型错误", abReplaceProcessor.id, abReplaceProcessor.process_param, prev_type);
+            console.warn(`处理器输出类型错误, id:${abReplaceProcessor.id}, virtualReturn:${abReplaceProcessor.process_return}, realReturn${prev_type}`);
             break
           }
         }

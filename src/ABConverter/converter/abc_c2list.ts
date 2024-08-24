@@ -374,22 +374,69 @@ export class C2ListProcess{
   }
 }
 
+const abc_list2c2listdata = ABConvert.factory({
+  id: "list2c2listdata",
+  name: "列表转c2listdata",
+  match: "list2c2listdata",
+  default: "列表转c2listdata",
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.c2list_strem,
+  process: (el, header, content: string): List_C2ListItem=>{
+    return C2ListProcess.list2c2data(content)
+  }
+})
+
+const abc_title2c2listdata = ABConvert.factory({
+  id: "title2c2listdata",
+  name: "标题转c2listdata",
+  match: "title2c2listdata",
+  default: "标题转c2listdata",
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.c2list_strem,
+  process: (el, header, content: string): List_C2ListItem=>{
+    return C2ListProcess.title2c2data(content)
+  }
+})
+
+const abc_c2listdata2tab = ABConvert.factory({
+  id: "c2listdata2tab",
+  name: "c2listdata转标签",
+  match: "c2listdata2tab",
+  default: "c2listdata转标签",
+  process_param: ABConvert_IOEnum.c2list_strem,
+  process_return: ABConvert_IOEnum.el,
+  process: (el, header, content: List_C2ListItem): HTMLElement=>{
+    return C2ListProcess.c2data2tab(content, el, false)
+  }
+})
+
+const abc_c2listdata2items = ABConvert.factory({
+  id: "c2listdata2items",
+  name: "c2listdata转容器结构",
+  match: "c2listdata2items",
+  default: "c2listdata转容器结构",
+  process_param: ABConvert_IOEnum.c2list_strem,
+  process_return: ABConvert_IOEnum.el,
+  process: (el, header, content: List_C2ListItem): HTMLElement=>{
+    return C2ListProcess.c2data2items(content, el)
+  }
+})
+
+// TODO 纯组合，应用别名替换
 const abc_list2tab = ABConvert.factory({
   id: "list2tab",
   name: "列表转标签栏",
-  match: /list2(md)?tab(T)?$/,
+  match: /list2(md)?tab$/,
   default: "list2mdtab",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
   process: (el, header, content: string): HTMLElement=>{
-    const matchs = header.match(/list2(md)?tab(T)?$/)
-    if (!matchs) return el
-    const c2listData = C2ListProcess.list2c2data(content)
-    C2ListProcess.c2data2tab(c2listData, el, matchs[2]=="T")
-    return el
+    const data = abc_list2c2listdata.process(el, header, content) as List_C2ListItem
+    return abc_c2listdata2tab.process(el, header, data) as HTMLElement
   }
 })
 
+// TODO 纯组合，应用别名替换
 const abc_title2tab = ABConvert.factory({
   id: "title2tab",
   name: "标题转标签栏",
@@ -397,12 +444,12 @@ const abc_title2tab = ABConvert.factory({
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
   process: (el, header, content: string): HTMLElement=>{
-    let data = C2ListProcess.title2c2data(content)
-    C2ListProcess.c2data2tab(data, el, false)
-    return el
+    let data = abc_title2c2listdata.process(el, header, content) as List_C2ListItem
+    return abc_c2listdata2tab.process(el, header, data) as HTMLElement
   }
 })
 
+// TODO 纯组合，应用别名替换
 const abc_list2col = ABConvert.factory({
   id: "list2col",
   name: "一级列表转分栏",
@@ -411,13 +458,14 @@ const abc_list2col = ABConvert.factory({
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
   process: (el, header, content: string): HTMLElement=>{
-    const c2listData = C2ListProcess.list2c2data(content)
-    C2ListProcess.c2data2items(c2listData, el)
+    const data = abc_list2c2listdata.process(el, header, content) as List_C2ListItem
+    el = abc_c2listdata2items.process(el, header, data) as HTMLDivElement
     el.querySelector("div")?.classList.add("ab-col")
     return el
   }
 })
 
+// TODO 纯组合，应用别名替换
 const abc_title2col = ABConvert.factory({
   id: "title2col",
   name: "标题转分栏",
@@ -425,13 +473,14 @@ const abc_title2col = ABConvert.factory({
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
   process: (el, header, content: string): HTMLElement=>{
-    let data = C2ListProcess.title2c2data(content)
-    C2ListProcess.c2data2items(data, el)
+    const data = abc_title2c2listdata.process(el, header, content) as List_C2ListItem
+    el = abc_c2listdata2items.process(el, header, data) as HTMLDivElement
     el.querySelector("div")?.classList.add("ab-col")
     return el
   }
 })
 
+// TODO 纯组合，应用别名替换
 const abc_list2card = ABConvert.factory({
   id: "list2card",
   name: "列表转卡片",
@@ -439,13 +488,14 @@ const abc_list2card = ABConvert.factory({
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
   process: (el, header, content: string): HTMLElement=>{
-    const c2listData = C2ListProcess.list2c2data(content)
-    C2ListProcess.c2data2items(c2listData, el)
+    const data = abc_list2c2listdata.process(el, header, content) as List_C2ListItem
+    el = abc_c2listdata2items.process(el, header, data) as HTMLDivElement
     el.querySelector("div")?.classList.add("ab-card")
     return el
   }
 })
 
+// TODO 纯组合，应用别名替换
 const abc_title2card = ABConvert.factory({
   id: "title2card",
   name: "标题转卡片",
@@ -453,9 +503,8 @@ const abc_title2card = ABConvert.factory({
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
   process: (el, header, content: string): HTMLElement=>{
-    let data = C2ListProcess.title2c2data(content)
-    C2ListProcess.c2data2items(data, el)
-    console.log(data, "pp", content)
+    const data = abc_title2c2listdata.process(el, header, content) as List_C2ListItem
+    el = abc_c2listdata2items.process(el, header, data) as HTMLDivElement
     el.querySelector("div")?.classList.add("ab-card")
     return el
   }

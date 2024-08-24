@@ -20,7 +20,7 @@
 
 import {ABConvert_IOEnum, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
 import {ABConvertManager} from "../ABConvertManager"
-import {ListProcess, type List_ListItem} from "./abc_list"
+import {abc_title2list, ListProcess, type List_ListItem} from "./abc_list"
 import {ABReg} from "../ABReg"
 
 /**
@@ -34,6 +34,7 @@ function getID(length=16){
 
 // markmap about
 import { Transformer, builtInPlugins } from 'markmap-lib'
+import type { C2ListItem } from "./abc_c2list";
 const transformer = new Transformer();
 //import { Markmap, loadCSS, loadJS } from 'markmap-view'
 
@@ -54,7 +55,7 @@ const abc_title2mindmap = ABConvert.factory({
 	process_param: ABConvert_IOEnum.text,
 	process_return: ABConvert_IOEnum.el,
 	process: (el, header, content: string): HTMLElement=>{
-			content = ListProcess.title2list(content, el)
+			content = abc_title2list.process(el, header, content) as string
 			list2markmap(content, el)
 			return el
 		}

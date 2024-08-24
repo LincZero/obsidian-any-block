@@ -11,17 +11,19 @@ import type { List_ListItem } from "./abc_list"
 import type { List_TableItem } from "./abc_table"
 
 /**
- * ab处理器子接口
- * @warn 暂时不允许扩展，处理器的参数和返回值目前还是使用的手动一个一个来检查的
- * 待增加一个list和json专用格式
+ * ab处理器子接口 - 类型声明
+ * 
+ * @detail
+ * TODO 待增加一个list和json专用格式
+ * 注意：后面的值必须是 typeof() 的结果。用来检查处理器的声明参数/返回值和实际参数/返回值是否一致
  */
 export enum ABConvert_IOEnum {
   text = "string",
   el = "HTMLElement",
-  el_text = "HTMLElementString",
-  json = "json",
-  list_strem = "",
-  c2list_strem = "",
+  // el_text = "string",
+  json = "string",
+  list_strem = "array",
+  c2list_strem = "array",
 }
 export type ABConvert_IOType =
   string|           // text/el_text

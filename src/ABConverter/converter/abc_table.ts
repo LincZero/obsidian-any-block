@@ -9,7 +9,7 @@
 import { ABReg } from '../ABReg'
 import {ABConvert_IOEnum, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
 import {ABConvertManager} from "../ABConvertManager"
-import { type ListItem, type List_ListItem, ListProcess } from "./abc_list"
+import { type ListItem, type List_ListItem, ListProcess, abc_title2listdata, abc_list2listdata } from "./abc_list"
 import { type C2ListItem, type List_C2ListItem, C2ListProcess } from "./abc_c2list"
 
 /**
@@ -45,11 +45,6 @@ export type List_TableItem = TableItem[]
 
 /// 一些表格相关的工具集
 export class TableProcess{
-  /** 列表转表格 */
-  static list2table(text: string, div: HTMLDivElement, modeT=false): HTMLDivElement {
-    let list_itemInfo = ListProcess.list2data(text)
-    return TableProcess.data2table(list_itemInfo, div, modeT)
-  }
 
   /** 列表转二维表格 */
   static list2ut(text: string, div: HTMLDivElement, modeT=false) {
@@ -168,9 +163,8 @@ const abc_title2table = ABConvert.factory({
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
   process: (el, header, content: string): HTMLElement=>{
-    content = ListProcess.title2list(content, el)
-    TableProcess.list2table(content, el)
-    return el
+    const data: List_ListItem = abc_title2listdata.process(el, header, content) as List_ListItem
+    return el = TableProcess.data2table(data, el, false) as HTMLDivElement
   }
 })
 
@@ -184,8 +178,8 @@ const abc_list2table = ABConvert.factory({
   process: (el, header, content: string): HTMLElement=>{
     const matchs = header.match(/list2(md)?table(T)?/)
     if (!matchs) return el
-    TableProcess.list2table(content, el, matchs[2]=="T")
-    return el
+    const data: List_ListItem = abc_list2listdata.process(el, header, content) as List_ListItem
+    return el = TableProcess.data2table(data, el, matchs[2]=="T") as HTMLDivElement
   }
 })
 
