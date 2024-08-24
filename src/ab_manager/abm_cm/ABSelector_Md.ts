@@ -34,6 +34,7 @@ export function autoMdSelector(
 ):MdSelectorRangeSpec[]{
   let list_mdSelectorRangeSpec:MdSelectorRangeSpec[] = []
   let list_text:string[] = mdText.split("\n")
+  let codeBlockFlag = "" // 避免代码块内识别
 
   /** 行数 - total_ch 映射表
    * 该表的长度是 行数+1
@@ -50,6 +51,22 @@ export function autoMdSelector(
   // 将全文遍历为多个AB块选择范围
   for (let i=0; i<list_text.length; i++){
     const line = list_text[i]
+
+    // 避免代码块内识别
+    if (codeBlockFlag == "") {
+      const match = line.match(/^((\s|>\s|-\s|\*\s|\+\s)*)(````*|~~~~*)(.*)/)
+      if (match && match[3]) {
+        codeBlockFlag = match[1]+match[3]
+        continue
+      }
+    }
+    else if (codeBlockFlag != "") {
+      if (line.indexOf(codeBlockFlag) == 0) {
+        codeBlockFlag = ""
+      }
+      continue
+    }
+
     for (let selecotr of list_mdSelector){
       if (selecotr.match.test(line)) {
         let sim:MdSelectorRangeSpecSimp|null = selecotr.selector(list_text, i)
