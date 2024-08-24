@@ -170,17 +170,20 @@ export class ListProcess{
   }
 
   static list2json(text: string): object{
+    interface NestedObject {              // 可递归的节点类型
+      [key: string]: NestedObject | string | number | any[];
+    }
     let data: List_ListItem = ListProcess.list2data(text, false)
     data = ListProcess.data2strict(data)
-    let nodes: {[key: string]: object} = {}         // 节点树
-    let prev_nodes: {[key: string]: object}[] = []  // 缓存每个level的最新节点
+    let nodes: NestedObject = {}         // 节点树
+    let prev_nodes: NestedObject[] = []  // 缓存每个level的最新节点
 
     // 第一次变换，所有节点为 "key": {...} 形式
     for (let index = 0; index<data.length; index++) {
       // 当前节点
       const item = data[index]
       const current_key: string = item.content
-      const current_value: {[key: string]: object} = {}
+      const current_value: NestedObject = {}
       prev_nodes[item.level] = current_value
 
       // 放入节点树的对应位置中
@@ -199,13 +202,60 @@ export class ListProcess{
       }
     }
 
-    // 第二次变换，节点 "k:v": {空} 展开为 "k": "v"
-    // ...
-    
-    // 第三次变换，部分转列表
-    // ...
+    // 第二、三次变换
+    let nodes2: NestedObject = nodes
+    traverse(nodes2)
 
-    return nodes
+    return nodes2
+
+    /**
+     * 递归遍历json，对obj进行两次变换
+     * 
+     * @detail
+     * - 节点 "k:v": {空} 展开为 "k": "v"
+     * - 部分转列表
+     * 
+     * @param
+     * 后两个参数是为了方便将整个obj替换掉，不然在地址不变的前提下array替换obj会很麻烦
+     */
+    function traverse(obj: NestedObject|any[], objSource?:any, objSource2?:string) {
+      if (Array.isArray(obj)) return
+      
+      // 变换：节点 "k:v": {空} 展开为 "k": "v"
+      const keys = Object.keys(obj)
+      let count_null = 0
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i]; if (!obj.hasOwnProperty(key)) continue;
+        const value = obj[key]
+        if (typeof value === 'object' && !Array.isArray(value)) {  // (b1) 对象
+          if (Object.keys(value).length === 0) {  // (b11) k-v展开
+            let index = key.indexOf(": ");
+            if (index > 0) {
+              delete obj[key]; i--; // @warn 希望新插入的k-v在后面，否则顺序问题很严重
+              obj[key.slice(0, index)] = key.slice(index+1)
+            } else {
+              obj[key] = ""
+              count_null++
+            }
+          } else {                                // (b12) 递归调用
+            traverse(value, obj, key);
+          }
+        } else {                                  // (b2) 非对象/数组对象
+        }
+      }
+
+      // 变换：尾判断，满足需求的json转成列表
+      if (objSource && objSource2) {
+        let newObj: (string|number|{})[] = []
+        if (count_null == keys.length) {
+          for (let i = 0; i < keys.length; i++) {
+            const key = keys[i]; if (!obj.hasOwnProperty(key)) continue;
+            newObj.push(key)
+          }
+          objSource[objSource2] = newObj
+        }
+      }
+    }
   }
 
   /**

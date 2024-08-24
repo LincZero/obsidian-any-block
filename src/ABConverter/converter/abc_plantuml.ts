@@ -12,7 +12,7 @@ import {ListProcess, type List_ListItem} from "./abc_list"
 import plantumlEncoder from "plantuml-encoder"
 
 const abc_list2jsontext = ABConvert.factory({
-  id: "json2pumlEl",
+  id: "json2pumlJson",
   name: "json到可视化",
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
