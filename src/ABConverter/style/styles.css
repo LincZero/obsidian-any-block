@@ -630,6 +630,62 @@
   column-count: 8 !important;
 }
 
+.ab-note .ab-nodes {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1em;
+}
+
+.ab-note .ab-nodes .ab-nodes-node {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.2em;
+}
+
+.ab-note .ab-nodes .ab-nodes-node .ab-nodes-content {
+  display: inline-block;
+}
+
+.ab-note .ab-nodes .ab-nodes-node .ab-nodes-children {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2em;
+  padding-left: 0.8em;
+  position: relative;
+}
+
+.ab-note .ab-nodes .ab-nodes-node .ab-nodes-children .ab-nodes-bracket {
+  content: "";
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  top: calc(50% - 4px);
+  left: calc(-8px - 2px);
+  clip-path: polygon(100% 0, 100% 100%, 0 50%);
+  background-color: currentColor;
+}
+
+.ab-note .ab-nodes .ab-nodes-node .ab-nodes-children .ab-nodes-bracket2 {
+  content: "";
+  position: absolute;
+  width: 10px;
+  left: -2px;
+  border-radius: 10px 0 0 10px;
+  border-left: 2px solid currentColor;
+  border-top: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+}
+
+.ab-note .ab-nodes > .ab-nodes-node > .ab-nodes-bracket {
+  display: none;
+}
+
+.ab-note .ab-nodes > .ab-nodes-node > .ab-nodes-bracket2 {
+  display: none;
+}
+
 div.md-table-fig1 {
   overflow-x: scroll;
   transform: scaleY(-1);

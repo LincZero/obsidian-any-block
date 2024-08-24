@@ -538,6 +538,7 @@
         padding: 10px;
       }
     }
+
     // 卡片 (对齐, flex布局)
     &.ab-card1{
       display: flex; // Flexbox 布局
@@ -596,6 +597,8 @@
         margin-bottom: 0.8rem;
       }
     }
+
+    // 补充结合样式
     &.ab-col1 { column-count: 1 !important; }
     &.ab-col2 { column-count: 2 !important; }
     &.ab-col3 { column-count: 3 !important; }
@@ -604,6 +607,62 @@
     &.ab-col6 { column-count: 6 !important; }
     &.ab-col7 { column-count: 7 !important; }
     &.ab-col8 { column-count: 8 !important; }
+  }
+
+  // 括弧图
+  .ab-nodes {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1em;
+    .ab-nodes-node {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 1.2em;   // 左右间隙
+      // 圆弧左侧
+      .ab-nodes-content {
+        display: inline-block;
+      }
+      // 圆弧右侧
+      .ab-nodes-children {
+        display: flex;
+        flex-direction: column;
+        // align-items
+        gap: 1.2em; // 上下间距
+
+        // border-left: 2px solid currentColor; // black;
+        padding-left: 0.8em;
+        position: relative; // 作为定位容器
+        // 圆弧样式 - 中间箭头
+        .ab-nodes-bracket {
+          content: "";
+          position: absolute;
+          width: 8px;
+          height: 8px;
+          top: calc(50% - 4px);
+          left: calc(-8px - 2px);
+          clip-path: polygon(100% 0, 100% 100%, 0 50%); // 裁剪成三角形
+          background-color: currentColor;
+        }
+        // 圆弧样式 - 两头弯曲
+        .ab-nodes-bracket2 {
+          content: "";
+          position: absolute;
+          width: 10px;
+          // height: 100%; // JS: 缩短第一个和最后一个节点的一半
+          // top: 0;       // JS: 第一个节点的一半
+          left: -2px;
+          border-radius: 10px 0 0 10px;
+          border-left: 2px solid currentColor;
+          border-top: 2px solid currentColor;
+          border-bottom: 2px solid currentColor;
+        }
+      }
+    }
+    // 最外面的那个不显示
+    &>.ab-nodes-node>.ab-nodes-bracket { display: none; }
+    &>.ab-nodes-node>.ab-nodes-bracket2 { display: none; }
   }
 }
 

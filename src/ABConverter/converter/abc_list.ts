@@ -477,6 +477,67 @@ export class ListProcess{
     const newcontent = list_newcontent.join("\n")
     return newcontent
   }
+
+  /** 
+   * 将多列列表转 `节点` 结构
+   * 
+   * .ab-nodes
+   *   .ab-nodes-content
+   *   .ab-nodes-children
+   *     (递归包含)
+   *     .ab-nodes
+   *     .ab-nodes
+   */
+  static data2nodes(listdata:List_ListItem, el:HTMLElement): HTMLElement {
+    const el_root = document.createElement("div"); el.appendChild(el_root); el_root.classList.add("ab-nodes")
+
+    let cache_els:HTMLElement[] = []  // 缓存各个level的最新节点 (level为i的节点在i处)，根节点另外处理
+    for (let item of listdata) {
+      // 节点准备
+      const el_node = document.createElement("div"); el_node.classList.add("ab-nodes-node")
+      const el_node_content = document.createElement("div"); el_node.appendChild(el_node_content); el_node_content.classList.add("ab-nodes-content")
+      ABConvertManager.getInstance().m_renderMarkdownFn(item.content, el_node_content)
+      const el_node_children = document.createElement("div"); el_node.appendChild(el_node_children); el_node_children.classList.add("ab-nodes-children")
+      const el_node_barcket = document.createElement("div"); el_node_children.appendChild(el_node_barcket); el_node_barcket.classList.add("ab-nodes-bracket")
+      const el_node_barcket2 = document.createElement("div"); el_node_children.appendChild(el_node_barcket2); el_node_barcket2.classList.add("ab-nodes-bracket2")
+      cache_els[item.level] = el_node_children
+      
+      // 将节点放入合适的位置
+      if (item.level == 0) {
+        el_root.appendChild(el_node)
+      } else if (item.level >= 1 && cache_els.hasOwnProperty(item.level-1)) {
+        cache_els[item.level-1].appendChild(el_node)
+      }
+      else {
+        console.error("节点错误")
+        return el
+      }
+    }
+
+    // 画圆弧 (应在onload后再处理) // TODO 这里需要在页面加载后触发
+    const list_children = el_root.querySelectorAll(".ab-nodes-node")
+    for (let children of list_children) {
+      // 元素准备
+      const el_child = children.querySelector(".ab-nodes-children"); if (!el_child) continue
+      const el_bracket = el_child.querySelector(".ab-nodes-bracket") as HTMLElement;
+      const el_bracket2 = el_child.querySelector(".ab-nodes-bracket2") as HTMLElement;
+      const childNodes = el_child.childNodes;
+      if (childNodes.length < 3) {
+        el_bracket.style.setProperty("display", "none")
+        el_bracket2.style.setProperty("display", "none")
+        continue
+      }
+      const el_child_first = childNodes[2] as HTMLElement;
+      const el_child_last = childNodes[childNodes.length - 1] as HTMLElement;
+
+      // 修改伪类
+      const heightToReduce = (el_child_first.offsetHeight + el_child_last.offsetHeight) / 2;
+      console.log("正在修改伪类", el_child_first.offsetHeight, el_child_last.offsetHeight)
+      el_bracket2.style.setProperty("height", `calc(100% - ${heightToReduce}px)`);
+      el_bracket2.style.setProperty("top", `${el_child_first.offsetHeight/2}`);
+    }
+    return el
+  }
 }
 
 export const abc_list2listdata = ABConvert.factory({
@@ -509,6 +570,17 @@ const abc_listdata2list = ABConvert.factory({
   detail: "listdata到列表",
   process: (el, header, content: List_ListItem): string=>{
     return ListProcess.data2list(content) as string
+  }
+})
+
+const abc_listdata2nodes = ABConvert.factory({
+  id: "listdata2nodes",
+  name: "listdata到节点",
+  process_param: ABConvert_IOEnum.list_strem,
+  process_return: ABConvert_IOEnum.el,
+  detail: "listdata到节点",
+  process: (el, header, content: List_ListItem): HTMLElement=>{
+    return ListProcess.data2nodes(content, el) as HTMLElement
   }
 })
 
