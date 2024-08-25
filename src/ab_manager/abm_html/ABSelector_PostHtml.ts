@@ -76,6 +76,39 @@ export class ABSelector_PostHtml{
       //   console.log(" -- ABPosthtmlManager.processor, called by 'ReadMode'. And During");
       // }
     }
+
+    // ---------------------------- 后处理钩子 (在页面加载后被触发) ----------------------------
+    // TODO 如果能在本页元素加载完后再触发那是最好，否则性能开销大
+
+    // list2nodes的圆弧调整 (应在onload后再处理)
+    const refresh = () => {
+      const list_children = document.querySelectorAll(".ab-nodes-node")
+      for (let children of list_children) {
+        // 元素准备
+        const el_child = children.querySelector(".ab-nodes-children"); if (!el_child) continue
+        const el_bracket = el_child.querySelector(".ab-nodes-bracket") as HTMLElement;
+        const el_bracket2 = el_child.querySelector(".ab-nodes-bracket2") as HTMLElement;
+        const childNodes = el_child.childNodes;
+        if (childNodes.length < 3) {
+          el_bracket.style.setProperty("display", "none")
+          el_bracket2.style.setProperty("display", "none")
+          continue
+        }
+        const el_child_first = childNodes[2] as HTMLElement;
+        const el_child_last = childNodes[childNodes.length - 1] as HTMLElement;
+
+        // 修改伪类
+        if (childNodes.length == 3) {
+          el_bracket2.style.setProperty("height", `calc(100% - ${(8+8)/2}px)`);
+          el_bracket2.style.setProperty("top", `${8/2}px`);
+        } else {
+          const heightToReduce = (el_child_first.offsetHeight + el_child_last.offsetHeight) / 2;
+          el_bracket2.style.setProperty("height", `calc(100% - ${heightToReduce}px)`);
+          el_bracket2.style.setProperty("top", `${el_child_first.offsetHeight/2}px`);
+        }
+      }
+    }
+    refresh();
   }
 }
 

@@ -514,9 +514,9 @@ export class ListProcess{
       }
     }
 
-    // 画圆弧 (应在onload后再处理) // TODO 这里需要在页面加载后触发
+    // list2nodes的圆弧调整 (应在onload后再处理)
     const refresh = () => {
-      const list_children = el.querySelectorAll(".ab-nodes-node")
+      const list_children = document.querySelectorAll(".ab-nodes-node")
       for (let children of list_children) {
         // 元素准备
         const el_child = children.querySelector(".ab-nodes-children"); if (!el_child) continue
@@ -540,16 +540,13 @@ export class ListProcess{
           el_bracket2.style.setProperty("height", `calc(100% - ${heightToReduce}px)`);
           el_bracket2.style.setProperty("top", `${el_child_first.offsetHeight/2}px`);
         }
-        
       }
     }
     refresh();
 
-    // 触发更新
+    // 手动触发更新
     const btn = document.createElement("button"); el_root.appendChild(btn); btn.textContent = "ChickMe Refresh";
-    btn.onclick = () => {
-      refresh()
-    }
+    btn.onclick = () => { refresh() }
 
     return el
   }
