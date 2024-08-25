@@ -490,23 +490,26 @@ export class ListProcess{
    */
   static data2nodes(listdata:List_ListItem, el:HTMLElement): HTMLElement {
     const el_root = document.createElement("div"); el.appendChild(el_root); el_root.classList.add("ab-nodes")
-
-    let cache_els:HTMLElement[] = []  // 缓存各个level的最新节点 (level为i的节点在i处)，根节点另外处理
+    const el_root2 = document.createElement("div"); el_root.appendChild(el_root2); el_root2.classList.add("ab-nodes-children") // 特点是无对应的content和bracket
+    let cache_els:HTMLElement[] = []  // 缓存各个level的最新节点 (level为0的节点在序列0处)，根节点另外处理
+    
     for (let item of listdata) {
       // 节点准备
       const el_node = document.createElement("div"); el_node.classList.add("ab-nodes-node")
       const el_node_content = document.createElement("div"); el_node.appendChild(el_node_content); el_node_content.classList.add("ab-nodes-content")
       ABConvertManager.getInstance().m_renderMarkdownFn(item.content, el_node_content)
       const el_node_children = document.createElement("div"); el_node.appendChild(el_node_children); el_node_children.classList.add("ab-nodes-children")
-      const el_node_barcket = document.createElement("div"); el_node_children.appendChild(el_node_barcket); el_node_barcket.classList.add("ab-nodes-bracket")
-      const el_node_barcket2 = document.createElement("div"); el_node_children.appendChild(el_node_barcket2); el_node_barcket2.classList.add("ab-nodes-bracket2")
+      const el_node_barcket = document.createElement("div"); el_node_children.appendChild(el_node_barcket); el_node_barcket.classList.add("ab-nodes-bracket"); el_node_barcket.style.setProperty("display", "none")
+      const el_node_barcket2 = document.createElement("div"); el_node_children.appendChild(el_node_barcket2); el_node_barcket2.classList.add("ab-nodes-bracket2"); el_node_barcket2.style.setProperty("display", "none")
       cache_els[item.level] = el_node_children
       
       // 将节点放入合适的位置
       if (item.level == 0) {
-        el_root.appendChild(el_node)
+        el_root2.appendChild(el_node)
       } else if (item.level >= 1 && cache_els.hasOwnProperty(item.level-1)) {
         cache_els[item.level-1].appendChild(el_node)
+        ;(cache_els[item.level-1].childNodes[0] as HTMLElement)?.style?.setProperty("display", "block")
+        ;(cache_els[item.level-1].childNodes[1] as HTMLElement)?.style?.setProperty("display", "block")
       }
       else {
         console.error("节点错误")
@@ -522,8 +525,8 @@ export class ListProcess{
       for (let children of list_children) {
         // 元素准备
         const el_child = children.querySelector(".ab-nodes-children"); if (!el_child) continue
-        const el_bracket = el_child.querySelector(".ab-nodes-bracket") as HTMLElement;
-        const el_bracket2 = el_child.querySelector(".ab-nodes-bracket2") as HTMLElement;
+        const el_bracket = el_child.querySelector(".ab-nodes-bracket") as HTMLElement; if (!el_bracket) continue
+        const el_bracket2 = el_child.querySelector(".ab-nodes-bracket2") as HTMLElement; if (!el_bracket2) continue
         const childNodes = el_child.childNodes;
         if (childNodes.length < 3) {
           el_bracket.style.setProperty("display", "none")

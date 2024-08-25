@@ -39,6 +39,16 @@
   height: 2px;
 }
 
+.ab-note .markdown-rendered table {
+  min-width: 0;
+  display: block;
+}
+
+.ab-note table {
+  display: table;
+  width: 100%;
+}
+
 .ab-note table[modeT="true"] tr {
   display: block;
   float: left;
@@ -46,11 +56,6 @@
 
 .ab-note table[modeT="true"] th, .ab-note table[modeT="true"] td {
   display: block;
-}
-
-.ab-note table {
-  display: table;
-  width: 100%;
 }
 
 .ab-note pre.ab-mermaid-raw {
@@ -482,7 +487,7 @@
   text-shadow: none;
 }
 
-.ab-note ::selection {
+.ab-note .ab-deco-heimu::selection, .ab-note .ab-deco-heimu a::selection {
   background: #9ab0c0;
   color: #fff;
 }
@@ -634,28 +639,14 @@
   column-count: 8 !important;
 }
 
-.ab-note .ab-nodes {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 1em;
-}
-
-.ab-note .ab-nodes .ab-nodes-node {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 1.2em;
-}
-
-.ab-note .ab-nodes .ab-nodes-node .ab-nodes-content {
+.ab-note .ab-nodes .ab-nodes-content {
   display: inline-block;
   background-color: rgba(50, 50, 50, 0.5);
   padding: 5px 10px 5px 10px;
   margin-left: 5px;
 }
 
-.ab-note .ab-nodes .ab-nodes-node .ab-nodes-children {
+.ab-note .ab-nodes .ab-nodes-children {
   display: flex;
   flex-direction: column;
   gap: 1.2em;
@@ -663,7 +654,7 @@
   position: relative;
 }
 
-.ab-note .ab-nodes .ab-nodes-node .ab-nodes-children .ab-nodes-bracket {
+.ab-note .ab-nodes .ab-nodes-children .ab-nodes-bracket {
   content: "";
   position: absolute;
   width: 8px;
@@ -674,7 +665,7 @@
   background-color: currentColor;
 }
 
-.ab-note .ab-nodes .ab-nodes-node .ab-nodes-children .ab-nodes-bracket2 {
+.ab-note .ab-nodes .ab-nodes-children .ab-nodes-bracket2 {
   content: "";
   position: absolute;
   width: 10px;
@@ -685,6 +676,13 @@
   border-left: 2px solid currentColor;
   border-top: 2px solid currentColor;
   border-bottom: 2px solid currentColor;
+}
+
+.ab-note .ab-nodes .ab-nodes-children .ab-nodes-node {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.2em;
 }
 
 .ab-note .ab-nodes > .ab-nodes-node > .ab-nodes-bracket {

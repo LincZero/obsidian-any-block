@@ -41,15 +41,19 @@
 }
 
 .ab-note{
-  table[modeT="true"]{  // 表格转置
-    tr { display: block; float: left; }
-    th, td { display: block; }
+  // 修复重渲染表格宽度过宽的问题
+  .markdown-rendered table {
+    min-width: 0;
+    display: block;
   }
-
   // 修复ob新版本导致表格宽度减少
   table {
     display: table;
     width: 100%;
+  }
+  table[modeT="true"]{  // 表格转置
+    tr { display: block; float: left; }
+    th, td { display: block; }
   }
 
   // 未渲染前的mermaid
@@ -482,9 +486,10 @@
     background-color: #252525;
     color:#252525;
     text-shadow: none;
-  }::selection{
-    background:#9ab0c0;
-    color:#fff;
+    &::selection{
+      background:#9ab0c0;
+      color:#fff;
+    }
   }
   .ab-deco-heimu:hover, .ab-deco-heimu:hover a{
     transition:color .13s linear;
@@ -617,56 +622,59 @@
 
   // 括弧图
   .ab-nodes {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1em;
-    .ab-nodes-node {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      gap: 1.2em;   // 左右间隙
-      // 圆弧左侧
-      .ab-nodes-content {
-        display: inline-block;
-        background-color: rgba(50,50,50,0.5);
-        padding: 5px 10px 5px 10px;
-        margin-left: 5px;
-      }
-      // 圆弧右侧
-      .ab-nodes-children {
-        display: flex;
-        flex-direction: column;
-        // align-items
-        gap: 1.2em; // 上下间距
+    // display: flex;
+    // flex-direction: column;
+    // align-items: flex-start;
+    // gap: 1em; // 根的上下间距
 
-        // border-left: 2px solid currentColor; // black;
-        padding-left: 0.8em;
-        position: relative; // 作为定位容器
-        // 圆弧样式 - 中间箭头
-        .ab-nodes-bracket {
-          content: "";
-          position: absolute;
-          width: 8px;
-          height: 8px;
-          top: calc(50% - 4px);
-          left: calc(-8px - 2px);
-          clip-path: polygon(100% 0, 100% 100%, 0 50%); // 裁剪成三角形
-          background-color: currentColor;
-        }
-        // 圆弧样式 - 两头弯曲
-        .ab-nodes-bracket2 {
-          content: "";
-          position: absolute;
-          width: 10px;
-          height: 100%; // JS: 缩短第一个和最后一个节点的一半
-          top: 0;       // JS: 第一个节点的一半
-          left: -2px;
-          border-radius: 10px 0 0 10px;
-          border-left: 2px solid currentColor;
-          border-top: 2px solid currentColor;
-          border-bottom: 2px solid currentColor;
-        }
+    // 圆弧左侧
+    .ab-nodes-content {
+      display: inline-block;
+      background-color: rgba(50,50,50,0.5);
+      padding: 5px 10px 5px 10px;
+      margin-left: 5px;
+    }
+    // 圆弧右侧
+    .ab-nodes-children {
+      display: flex;
+      flex-direction: column;
+      // align-items
+      gap: 1.2em; // 上下间距
+
+      // border-left: 2px solid currentColor; // black;
+      padding-left: 0.8em;
+      position: relative; // 作为定位容器
+      // 圆弧样式 - 中间箭头
+      .ab-nodes-bracket {
+        content: "";
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        top: calc(50% - 4px);
+        left: calc(-8px - 2px);
+        clip-path: polygon(100% 0, 100% 100%, 0 50%); // 裁剪成三角形
+        background-color: currentColor;
+      }
+      // 圆弧样式 - 两头弯曲
+      .ab-nodes-bracket2 {
+        content: "";
+        position: absolute;
+        width: 10px;
+        height: 100%; // JS: 缩短第一个和最后一个节点的一半
+        top: 0;       // JS: 第一个节点的一半
+        left: -2px;
+        border-radius: 10px 0 0 10px;
+        border-left: 2px solid currentColor;
+        border-top: 2px solid currentColor;
+        border-bottom: 2px solid currentColor;
+      }
+
+      // 节点内容
+      .ab-nodes-node {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 1.2em;   // 左右间隙
       }
     }
     // 最外面的那个不显示

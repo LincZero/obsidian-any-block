@@ -89,8 +89,8 @@ export class ABStateManager{
       for (let children of list_children) {
         // 元素准备
         const el_child = children.querySelector(".ab-nodes-children"); if (!el_child) continue
-        const el_bracket = el_child.querySelector(".ab-nodes-bracket") as HTMLElement;
-        const el_bracket2 = el_child.querySelector(".ab-nodes-bracket2") as HTMLElement;
+        const el_bracket = el_child.querySelector(".ab-nodes-bracket") as HTMLElement; if (!el_bracket) continue
+        const el_bracket2 = el_child.querySelector(".ab-nodes-bracket2") as HTMLElement; if (!el_bracket2) continue
         const childNodes = el_child.childNodes;
         if (childNodes.length < 3) {
           el_bracket.style.setProperty("display", "none")
