@@ -11,6 +11,14 @@
   --pre-background-color: #1b1b1b;
 }
 
+.app-container .markdown-reading-view .ab-replace {
+  margin-bottom: 22px;
+}
+
+.app-container .markdown-source-view .ab-replace {
+  margin-bottom: 0;
+}
+
 /**
  * 替换内容
  * .ab-replace

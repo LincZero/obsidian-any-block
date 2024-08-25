@@ -12,6 +12,23 @@
   --pre-background-color: #1b1b1b; // 作者的样式
 }
 
+.app-container {
+  // 阅读模式
+  .markdown-reading-view {
+    .ab-replace{
+      margin-bottom: 22px;
+    }
+  }
+  // 源码/实时模式
+  .markdown-source-view {
+    .ab-replace{
+      margin-bottom: 0;
+    }
+  }
+  // 源码模式
+  .markdown-source-view.is-live-preview {}
+}
+
 /**
  * 替换内容
  * .ab-replace

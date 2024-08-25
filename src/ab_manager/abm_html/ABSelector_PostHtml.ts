@@ -11,9 +11,6 @@ import {ABReplacer_Render} from "./ABReplacer_Render"
 import {ABConvertManager} from "src/ABConverter/ABConvertManager"
 import { match } from 'assert'
 
-let last_el: HTMLElement;
-let last_mdSrc: HTMLSelectorRangeSpec | null;
-let current_selector: string = ""; // 内敛选择器 (如标题选择器和mdit `:::`) 才会用到，块选择器不需要使用
 /**
  * Html处理器
  * 
@@ -58,8 +55,6 @@ export class ABSelector_PostHtml{
       for (const subEl of el.children) {
         findABBlock_cross(subEl as HTMLElement, ctx)
       }
-      last_el = el
-      last_mdSrc = mdSrc
       
       // c22. 末处理钩子 (页面完全被加载后触发)
       //      ~~可-1再比较来上个保险，用可能的重复触发性能损耗换取一点触发的稳定性~~
@@ -176,6 +171,8 @@ function findABBlock_end() {
   refresh();
 }
 
+let selected_els: HTMLElement[] = [];             // 正在选择中的元素 (如果未在AB块内，还未开始选择，则为空)
+let selected_mdSrc: HTMLSelectorRangeSpec | null; // 已经选中的范围   (如果未在AB块内，还未开始选择，则为空)
 /**
  * 找ab块 - 跨切割块版 (阅读模式下按片触发)
  * 
@@ -187,42 +184,116 @@ function findABBlock_end() {
  *  1. 跨越AB优化的切割块来寻找
  *  2. 只为在根部的AB块，使用 MarkdownRenderChild 进行渲染
  *  3. 只寻找在根部的AB块？？？（对，目前对这个功能失效）
+ * 
+ * 因为是逐个片段来判断，所以判断当前片段时，可能是AB块的未激活、开头、中间、结尾。应进行操作：
+ * (注意：如果是一个ab块紧接着一个ab块，开头和结尾状态是能同时存在的。先完成结尾操作再完成开头操作)
+ * - 未活：不作为/将selected缓存清空
+ * - 开头：将selected置为新值
+ * - 中间：追加到selected缓存中
+ * - 结尾：将selected缓存渲染、清空
+ * - 取消：将selected缓存清空
  */
 function findABBlock_cross(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext){
-  if (targetEl instanceof HTMLUListElement
-    || targetEl instanceof HTMLQuoteElement
-    || targetEl instanceof HTMLPreElement
-    || targetEl instanceof HTMLTableElement
-  ) {
-    // 寻找AB块 (主体正确+头部正确)
-    const range = getSourceMarkdown(targetEl, ctx)
-    if (!range || !range.header) return false
+  // 寻找AB块
+  const current_mdSrc = getSourceMarkdown(targetEl, ctx)
+  if (!current_mdSrc) { return false }
 
-    // 渲染AB    
-    if (range.selector=="list"){ // 语法糖 TODO 将弃用
-      if (range.header.indexOf("2")==0) range.header="list"+range.header
+  console.log("cross", selected_mdSrc, current_mdSrc)
+
+  // c1. 在AB块内。则判断本次是否结束ab块
+  if (selected_mdSrc && selected_mdSrc.header) {
+    // b3. 文章末尾，强制结尾
+    // TODO
+
+    // b1. 没有startFlag
+    if (!selected_mdSrc.seFlag) {
+      // b11. 无需endFlag，清空并渲染
+      if (current_mdSrc.type == "list" || current_mdSrc.type == "code" || current_mdSrc.type == "quote" || current_mdSrc.type == "table") {
+        if (current_mdSrc.type=="list"){ // 语法糖 TODO 将弃用
+          if (current_mdSrc.header.indexOf("2")==0) current_mdSrc.header="list"+current_mdSrc.header
+        }
+        selected_els.push(targetEl)
+        selected_mdSrc.to_line = current_mdSrc.to_line
+        selected_mdSrc.content += "\n\n" + current_mdSrc.content
+        ctx.addChild(new ABReplacer_Render(targetEl, current_mdSrc.header, current_mdSrc.content, current_mdSrc.type));
+        for (const el of selected_els) el.hide()
+        selected_els = []
+        selected_mdSrc = null
+      }
+      // b12. 找到startFlag，后面找endFlag
+      else if (current_mdSrc.type == "heading" || current_mdSrc.type == "mdit_head") {
+        selected_els.push(targetEl)
+        selected_mdSrc.to_line = current_mdSrc.to_line
+        selected_mdSrc.content += "\n\n" + current_mdSrc.content
+        selected_mdSrc.seFlag = current_mdSrc.seFlag
+      }
+      // b13. 找不到startFlag，放弃本次AnyBlock
+      else {
+        selected_els = []
+        selected_mdSrc = null
+      }
     }
-    ctx.addChild(new ABReplacer_Render(targetEl, range.header, range.content, range.selector));
-    last_el.hide()
+    // b2. 有startFlag，寻找endFlag
+    else {
+      if (current_mdSrc.type == "mdit_tail" && selected_mdSrc!.seFlag.length == current_mdSrc.seFlag.length) {
+        selected_els.push(targetEl)
+        selected_mdSrc.to_line = current_mdSrc.to_line
+        selected_mdSrc.content += "\n\n" + current_mdSrc.content
+        ctx.addChild(new ABReplacer_Render(targetEl, current_mdSrc.header, current_mdSrc.content, current_mdSrc.type));
+        for (const el of selected_els) el.hide()
+        selected_els = []
+        selected_mdSrc = null
+      }
+      else if (current_mdSrc.type == "heading" && selected_mdSrc!.seFlag.length >= current_mdSrc.seFlag.length) {
+        ctx.addChild(new ABReplacer_Render(targetEl, current_mdSrc.header, current_mdSrc.content, current_mdSrc.type));
+        for (const el of selected_els) el.hide()
+        selected_els = []
+        selected_mdSrc = null
+      }
+      else {}
+    }
+  }
+
+  // c2. 不在AB块内。则判断本次是否开始AB块 (注意结束和开始可以同时进行)
+  if (!selected_mdSrc || !selected_mdSrc.header) {
+    // b1. 现在开始
+    if (current_mdSrc.type == "header" || current_mdSrc.type == "mdit_head") {
+      selected_mdSrc = current_mdSrc;
+      selected_els = [targetEl];
+    }
+    // b2. 还没开始
+    else {
+      selected_mdSrc = null
+      selected_els = []
+    }
   }
 }
 
 interface HTMLSelectorRangeSpec {
+  // 通用部分
   from_line: number,  // div片段的头部
-  to_line: number,    // div片段的尾部
+  to_line: number,    // div片段的尾部 - 可变
+  to_line_all: number // 全文片段的尾部 (已去除尾部空格) 当 to_line_all == to_line，说明片段在文章的结尾了
+  content: string,    // 内容信息 - 可变 (已去除尾部空格)
+  type: string,       // 类型。6个el基本类型的基础上，paragraph多派生出 "header"/"mdit_head"/"mdit_tail" 三个新类型
+
+  // 选择器部分
   header: string,     // 头部信息
-  selector: string,   // 选择器 (范围选择方式)
-  content: string,    // 内容信息 (已去除尾部空格)
-  prefix: string,     // 选择器的前缀
-  to_line_all: number // 全文代尾部 (已去除尾部空格) 当 to_line_all == to_line，说明片段在文章的结尾了
+  seFlag: string,     // 开始/结束标志 - 可变
+                      //     对于nowMdSrc来说，这是当前标志，对于selectedMdSrc来说，这是结束标志
+                      //     内敛选择器 (如标题选择器和mdit `:::`) 才会用到，块选择器不需要使用
+  prefix: string,     // 选择器的前缀 (为了去除前缀后再进行渲染)
 }
 /**
- * 将html还原回md格式
+ * 将html还原回md格式。
+ * 
+ * 不负责对ab块的判断，只负责分析当前这一段html (旧版是负责对ab块判断的，新版职责分离了)
  * 
  * @detail
  * 被processTextSection调用
  * 
- * @returns 三种结果
+ * @returns
+ * (旧) 三种结果
  *  1. 获取info失败：返回null
  *  2. 获取info成功，满足ab块条件：返回HTMLSelectorRangeSpec
  *  3. 获取info成功，不满足ab块：  返回HTMLSelectorRangeSpec，但header为""
@@ -236,11 +307,13 @@ function getSourceMarkdown(
     let range:HTMLSelectorRangeSpec = {
       from_line: 0,
       to_line: 1,
-      header: "",
-      selector: "none",
-      content: "",
-      prefix: "",
       to_line_all: 1,
+      content: "",
+      type: "",
+
+      header: "",
+      seFlag: "",
+      prefix: "",
     }
 
     // 基本信息
@@ -253,57 +326,79 @@ function getSourceMarkdown(
     const list_content = list_text.slice(lineStart, lineEnd + 1)  // div部分的内容。@attension 去除尾部空格否则无法判断 is_end，头部不能去除否则会错位
     range.from_line = lineStart
     range.to_line = lineEnd+1
-    range.content = list_content.join("\n")
     range.to_line_all = list_text.length+1
+    range.content = list_content.join("\n")
 
     // 找类型、找前缀
     if (sectionEl instanceof HTMLUListElement) {
-      range.selector = "list"
+      range.type = "list"
       const match = list_content[0].match(ABReg.reg_list)
       if (!match) return range
-      else range.prefix = match[1]
+      range.prefix = match[1]
     }
     else if (sectionEl instanceof HTMLQuoteElement) {
-      range.selector = "quote"
+      range.type = "quote"
       const match = list_content[0].match(ABReg.reg_quote)
       if (!match) return range
-      else range.prefix = match[1]
+      range.prefix = match[1]
     }
     else if (sectionEl instanceof HTMLPreElement) {
-      range.selector = "code"
+      range.type = "code"
       const match = list_content[0].match(ABReg.reg_code)
       if (!match) return range
-      else range.prefix = match[1]
-    }
-    else if (sectionEl instanceof HTMLHeadingElement) {
-      range.selector = "heading"
-      const match = list_content[0].match(ABReg.reg_heading)
-      if (!match) return range
-      else range.prefix = match[1]
+      range.prefix = match[1]
     }
     else if (sectionEl instanceof HTMLTableElement) {
-      range.selector = "table"
+      range.type = "table"
       const match = list_content[0].match(ABReg.reg_table)
       if (!match) return range
-      else range.prefix = match[1]
+      range.prefix = match[1]
+    }
+    else if (sectionEl instanceof HTMLHeadingElement) {
+      range.type = "heading"
+      const match = list_content[0].match(ABReg.reg_heading)
+      if (!match) return range
+      range.seFlag = match[3]
+    }
+    else if (sectionEl instanceof HTMLParagraphElement) { // mdit/ab_header
+      range.type = "paragraph"
+      const match_header = list_content[0].match(ABReg.reg_header)
+      const match_mdit_head = list_content[0].match(ABReg.reg_mdit_head)
+      const match_mdit_tail = list_content[0].match(ABReg.reg_mdit_tail)
+      if (match_header) {
+        range.type = "header"
+        range.prefix = match_header[1]
+        range.header = list_content[0]
+      } else if (match_mdit_head) {
+        range.type = "mdit_heading"
+        range.prefix = match_mdit_head[1]
+        range.seFlag = match_mdit_head[3]
+        range.header = list_content[4]
+      } else if (match_mdit_head) {
+        range.type = "mdit_tail"
+        range.prefix = match_mdit_head[1]
+        range.seFlag = match_mdit_head[3]
+      }
+    } else {
+      range.type = "other"
     }
 
+    // 旧版本方法。从文本中向上查找。如果找到了，last_el 属性缓存了 header 所对应的 el，便可以将其删掉。缺点是无法使用部分选择器 (标题和mdit)
     // 找头部header
-    let match_header
-    if (lineStart==0) { // 1. 没有上行
-      return range
-    } else if (lineStart>2 && list_text[lineStart-1].trim()=="") { // 2. 找上上行
-      if (list_text[lineStart-2].indexOf(range.prefix)!=0) return range
-      match_header = list_text[lineStart-2].replace(range.prefix, "").match(ABReg.reg_header)
-    } else { // 3. 找上一行
-      if (lineStart>1 && list_text[lineStart-1].indexOf(range.prefix)!=0 && list_text[lineStart-1].trim()=="") return range
-      match_header = list_text[lineStart-1].replace(range.prefix, "").match(ABReg.reg_header)
-    }
-    // （必须是最后一步，通过有无header来判断是否是ab块）
-    if (!match_header) return range
-    range.header = match_header[5]
+    // let match_header
+    // if (lineStart==0) { // 1. 没有上行
+    //   return range
+    // } else if (lineStart>2 && list_text[lineStart-1].trim()=="") { // 2. 找上上行
+    //   if (list_text[lineStart-2].indexOf(range.prefix)!=0) return range
+    //   match_header = list_text[lineStart-2].replace(range.prefix, "").match(ABReg.reg_header)
+    // } else { // 3. 找上一行
+    //   if (lineStart>1 && list_text[lineStart-1].indexOf(range.prefix)!=0 && list_text[lineStart-1].trim()=="") return range
+    //   match_header = list_text[lineStart-1].replace(range.prefix, "").match(ABReg.reg_header)
+    // }
+    // if (!match_header) return range
+    // range.header = match_header[5] // （外部通过有无header属性来判断是否是ab块）
+
     return range
   }
-  // console.warn("获取MarkdownSectionInformation失败，可能会产生bug") // 其实会return void，应该不会有bug
   return null
 }
