@@ -308,7 +308,6 @@ export class C2ListProcess{
           }
         }
         else{                         // 找结束，不需要找标志，因为传过来的是二层一叉树
-          current_dom.classList.add("markdown-rendered")
           ABConvertManager.getInstance().m_renderMarkdownFn(itemInfo.content, current_dom)
           current_dom = null
         }

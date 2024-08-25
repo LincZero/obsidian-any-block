@@ -198,7 +198,6 @@ export class DirProcess{
           }
         }
         let td_cell = document.createElement("div"); td.appendChild(td_cell); td_cell.classList.add("ab-list-table-witharrow");
-        td_cell.classList.add("markdown-rendered")
         ABConvertManager.getInstance().m_renderMarkdownFn(cell_item.content, td_cell);
       }
 

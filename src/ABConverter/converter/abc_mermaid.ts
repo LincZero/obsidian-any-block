@@ -164,7 +164,6 @@ async function render_mermaidText(mermaidText: string, div: HTMLElement) {
   // - 优点：abc模块无需重复内置mermaid
   // - 缺点：在ob里中，一个mermaid块的变更会导致所在页面内的所有mermaid一起变更，在mdit里似乎id会有问题
   // min-ob使用
-  // div.classList.add("markdown-rendered")
   // ABConvertManager.getInstance().m_renderMarkdownFn("```mermaid\n"+mermaidText+"\n```", div)
 
   // 3. 四选一。这里不渲，交给上一层让上一层渲

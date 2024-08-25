@@ -29,6 +29,8 @@ export default class AnyBlockPlugin extends Plugin {
 
     // 将ob的解耦行为传入回调函数 (目的是将转换器和Obsidian相解耦合)
     ABConvertManager.getInstance().redefine_renderMarkdown((markdown: string, el: HTMLElement): void => {
+      el.classList.add("markdown-rendered")
+
       /**
        * Renders markdown string to an HTML element.
        * @deprecated - use {@link MarkdownRenderer.render}

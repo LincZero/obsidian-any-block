@@ -31,7 +31,6 @@ const abc_faq = ABConvert.factory({
           const e_faq_line = document.createElement("div"); e_faq.appendChild(e_faq_line); e_faq_line.classList.add("ab-faq-line", `ab-faq-${mode_qa}`);
           const e_faq_bubble = document.createElement("div"); e_faq_line.appendChild(e_faq_bubble); e_faq_bubble.classList.add("ab-faq-bubble", `ab-faq-${mode_qa}`);
           const e_faq_content = document.createElement("div"); e_faq_bubble.appendChild(e_faq_content); e_faq_content.classList.add("ab-faq-content");
-          e_faq_content.classList.add("markdown-rendered")
           ABConvertManager.getInstance().m_renderMarkdownFn(last_content, e_faq_content)
         }
         mode_qa = m_line[1]
@@ -43,7 +42,6 @@ const abc_faq = ABConvert.factory({
           const e_faq_line = document.createElement("div"); e_faq.appendChild(e_faq_line); e_faq_line.classList.add("ab-faq-line", `ab-faq-${mode_qa}`);
           const e_faq_bubble = document.createElement("div"); e_faq_line.appendChild(e_faq_bubble); e_faq_bubble.classList.add("ab-faq-bubble", `ab-faq-${mode_qa}`);
           const e_faq_content = document.createElement("div"); e_faq_bubble.appendChild(e_faq_content); e_faq_content.classList.add("ab-faq-content");
-          e_faq_content.classList.add("markdown-rendered")
           ABConvertManager.getInstance().m_renderMarkdownFn(last_content, e_faq_content)
     }
     return el
@@ -57,7 +55,7 @@ const abc_info = ABConvert.factory({
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
   process: (el, header, content: string): HTMLElement=>{
-    const table_p: HTMLDivElement = document.createElement("div"); el.appendChild(table_p); table_p.classList.add("markdown-rendered", "ab-setting", "md-table-fig1");
+    const table_p: HTMLDivElement = document.createElement("div"); el.appendChild(table_p); table_p.classList.add("ab-setting", "md-table-fig1");
     const table: HTMLDivElement = document.createElement("table"); table_p.appendChild(table); table.classList.add("ab-setting","md-table-fig2");
     {
       const thead = document.createElement("thead"); table.appendChild(thead);

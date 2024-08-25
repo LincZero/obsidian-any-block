@@ -146,7 +146,6 @@ export class TableProcess{
           if (item.tableRow!=index_line) continue
           let td = document.createElement(is_head?"th":"td"); tr.appendChild(td);
             td.setAttribute("rowspan", item.tableRowSpan.toString()); td.setAttribute("col_index", item.level.toString())
-          td.classList.add("markdown-rendered")
           ABConvertManager.getInstance().m_renderMarkdownFn(item.content, td)
         }
       }

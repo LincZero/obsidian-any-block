@@ -16,7 +16,7 @@ const abc_md = ABConvert.factory({
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
   process: (el, header, content: string): HTMLElement=>{
-    const subEl = document.createElement("div"); el.appendChild(subEl); subEl.classList.add("markdown-rendered")
+    const subEl = document.createElement("div"); el.appendChild(subEl);
     ABConvertManager.getInstance().m_renderMarkdownFn(content, subEl)
     return el
   }

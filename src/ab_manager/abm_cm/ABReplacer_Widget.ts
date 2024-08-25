@@ -25,7 +25,7 @@ export class ABReplacer_Widget extends WidgetType {
     // 根元素
     this.div = document.createElement("div");
     this.div.setAttribute("type_header", this.rangeSpec.header)
-    this.div.addClasses(["ab-replace", "cm-embed-block"]) // , "markdown-rendered", "show-indentation-guide"
+    this.div.addClasses(["ab-replace", "cm-embed-block"]) // , "show-indentation-guide"
 
     // 内容替换元素
     let dom_note = this.div.createEl("div", {cls: ["ab-note", "drop-shadow"]});

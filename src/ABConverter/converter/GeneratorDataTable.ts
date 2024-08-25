@@ -34,7 +34,6 @@ for (let index_line=0; index_line<prev_line+1; index_line++){ // 遍历表格行
     let td = tr.createEl(is_head?"th":"td", {
       attr:{"rowspan": item.tableRow}
     })
-    td.classList.add("markdown-rendered")
     ABConvertManager.getInstance().m_renderMarkdownFn(item.content, td)
   }
 }

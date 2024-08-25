@@ -84,6 +84,7 @@ export class ABConvertManager {
    * @param el 要追加到的元素
    */
   public m_renderMarkdownFn:(markdown: string, el: HTMLElement) => void = (markdown, el) => {
+    el.classList.add("markdown-rendered") // 并注意，应当在使用该函数前将el添加该css类，或者重定义时增加该条语句
     console.error("AnyBlockError: 请先制定/重定义md渲染器")
   }
 
@@ -167,7 +168,7 @@ export class ABConvertManager {
             if (abReplaceProcessor.process_param==ABConvert_IOEnum.el &&
               prev.prev_type2==ABConvert_IOEnum.text
             ){ // 需要输入html，实际输入md，则插入一个md->html
-              const subEl: HTMLDivElement = document.createElement("div"); el.appendChild(subEl); subEl.classList.add("markdown-rendered");
+              const subEl: HTMLDivElement = document.createElement("div"); el.appendChild(subEl);
               ABConvertManager.getInstance().m_renderMarkdownFn(prev.prev_result, subEl);
               prev.prev_result = el
               prev.prev_type = typeof(prev.prev_result)
@@ -420,14 +421,14 @@ export class ABConvertManager {
   private static autoABConvert_last (el:HTMLDivElement, header:string, selectorName:string, prev:any):any{
     // text内容，则给一个md渲染器
     if (prev.prev_type == "string" && prev.prev_type2 == ABConvert_IOEnum.text) {
-      const subEl = document.createElement("div"); el.appendChild(subEl); subEl.classList.add("markdown-rendered");
+      const subEl = document.createElement("div"); el.appendChild(subEl);
       ABConvertManager.getInstance().m_renderMarkdownFn(prev.prev_result as string, subEl);
       prev.prev_result = el; prev.prev_type = "object"; prev.prev_type2 = ABConvert_IOEnum.el; prev.process = "md";
     }
     // json内容/数组内容，则用代码块表示
     else if (prev.prev_type == "string" && prev.prev_type2 == ABConvert_IOEnum.json) {
       const code_str:string = "```json\n" + prev.prev_result + "\n```\n"
-      const subEl = document.createElement("div"); el.appendChild(subEl); subEl.classList.add("markdown-rendered");
+      const subEl = document.createElement("div"); el.appendChild(subEl);
       ABConvertManager.getInstance().m_renderMarkdownFn(code_str, subEl);
       prev.prev_result = el; prev.prev_type = "object"; prev.prev_type2 = ABConvert_IOEnum.el; prev.process = "show_json";
     }
@@ -436,7 +437,7 @@ export class ABConvertManager {
       (prev.prev_type2 == ABConvert_IOEnum.list_strem || prev.prev_type2 == ABConvert_IOEnum.c2list_strem || prev.prev_type2 == ABConvert_IOEnum.json)
     ) {
       const code_str:string = "```json\n" + JSON.stringify(prev.prev_result, null, 2) + "\n```\n"
-      const subEl = document.createElement("div"); el.appendChild(subEl); subEl.classList.add("markdown-rendered");
+      const subEl = document.createElement("div"); el.appendChild(subEl);
       ABConvertManager.getInstance().m_renderMarkdownFn(code_str, subEl);
       prev.prev_result = el; prev.prev_type = "object"; prev.prev_type2 = ABConvert_IOEnum.el; prev.process = "show_listStream";
     }
