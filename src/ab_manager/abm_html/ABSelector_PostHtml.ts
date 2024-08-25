@@ -171,8 +171,8 @@ function findABBlock_end() {
   refresh();
 }
 
-let selected_els: HTMLElement[] = [];             // 正在选择中的元素 (如果未在AB块内，还未开始选择，则为空)
-let selected_mdSrc: HTMLSelectorRangeSpec | null; // 已经选中的范围   (如果未在AB块内，还未开始选择，则为空)
+let selected_els: HTMLElement[] = [];                   // 正在选择中的元素 (如果未在AB块内，还未开始选择，则为空)
+let selected_mdSrc: HTMLSelectorRangeSpec|null = null;  // 已经选中的范围   (如果未在AB块内，还未开始选择，则为空)
 /**
  * 找ab块 - 跨切割块版 (阅读模式下按片触发)
  * 
@@ -198,7 +198,7 @@ function findABBlock_cross(targetEl: HTMLElement, ctx: MarkdownPostProcessorCont
   const current_mdSrc = getSourceMarkdown(targetEl, ctx)
   if (!current_mdSrc) { return false }
 
-  console.log("cross", selected_mdSrc, current_mdSrc)
+  console.log("cross", JSON.stringify(selected_mdSrc, null, 2), JSON.stringify(current_mdSrc, null, 2), current_mdSrc.content, selected_els.length)
 
   // c1. 在AB块内。则判断本次是否结束ab块
   if (selected_mdSrc && selected_mdSrc.header) {
@@ -212,45 +212,32 @@ function findABBlock_cross(targetEl: HTMLElement, ctx: MarkdownPostProcessorCont
         if (current_mdSrc.type=="list"){ // 语法糖 TODO 将弃用
           if (current_mdSrc.header.indexOf("2")==0) current_mdSrc.header="list"+current_mdSrc.header
         }
-        selected_els.push(targetEl)
-        selected_mdSrc.to_line = current_mdSrc.to_line
-        selected_mdSrc.content += "\n\n" + current_mdSrc.content
-        ctx.addChild(new ABReplacer_Render(targetEl, current_mdSrc.header, current_mdSrc.content, current_mdSrc.type));
-        for (const el of selected_els) el.hide()
-        selected_els = []
-        selected_mdSrc = null
+        selected_els.push(targetEl); selected_mdSrc.to_line = current_mdSrc.to_line; selected_mdSrc.content += "\n\n" + current_mdSrc.content; // 追加到selected缓存
+        const replaceEl = selected_els.pop()!; if (replaceEl) {ctx.addChild(new ABReplacer_Render(replaceEl, selected_mdSrc.header, selected_mdSrc.content.split("\n").slice(2,).join("\n"), selected_mdSrc.type)); for (const el of selected_els) {el.hide()}; selected_mdSrc = null; selected_els = []; } // 将selected缓存输出渲染
       }
       // b12. 找到startFlag，后面找endFlag
       else if (current_mdSrc.type == "heading" || current_mdSrc.type == "mdit_head") {
-        selected_els.push(targetEl)
-        selected_mdSrc.to_line = current_mdSrc.to_line
-        selected_mdSrc.content += "\n\n" + current_mdSrc.content
+        selected_els.push(targetEl); selected_mdSrc.to_line = current_mdSrc.to_line; selected_mdSrc.content += "\n\n" + current_mdSrc.content; // 追加到selected缓存
         selected_mdSrc.seFlag = current_mdSrc.seFlag
       }
       // b13. 找不到startFlag，放弃本次AnyBlock
       else {
-        selected_els = []
-        selected_mdSrc = null
+        selected_mdSrc = null; selected_els = [];
       }
     }
     // b2. 有startFlag，寻找endFlag
     else {
-      if (current_mdSrc.type == "mdit_tail" && selected_mdSrc!.seFlag.length == current_mdSrc.seFlag.length) {
-        selected_els.push(targetEl)
-        selected_mdSrc.to_line = current_mdSrc.to_line
-        selected_mdSrc.content += "\n\n" + current_mdSrc.content
-        ctx.addChild(new ABReplacer_Render(targetEl, current_mdSrc.header, current_mdSrc.content, current_mdSrc.type));
-        for (const el of selected_els) el.hide()
-        selected_els = []
-        selected_mdSrc = null
+      if ((current_mdSrc.type == "mdit_tail" || current_mdSrc.type == "mdit_head") && selected_mdSrc!.seFlag.length == current_mdSrc.seFlag.length) {
+        selected_els.push(targetEl); selected_mdSrc.to_line = current_mdSrc.to_line; selected_mdSrc.content += "\n\n" + current_mdSrc.content; // 追加到selected缓存
+        const replaceEl = selected_els.pop()!; if (replaceEl) {ctx.addChild(new ABReplacer_Render(replaceEl, selected_mdSrc.header, selected_mdSrc.content.split("\n").slice(2, -1).join("\n"), selected_mdSrc.type)); for (const el of selected_els) {el.hide()}; selected_mdSrc = null; selected_els = []; } // 将selected缓存输出渲染 (注意减了末尾的:::)
       }
-      else if (current_mdSrc.type == "heading" && selected_mdSrc!.seFlag.length >= current_mdSrc.seFlag.length) {
-        ctx.addChild(new ABReplacer_Render(targetEl, current_mdSrc.header, current_mdSrc.content, current_mdSrc.type));
-        for (const el of selected_els) el.hide()
-        selected_els = []
-        selected_mdSrc = null
+      else if (current_mdSrc.type == "heading" && selected_mdSrc!.seFlag.length > current_mdSrc.seFlag.length) {
+        const replaceEl = selected_els.pop()!; if (replaceEl) {ctx.addChild(new ABReplacer_Render(replaceEl, selected_mdSrc.header, selected_mdSrc.content.split("\n").slice(2,).join("\n"), selected_mdSrc.type)); for (const el of selected_els) {el.hide()}; selected_mdSrc = null; selected_els = []; } // 将selected缓存输出渲染
+        console.log("这里有bug?不应该用targetEl为基础去渲染标题");
       }
-      else {}
+      else {
+        selected_els.push(targetEl); selected_mdSrc.to_line = current_mdSrc.to_line; selected_mdSrc.content += "\n\n" + current_mdSrc.content; // 追加到selected缓存
+      }
     }
   }
 
@@ -258,13 +245,11 @@ function findABBlock_cross(targetEl: HTMLElement, ctx: MarkdownPostProcessorCont
   if (!selected_mdSrc || !selected_mdSrc.header) {
     // b1. 现在开始
     if (current_mdSrc.type == "header" || current_mdSrc.type == "mdit_head") {
-      selected_mdSrc = current_mdSrc;
-      selected_els = [targetEl];
+      selected_mdSrc = current_mdSrc; selected_els = [targetEl];
     }
     // b2. 还没开始
     else {
-      selected_mdSrc = null
-      selected_els = []
+      selected_mdSrc = null; selected_els = [];
     }
   }
 }
@@ -368,16 +353,16 @@ function getSourceMarkdown(
       if (match_header) {
         range.type = "header"
         range.prefix = match_header[1]
-        range.header = list_content[0]
+        range.header = match_header[5]
       } else if (match_mdit_head) {
-        range.type = "mdit_heading"
+        range.type = "mdit_head"
         range.prefix = match_mdit_head[1]
         range.seFlag = match_mdit_head[3]
-        range.header = list_content[4]
-      } else if (match_mdit_head) {
+        range.header = match_mdit_head[4]
+      } else if (match_mdit_tail) {
         range.type = "mdit_tail"
-        range.prefix = match_mdit_head[1]
-        range.seFlag = match_mdit_head[3]
+        range.prefix = match_mdit_tail[1]
+        range.seFlag = match_mdit_tail[3]
       }
     } else {
       range.type = "other"
