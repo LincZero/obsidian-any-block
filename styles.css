@@ -641,7 +641,7 @@
 
 .ab-note .ab-nodes .ab-nodes-content {
   display: inline-block;
-  background-color: rgba(50, 50, 50, 0.5);
+  background-color: rgba(100, 100, 100, 0.25);
   padding: 5px 10px 5px 10px;
   margin-left: 5px;
 }
@@ -660,8 +660,8 @@
   width: 8px;
   height: 8px;
   top: calc(50% - 4px);
-  left: calc(-8px - 2px);
-  clip-path: polygon(100% 0, 100% 100%, 0 50%);
+  left: calc(-8px - 2px + 1px);
+  clip-path: polygon(100% 0, 100% 100%, 13.4% 50%);
   background-color: currentColor;
 }
 

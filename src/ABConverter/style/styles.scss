@@ -630,7 +630,7 @@
     // 圆弧左侧
     .ab-nodes-content {
       display: inline-block;
-      background-color: rgba(50,50,50,0.5);
+      background-color: rgba(100,100,100,0.25);
       padding: 5px 10px 5px 10px;
       margin-left: 5px;
     }
@@ -651,8 +651,8 @@
         width: 8px;
         height: 8px;
         top: calc(50% - 4px);
-        left: calc(-8px - 2px);
-        clip-path: polygon(100% 0, 100% 100%, 0 50%); // 裁剪成三角形
+        left: calc(-8px - 2px + 1px); // 重合一个px避免出现黑线
+        clip-path: polygon(100% 0, 100% 100%, 13.40% 50%); // 裁剪成等边三角形
         background-color: currentColor;
       }
       // 圆弧样式 - 两头弯曲
