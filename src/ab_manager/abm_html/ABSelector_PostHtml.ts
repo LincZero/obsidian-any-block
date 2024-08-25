@@ -13,6 +13,7 @@ import { match } from 'assert'
 
 let last_el: HTMLElement;
 let last_mdSrc: HTMLSelectorRangeSpec | null;
+let current_selector: string = ""; // 内敛选择器 (如标题选择器和mdit `:::`) 才会用到，块选择器不需要使用
 /**
  * Html处理器
  * 
@@ -36,70 +37,41 @@ export class ABSelector_PostHtml{
     el: HTMLElement, 
     ctx: MarkdownPostProcessorContext
   ) {
-    // 设置里不启用，直接关了
-    if (this.settings.decoration_render==ConfDecoration.none) return
-
-    // 获取el对应的源md
-    const mdSrc: HTMLSelectorRangeSpec | null = getSourceMarkdown(el, ctx)
+    if (this.settings.decoration_render==ConfDecoration.none) return // 若设置里不启用，直接退出
+    const mdSrc: HTMLSelectorRangeSpec | null = getSourceMarkdown(el, ctx) // 获取el对应的源md
     
-    // 1. RenderMarkdown引起的调用（需要嵌套寻找）
+    // b1. RenderMarkdown引起的调用（需要嵌套寻找）
+    //     console.log(" -- ABPosthtmlManager.processor, called by 'ReRender'");
     if (!mdSrc) {
-      // console.log(" -- ABPosthtmlManager.processor, called by 'ReRender'");
       if (!el.classList.contains("markdown-rendered")) return
       findABBlock_recurve(el)
       return
     }
 
-    // 2. html渲染模式的逐个切割块调用（需要跨切割块寻找）
-    // 一个文档会被切割成成div stream，这是一个div数组，每个数组元素会在这里走一遍。即分步渲染，有益于性能优化
-    // 其中，每一个div项，一般el.children都是只有一层的，特殊情况是p-br的情况
+    // b2. html渲染模式的逐个切割块调用（需要跨切割块寻找）
+    //     Obsidian后处理机制：一个文档会被切割成成div stream，这是一个div数组，每个数组元素会在这里走一遍。即分步渲染，有益于性能优化
+    //     console.log(" -- ABPosthtmlManager.processor, called by 'ReadMode'");
     else{
-      // console.log(" -- ABPosthtmlManager.processor, called by 'ReadMode'
+      // c21. 片段处理 (一个html界面被分成多个片段触发)
+      //      其中，每一个subEl项都是无属性的div项，内部才是有效信息。
+      //      一般el.children里都是只有一个项 (table/pre等)，只会循环一次。特殊情况是p-br的情况
       for (const subEl of el.children) {
         findABBlock_cross(subEl as HTMLElement, ctx)
       }
       last_el = el
       last_mdSrc = mdSrc
-
-      // ---------------------------- 末处理钩子 (页面完全被加载后触发) ----------------------------
-      if (mdSrc.to_line == mdSrc.to_line_all) { // ~~可用 -1 上个保险，用可能的重复触发性能损耗换取一点触发的稳定性~~
-
-        // list2nodes的圆弧调整 (应在onload后再处理)
-        const refresh = (d:Element|Document = document) => {
-          const list_children = d.querySelectorAll(".ab-nodes-node")
-          for (let children of list_children) {
-            // 元素准备
-            const el_child = children.querySelector(".ab-nodes-children"); if (!el_child) continue
-            const el_bracket = el_child.querySelector(".ab-nodes-bracket") as HTMLElement; if (!el_bracket) continue
-            const el_bracket2 = el_child.querySelector(".ab-nodes-bracket2") as HTMLElement; if (!el_bracket2) continue
-            const childNodes = el_child.childNodes;
-            if (childNodes.length < 3) {
-              el_bracket.style.setProperty("display", "none")
-              el_bracket2.style.setProperty("display", "none")
-              continue
-            }
-            const el_child_first = childNodes[2] as HTMLElement;
-            const el_child_last = childNodes[childNodes.length - 1] as HTMLElement;
-
-            // 修改伪类
-            if (childNodes.length == 3) {
-              el_bracket2.style.setProperty("height", `calc(100% - ${(8+8)/2}px)`);
-              el_bracket2.style.setProperty("top", `${8/2}px`);
-            } else {
-              const heightToReduce = (el_child_first.offsetHeight + el_child_last.offsetHeight) / 2;
-              el_bracket2.style.setProperty("height", `calc(100% - ${heightToReduce}px)`);
-              el_bracket2.style.setProperty("top", `${el_child_first.offsetHeight/2}px`);
-            }
-          }
-        }
-        refresh();
+      
+      // c22. 末处理钩子 (页面完全被加载后触发)
+      //      ~~可-1再比较来上个保险，用可能的重复触发性能损耗换取一点触发的稳定性~~
+      if (mdSrc.to_line == mdSrc.to_line_all) {
+        findABBlock_end();
       }
     }
   }
 }
 
 /**
- * 找ab块 - 递归版
+ * 找ab块 - 递归版 (重渲染触发)
  * 
  * @detail
  * 
@@ -116,10 +88,10 @@ function findABBlock_recurve(targetEl: HTMLElement){
     for (let targetEl2 of targetEl.children){
       findABBlock(targetEl2 as HTMLElement, ctx)
     }
-  }*/
-
+  }
   // replaceABBlock(targetEl, ctx)
   // console.log("hook 准备再渲染", targetEl)
+  */
 
   // 遍历Elements
   for(let i=0; i<targetEl.children.length; i++){  // start form 0，因为可以递归，该层不一定需要header
@@ -170,7 +142,42 @@ function findABBlock_recurve(targetEl: HTMLElement){
 }
 
 /**
- * 找ab块 - 跨切割块版
+ * 找ab块 - 末处理 (整个阅读模式html渲染完了后才被触发)
+ */
+function findABBlock_end() {
+  // list2nodes的圆弧调整 (应在onload后再处理)
+  const refresh = (d:Element|Document = document) => {
+    const list_children = d.querySelectorAll(".ab-nodes-node")
+    for (let children of list_children) {
+      // 元素准备
+      const el_child = children.querySelector(".ab-nodes-children"); if (!el_child) continue
+      const el_bracket = el_child.querySelector(".ab-nodes-bracket") as HTMLElement; if (!el_bracket) continue
+      const el_bracket2 = el_child.querySelector(".ab-nodes-bracket2") as HTMLElement; if (!el_bracket2) continue
+      const childNodes = el_child.childNodes;
+      if (childNodes.length < 3) {
+        el_bracket.style.setProperty("display", "none")
+        el_bracket2.style.setProperty("display", "none")
+        continue
+      }
+      const el_child_first = childNodes[2] as HTMLElement;
+      const el_child_last = childNodes[childNodes.length - 1] as HTMLElement;
+
+      // 修改伪类
+      if (childNodes.length == 3) {
+        el_bracket2.style.setProperty("height", `calc(100% - ${(8+8)/2}px)`);
+        el_bracket2.style.setProperty("top", `${8/2}px`);
+      } else {
+        const heightToReduce = (el_child_first.offsetHeight + el_child_last.offsetHeight) / 2;
+        el_bracket2.style.setProperty("height", `calc(100% - ${heightToReduce}px)`);
+        el_bracket2.style.setProperty("top", `${el_child_first.offsetHeight/2}px`);
+      }
+    }
+  }
+  refresh();
+}
+
+/**
+ * 找ab块 - 跨切割块版 (阅读模式下按片触发)
  * 
  * @detail
  * 
@@ -187,170 +194,18 @@ function findABBlock_cross(targetEl: HTMLElement, ctx: MarkdownPostProcessorCont
     || targetEl instanceof HTMLPreElement
     || targetEl instanceof HTMLTableElement
   ) {
-    replaceABBlock(targetEl, ctx)
-  }
-
-  /**
-   * 尝试转化el
-   * 判断是否有header并替换元素
-   */
-  function replaceABBlock(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext){
-    // 检查头部
+    // 寻找AB块 (主体正确+头部正确)
     const range = getSourceMarkdown(targetEl, ctx)
     if (!range || !range.header) return false
 
-    // 语法糖 TODO 将弃用
-    if (range.selector=="list"){
+    // 渲染AB    
+    if (range.selector=="list"){ // 语法糖 TODO 将弃用
       if (range.header.indexOf("2")==0) range.header="list"+range.header
     }
-
-    // 渲染
     ctx.addChild(new ABReplacer_Render(targetEl, range.header, range.content, range.selector));
     last_el.hide()
   }
 }
-
-/**
- * (已弃用) 找AB块 - 全局选择器版
- * 
- * @detail
- * 
- * called by 'ReadMode2'，在同一个文档里只在最后处理一次
- * 
- * 失败经验1：
- *      if (pEl.getAttribute("ab-title-flag")=="true")
- *      pEl.setAttribute("ab-title-flag", "true") // f这个好像会被清除掉
- * 失败经验2：
- *      后来发现是到了heading with header以后，此时的pEl.children后面的元素还没渲染出来，自然无法判断什么时候结束
- * 失败经验3：
- *      最后想到用mod-footer作为结束标志，再来启用全局选择器
- *      但好像不一定会有mod-footer和mod-header走这里，有时走有时不走，很烦。还有缓存机制也很烦
- *      话说我之前弄display:none怎么好像没bug，不过那个是高性能消耗运行多次，而非全局运行一次的……可能bug会少些
- * 失败经验4：
- *      用getSourceMarkdown的end来判断是否可行，好像还可以，比用mod-footer作为标志稳定
- *      但后来又发现这样的话末尾有空格时会有bug，要去除尾部空格（头部不要去除，会错位）
- *      然后还有一个坑：好像有的能选pertent有的不行，用document直接筛会更稳定
- * 后来基于经验4改了下终于成功了
- * 
- * 备注
- * page/pEl是整个文档
- * div/cEl是文档的根div，类型总为div
- * content/sub/(cEl.children)是有可能为p table这些元素的东西
- */
-/*function findABBlock_global(
-  el: HTMLElement, 
-  ctx: MarkdownPostProcessorContext
-){
-  // const pEl = el.parentElement    // 这里无法获取parentElement
-  const pageEl = document.querySelectorAll(".workspace-leaf.mod-active .markdown-preview-section")[0]
-  if (!pageEl) return
-  let prev_header = ""                // 头部信息
-  let prev_el:HTMLElement|null = null // 选中第一个标题，作用是用来替换为repalce块
-  let prev_from_line:number = 0       // 开始行
-  let prev_heading_level:number = 0   // 上一个标题的等级
-  for (let i=0; i<pageEl.children.length; i++){
-    const divEl = pageEl.children[i] as HTMLElement
-    if (divEl.classList.contains("mod-header") 
-      || divEl.classList.contains("markdown-preview-pusher")) continue
-    if (divEl.classList.contains("mod-footer")) break
-    // 寻找已经处理过的局部选择器，并……
-    (()=>{
-      if (!divEl.children[0]) return
-      const subEl:any = divEl.children[0]
-      if (!(subEl instanceof HTMLElement) || !subEl.classList.contains("ab-replace")) return
-      // 隐藏局部选择器的header块
-      const divEl_last = pageEl.children[i-1] as HTMLElement
-      if (divEl_last.children.length != 1) return
-      const subEl_last = divEl_last.children[0]
-      if (subEl_last
-        && subEl_last instanceof HTMLParagraphElement
-        && ABReg.reg_header.test(subEl_last.getText())
-      ){
-        divEl_last.setAttribute("style", "display: none")
-      }
-    })()
-    if (prev_heading_level == 0) {      // 寻找开始标志
-      if (!divEl.children[0] || !(divEl.children[0] instanceof HTMLHeadingElement)) continue
-      const mdSrc = getSourceMarkdown(divEl, ctx)
-      if (!mdSrc) continue
-      if (mdSrc.header=="") continue
-      const match = mdSrc.content.match(ABReg.reg_heading)
-      if (!match) continue
-      prev_heading_level = match[1].length
-      prev_header = mdSrc.header
-      prev_from_line = mdSrc.from_line
-      prev_el = divEl.children[0] // 就是标题那级
-      // 隐藏全局选择器的header块
-      const divEl_last = pageEl.children[i-1] as HTMLElement
-        if (divEl_last.children.length == 1){
-        const contentEl_last = divEl_last.children[0]
-        if (contentEl_last
-          && contentEl_last instanceof HTMLParagraphElement
-          && ABReg.reg_header.test(contentEl_last.getText())
-        ){
-          divEl_last.setAttribute("style", "display: none")
-        }
-      }
-    }
-    else {                            // 寻找结束标志
-      if (!divEl.children[0]){  // .mod-footer会触发这一层
-        divEl.setAttribute("style", "display: none")
-        continue
-      }
-      if (!(divEl.children[0] instanceof HTMLHeadingElement)){
-        divEl.setAttribute("style", "display: none")
-        continue
-      }
-      const mdSrc = getSourceMarkdown(divEl, ctx)
-      if (!mdSrc) {
-        divEl.setAttribute("style", "display: none")
-        continue
-      }
-      const match = mdSrc.content.match(ABReg.reg_heading)
-      if (!match){
-        divEl.setAttribute("style", "display: none")
-        continue
-      }
-      if (match[1].length >= prev_heading_level){  // 【改】可选同级
-        divEl.setAttribute("style", "display: none")
-        continue
-      }
-
-      // 渲染
-      const cEl_last = pageEl.children[i-1] as HTMLElement   // 回溯到上一个
-      const mdSrc_last = getSourceMarkdown(cEl_last, ctx)
-      if (!mdSrc_last) {
-        console.warn("标题选择器结束时发生意外情况")
-        return
-      }
-      
-      const header = prev_header??"md"
-      const content = mdSrc_last.content.split("\n")
-        .slice(prev_from_line, mdSrc_last.to_line).join("\n");
-      if(prev_el) ctx.addChild(new ABReplacer_Render(prev_el, header, content));
-
-      prev_header = ""
-      prev_from_line = 0
-      prev_heading_level = 0
-      prev_el = null
-      i-- // 回溯一步，@bug 下一个标题的header行会被上一个隐藏
-    }
-  }
-  if (prev_heading_level > 0){ // 循环尾调用（@attention 注意：有个.mod-footer，所以不能用最后一个!）
-    const i = pageEl.children.length-1
-    // 渲染
-    const cEl_last = pageEl.children[i-1] as HTMLElement // @bug 可能有bug，这里直接猜使用倒数第二个
-    const mdSrc_last = getSourceMarkdown(cEl_last, ctx)
-    if (!mdSrc_last) {
-      console.warn("标题选择器结束时发生意外情况")
-      return
-    }
-    const header = prev_header??"md"
-    const content = mdSrc_last.content.trim().split("\n")
-      .slice(prev_from_line, mdSrc_last.to_line).join("\n");
-    if(prev_el) ctx.addChild(new ABReplacer_Render(prev_el, header, content));
-  }
-}*/
 
 interface HTMLSelectorRangeSpec {
   from_line: number,  // div片段的头部
