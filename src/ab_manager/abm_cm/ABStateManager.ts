@@ -84,8 +84,8 @@ export class ABStateManager{
     }`;
 
     // list2nodes的圆弧调整 (应在onload后再处理)
-    const refresh = () => {
-      const list_children = document.querySelectorAll(".ab-nodes-node")
+    const refresh = (d:Element|Document = document) => {
+      const list_children = d.querySelectorAll(".ab-nodes-node")
       for (let children of list_children) {
         // 元素准备
         const el_child = children.querySelector(".ab-nodes-children"); if (!el_child) continue
@@ -109,7 +109,6 @@ export class ABStateManager{
           el_bracket2.style.setProperty("height", `calc(100% - ${heightToReduce}px)`);
           el_bracket2.style.setProperty("top", `${el_child_first.offsetHeight/2}px`);
         }
-        
       }
     }
     refresh();

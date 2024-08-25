@@ -65,8 +65,8 @@ export class ABSelector_PostHtml{
       if (mdSrc.to_line == mdSrc.to_line_all) { // ~~可用 -1 上个保险，用可能的重复触发性能损耗换取一点触发的稳定性~~
 
         // list2nodes的圆弧调整 (应在onload后再处理)
-        const refresh = () => {
-          const list_children = document.querySelectorAll(".ab-nodes-node")
+        const refresh = (d:Element|Document = document) => {
+          const list_children = d.querySelectorAll(".ab-nodes-node")
           for (let children of list_children) {
             // 元素准备
             const el_child = children.querySelector(".ab-nodes-children"); if (!el_child) continue

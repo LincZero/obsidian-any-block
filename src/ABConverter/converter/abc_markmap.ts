@@ -88,23 +88,24 @@ function list2markmap(markdown: string, div: HTMLDivElement) {
 		// div.innerHTML = `<div class="ab-raw-data" type-data="markmap" content-data='${markdown}'></div>`
 
 		// 4. 四选一。纯动态/手动渲染 (优缺点见abc_mermaid的相似方法)。
-		// 当前ob使用
-		const svg_btn = document.createElement("button"); div.appendChild(svg_btn); svg_btn.textContent = "ChickMe ReRender Markmap";
-		svg_btn.setAttribute("style", "background-color: argb(255, 125, 125, 0.5)");
-		svg_btn.setAttribute("onclick", `
-		console.log("markmap chick");
-		let script_el = document.querySelector('script[script-id="ab-markmap-script"]');
-		if (script_el) script_el.remove();
-		script_el = document.createElement('script'); document.head.appendChild(script_el);
-		script_el.type = "module";
-		script_el.setAttribute("script-id", "ab-markmap-script");
-		script_el.textContent = \`
-		import { Markmap, } from 'https://jspm.dev/markmap-view';
-		const mindmaps = document.querySelectorAll('.ab-markmap-svg');
-		for(const mindmap of mindmaps) {
-			Markmap.create(mindmap,null,JSON.parse(mindmap.getAttribute('data-json')));
-		}\``);
+		// 旧Ob使用，现在Ob的刷新按钮统一放在了外面
+		// const svg_btn = document.createElement("button"); div.appendChild(svg_btn); svg_btn.textContent = "ChickMe ReRender Markmap";
+		// svg_btn.setAttribute("style", "background-color: argb(255, 125, 125, 0.5)");
+		// svg_btn.setAttribute("onclick", `
+		// console.log("markmap chick");
+		// let script_el = document.querySelector('script[script-id="ab-markmap-script"]');
+		// if (script_el) script_el.remove();
+		// script_el = document.createElement('script'); document.head.appendChild(script_el);
+		// script_el.type = "module";
+		// script_el.setAttribute("script-id", "ab-markmap-script");
+		// script_el.textContent = \`
+		// import { Markmap, } from 'https://jspm.dev/markmap-view';
+		// const mindmaps = document.querySelectorAll('.ab-markmap-svg');
+		// for(const mindmap of mindmaps) {
+		// 	Markmap.create(mindmap,null,JSON.parse(mindmap.getAttribute('data-json')));
+		// }\``);
 		// TODO 似乎是这里导致了`'`符号的异常
+
 		const svg_div = document.createElement("div"); div.appendChild(svg_div);
 		let height_adapt = 100 + markdown.split("\n").length*25; // 仅大致估算px: 100 + (0~40)行 * 25 = [200~1000]。如果要准确估计，得自己解析一遍，麻烦
 		if (height_adapt>1000) height_adapt = 1000;

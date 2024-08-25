@@ -516,7 +516,8 @@ export class ListProcess{
 
     // TODO 后期组件应具备监听全局事件的能力
     // list2nodes的圆弧调整 (应在onload后再处理)
-    const refresh = () => {
+    // Mdit使用，可修改(onclick变内联)并保留该段代码
+    /*const refresh = (d:Element|Document = document) => {
       const list_children = document.querySelectorAll(".ab-nodes-node")
       for (let children of list_children) {
         // 元素准备
@@ -547,7 +548,7 @@ export class ListProcess{
 
     // 手动触发更新
     const btn = document.createElement("button"); el_root.appendChild(btn); btn.textContent = "ChickMe Refresh";
-    btn.onclick = () => { refresh() }
+    btn.onclick = () => { refresh() }*/
 
     return el
   }
