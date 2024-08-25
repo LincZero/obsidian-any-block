@@ -285,6 +285,9 @@ export class ABConvertManager {
         header = header.replace(/^\|title 140lne\|分栏\|/, "|title2col|");
         header = header.replace(/^\|title 140lne\|card\|/, "|title2card|");
         header = header.replace(/^\|title 140lne\|卡片\|/, "|title2card|");
+        header = header.replace(/^\|title 140lne\|node\|/, "|title2listdata|listdata2strict|listdata2nodes|addClass(ab-bracket)|");
+        header = header.replace(/^\|title 140lne\|nodes\|/, "|title2listdata|listdata2strict|listdata2nodes|addClass(ab-bracket)|");
+        header = header.replace(/^\|title 140lne\|节点\|/, "|title2listdata|listdata2strict|listdata2nodes|addClass(ab-bracket)|");
         header = header.replace(/^\|title 140lne/, "");
       }
       const old_list_header = header
@@ -345,6 +348,9 @@ export class ABConvertManager {
       header = header.replace(/^\|list 140lne\|分栏\|/, "|list2col|");
       header = header.replace(/^\|list 140lne\|card\|/, "|list2card|");
       header = header.replace(/^\|list 140lne\|卡片\|/, "|list2card|");
+      header = header.replace(/^\|list 140lne\|node\|/, "|list2listdata|listdata2strict|listdata2nodes|addClass(ab-bracket)|");
+      header = header.replace(/^\|list 140lne\|nodes\|/, "|list2listdata|listdata2strict|listdata2nodes|addClass(ab-bracket)|");
+      header = header.replace(/^\|list 140lne\|节点\|/, "|list2listdata|listdata2strict|listdata2nodes|addClass(ab-bracket)|");
 
       header = header.replace(/^\|list 140lne/, "");
 

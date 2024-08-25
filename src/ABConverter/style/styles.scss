@@ -42,9 +42,9 @@
 
 .ab-note{
   // 修复重渲染表格宽度过宽的问题
+  .ab-note table,
   .markdown-rendered table {
     min-width: 0;
-    display: block;
   }
   // 修复ob新版本导致表格宽度减少
   table {

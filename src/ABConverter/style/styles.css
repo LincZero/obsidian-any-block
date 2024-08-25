@@ -39,9 +39,9 @@
   height: 2px;
 }
 
+.ab-note .ab-note table,
 .ab-note .markdown-rendered table {
   min-width: 0;
-  display: block;
 }
 
 .ab-note table {
