@@ -109,26 +109,32 @@
     }
   }
 
+  // 使单元格内容更紧凑 - 去除单元格内部的间隔 (首尾)
+  td>p:first-child, th>p:first-child, // ob x 5
+  td>ul:first-child, th>ul:first-child,
+  .ab-list-table-witharrow>p:first-child,
+  .ab-nodes-content>p:first-child,
+  td>div>p:first-child, th>div>p:first-child, // mdit x 5
+  td>div>ul:first-child, th>div>ul:first-child, 
+  .ab-list-table-witharrow>div>p:first-child,
+  .ab-nodes-content>div>p:first-child
+  {
+    margin-top: 0;
+  }
+  td>p:last-child, th>p:last-child, // ob x 5
+  td>ul:last-child, th>ul:last-child, 
+  .ab-list-table-witharrow>p:last-child,
+  .ab-nodes-content>p:last-child,
+  td>div>p:last-child, th>div>p:last-child, // mdit x 5
+  td>div>ul:last-child, th>div>ul:last-child,
+  .ab-list-table-witharrow>div>p:last-child,
+  .ab-nodes-content>div>p:last-child
+  {
+    margin-bottom: 0;
+  }
+
   // 通用表格
   table.ab-table{
-    // 使空格内容更紧凑 - 去除单元格内部的间隔 (首尾)
-    td>p:first-child, th>p:first-child, // ob x 5
-    td>ul:first-child, th>ul:first-child,
-    .ab-list-table-witharrow>p:first-child,
-    td>div>p:first-child, th>div>p:first-child, // mdit x 5
-    td>div>ul:first-child, th>div>ul:first-child, 
-    .ab-list-table-witharrow>div>p:first-child
-    {
-      margin-top: 0;
-    }
-    td>p:last-child, th>p:last-child, // ob x 5
-    td>ul:last-child, th>ul:last-child, 
-    .ab-list-table-witharrow>p:last-child,
-    td>div>p:last-child, th>div>p:last-child, // mdit x 5
-    td>div>ul:last-child, th>div>ul:last-child,
-    .ab-list-table-witharrow>div>p:last-child{
-      margin-bottom: 0;
-    }
     // 使空格内容更紧凑 -  去除单元格之间的间距
     border-collapse:collapse;
     td,th{
@@ -623,6 +629,9 @@
       // 圆弧左侧
       .ab-nodes-content {
         display: inline-block;
+        background-color: rgba(50,50,50,0.5);
+        padding: 5px 10px 5px 10px;
+        margin-left: 5px;
       }
       // 圆弧右侧
       .ab-nodes-children {

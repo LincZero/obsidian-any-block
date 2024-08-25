@@ -515,27 +515,42 @@ export class ListProcess{
     }
 
     // 画圆弧 (应在onload后再处理) // TODO 这里需要在页面加载后触发
-    const list_children = el_root.querySelectorAll(".ab-nodes-node")
-    for (let children of list_children) {
-      // 元素准备
-      const el_child = children.querySelector(".ab-nodes-children"); if (!el_child) continue
-      const el_bracket = el_child.querySelector(".ab-nodes-bracket") as HTMLElement;
-      const el_bracket2 = el_child.querySelector(".ab-nodes-bracket2") as HTMLElement;
-      const childNodes = el_child.childNodes;
-      if (childNodes.length < 3) {
-        el_bracket.style.setProperty("display", "none")
-        el_bracket2.style.setProperty("display", "none")
-        continue
-      }
-      const el_child_first = childNodes[2] as HTMLElement;
-      const el_child_last = childNodes[childNodes.length - 1] as HTMLElement;
+    const refresh = () => {
+      const list_children = el.querySelectorAll(".ab-nodes-node")
+      for (let children of list_children) {
+        // 元素准备
+        const el_child = children.querySelector(".ab-nodes-children"); if (!el_child) continue
+        const el_bracket = el_child.querySelector(".ab-nodes-bracket") as HTMLElement;
+        const el_bracket2 = el_child.querySelector(".ab-nodes-bracket2") as HTMLElement;
+        const childNodes = el_child.childNodes;
+        if (childNodes.length < 3) {
+          el_bracket.style.setProperty("display", "none")
+          el_bracket2.style.setProperty("display", "none")
+          continue
+        }
+        const el_child_first = childNodes[2] as HTMLElement;
+        const el_child_last = childNodes[childNodes.length - 1] as HTMLElement;
 
-      // 修改伪类
-      const heightToReduce = (el_child_first.offsetHeight + el_child_last.offsetHeight) / 2;
-      console.log("正在修改伪类", el_child_first.offsetHeight, el_child_last.offsetHeight)
-      el_bracket2.style.setProperty("height", `calc(100% - ${heightToReduce}px)`);
-      el_bracket2.style.setProperty("top", `${el_child_first.offsetHeight/2}`);
+        // 修改伪类
+        if (childNodes.length == 3) {
+          el_bracket2.style.setProperty("height", `calc(100% - ${(8+8)/2}px)`);
+          el_bracket2.style.setProperty("top", `${8/2}px`);
+        } else {
+          const heightToReduce = (el_child_first.offsetHeight + el_child_last.offsetHeight) / 2;
+          el_bracket2.style.setProperty("height", `calc(100% - ${heightToReduce}px)`);
+          el_bracket2.style.setProperty("top", `${el_child_first.offsetHeight/2}px`);
+        }
+        
+      }
     }
+    refresh();
+
+    // 触发更新
+    const btn = document.createElement("button"); el_root.appendChild(btn); btn.textContent = "ChickMe Refresh";
+    btn.onclick = () => {
+      refresh()
+    }
+
     return el
   }
 }

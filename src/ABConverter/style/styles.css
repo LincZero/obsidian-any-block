@@ -109,26 +109,30 @@
   padding: 10px 20px;
 }
 
-.ab-note table.ab-table {
-  border-collapse: collapse;
-}
-
-.ab-note table.ab-table td > p:first-child, .ab-note table.ab-table th > p:first-child,
-.ab-note table.ab-table td > ul:first-child, .ab-note table.ab-table th > ul:first-child,
-.ab-note table.ab-table .ab-list-table-witharrow > p:first-child,
-.ab-note table.ab-table td > div > p:first-child, .ab-note table.ab-table th > div > p:first-child,
-.ab-note table.ab-table td > div > ul:first-child, .ab-note table.ab-table th > div > ul:first-child,
-.ab-note table.ab-table .ab-list-table-witharrow > div > p:first-child {
+.ab-note td > p:first-child, .ab-note th > p:first-child,
+.ab-note td > ul:first-child, .ab-note th > ul:first-child,
+.ab-note .ab-list-table-witharrow > p:first-child,
+.ab-note .ab-nodes-content > p:first-child,
+.ab-note td > div > p:first-child, .ab-note th > div > p:first-child,
+.ab-note td > div > ul:first-child, .ab-note th > div > ul:first-child,
+.ab-note .ab-list-table-witharrow > div > p:first-child,
+.ab-note .ab-nodes-content > div > p:first-child {
   margin-top: 0;
 }
 
-.ab-note table.ab-table td > p:last-child, .ab-note table.ab-table th > p:last-child,
-.ab-note table.ab-table td > ul:last-child, .ab-note table.ab-table th > ul:last-child,
-.ab-note table.ab-table .ab-list-table-witharrow > p:last-child,
-.ab-note table.ab-table td > div > p:last-child, .ab-note table.ab-table th > div > p:last-child,
-.ab-note table.ab-table td > div > ul:last-child, .ab-note table.ab-table th > div > ul:last-child,
-.ab-note table.ab-table .ab-list-table-witharrow > div > p:last-child {
+.ab-note td > p:last-child, .ab-note th > p:last-child,
+.ab-note td > ul:last-child, .ab-note th > ul:last-child,
+.ab-note .ab-list-table-witharrow > p:last-child,
+.ab-note .ab-nodes-content > p:last-child,
+.ab-note td > div > p:last-child, .ab-note th > div > p:last-child,
+.ab-note td > div > ul:last-child, .ab-note th > div > ul:last-child,
+.ab-note .ab-list-table-witharrow > div > p:last-child,
+.ab-note .ab-nodes-content > div > p:last-child {
   margin-bottom: 0;
+}
+
+.ab-note table.ab-table {
+  border-collapse: collapse;
 }
 
 .ab-note table.ab-table td, .ab-note table.ab-table th {
@@ -646,6 +650,9 @@
 
 .ab-note .ab-nodes .ab-nodes-node .ab-nodes-content {
   display: inline-block;
+  background-color: rgba(50, 50, 50, 0.5);
+  padding: 5px 10px 5px 10px;
+  margin-left: 5px;
 }
 
 .ab-note .ab-nodes .ab-nodes-node .ab-nodes-children {
