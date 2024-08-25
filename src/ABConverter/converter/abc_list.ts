@@ -514,6 +514,7 @@ export class ListProcess{
       }
     }
 
+    // TODO 后期组件应具备监听全局事件的能力
     // list2nodes的圆弧调整 (应在onload后再处理)
     const refresh = () => {
       const list_children = document.querySelectorAll(".ab-nodes-node")

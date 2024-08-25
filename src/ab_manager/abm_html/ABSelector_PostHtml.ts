@@ -47,7 +47,9 @@ export class ABSelector_PostHtml{
       // console.log(" -- ABPosthtmlManager.processor, called by 'ReRender'");
       if (!el.classList.contains("markdown-rendered")) return
       findABBlock_recurve(el)
+      return
     }
+
     // 2. html渲染模式的逐个切割块调用（需要跨切割块寻找）
     // 一个文档会被切割成成div stream，这是一个div数组，每个数组元素会在这里走一遍。即分步渲染，有益于性能优化
     // 其中，每一个div项，一般el.children都是只有一层的，特殊情况是p-br的情况
@@ -59,56 +61,40 @@ export class ABSelector_PostHtml{
       last_el = el
       last_mdSrc = mdSrc
 
-      // 弃用
-      // 
-      // 以前是分两个场景：
-      // - 情景一：每次有元素进来时，均执行 findABBlock_cross
-      // - 情景二：当div_stream的所有元素进来后，执行 findABBlock_global
-      // 
-      // 然后场景二就运行这个：
-      // if (mdSrc.to_line==mdSrc.content.split("\n").length // 失效，新版本似乎没有这个
-      //   || el.classList.contains("mod-footer")            // 失效，新版本似乎没有这个
-      //   || mdSrc.content.trim() == "[end]"                // 手动声明文档结尾，仅调试使用
-      // ){
-      //   console.log(" -- ABPosthtmlManager.processor, called by 'ReadMode'. And End");
-      //   findABBlock_global(el, ctx)
-      // } else {
-      //   console.log(" -- ABPosthtmlManager.processor, called by 'ReadMode'. And During");
-      // }
-    }
+      // ---------------------------- 末处理钩子 (页面完全被加载后触发) ----------------------------
+      if (mdSrc.to_line == mdSrc.to_line_all) { // ~~可用 -1 上个保险，用可能的重复触发性能损耗换取一点触发的稳定性~~
 
-    // ---------------------------- 后处理钩子 (在页面加载后被触发) ----------------------------
-    // TODO 如果能在本页元素加载完后再触发那是最好，否则性能开销大
+        // list2nodes的圆弧调整 (应在onload后再处理)
+        const refresh = () => {
+          const list_children = document.querySelectorAll(".ab-nodes-node")
+          for (let children of list_children) {
+            // 元素准备
+            const el_child = children.querySelector(".ab-nodes-children"); if (!el_child) continue
+            const el_bracket = el_child.querySelector(".ab-nodes-bracket") as HTMLElement;
+            const el_bracket2 = el_child.querySelector(".ab-nodes-bracket2") as HTMLElement;
+            const childNodes = el_child.childNodes;
+            if (childNodes.length < 3) {
+              el_bracket.style.setProperty("display", "none")
+              el_bracket2.style.setProperty("display", "none")
+              continue
+            }
+            const el_child_first = childNodes[2] as HTMLElement;
+            const el_child_last = childNodes[childNodes.length - 1] as HTMLElement;
 
-    // list2nodes的圆弧调整 (应在onload后再处理)
-    const refresh = () => {
-      const list_children = document.querySelectorAll(".ab-nodes-node")
-      for (let children of list_children) {
-        // 元素准备
-        const el_child = children.querySelector(".ab-nodes-children"); if (!el_child) continue
-        const el_bracket = el_child.querySelector(".ab-nodes-bracket") as HTMLElement;
-        const el_bracket2 = el_child.querySelector(".ab-nodes-bracket2") as HTMLElement;
-        const childNodes = el_child.childNodes;
-        if (childNodes.length < 3) {
-          el_bracket.style.setProperty("display", "none")
-          el_bracket2.style.setProperty("display", "none")
-          continue
+            // 修改伪类
+            if (childNodes.length == 3) {
+              el_bracket2.style.setProperty("height", `calc(100% - ${(8+8)/2}px)`);
+              el_bracket2.style.setProperty("top", `${8/2}px`);
+            } else {
+              const heightToReduce = (el_child_first.offsetHeight + el_child_last.offsetHeight) / 2;
+              el_bracket2.style.setProperty("height", `calc(100% - ${heightToReduce}px)`);
+              el_bracket2.style.setProperty("top", `${el_child_first.offsetHeight/2}px`);
+            }
+          }
         }
-        const el_child_first = childNodes[2] as HTMLElement;
-        const el_child_last = childNodes[childNodes.length - 1] as HTMLElement;
-
-        // 修改伪类
-        if (childNodes.length == 3) {
-          el_bracket2.style.setProperty("height", `calc(100% - ${(8+8)/2}px)`);
-          el_bracket2.style.setProperty("top", `${8/2}px`);
-        } else {
-          const heightToReduce = (el_child_first.offsetHeight + el_child_last.offsetHeight) / 2;
-          el_bracket2.style.setProperty("height", `calc(100% - ${heightToReduce}px)`);
-          el_bracket2.style.setProperty("top", `${el_child_first.offsetHeight/2}px`);
-        }
+        refresh();
       }
     }
-    refresh();
   }
 }
 
@@ -367,12 +353,13 @@ function findABBlock_cross(targetEl: HTMLElement, ctx: MarkdownPostProcessorCont
 }*/
 
 interface HTMLSelectorRangeSpec {
-  from_line: number,// 替换范围
-  to_line: number,  // .
-  header: string,   // 头部信息
-  selector: string, // 选择器（范围选择方式）
-  content: string,  // 内容信息（已去除尾部空格）
-  prefix: string,
+  from_line: number,  // div片段的头部
+  to_line: number,    // div片段的尾部
+  header: string,     // 头部信息
+  selector: string,   // 选择器 (范围选择方式)
+  content: string,    // 内容信息 (已去除尾部空格)
+  prefix: string,     // 选择器的前缀
+  to_line_all: number // 全文代尾部 (已去除尾部空格) 当 to_line_all == to_line，说明片段在文章的结尾了
 }
 /**
  * 将html还原回md格式
@@ -397,16 +384,22 @@ function getSourceMarkdown(
       header: "",
       selector: "none",
       content: "",
-      prefix: ""
+      prefix: "",
+      to_line_all: 1,
     }
 
     // 基本信息
-    const { text, lineStart, lineEnd } = info;  // 分别是：全文文档、div的开始行、div的结束行（结束行是包含的，+1才是不包含）
-    const list_text = text.replace(/(\s*$)/g,"").split("\n")
-    const list_content = list_text.slice(lineStart, lineEnd + 1)   // @attension 去除尾部空格否则无法判断 is_end，头部不能去除否则会错位
+    const {
+      text,       // 全文文档
+      lineStart,  // div部分的开始行
+      lineEnd     // div部分的结束行（结束行是包含的，+1才是不包含）
+    } = info; 
+    const list_text = text.replace(/(\s*$)/g,"").split("\n")      // div部分的内容 (去除了尾部空行)
+    const list_content = list_text.slice(lineStart, lineEnd + 1)  // div部分的内容。@attension 去除尾部空格否则无法判断 is_end，头部不能去除否则会错位
     range.from_line = lineStart
     range.to_line = lineEnd+1
-    range.content = list_content.join("\n");
+    range.content = list_content.join("\n")
+    range.to_line_all = list_text.length+1
 
     // 找类型、找前缀
     if (sectionEl instanceof HTMLUListElement) {
