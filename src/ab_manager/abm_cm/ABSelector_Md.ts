@@ -15,6 +15,9 @@
  */
 
 /**
+ * 自动选择器
+ * 
+ * @detail
  * 与自动处理器相似，但不需要那么多的东西
  * 
  * 自动选择器（仅md版，html逻辑不同，是区分局部和全局选择器的）：
@@ -57,7 +60,7 @@ export function autoMdSelector(
       const match = line.match(/^((\s|>\s|-\s|\*\s|\+\s)*)(````*|~~~~*)(.*)/)
       if (match && match[3]) {
         codeBlockFlag = match[1]+match[3]
-        continue
+        // TODO V3.0.7beta 发现一个选择器优化方案。未应用。暂时应急修复：这里不再执行 continue，当行可以触发，再往下一行不让触发
       }
     }
     else if (codeBlockFlag != "") {
@@ -69,6 +72,7 @@ export function autoMdSelector(
 
     for (let selecotr of list_mdSelector){
       if (selecotr.match.test(line)) {
+        // TODO V3.0.7beta 发现一个选择器优化方案：这里触发时，i位于`[]`的下面，即 `- `、`# ` 所属行。这个逻辑其实不太对。应该在 `[]` 所在行触发会比较好
         let sim:MdSelectorRangeSpecSimp|null = selecotr.selector(list_text, i)
         if (!sim) continue
         // 语法糖 // TODO 要被新的语法系统给替换掉
@@ -89,6 +93,7 @@ export function autoMdSelector(
           prefix: sim.prefix,
         })
         i = sim.to_line-1
+        codeBlockFlag = ""
         break
       }
     }

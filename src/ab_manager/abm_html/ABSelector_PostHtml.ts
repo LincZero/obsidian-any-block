@@ -233,7 +233,6 @@ function findABBlock_cross(targetEl: HTMLElement, ctx: MarkdownPostProcessorCont
       }
       else if (current_mdSrc.type == "heading" && selected_mdSrc!.seFlag.length > current_mdSrc.seFlag.length) {
         const replaceEl = selected_els.pop()!; if (replaceEl) {ctx.addChild(new ABReplacer_Render(replaceEl, selected_mdSrc.header, selected_mdSrc.content.split("\n").slice(2,).join("\n"), selected_mdSrc.type)); for (const el of selected_els) {el.hide()}; selected_mdSrc = null; selected_els = []; } // 将selected缓存输出渲染
-        console.log("这里有bug?不应该用targetEl为基础去渲染标题");
       }
       else {
         selected_els.push(targetEl); selected_mdSrc.to_line = current_mdSrc.to_line; selected_mdSrc.content += "\n\n" + current_mdSrc.content; // 追加到selected缓存

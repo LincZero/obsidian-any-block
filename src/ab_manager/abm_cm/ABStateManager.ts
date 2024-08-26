@@ -48,7 +48,9 @@ export class ABStateManager{
   editorState: EditorState  // CM State
   initialFileName: String   // 固定为构造时的名字
 
-  // 用于防止频繁刷新，true->true/false->false，不大刷新，false->true/true->false，大刷新
+  // 用于防止频繁刷新
+  // 若 true->true/false->false，不大刷新，仅局部刷新
+  // 若 false->true/true->false，大刷新
   is_prev_cursor_in:boolean
   prev_decoration_mode:ConfDecoration
   prev_editor_mode:Editor_mode
@@ -179,7 +181,7 @@ export class ABStateManager{
     // 如果没有修改就不管了（点击编辑块的按钮除外）
     // if(tr.changes.empty) return decorationSet
 
-    // 获取 - 编辑器模式、装饰选项、选择器选项
+    // 1. 准备，获取 - 编辑器模式、装饰选项、选择器选项
     let editor_mode: Editor_mode = this.getEditorMode()
     let decoration_mode:ConfDecoration
     if(editor_mode==Editor_mode.SOURCE) {
@@ -192,9 +194,8 @@ export class ABStateManager{
       decoration_mode = this.plugin_this.settings.decoration_render
     }
 
-    // 装饰调整（删增改），包起来准备防抖（未防抖）
+    // 2. 解析、并装饰调整匹配项（删增改），包起来准备防抖（未防抖）
     // let refreshStrong = this.refreshStrong2.bind(this)
-    
     return this.refreshStrong2(decorationSet, tr, decoration_mode, editor_mode)
   }
 
@@ -258,8 +259,9 @@ export class ABStateManager{
   private refreshStrong2(decorationSet:DecorationSet, tr:Transaction, decoration_mode:ConfDecoration, editor_mode:Editor_mode){
     let is_current_cursor_in = false
 
-    // 装饰调整 - 不查了，直接全清了
+    // b1. 装饰调整 - 不查了
     if (decoration_mode==ConfDecoration.none) {
+      // 大刷新，全文刷新，全清空掉再重新赋予
       if (decoration_mode!=this.prev_decoration_mode){
         decorationSet = decorationSet.update({
           filter: (from, to, value)=>{return false}
@@ -269,14 +271,17 @@ export class ABStateManager{
         this.prev_editor_mode = editor_mode
         return decorationSet
       }
+      // 不刷新
       else {
         return decorationSet
       }
     }
 
-    // 装饰调整 - 查
-    let list_add_decoration:Range<Decoration>[] = []
+    // b2. 装饰调整 - 查哪个局部发生了变化，并进行局部刷新
+    //     f1. 全查
     const list_rangeSpec:MdSelectorRangeSpec[] = autoMdSelector(this.mdText)
+    //     f2. 筛选
+    let list_add_decoration:Range<Decoration>[] = []
     for (let rangeSpec of list_rangeSpec){
       let decoration: Decoration
       // 判断光标位置
@@ -294,6 +299,7 @@ export class ABStateManager{
       list_add_decoration.push(decoration.range(rangeSpec.from_ch, rangeSpec.to_ch))
     }
     
+    //     f3. 删增改
     /*const list_abRangeManager:ABMdSelector[] = get_selectors(this.plugin_this.settings).map(c => {
       return new c(this.mdText, this.plugin_this.settings)
     })
