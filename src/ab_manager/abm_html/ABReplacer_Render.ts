@@ -46,7 +46,7 @@ export class ABReplacer_Render extends MarkdownRenderChild {
     // 下拉框格式部分
     const dom_edit = div.createEl("select", {
       cls: ["ab-button", "edit-block-button"], 
-      attr: {"aria-label": "Edit this block - "+this.header}
+      attr: {"aria-label": "Change the block - "+this.header}
     });
     const first_dom_option = dom_edit.createEl("option",{ // 这个需要在首选
       text:"复合格式:"+this.header,

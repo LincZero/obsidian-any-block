@@ -6,6 +6,7 @@
 
 import {ABConvert_IOEnum, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
 import {ABConvertManager} from "../ABConvertManager"
+import { ABAlias_json } from "../ABAlias";
 
 const abc_faq = ABConvert.factory({
   id: "faq",
@@ -87,5 +88,22 @@ const abc_info = ABConvert.factory({
       td = document.createElement("td"); tr.appendChild(td); td.textContent = item.register_from;
     }
     return el
+  }
+})
+
+const abc_info_alias = ABConvert.factory({
+  id: "alias",
+  name: "INFO_Alias",
+  match: "info_alias",
+  process_param: ABConvert_IOEnum.text,
+  process_return: ABConvert_IOEnum.json,
+  process: (el, header, content: string): string=>{
+    return JSON.stringify(
+      ABAlias_json.map((item)=>{return {
+        regex: item.regex.toString(),
+        replacement: item.replacement
+      }}),
+      null, 2
+    )
   }
 })

@@ -8,6 +8,7 @@ import {App, PluginSettingTab, Setting, Modal} from "obsidian"
 import type AnyBlockPlugin from "../main"
 import {ABConvertManager} from "src/ABConverter/ABConvertManager"
 import {ABConvert, type ABConvert_SpecUser} from "src/ABConverter/converter/ABConvert"
+import { ABAlias_json } from "src/ABConverter/ABAlias"
 
 // 加载所有选择器
 import {} from "src/ab_manager/abm_cm/ABSelector_MdBase"
@@ -15,18 +16,26 @@ import {generateSelectorInfoTable} from "src/ab_manager/abm_cm/ABSelector_Md"
 
 /** 设置值接口 */
 export interface ABSettingInterface {
-  select_list: ConfSelect
-  select_quote: ConfSelect
-  select_code: ConfSelect
-  select_heading: ConfSelect
-  select_brace: ConfSelect
-  //is_range_html: boolean
-  //is_range_brace: boolean
-  decoration_source: ConfDecoration
-  decoration_live: ConfDecoration
-  decoration_render: ConfDecoration
-  is_neg_level: boolean,
-  user_processor: ABConvert_SpecUser[]
+  // 选择器模块部分
+  select_list: ConfSelect           // 是否启用list选择器
+  select_quote: ConfSelect          // 是否启用quote选择器
+  select_code: ConfSelect           // 是否启用code选择器
+  select_heading: ConfSelect        // 是否启用heading选择器
+  select_brace: ConfSelect          // 是否启用brace选择器
+  decoration_source: ConfDecoration // 是否在源码模式中启用
+  decoration_live: ConfDecoration   // 是否在实时模式中启用
+  decoration_render: ConfDecoration // 是否在阅读模式中启用
+  is_neg_level: boolean,            // 是否使用负标题标志 `<` (其实是还没做出来)
+
+  // 别名模块部分
+  alias_user: {                         // 别名系统 (V3.0.8提供)，用户定义的别名 (不包含自带的)
+    regex: string,
+    replacement: string
+  }[],
+  user_processor: ABConvert_SpecUser[],  // 别名系统 (旧)，用户自定义的别名处理器
+
+  // 其他
+  is_debug: boolean                 // 是否开启调试打印 (未启用，思考:是否每个模块单独有is_debug开关)
 }
 export enum ConfSelect{
   no = "no",
@@ -39,18 +48,31 @@ export enum ConfDecoration{
   block = "block"
 }
 
-/** 设置值默认项 */
+// 当前设置值 (有默认项)
 export const AB_SETTINGS: ABSettingInterface = {
   select_list: ConfSelect.ifhead,
   select_quote: ConfSelect.ifhead,
   select_code: ConfSelect.ifhead,
   select_heading: ConfSelect.ifhead,
   select_brace: ConfSelect.yes,
+
   decoration_source: ConfDecoration.none,
   decoration_live: ConfDecoration.block,
   decoration_render: ConfDecoration.block,
   is_neg_level: false,
-  user_processor: []
+
+  alias_user: [{ // 仅给一个默认示例
+    "regex": "/\\|alias_demo\\|/",
+    "replacement": "|addClass(ab-custom-text-red)|addClass(ab-custom-bg-blue)|"
+  }],
+  user_processor: [{ // 仅给一个默认示例
+    "id": "alias2_demo",
+    "name": "alias2_demo",
+    "match": "alias2_demo",
+    "process_alias": "|addClass(ab-custom-text-blue)|addClass(ab-custom-bg-red)|"
+  }],
+
+  is_debug: false
 }
 
 /** 设置值面板 */
@@ -62,6 +84,16 @@ export class ABSettingTab extends PluginSettingTab {
 	constructor(app: App, plugin: AnyBlockPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
+
+    // 别名模块加载自定义别名
+    //   新版
+    for (let item of plugin.settings.alias_user){
+      ABAlias_json.push({
+        regex: new RegExp(item.regex.slice(1,-1)), // 去除两侧的`/`并变回string
+        replacement: item.replacement
+      })
+    }
+    //   旧版
     for (let item of plugin.settings.user_processor){
       ABConvert.factory(item)
     }
@@ -136,11 +168,21 @@ export class ABSettingTab extends PluginSettingTab {
 
     // 别名系统的管理
     containerEl.createEl('h2', {text: 'AliasSystem Manager (别名系统的管理)'});
-    containerEl.createEl('p', {text: 'Come will be deprecated in the future! Switch to a new alias system. (该项未来将弃用! 换用新的别名系统)'});
-    containerEl.createEl('p', {text: 'To delete or modify an addition, open the "data.json" file. (添加后要删除或修改请打开data.json文件.)'});
+    containerEl.createEl('p', {text: 'It can also be viewed in the main page using the `[info_alias]` processor (这部分内容也可以使用 `[info_alias]` 处理器在主页面中查看)'});
+    containerEl.createEl('p', {text: 'This section can also be modified by opening the `data.json` file in the plugin folder (这部分也可以打开插件文件夹中的 `data.json` 文件修改)'});
     new Setting(containerEl)
       .setName('Add a new registration instruction')
       .setDesc(`添加新的注册指令`)
+      .addButton(component => {
+        component
+        .setIcon("plus-circle")
+        .onClick(e => {
+          console.warn("目前只能通过修改data.json来修改")
+        })
+      })
+    new Setting(containerEl)
+      .setName('Add a new registration instruction (old, will not be used)')
+      .setDesc(`添加新的注册指令 - 旧版，将弃用`)
       .addButton(component => {
         component
         .setIcon("plus-circle")
@@ -152,18 +194,18 @@ export class ABSettingTab extends PluginSettingTab {
             this.processorPanel.remove()
 
             const div = containerEl.createEl("div");
-            ABConvertManager.autoABConvert(div, "info", "", "null_content") // this.processorPanel = ABConvertManager.getInstance().generateConvertInfoTable(containerEl)
+            ABConvertManager.autoABConvert(div, "info", "", "null_content")
             this.processorPanel = div
           }).open()
         })
       })
-      containerEl.createEl('hr', {attr: {"style": "border-color:#9999ff"}})
+    containerEl.createEl('hr', {attr: {"style": "border-color:#9999ff"}})
 
     // 转换器的管理
     containerEl.createEl('h2', {text: 'Convertor Manager (转换器的管理)'});
+    containerEl.createEl('p', {text: 'It can also be viewed in the main page using the `[info]` processor (这部分内容也可以使用 `[info]` 处理器在主页面中查看)'});
     containerEl.createEl('p', {text: 'This section is for query only and cannot be edited (这一部分仅供查询不可编辑)'})
-    containerEl.createEl('p', {text: 'It can also be viewed in the main page using the `[info]` processor'});
-    containerEl.createEl('p', {text: '这部分内容也可以使用 `[info]` 处理器在主页面中查看'});
+    containerEl.createEl('p', {text: ''});
     const div = containerEl.createEl("div");
     ABConvertManager.autoABConvert(div, "info", "", "null_content") // this.processorPanel = ABConvertManager.getInstance().generateConvertInfoTable(containerEl)
     this.processorPanel = div

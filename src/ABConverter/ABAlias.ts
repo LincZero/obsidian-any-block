@@ -17,11 +17,6 @@
 
 import {ABReg} from "./ABReg"
 
-interface ABAlias_json_item {
-  regex: RegExp,
-  replacement: string
-}
-
 /**
  * 指令头转义补全，可配合自然语言转指令
  * 
@@ -76,8 +71,16 @@ export function autoABAlias (header:string, selectorName:string, content:string)
   for (const item of ABAlias_json) {
     header = header.replace(item.regex, item.replacement)
   }
+  for (const item of ABAlias_json_end) { // 保证ABAlias_json内容被扩展后，该部分的替换规则仍处于最后
+    header = header.replace(item.regex, item.replacement)
+  }
 
   return header
+}
+
+interface ABAlias_json_item {
+  regex: RegExp,
+  replacement: string
 }
 
 // mdit块
@@ -97,7 +100,6 @@ const ABAlias_json_mdit: ABAlias_json_item[] = [
   {regex: /^\|::: 140lne\|分栏\|/, replacement: "|mditCol|"},
   {regex: /^\|::: 140lne\|card\|/, replacement: "|mditCard|"},
   {regex: /^\|::: 140lne\|卡片\|/, replacement: "|mditCard|"},
-  {regex: /^\|::: 140lne/, replacement: ""},
 ]
 
 // 标题块
@@ -162,7 +164,6 @@ const ABAlias_json_title: ABAlias_json_item[] = [
   // title - 二层树
   {regex: /^\|title 140lne\|fakeList\|/, replacement: "|title2list|list2table|addClass(ab-table-fc)|addClass(ab-table-likelist)|"},
   {regex: /^\|title 140lne\|仿列表\|/, replacement: "|title2list|list2table|addClass(ab-table-fc)|addClass(ab-table-likelist)|"},
-  {regex: /^\|title 140lne/, replacement: ""},
 ]
 
 // 列表块
@@ -227,24 +228,20 @@ const ABAlias_json_list: ABAlias_json_item[] = [
   // list - 二层树
   {regex: /^\|list 140lne\|fakeList\|/, replacement: "|list2table|addClass(ab-table-fc)|addClass(ab-table-likelist)|"},
   {regex: /^\|list 140lne\|仿列表\|/, replacement: "|list2table|addClass(ab-table-fc)|addClass(ab-table-likelist)|"},
-  {regex: /^\|list 140lne/, replacement: ""},
 ]
 
 // 代码块
 const ABAlias_json_code: ABAlias_json_item[] = [
   {regex: /^\|code 140lne\|X\|/, replacement: "|Xcode|"},
-  {regex: /^\|code 140lne/, replacement: ""},
 ]
 
 // 引用块
 const ABAlias_json_quote: ABAlias_json_item[] = [
   {regex: /^\|quote 140lne|X\|/, replacement: "|Xquote|"},
-  {regex: /^\|qutoe 140lne/, replacement: ""},
 ]
 
 // 表格块
 const ABAlias_json_table: ABAlias_json_item[] = [
-  {regex: /^\|table 140lne/, replacement: ""},
 ]
 
 // 通用，一般是装饰处理器
@@ -290,7 +287,7 @@ const ABAlias_json_general: ABAlias_json_item[] = [
 ]
 
 // 暂时只支持在开头处替换
-export const ABAlias_json: ABAlias_json_item[] = [
+export let ABAlias_json: ABAlias_json_item[] = [
   ...ABAlias_json_mdit,
   ...ABAlias_json_title,
   ...ABAlias_json_list,
@@ -298,4 +295,13 @@ export const ABAlias_json: ABAlias_json_item[] = [
   ...ABAlias_json_quote,
   ...ABAlias_json_table,
   ...ABAlias_json_general, // 这个放最后
+]
+
+const ABAlias_json_end: ABAlias_json_item[] = [
+  {regex: /^\|::: 140lne/, replacement: ""},
+  {regex: /^\|title 140lne/, replacement: ""},
+  {regex: /^\|list 140lne/, replacement: ""},
+  {regex: /^\|code 140lne/, replacement: ""},
+  {regex: /^\|qutoe 140lne/, replacement: ""},
+  {regex: /^\|table 140lne/, replacement: ""},
 ]
