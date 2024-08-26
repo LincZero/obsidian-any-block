@@ -28,6 +28,7 @@ export interface ABSettingInterface {
   is_neg_level: boolean,            // 是否使用负标题标志 `<` (其实是还没做出来)
 
   // 别名模块部分
+  alias_use_default: true,              // 使用默认的别名预设 (可以为了性能优化而关掉)
   alias_user: {                         // 别名系统 (V3.0.8提供)，用户定义的别名 (不包含自带的)
     regex: string,
     replacement: string
@@ -61,6 +62,7 @@ export const AB_SETTINGS: ABSettingInterface = {
   decoration_render: ConfDecoration.block,
   is_neg_level: false,
 
+  alias_use_default: true,
   alias_user: [ // 仅给一个默认示例
     {
       "regex": "|alias_demo|",
@@ -94,8 +96,14 @@ export class ABSettingTab extends PluginSettingTab {
     // 别名模块加载自定义别名
     //   新版
     for (let item of plugin.settings.alias_user){
+      let newReg: string|RegExp;
+      if (/^\/.*\/$/.test(item.regex)) {
+        newReg = new RegExp(item.regex.slice(1,-1)) // 去除两侧的`/`并变回regExp
+      } else {
+        newReg = item.regex
+      }
       ABAlias_json.push({
-        regex: new RegExp(item.regex.slice(1,-1)), // 去除两侧的`/`并变回string
+        regex: newReg,
         replacement: item.replacement
       })
     }
@@ -183,7 +191,21 @@ export class ABSettingTab extends PluginSettingTab {
         component
         .setIcon("plus-circle")
         .onClick(e => {
-          console.warn("目前只能通过修改data.json来修改")
+          new ABModal_alias(this.app, async (result)=>{
+            // 1. 保存到对象
+            let newReg: string|RegExp;
+            if (/^\/.*\/$/.test(result.regex)) {
+              newReg = new RegExp(result.regex.slice(1,-1)) // 去除两侧的`/`并变回regExp
+            } else {
+              newReg = result.regex
+            }
+            ABAlias_json.push({
+              regex: newReg,
+              replacement: result.replacement
+            })
+            // 2. 保存到文件
+            await this.plugin.saveSettings();
+          }).open()
         })
       })
     new Setting(containerEl)
@@ -194,11 +216,13 @@ export class ABSettingTab extends PluginSettingTab {
         .setIcon("plus-circle")
         .onClick(e => {
           new ABProcessorModal(this.app, async (result)=>{
+            // 1. 保存到对象
             ABConvert.factory(result)
             settings.user_processor.push(result)
+            // 2. 保存到文件
             await this.plugin.saveSettings();
+            // 3. 刷新处理器的图表
             this.processorPanel.remove()
-
             const div = containerEl.createEl("div");
             ABConvertManager.autoABConvert(div, "info", "", "null_content")
             this.processorPanel = div
@@ -283,6 +307,64 @@ class ABProcessorModal extends Modal {
         .setCta() // 这个不知道什么意思
         .onClick(() => {
           if(this.args.id && this.args.name && this.args.match && this.args.process_alias){
+            this.close();
+            this.onSubmit(this.args);
+          }
+        })
+      })
+  }
+
+  onClose() {	// onClose() 方法在对话框被关闭时调用，它负责清理对话框所占用的资源。
+    let { contentEl } = this;
+    contentEl.empty();
+  }
+}
+
+class ABModal_alias extends Modal {
+  args: {regex: string,replacement: string}
+  onSubmit: (args: {regex: string,replacement: string})=>void
+
+  constructor(
+    app: App, 
+    onSubmit: (args: {regex: string,replacement: string})=>void
+  ) {
+    super(app);
+    this.args = {
+      regex: "",
+      replacement: ""
+    }
+    this.onSubmit = onSubmit
+  }
+
+  onOpen() {	// onOpen() 方法在对话框打开时被调用，它负责创建对话框中的内容。想要获取更多信息，可以查阅 HTML elements。
+    let { contentEl } = this;
+    contentEl.setText("Custom alias (自定义别名)");
+    contentEl.createEl("p", {text: ""})
+    new Setting(contentEl)
+      .setName("Alias matching rule")
+      .setDesc("别名匹配规则 (若用/包括起来则表示正则)")
+      .addText((text)=>{
+        text.onChange((value) => {
+        this.args.regex = value
+      })
+    })
+
+    new Setting(contentEl)
+      .setName("Alias replacement")
+      .setDesc("别名替换为")
+      .addText((text)=>{
+        text.onChange((value) => {
+        this.args.replacement = value
+      })
+    })
+
+    new Setting(contentEl)
+      .addButton(btn => {
+        btn
+        .setButtonText("Submit (提交)")
+        .setCta() // 这个不知道什么意思
+        .onClick(() => {
+          if(this.args.regex && this.args.replacement){
             this.close();
             this.onSubmit(this.args);
           }
