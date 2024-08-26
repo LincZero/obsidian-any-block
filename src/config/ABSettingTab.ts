@@ -61,10 +61,16 @@ export const AB_SETTINGS: ABSettingInterface = {
   decoration_render: ConfDecoration.block,
   is_neg_level: false,
 
-  alias_user: [{ // 仅给一个默认示例
-    "regex": "/\\|alias_demo\\|/",
-    "replacement": "|addClass(ab-custom-text-red)|addClass(ab-custom-bg-blue)|"
-  }],
+  alias_user: [ // 仅给一个默认示例
+    {
+      "regex": "|alias_demo|",
+      "replacement": "|addClass(ab-custom-text-red)|addClass(ab-custom-bg-blue)|"
+    },
+    {
+      "regex": "/\\|alias_reg_demo\\|/",
+      "replacement": "|addClass(ab-custom-text-red)|addClass(ab-custom-bg-blue)|"
+    },
+  ],
   user_processor: [{ // 仅给一个默认示例
     "id": "alias2_demo",
     "name": "alias2_demo",
