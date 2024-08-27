@@ -516,43 +516,6 @@ export class ListProcess{
         return el
       }
     }
-
-    // TODO 后期组件应具备监听全局事件的能力
-    // list2nodes的圆弧调整 (应在onload后再处理)
-    // Mdit使用，可修改(onclick变内联)并保留该段代码
-    /*const refresh = (d:Element|Document = document) => {
-      const list_children = document.querySelectorAll(".ab-nodes-node")
-      for (let children of list_children) {
-        // 元素准备
-        const el_child = children.querySelector(".ab-nodes-children"); if (!el_child) continue
-        const el_bracket = el_child.querySelector(".ab-nodes-bracket") as HTMLElement; if (!el_bracket) continue
-        const el_bracket2 = el_child.querySelector(".ab-nodes-bracket2") as HTMLElement; if (!el_bracket2) continue
-        const childNodes = el_child.childNodes;
-        if (childNodes.length < 3) {
-          el_bracket.style.setProperty("display", "none")
-          el_bracket2.style.setProperty("display", "none")
-          continue
-        }
-        const el_child_first = childNodes[2] as HTMLElement;
-        const el_child_last = childNodes[childNodes.length - 1] as HTMLElement;
-
-        // 修改伪类
-        if (childNodes.length == 3) {
-          el_bracket2.style.setProperty("height", `calc(100% - ${(8+8)/2}px)`);
-          el_bracket2.style.setProperty("top", `${8/2}px`);
-        } else {
-          const heightToReduce = (el_child_first.offsetHeight + el_child_last.offsetHeight) / 2;
-          el_bracket2.style.setProperty("height", `calc(100% - ${heightToReduce}px)`);
-          el_bracket2.style.setProperty("top", `${el_child_first.offsetHeight/2}px`);
-        }
-      }
-    }
-    refresh();
-
-    // 手动触发更新
-    const btn = document.createElement("button"); el_root.appendChild(btn); btn.textContent = "ChickMe Refresh";
-    btn.onclick = () => { refresh() }*/
-
     return el
   }
 }

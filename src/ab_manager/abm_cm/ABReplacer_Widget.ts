@@ -3,6 +3,7 @@ import {EditorView, WidgetType} from "@codemirror/view"
 
 import {ABConvertManager} from "../../ABConverter/ABConvertManager"
 import type {MdSelectorRangeSpec} from "./ABSelector_Md"
+import { abConvertEvent } from 'src/ABConverter/ABConvertEvent';
 
 export class ABReplacer_Widget extends WidgetType {
   rangeSpec: MdSelectorRangeSpec
@@ -38,9 +39,6 @@ export class ABReplacer_Widget extends WidgetType {
         attr: {"aria-label": "Edit the block - "+this.rangeSpec.header}
       });
       dom_edit.innerHTML = ABReplacer_Widget.str_icon_code2
-    
-      // 通过控制光标移动间接取消显示块
-      // this.div.ondblclick = ()=>{this.moveCursorToHead()}
       dom_edit.onclick = ()=>{this.moveCursorToHead()}
     }
 
@@ -51,112 +49,15 @@ export class ABReplacer_Widget extends WidgetType {
         attr: {"aria-label": "Refresh the block", "style": "right: 40px"}
       });
       dom_edit.innerHTML = ABReplacer_Widget.str_icon_refresh
-      dom_edit.onclick = ()=>{
-
-        // list2nodes的圆弧调整 (应在onload后再处理)
-        if (this.div.querySelector('.ab-nodes-node')) {
-          const refresh = (d:Element|Document = document) => {
-            const list_children = d.querySelectorAll(".ab-nodes-node")
-            for (let children of list_children) {
-              // 元素准备
-              const el_child = children.querySelector(".ab-nodes-children"); if (!el_child) continue
-              const el_bracket = el_child.querySelector(".ab-nodes-bracket") as HTMLElement; if (!el_bracket) continue
-              const el_bracket2 = el_child.querySelector(".ab-nodes-bracket2") as HTMLElement; if (!el_bracket2) continue
-              const childNodes = el_child.childNodes;
-              if (childNodes.length < 3) {
-                el_bracket.style.setProperty("display", "none")
-                el_bracket2.style.setProperty("display", "none")
-                continue
-              }
-              const el_child_first = childNodes[2] as HTMLElement;
-              const el_child_last = childNodes[childNodes.length - 1] as HTMLElement;
-
-              // 修改伪类
-              if (childNodes.length == 3) {
-                el_bracket2.style.setProperty("height", `calc(100% - ${(8+8)/2}px)`);
-                el_bracket2.style.setProperty("top", `${8/2}px`);
-              } else {
-                const heightToReduce = (el_child_first.offsetHeight + el_child_last.offsetHeight) / 2;
-                el_bracket2.style.setProperty("height", `calc(100% - ${heightToReduce}px)`);
-                el_bracket2.style.setProperty("top", `${el_child_first.offsetHeight/2}px`);
-              }
-            }
-          }
-          refresh(this.div);
-        }
-
-        // list2card的卡片顺序
-        if (this.div.querySelector('.ab-items.ab-card')) {
-          const refresh = (d:Element|Document = document) => {
-            // 1. 准备原元素
-            const root_el = d.querySelector('.ab-items.ab-card')!
-            const list_children = root_el.querySelectorAll(".ab-items-item")
-            // const columnCountTmp2 = parseInt((root_el as HTMLElement).style.columnCount) // NaN
-            const columnCountTmp = parseInt(window.getComputedStyle(root_el).getPropertyValue('column-count'))
-            const columnCount: number = (columnCountTmp && columnCountTmp>0)?columnCountTmp:4 // 计算列数和列宽
-            // const columnWidth = root_el.clientWidth / columnCount;
-
-            // 2. 准备高度缓存、元素缓存
-            let height_cache:number[] = []; // 缓存每列的当前高度，每次将新元素添加到高度最底的列中
-            let el_cache:HTMLElement[][] = [];
-            for (let i = 0; i < columnCount; i++) {
-              height_cache.push(0);
-              el_cache.push([])
-            }
-
-            // 3. 得到顺序数组
-            for (let children of list_children) {
-              const minValue: number =  Math.min.apply(null, height_cache);
-              const minIndex: number =  height_cache.indexOf(minValue)
-              height_cache[minIndex] += parseInt(window.getComputedStyle(children).getPropertyValue("height"))
-              el_cache[minIndex].push(children as HTMLElement)
-            }
-
-            // 3.2. 修复特殊情况下的异常：
-            //    特殊情况指：当分N列时，若 (length%N != 0 || length%N != N-1)，存在问题
-            //    或写成这样好理解些：当 (length%(N-1) != N || length%(N-1) != N-1)，最后一列会缺好几个时，存在问题
-            const fillNumber = columnCount-list_children.length%columnCount
-            if (fillNumber!=4) {
-              for (let i=0; i<fillNumber; i++) {
-                const children = document.createElement("div"); children.classList.add(".ab-items-item.placeholder"); children.setAttribute("style", "height: 20px")
-                const minValue: number =  Math.min.apply(null, height_cache);
-                const minIndex: number =  height_cache.indexOf(minValue)
-                height_cache[minIndex] += 20
-                el_cache[minIndex].push(children as HTMLElement)
-              }
-            }
-
-            // 4. 按顺序重新填入元素
-            root_el.innerHTML = ""
-            for (let i=0; i<columnCount; i++) {
-              for (let j of el_cache[i]) {
-                root_el.appendChild(j)
-              }
-            }
-          }
-          refresh(this.div);
-        }
-
-        // markmap渲染
-        if (this.div.querySelector('.ab-markmap-svg')) {
-          let script_el: HTMLScriptElement|null = document.querySelector('script[script-id="ab-markmap-script"]');
-          if (script_el) script_el.remove();
-          script_el = document.createElement('script'); document.head.appendChild(script_el);
-          script_el.type = "module";
-          script_el.setAttribute("script-id", "ab-markmap-script");
-          script_el.textContent = `
-          import { Markmap, } from 'https://jspm.dev/markmap-view';
-          const mindmaps = document.querySelectorAll('.ab-markmap-svg'); // 注意一下这里的选择器
-          for(const mindmap of mindmaps) {
-            Markmap.create(mindmap,null,JSON.parse(mindmap.getAttribute('data-json')));
-          }`;
-        }
-      }
+      dom_edit.onclick = ()=>{abConvertEvent(this.div)}
     }
     
     return this.div;
   }
 
+  /**
+   * 通过控制光标移动间接取消显示块
+   */
   private moveCursorToHead(): void{
       /** @warning 注意这里千万不能用 toDOM 方法给的 view 参数
        * const editor: Editor = view.editor // @ts-ignore

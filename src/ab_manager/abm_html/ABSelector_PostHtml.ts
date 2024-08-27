@@ -4,12 +4,12 @@ import type {
   MarkdownSectionInformation
 } from "obsidian"
 
-import {ABReg} from "src/config/ABReg"
-import {ConfDecoration} from "src/config/ABSettingTab"
+import { ABReg } from "src/config/ABReg"
+import { ConfDecoration } from "src/config/ABSettingTab"
 import type AnyBlockPlugin from "../../main"
-import {ABReplacer_Render} from "./ABReplacer_Render"
-import {ABConvertManager} from "src/ABConverter/ABConvertManager"
-import { match } from 'assert'
+import { ABReplacer_Render } from "./ABReplacer_Render"
+import { ABConvertManager } from "src/ABConverter/ABConvertManager"
+import { abConvertEvent } from "src/ABConverter/ABConvertEvent";
 
 /**
  * Html处理器
@@ -140,35 +140,7 @@ function findABBlock_recurve(targetEl: HTMLElement){
  * 找ab块 - 末处理 (整个阅读模式html渲染完了后才被触发)
  */
 function findABBlock_end() {
-  // list2nodes的圆弧调整 (应在onload后再处理)
-  const refresh = (d:Element|Document = document) => {
-    const list_children = d.querySelectorAll(".ab-nodes-node")
-    for (let children of list_children) {
-      // 元素准备
-      const el_child = children.querySelector(".ab-nodes-children"); if (!el_child) continue
-      const el_bracket = el_child.querySelector(".ab-nodes-bracket") as HTMLElement; if (!el_bracket) continue
-      const el_bracket2 = el_child.querySelector(".ab-nodes-bracket2") as HTMLElement; if (!el_bracket2) continue
-      const childNodes = el_child.childNodes;
-      if (childNodes.length < 3) {
-        el_bracket.style.setProperty("display", "none")
-        el_bracket2.style.setProperty("display", "none")
-        continue
-      }
-      const el_child_first = childNodes[2] as HTMLElement;
-      const el_child_last = childNodes[childNodes.length - 1] as HTMLElement;
-
-      // 修改伪类
-      if (childNodes.length == 3) {
-        el_bracket2.style.setProperty("height", `calc(100% - ${(8+8)/2}px)`);
-        el_bracket2.style.setProperty("top", `${8/2}px`);
-      } else {
-        const heightToReduce = (el_child_first.offsetHeight + el_child_last.offsetHeight) / 2;
-        el_bracket2.style.setProperty("height", `calc(100% - ${heightToReduce}px)`);
-        el_bracket2.style.setProperty("top", `${el_child_first.offsetHeight/2}px`);
-      }
-    }
-  }
-  refresh();
+  abConvertEvent(document)
 }
 
 let selected_els: HTMLElement[] = [];                   // 正在选择中的元素 (如果未在AB块内，还未开始选择，则为空)
@@ -197,8 +169,6 @@ function findABBlock_cross(targetEl: HTMLElement, ctx: MarkdownPostProcessorCont
   // 寻找AB块
   const current_mdSrc = getSourceMarkdown(targetEl, ctx)
   if (!current_mdSrc) { return false }
-
-  console.log("cross", JSON.stringify(selected_mdSrc, null, 2), JSON.stringify(current_mdSrc, null, 2), current_mdSrc.content, selected_els.length)
 
   // c1. 在AB块内。则判断本次是否结束ab块
   if (selected_mdSrc && selected_mdSrc.header) {

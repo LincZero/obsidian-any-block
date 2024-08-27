@@ -20,6 +20,7 @@ import { ConfDecoration } from "src/config/ABSettingTab"
 import { autoMdSelector, type MdSelectorRangeSpec} from "./ABSelector_Md"
 import { ABDecorationManager } from "./ABDecorationManager"
 import { ABReplacer_Widget } from "./ABReplacer_Widget"
+import { abConvertEvent } from "src/ABConverter/ABConvertEvent";
 
 // 获取 - 模式
 enum Editor_mode{
@@ -72,48 +73,7 @@ export class ABStateManager{
 
     // ---------------------------- 后处理钩子 (在页面加载后被触发) ----------------------------
 
-    // markmap渲染 (这里虽然能自动触发，但必须放要在页面前面的地方才行)
-    let script_el: HTMLScriptElement|null = document.querySelector('script[script-id="ab-markmap-script"]');
-    if (script_el) script_el.remove();
-    script_el = document.createElement('script'); document.head.appendChild(script_el);
-    script_el.type = "module";
-    script_el.setAttribute("script-id", "ab-markmap-script");
-    script_el.textContent = `
-    import { Markmap, } from 'https://jspm.dev/markmap-view';
-    const mindmaps = document.querySelectorAll('.ab-markmap-svg'); // 注意一下这里的选择器
-    for(const mindmap of mindmaps) {
-      Markmap.create(mindmap,null,JSON.parse(mindmap.getAttribute('data-json')));
-    }`;
-
-    // list2nodes的圆弧调整 (应在onload后再处理)
-    const refresh = (d:Element|Document = document) => {
-      const list_children = d.querySelectorAll(".ab-nodes-node")
-      for (let children of list_children) {
-        // 元素准备
-        const el_child = children.querySelector(".ab-nodes-children"); if (!el_child) continue
-        const el_bracket = el_child.querySelector(".ab-nodes-bracket") as HTMLElement; if (!el_bracket) continue
-        const el_bracket2 = el_child.querySelector(".ab-nodes-bracket2") as HTMLElement; if (!el_bracket2) continue
-        const childNodes = el_child.childNodes;
-        if (childNodes.length < 3) {
-          el_bracket.style.setProperty("display", "none")
-          el_bracket2.style.setProperty("display", "none")
-          continue
-        }
-        const el_child_first = childNodes[2] as HTMLElement;
-        const el_child_last = childNodes[childNodes.length - 1] as HTMLElement;
-
-        // 修改伪类
-        if (childNodes.length == 3) {
-          el_bracket2.style.setProperty("height", `calc(100% - ${(8+8)/2}px)`);
-          el_bracket2.style.setProperty("top", `${8/2}px`);
-        } else {
-          const heightToReduce = (el_child_first.offsetHeight + el_child_last.offsetHeight) / 2;
-          el_bracket2.style.setProperty("height", `calc(100% - ${heightToReduce}px)`);
-          el_bracket2.style.setProperty("top", `${el_child_first.offsetHeight/2}px`);
-        }
-      }
-    }
-    refresh();
+    abConvertEvent(document)
   }
 
   destructor() {
