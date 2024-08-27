@@ -314,7 +314,7 @@ export const ABAlias_json_default: ABAlias_json_item[] = [
 
 // 暂时只支持在开头处替换
 export let ABAlias_json: ABAlias_json_item[] = [
-  ...ABAlias_json_default
+  ...ABAlias_json_default // 设置决定是否停用
 ]
 
 const ABAlias_json_end: ABAlias_json_item[] = [

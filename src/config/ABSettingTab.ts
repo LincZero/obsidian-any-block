@@ -94,8 +94,8 @@ export class ABSettingTab extends PluginSettingTab {
 		this.plugin = plugin;
 
     // 别名模块加载自定义别名
-    if (plugin.settings.alias_use_default) {
-      ABAlias_json.concat(ABAlias_json_default)
+    if (!plugin.settings.alias_use_default) {
+      ABAlias_json.length = 0 // 清空数组
     }
     //   新版
     for (let item of plugin.settings.alias_user){
