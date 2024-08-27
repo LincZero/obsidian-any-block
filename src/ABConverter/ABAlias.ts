@@ -112,7 +112,7 @@ const ABAlias_json_mdit: ABAlias_json_item[] = [
 
 // 标题块
 const ABAlias_json_title: ABAlias_json_item[] = [
-  {regex: "|title2list|", replacement: "|title2listdata|listdata2stric|listdata2list|"},
+  {regex: "|title2list|", replacement: "|title2listdata|listdata2strict|listdata2list|"},
 
   // title - list&title
   {regex: "|title 140lne|timeline|", replacement: "|title2timeline|"},
