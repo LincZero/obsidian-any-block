@@ -20,7 +20,6 @@
 
 import {ABConvert_IOEnum, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
 import {ABConvertManager} from "../ABConvertManager"
-import {abc_title2list, ListProcess, type List_ListItem} from "./abc_list"
 import {ABReg} from "../ABReg"
 
 /**
@@ -35,6 +34,7 @@ function getID(length=16){
 // markmap about
 import { Transformer, builtInPlugins } from 'markmap-lib'
 import type { C2ListItem } from "./abc_c2list";
+import { abc_title2listdata } from "./abc_list";
 const transformer = new Transformer();
 //import { Markmap, loadCSS, loadJS } from 'markmap-view'
 
@@ -48,18 +48,6 @@ process: (el, header, content: string): HTMLElement=>{
 		return el
 	}
 })
-
-const abc_title2mindmap = ABConvert.factory({
-	id: "title2markmap",
-	name: "标题到脑图 (markmap)",
-	process_param: ABConvert_IOEnum.text,
-	process_return: ABConvert_IOEnum.el,
-	process: (el, header, content: string): HTMLElement=>{
-			content = abc_title2list.process(el, header, content) as string
-			list2markmap(content, el)
-			return el
-		}
-	})
 
 function list2markmap(markdown: string, div: HTMLDivElement) {
 	// 1. markdown解析 (markmap-lib)

@@ -597,29 +597,3 @@ export const abc_list2json = ABConvert.factory({
     return JSON.stringify(data, null, 2) // TMP
   }
 })
-
-// TODO 仅组合，应用别名替换
-export const abc_title2list = ABConvert.factory({
-  id: "title2list",
-  name: "标题到列表",
-  process_param: ABConvert_IOEnum.text,
-  process_return: ABConvert_IOEnum.text,
-  detail: "也可以当作是更强大的列表解析器",
-  process: (el, header, content: string): string=>{
-    let data: List_ListItem = abc_title2listdata.process(el, header, content) as List_ListItem
-    data = (abc_listdata2strict.process(el, header, data) as List_ListItem).map((item: ListItem, index)=>{ return {content: item.content, level: item.level*2}})
-    return abc_listdata2list.process(el, header, data) as string
-  }
-})
-
-// TODO 仅组合，应用别名替换
-const abc_listXinline = ABConvert.factory({
-  id: "listXinline",
-  name: "列表消除内联换行",
-  process_param: ABConvert_IOEnum.text,
-  process_return: ABConvert_IOEnum.text,
-  process: (el, header, content: string): string=>{
-    const data: List_ListItem = abc_list2listdata.process(el, header, content) as List_ListItem;
-    return abc_listdata2list.process(el, header, data) as string
-  }
-})

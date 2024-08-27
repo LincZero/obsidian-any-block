@@ -191,15 +191,6 @@ const abc_addDiv = ABConvert.factory({
   }
 })
 
-// TODO 应用新别名系统替换
-const abc_heimu = ABConvert.factory({
-  id: "heimu",
-  name: "黑幕",
-  detail: "和萌娘百科的黑幕效果相似",
-  process_alias: "addClass(ab-deco-heimu)",
-  process: (el, header, content)=>{}
-})
-
 const abc_title = ABConvert.factory({
   id: "title",
   name: "标题",
