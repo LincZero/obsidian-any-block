@@ -302,8 +302,7 @@ const ABAlias_json_general: ABAlias_json_item[] = [
   {regex: "|加粗|", replacement: "|addClass(ab-custom-font-bold)|"},
 ]
 
-// 暂时只支持在开头处替换
-export let ABAlias_json: ABAlias_json_item[] = [
+export const ABAlias_json_default: ABAlias_json_item[] = [
   ...ABAlias_json_mdit,
   ...ABAlias_json_title,
   ...ABAlias_json_list,
@@ -311,6 +310,11 @@ export let ABAlias_json: ABAlias_json_item[] = [
   ...ABAlias_json_quote,
   ...ABAlias_json_table,
   ...ABAlias_json_general, // 这个放最后
+]
+
+// 暂时只支持在开头处替换
+export let ABAlias_json: ABAlias_json_item[] = [
+  ...ABAlias_json_default
 ]
 
 const ABAlias_json_end: ABAlias_json_item[] = [

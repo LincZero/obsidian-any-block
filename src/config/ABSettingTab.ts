@@ -8,7 +8,7 @@ import {App, PluginSettingTab, Setting, Modal} from "obsidian"
 import type AnyBlockPlugin from "../main"
 import {ABConvertManager} from "src/ABConverter/ABConvertManager"
 import {ABConvert, type ABConvert_SpecUser} from "src/ABConverter/converter/ABConvert"
-import { ABAlias_json } from "src/ABConverter/ABAlias"
+import { ABAlias_json, ABAlias_json_default } from "src/ABConverter/ABAlias"
 
 // 加载所有选择器
 import {} from "src/ab_manager/abm_cm/ABSelector_MdBase"
@@ -94,6 +94,9 @@ export class ABSettingTab extends PluginSettingTab {
 		this.plugin = plugin;
 
     // 别名模块加载自定义别名
+    if (plugin.settings.alias_use_default) {
+      ABAlias_json.concat(ABAlias_json_default)
+    }
     //   新版
     for (let item of plugin.settings.alias_user){
       let newReg: string|RegExp;
