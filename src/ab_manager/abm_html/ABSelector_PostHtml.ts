@@ -27,6 +27,9 @@ import { abConvertEvent } from "src/ABConverter/ABConvertEvent";
  * - 后处理器，附带还原成md的功能
  *   - ~~html选择器~~
  *   - 渲染器
+ * 
+ * 当前bug：
+ * 切换回实时模式编辑后再切回阅读模式，ob会沿用缓存，这里似乎会失效。需要关闭标签页再重新打开，才能正确重新渲染
  */
 export class ABSelector_PostHtml{
   public static processor(
@@ -53,7 +56,7 @@ export class ABSelector_PostHtml{
       //      其中，每一个subEl项都是无属性的div项，内部才是有效信息。
       //      一般el.children里都是只有一个项 (table/pre等)，只会循环一次。特殊情况是p-br的情况
       for (const subEl of el.children) {
-        findABBlock_cross(subEl as HTMLElement, ctx)
+        findABBlock_cross(subEl as HTMLElement, ctx, (mdSrc.to_line == mdSrc.to_line_all))
       }
       
       // c22. 末处理钩子 (页面完全被加载后触发)
@@ -165,7 +168,7 @@ let selected_mdSrc: HTMLSelectorRangeSpec|null = null;  // 已经选中的范围
  * - 结尾：将selected缓存渲染、清空
  * - 取消：将selected缓存清空
  */
-function findABBlock_cross(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext){
+function findABBlock_cross(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext, is_last:boolean = false){
   // 寻找AB块
   const current_mdSrc = getSourceMarkdown(targetEl, ctx)
   if (!current_mdSrc) { return false }
@@ -204,6 +207,10 @@ function findABBlock_cross(targetEl: HTMLElement, ctx: MarkdownPostProcessorCont
       else if (current_mdSrc.type == "heading" && selected_mdSrc!.seFlag.length > current_mdSrc.seFlag.length) {
         const replaceEl = selected_els.pop()!; if (replaceEl) {ctx.addChild(new ABReplacer_Render(replaceEl, selected_mdSrc.header, selected_mdSrc.content.split("\n").slice(2,).join("\n"), selected_mdSrc.type)); for (const el of selected_els) {el.hide()}; selected_mdSrc = null; selected_els = []; } // 将selected缓存输出渲染
       }
+      else if (is_last) {
+        selected_els.push(targetEl); selected_mdSrc.to_line = current_mdSrc.to_line; selected_mdSrc.content += "\n\n" + current_mdSrc.content; // 追加到selected缓存
+        const replaceEl = selected_els.pop()!; if (replaceEl) {ctx.addChild(new ABReplacer_Render(replaceEl, selected_mdSrc.header, selected_mdSrc.content.split("\n").slice(2,).join("\n"), selected_mdSrc.type)); for (const el of selected_els) {el.hide()}; selected_mdSrc = null; selected_els = []; } // 将selected缓存输出渲染
+      }
       else {
         selected_els.push(targetEl); selected_mdSrc.to_line = current_mdSrc.to_line; selected_mdSrc.content += "\n\n" + current_mdSrc.content; // 追加到selected缓存
       }
@@ -220,6 +227,12 @@ function findABBlock_cross(targetEl: HTMLElement, ctx: MarkdownPostProcessorCont
     else {
       selected_mdSrc = null; selected_els = [];
     }
+  }
+
+  if (is_last) {
+    // 若处于AB块中直接终止
+    selected_els = []
+    selected_mdSrc = null
   }
 }
 
