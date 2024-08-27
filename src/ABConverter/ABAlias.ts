@@ -112,6 +112,8 @@ const ABAlias_json_mdit: ABAlias_json_item[] = [
 
 // 标题块
 const ABAlias_json_title: ABAlias_json_item[] = [
+  {regex: "|title2list|", replacement: "|title2listdata|listdata2stric|listdata2list|"},
+
   // title - list&title
   {regex: "|title 140lne|timeline|", replacement: "|title2timeline|"},
   {regex: "|title 140lne|时间线|", replacement: "|title2timeline|"},
@@ -119,8 +121,10 @@ const ABAlias_json_title: ABAlias_json_item[] = [
   {regex: "|title 140lne|tabs|", replacement: "|title2c2listdata|c2listdata2tab|"},
   {regex: "|title 140lne|标签|", replacement: "|title2c2listdata|c2listdata2tab|"},
   {regex: "|title 140lne|标签页|", replacement: "|title2c2listdata|c2listdata2tab|"},
+  {regex: "|title2col|", replacement: "|title2c2listdata|c2listdata2items|addClass(ab-col)|"},
   {regex: "|title 140lne|col|", replacement: "|title2c2listdata|c2listdata2items|addClass(ab-col)|"},
   {regex: "|title 140lne|分栏|", replacement: "|title2c2listdata|c2listdata2items|addClass(ab-col)|"},
+  {regex: "|title2card|", replacement: "|title2c2listdata|c2listdata2items|addClass(ab-card)|"},
   {regex: "|title 140lne|card|", replacement: "|title2c2listdata|c2listdata2items|addClass(ab-card)|"},
   {regex: "|title 140lne|卡片|", replacement: "|title2c2listdata|c2listdata2items|addClass(ab-card)|"},
   {regex: "|title2node|", replacement: "|title2listdata|listdata2strict|listdata2nodes|addClass(ab-bracket)|"},
@@ -176,6 +180,8 @@ const ABAlias_json_title: ABAlias_json_item[] = [
 
 // 列表块
 const ABAlias_json_list: ABAlias_json_item[] = [
+  {regex: "|listXinline|", replacement: "|list2listdata|listdata2list|"},
+
   // list - list&title
   {regex: "|list 140lne|timeline|", replacement: "|list2timeline|"},
   {regex: "|list 140lne|时间线|", replacement: "|list2timeline|"},
@@ -183,8 +189,10 @@ const ABAlias_json_list: ABAlias_json_item[] = [
   {regex: "|list 140lne|tabs|", replacement: "|list2c2listdata|c2listdata2tab|"},
   {regex: "|list 140lne|标签|", replacement: "|list2c2listdata|c2listdata2tab|"},
   {regex: "|list 140lne|标签页|", replacement: "|list2c2listdata|c2listdata2tab|"},
+  {regex: "|list2col|", replacement: "|list2c2listdata|c2listdata2items|addClass(ab-col)|"},
   {regex: "|list 140lne|col|", replacement: "|list2c2listdata|c2listdata2items|addClass(ab-col)|"},
   {regex: "|list 140lne|分栏|", replacement: "|list2c2listdata|c2listdata2items|addClass(ab-col)|"},
+  {regex: "|list2card|", replacement: "|list2c2listdata|c2listdata2items|addClass(ab-card)|"},
   {regex: "|list 140lne|card|", replacement: "|list2c2listdata|c2listdata2items|addClass(ab-card)|"},
   {regex: "|list 140lne|卡片|", replacement: "|list2c2listdata|c2listdata2items|addClass(ab-card)|"},
   {regex: "|list2node|", replacement: "|list2listdata|listdata2strict|listdata2nodes|addClass(ab-bracket)|"},
@@ -254,9 +262,6 @@ const ABAlias_json_table: ABAlias_json_item[] = [
 
 // 通用，一般是装饰处理器
 const ABAlias_json_general: ABAlias_json_item[] = [
-  {regex: "|title2list|", replacement: "|title2listdata|listdata2stric|listdata2list|"},
-  {regex: "|listXinline|", replacement: "|list2listdata|listdata2list|"},
-
   {regex: "|黑幕|", replacement: "|add_class(ab-deco-heimu)|"},
   {regex: "|折叠|", replacement: "|fold|"},
   {regex: "|滚动|", replacement: "|scroll|"},
