@@ -564,29 +564,40 @@
   padding: 10px;
 }
 
-.ab-note .ab-items.ab-card1 {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.ab-note .ab-items.ab-card1 .ab-items-item {
-  flex: 1 0 calc(25% - 1rem);
-  box-sizing: border-box;
-  color: var(--ab-tab-root-tx-color);
-  background-color: var(--ab-tab-root-bg-color);
-  border: solid 2px var(--ab-tab-root-bd-color);
-  box-shadow: #34343f;
-  padding: 10px;
-}
-
 .ab-note .ab-items.ab-card {
+  /*display: flex; // Flexbox 布局
+      flex-wrap: wrap; // 元素换行显示
+      gap: 1rem; // 间隙
+      .ab-items-item {
+        flex: 1 0 calc(25% - 1rem); // 每个项目的宽度大约为容器的 33.33%，减去间隙的一半
+      }*/
   column-count: 4;
   column-gap: 10px;
+  /*display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-gap: 1rem; // 间隙
+      grid-template-rows: masonry; // 兼容有问题，只有火狐支持，还tm的要开选项
+      .ab-items-item {
+        width: 100%;
+        display: block;
+      }*/
+  /*display: flex;          // Flexbox 布局
+      flex-wrap: wrap; // 元素换行显示
+      // gap: 1rem;           // 间隙
+      flex-direction: column; // 按列填充
+      .ab-items-item {
+        position: relative;
+        width: calc(100% / 4);
+        padding: 5px;
+        box-sizing: border-box;
+        &:nth-child(4n+1){ order: 1; }
+        &:nth-child(4n+2){ order: 2; }
+        &:nth-child(4n+3){ order: 3; }
+        &:nth-child(4n+0){ order: 4; }
+      }*/
 }
 
 .ab-note .ab-items.ab-card .ab-items-item {
-  break-inside: avoid-column;
   box-sizing: border-box;
   color: var(--ab-tab-root-tx-color);
   background-color: var(--ab-tab-root-bg-color);
@@ -596,23 +607,8 @@
   margin-bottom: 10px;
 }
 
-.ab-note .ab-items.ab-card3 {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-gap: 1rem;
-  grid-template-rows: masonry;
-}
-
-.ab-note .ab-items.ab-card3 .ab-items-item {
-  width: 100%;
-  display: block;
-  box-sizing: border-box;
-  color: var(--ab-tab-root-tx-color);
-  background-color: var(--ab-tab-root-bg-color);
-  border: solid 2px var(--ab-tab-root-bd-color);
-  box-shadow: #34343f;
-  padding: 5px 10px;
-  margin-bottom: 0.8rem;
+.ab-note .ab-items.ab-card .ab-items-item {
+  break-inside: avoid-column;
 }
 
 .ab-note .ab-items.ab-col1 {
