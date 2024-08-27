@@ -39,7 +39,7 @@ export class ABReplacer_Widget extends WidgetType {
         attr: {"aria-label": "Edit the block - "+this.rangeSpec.header}
       });
       dom_edit.innerHTML = ABReplacer_Widget.str_icon_code2
-      dom_edit.onclick = ()=>{this.moveCursorToHead()}
+      dom_edit.onclick = ()=>{this.moveCursor()}
     }
 
     // 刷新按钮
@@ -49,7 +49,7 @@ export class ABReplacer_Widget extends WidgetType {
         attr: {"aria-label": "Refresh the block", "style": "right: 40px"}
       });
       dom_edit.innerHTML = ABReplacer_Widget.str_icon_refresh
-      dom_edit.onclick = ()=>{abConvertEvent(this.div)}
+      dom_edit.onclick = ()=>{abConvertEvent(this.div); this.moveCursor(-1)}
     }
     
     return this.div;
@@ -57,37 +57,44 @@ export class ABReplacer_Widget extends WidgetType {
 
   /**
    * 通过控制光标移动间接取消显示块
+   * 
+   * @detail
+   * 当line_offset为0时，相当于将光标移到AB块的第一行
+   * 否则则相当于向上/向下偏移
    */
-  private moveCursorToHead(): void{
-      /** @warning 注意这里千万不能用 toDOM 方法给的 view 参数
-       * const editor: Editor = view.editor // @ts-ignore
-       * 否则editor是undefined
-       */
-      if (this.global_editor){
-        const editor: Editor = this.global_editor
-        let pos = this.getCursorPos(editor, this.rangeSpec.from_ch)
-        if (pos) {
+  private moveCursor(line_offset:number = 0): void{
+    /** @warning 注意这里千万不能用 toDOM 方法给的 view 参数
+     * const editor: Editor = view.editor // @ts-ignore
+     * 否则editor是undefined
+     */
+    if (this.global_editor){
+      const editor: Editor = this.global_editor
+      let pos = getCursorPos(editor, this.rangeSpec.from_ch)
+      if (pos) {
+        pos.line+=line_offset
+        if (line_offset<0) {
+          pos.ch = 0
           editor.setCursor(pos)
-          // 往返修改，间接重新渲染State
-          editor.replaceRange("OF", pos)
+        }
+        // 如果是>=0，则表示将光标移动到AB块所在范围，那么需要重新渲染State
+        else {
+          editor.setCursor(pos)
+          editor.replaceRange("OF", pos) // 这里相当于将光标移出再内移，间接使之重新渲染
           editor.replaceRange("", pos, {line:pos.line, ch:pos.ch+2})
         }
       }
-  }
-
-  private getCursorPos(editor:Editor, total_ch:number): EditorPosition|null{
-    let count_ch = 0
-    let list_text: string[] = editor.getValue().split("\n")
-    for (let i=0; i<list_text.length; i++){
-      if (count_ch+list_text[i].length >= total_ch) return {line:i, ch:total_ch-count_ch}
-      count_ch = count_ch + list_text[i].length + 1
     }
-    return null
-  }
+    return
 
-  // 迭代
-  createTable(div: Element){
-
+    function getCursorPos(editor:Editor, total_ch:number): EditorPosition|null{
+      let count_ch = 0
+      let list_text: string[] = editor.getValue().split("\n")
+      for (let i=0; i<list_text.length; i++){
+        if (count_ch+list_text[i].length >= total_ch) return {line:i, ch:total_ch-count_ch}
+        count_ch = count_ch + list_text[i].length + 1
+      }
+      return null
+    }
   }
 
   static str_icon_code2 = `<svg xmlns="http://www.w3.org/2000/svg" stroke-linecap="round"
