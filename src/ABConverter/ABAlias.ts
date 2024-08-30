@@ -127,11 +127,11 @@ const ABAlias_json_title: ABAlias_json_item[] = [
   {regex: "|title2card|", replacement: "|title2c2listdata|c2listdata2items|addClass(ab-card)|"},
   {regex: "|title 140lne|card|", replacement: "|title2c2listdata|c2listdata2items|addClass(ab-card)|"},
   {regex: "|title 140lne|卡片|", replacement: "|title2c2listdata|c2listdata2items|addClass(ab-card)|"},
-  {regex: "|title2node|", replacement: "|title2listdata|listdata2strict|listdata2nodes|addClass(ab-bracket)|"},
-  {regex: "|title2abMindmap|", replacement: "|title2listdata|listdata2strict|listdata2nodes|addClass(ab-bracket)|"},
-  {regex: "|title 140lne|node|", replacement: "|title2listdata|listdata2strict|listdata2nodes|addClass(ab-bracket)|"},
-  {regex: "|title 140lne|nodes|", replacement: "|title2listdata|listdata2strict|listdata2nodes|addClass(ab-bracket)|"},
-  {regex: "|title 140lne|节点|", replacement: "|title2listdata|listdata2strict|listdata2nodes|addClass(ab-bracket)|"},
+  {regex: "|title2node|", replacement: "|title2listdata|listdata2strict|listdata2nodes|"},
+  {regex: "|title2abMindmap|", replacement: "|title2listdata|listdata2strict|listdata2nodes|"},
+  {regex: "|title 140lne|node|", replacement: "|title2listdata|listdata2strict|listdata2nodes|"},
+  {regex: "|title 140lne|nodes|", replacement: "|title2listdata|listdata2strict|listdata2nodes|"},
+  {regex: "|title 140lne|节点|", replacement: "|title2listdata|listdata2strict|listdata2nodes|"},
 
   // title  - 多叉多层树
   {regex: "|title 140lne|flow|", replacement: "|title2list" + "|list2mermaid|"},
@@ -158,6 +158,7 @@ const ABAlias_json_title: ABAlias_json_item[] = [
   {regex: "|title 140lne|跨行表|", replacement: "|title2list" + "|list2table|"},
 
   // title - lt树 (属于多层一叉树)
+  {regex: "|title 140lne|2lt|", replacement: "|title2list" + "|list2lt|"},
   {regex: "|title 140lne|listTable|", replacement: "|title2list" + "|list2lt|"},
   {regex: "|title 140lne|treeTable|", replacement: "|title2list" + "|list2lt|"},
   {regex: "|title 140lne|listGrid|", replacement: "|title2list" + "|list2lt|"},
@@ -195,11 +196,11 @@ const ABAlias_json_list: ABAlias_json_item[] = [
   {regex: "|list2card|", replacement: "|list2c2listdata|c2listdata2items|addClass(ab-card)|"},
   {regex: "|list 140lne|card|", replacement: "|list2c2listdata|c2listdata2items|addClass(ab-card)|"},
   {regex: "|list 140lne|卡片|", replacement: "|list2c2listdata|c2listdata2items|addClass(ab-card)|"},
-  {regex: "|list2node|", replacement: "|list2listdata|listdata2strict|listdata2nodes|addClass(ab-bracket)|"},
-  {regex: "|list2abMindmap|", replacement: "|list2listdata|listdata2strict|listdata2nodes|addClass(ab-bracket)|"},
-  {regex: "|list 140lne|node|", replacement: "|list2listdata|listdata2strict|listdata2nodes|addClass(ab-bracket)|"},
-  {regex: "|list 140lne|nodes|", replacement: "|list2listdata|listdata2strict|listdata2nodes|addClass(ab-bracket)|"},
-  {regex: "|list 140lne|节点|", replacement: "|list2listdata|listdata2strict|listdata2nodes|addClass(ab-bracket)|"},
+  {regex: "|list2node|", replacement: "|list2listdata|listdata2strict|listdata2nodes|"},
+  {regex: "|list2abMindmap|", replacement: "|list2listdata|listdata2strict|listdata2nodes|"},
+  {regex: "|list 140lne|node|", replacement: "|list2listdata|listdata2strict|listdata2nodes|"},
+  {regex: "|list 140lne|nodes|", replacement: "|list2listdata|listdata2strict|listdata2nodes|"},
+  {regex: "|list 140lne|节点|", replacement: "|list2listdata|listdata2strict|listdata2nodes|"},
 
   // list  - 多叉多层树
   {regex: "|list 140lne|flow|", replacement: "|list2mermaid|"},
@@ -226,6 +227,7 @@ const ABAlias_json_list: ABAlias_json_item[] = [
   {regex: "|list 140lne|跨行表|", replacement: "|list2table|"},
 
   // list - lt树 (属于多层一叉树)
+  {regex: "|list 140lne|2lt|", replacement: "|list2lt|"},
   {regex: "|list 140lne|listTable|", replacement: "|list2lt|"},
   {regex: "|list 140lne|treeTable|", replacement: "|list2lt|"},
   {regex: "|list 140lne|listGrid|", replacement: "|list2lt|"},

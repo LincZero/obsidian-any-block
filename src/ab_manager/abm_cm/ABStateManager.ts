@@ -67,7 +67,7 @@ export class ABStateManager{
     // 因为打开文档会触发，所以后台打开的文档会return false，聚焦到一个非文件的新标签页也会return false
     let ret = this.init()
 
-    console.log(">>> ABStateManager, initialFileName:", this.initialFileName, "initRet:", ret)
+    if (this.plugin_this.settings.is_debug) console.log(">>> ABStateManager, initialFileName:", this.initialFileName, "initRet:", ret)
 
     if (ret) this.setStateEffects()
 
@@ -77,7 +77,7 @@ export class ABStateManager{
   }
 
   destructor() {
-    console.log("<<< ABStateManager, initialFileName:", this.initialFileName)
+    if (this.plugin_this.settings.is_debug) console.log("<<< ABStateManager, initialFileName:", this.initialFileName)
   }
 
   // 设置常用变量

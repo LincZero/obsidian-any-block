@@ -11,6 +11,8 @@ import { ABReplacer_Render } from "./ABReplacer_Render"
 import { ABConvertManager } from "src/ABConverter/ABConvertManager"
 import { abConvertEvent } from "src/ABConverter/ABConvertEvent";
 
+const is_debug = true
+
 /**
  * Html处理器
  * 
@@ -41,8 +43,8 @@ export class ABSelector_PostHtml{
     const mdSrc: HTMLSelectorRangeSpec | null = getSourceMarkdown(el, ctx) // 获取el对应的源md
     
     // b1. RenderMarkdown引起的调用（需要嵌套寻找）
-    //     console.log(" -- ABPosthtmlManager.processor, called by 'ReRender'");
     if (!mdSrc) {
+      if (is_debug) console.log(" -- ABPosthtmlManager.processor, called by 'ReRender'");
       if (!el.classList.contains("markdown-rendered")) return
       findABBlock_recurve(el)
       return
@@ -50,8 +52,9 @@ export class ABSelector_PostHtml{
 
     // b2. html渲染模式的逐个切割块调用（需要跨切割块寻找）
     //     Obsidian后处理机制：一个文档会被切割成成div stream，这是一个div数组，每个数组元素会在这里走一遍。即分步渲染，有益于性能优化
-    //     console.log(" -- ABPosthtmlManager.processor, called by 'ReadMode'");
     else{
+      if (is_debug) console.log(` -- ABPosthtmlManager.processor, called by 'ReadMode', ${mdSrc.to_line}/${mdSrc.to_line_all}`);
+
       // c21. 片段处理 (一个html界面被分成多个片段触发)
       //      其中，每一个subEl项都是无属性的div项，内部才是有效信息。
       //      一般el.children里都是只有一个项 (table/pre等)，只会循环一次。特殊情况是p-br的情况

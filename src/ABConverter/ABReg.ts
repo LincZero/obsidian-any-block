@@ -49,3 +49,13 @@ export const ABReg = {
 
   inline_split: /\| |,  |， |\.  |:  |： /, // 内联切分。除`|`外，半角符号+两空格，或全角符号+一空格
 }
+
+/**
+ * ABConvert的设置
+ * 
+ * @detail
+ * 可以被obsidian的设置覆盖，如果没有GUI设置页面，可以人工修改
+ */
+export let ABCSetting = {
+  is_debug: false
+}

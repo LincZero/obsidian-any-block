@@ -23,7 +23,8 @@ import {
   type ABConvert_IOType, 
   ABConvert
 } from './converter/ABConvert'
-import {autoABAlias} from "./ABAlias"
+import { autoABAlias } from "./ABAlias"
+import { ABCSetting } from "./ABReg"
  
 /**
   * AB转换器的管理器。注意：使用前必须先执行：`redefine_renderMarkdown`
@@ -95,6 +96,7 @@ export class ABConvertManager {
 
   /** --------------------------------- 处理器的调用 ----------------------- */
   
+  static startTime: number; // cache
   /**
    * 自动寻找相匹配的ab处理器进行处理
    * 
@@ -119,10 +121,17 @@ export class ABConvertManager {
       prev_result, prev_type, prev_type2, prev_processor
     }
 
-    header = autoABAlias(header, selectorName, prev_result as string);
-    let list_header = header.split("|")
-    prev_result = this.autoABConvert_runConvert(el, list_header, prev)
-    this.autoABConvert_last(el, header, selectorName, prev)
+    if (false && ABCSetting.is_debug) ABConvertManager.startTime = performance.now();
+    {
+      header = autoABAlias(header, selectorName, prev_result as string);
+      let list_header = header.split("|")
+      prev_result = this.autoABConvert_runConvert(el, list_header, prev)
+      this.autoABConvert_last(el, header, selectorName, prev)
+    }
+    if (false && ABCSetting.is_debug) {
+      const endTime = performance.now();
+      console.log(`Takes ${(endTime - ABConvertManager.startTime).toFixed(2)} ms when selector "${selectorName}" header "${header}"`);
+    }
   }
 
   /**

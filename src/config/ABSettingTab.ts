@@ -9,6 +9,7 @@ import type AnyBlockPlugin from "../main"
 import {ABConvertManager} from "src/ABConverter/ABConvertManager"
 import {ABConvert, type ABConvert_SpecUser} from "src/ABConverter/converter/ABConvert"
 import { ABAlias_json, ABAlias_json_default } from "src/ABConverter/ABAlias"
+import { ABCSetting } from "src/ABConverter/ABReg"
 
 // 加载所有选择器
 import {} from "src/ab_manager/abm_cm/ABSelector_MdBase"
@@ -36,7 +37,7 @@ export interface ABSettingInterface {
   user_processor: ABConvert_SpecUser[],  // 别名系统 (旧)，用户自定义的别名处理器
 
   // 其他
-  is_debug: boolean                 // 是否开启调试打印 (未启用，思考:是否每个模块单独有is_debug开关)
+  is_debug: boolean                 // 是否开启调试打印
 }
 export enum ConfSelect{
   no = "no",
@@ -93,7 +94,10 @@ export class ABSettingTab extends PluginSettingTab {
 		super(app, plugin);
 		this.plugin = plugin;
 
-    // 别名模块加载自定义别名
+    // Convert模块
+    ABCSetting.is_debug = this.plugin.settings.is_debug
+
+    // Alias模块，加载自定义别名
     if (!plugin.settings.alias_use_default) {
       ABAlias_json.length = 0 // 清空数组
     }
