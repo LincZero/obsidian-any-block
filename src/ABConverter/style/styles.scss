@@ -22,7 +22,8 @@
   // 源码/实时模式
   .markdown-source-view {
     .ab-replace{
-      margin-bottom: 0;
+      margin-top: -18px; // 消除CM自带的间隙
+      margin-bottom: -18px;
     }
   }
   // 源码模式
