@@ -1,7 +1,6 @@
 import html2md from 'html-to-md'
 import type {
   MarkdownPostProcessorContext,
-  MarkdownSectionInformation
 } from "obsidian"
 
 import { ABReg } from "src/config/ABReg"
@@ -10,8 +9,6 @@ import type AnyBlockPlugin from "../../main"
 import { ABReplacer_Render } from "./ABReplacer_Render"
 import { ABConvertManager } from "src/ABConverter/ABConvertManager"
 import { abConvertEvent } from "src/ABConverter/ABConvertEvent";
-
-const is_debug = true
 
 /**
  * Html处理器
@@ -29,9 +26,6 @@ const is_debug = true
  * - 后处理器，附带还原成md的功能
  *   - ~~html选择器~~
  *   - 渲染器
- * 
- * 当前bug：
- * 切换回实时模式编辑后再切回阅读模式，ob会沿用缓存，这里似乎会失效。需要关闭标签页再重新打开，才能正确重新渲染
  */
 export class ABSelector_PostHtml{
   public static processor(
@@ -44,7 +38,7 @@ export class ABSelector_PostHtml{
     
     // b1. RenderMarkdown引起的调用（需要嵌套寻找）
     if (!mdSrc) {
-      if (is_debug) console.log(" -- ABPosthtmlManager.processor, called by 'ReRender'");
+      if (this.settings.is_debug) console.log(" -- ABPosthtmlManager.processor, called by 'ReRender'");
       if (!el.classList.contains("markdown-rendered")) return
       findABBlock_recurve(el)
       return
@@ -53,18 +47,42 @@ export class ABSelector_PostHtml{
     // b2. html渲染模式的逐个切割块调用（需要跨切割块寻找）
     //     Obsidian后处理机制：一个文档会被切割成成div stream，这是一个div数组，每个数组元素会在这里走一遍。即分步渲染，有益于性能优化
     else{
-      if (is_debug) console.log(` -- ABPosthtmlManager.processor, called by 'ReadMode', ${mdSrc.to_line}/${mdSrc.to_line_all}`);
+      // 一些基本信息
+      let is_newContent = false                             // 新的md笔记或当前md笔记被修改过
+      if (cache_mdContent != mdSrc.content_all) { cache_mdContent = mdSrc.content_all; is_newContent = true; }
+      let is_onlyPart = false                               // 片段是否由于ob的缓存而未能重新渲染
+      let is_start = false                                  // 片段为md的开头 (且非cache的情况)
+      if (is_newContent) { // TODO FIX BUG: 如果是开头片段的仅加载，则这里判断出错
+        if (mdSrc.content_all.split("\n").slice(0, mdSrc.from_line).join("\n").trim() == "") { is_start = true }
+        else { is_onlyPart = true }
+      }
+      const is_end = (mdSrc.to_line == mdSrc.to_line_all)   // 片段是否为md的结尾
+      if (is_newContent && !is_start) is_onlyPart = true
+      if (this.settings.is_debug) console.log(` -- ABPosthtmlManager.processor, called by 'ReadMode', [${mdSrc.from_line},${mdSrc.to_line})/${mdSrc.to_line_all}. 
+        ${is_start?"is_start, ":""}${is_end?"is_end, ":""}${is_onlyPart?"is_onlyPart":""}`);
+
+      // 特殊，如果是带缓存的情况下，应该强制重新刷新
+      // 如果没有这个，如果从阅读模式切换回实时模式，并只修改一部分内容再切换回阅读模式，那么 `ABPosthtmlManager.processor, called by 'ReadMode'` 只会识别到那些有改动的块，其他不再走这里
+      // 本来想用上面的 `is_onlyPart`，但不准的。因为开头片段被修改过，则判断不了，然后想象还是用回 `is_newContent` 作为判断依据
+      // TODO 这里存在改进的空间，如果这里触发了实际上会渲染 n+m 次，n是受影响的div，m是全文的div。前者这里可以弄个flag来消除掉，没必要进行
+      if (is_newContent) {
+        // @ts-ignore 类型“View”上不存在属性“file”
+        if (this.settings.is_debug) console.log("Local cache present, perform a global refresh (rebuildView): ", app.workspace.activeLeaf?.view.file.basename)
+        // @ts-ignore 类型“WorkspaceLeaf”上不存在属性“rebuildView”
+        app.workspace.activeLeaf?.rebuildView()
+        return
+      }
 
       // c21. 片段处理 (一个html界面被分成多个片段触发)
       //      其中，每一个subEl项都是无属性的div项，内部才是有效信息。
       //      一般el.children里都是只有一个项 (table/pre等)，只会循环一次。特殊情况是p-br的情况
       for (const subEl of el.children) {
-        findABBlock_cross(subEl as HTMLElement, ctx, (mdSrc.to_line == mdSrc.to_line_all))
+        findABBlock_cross(subEl as HTMLElement, ctx, is_end)
       }
       
       // c22. 末处理钩子 (页面完全被加载后触发)
       //      ~~可-1再比较来上个保险，用可能的重复触发性能损耗换取一点触发的稳定性~~
-      if (mdSrc.to_line == mdSrc.to_line_all) {
+      if (is_end) {
         findABBlock_end();
       }
     }
@@ -149,6 +167,7 @@ function findABBlock_end() {
   abConvertEvent(document)
 }
 
+let cache_mdContent: string = ""
 let selected_els: HTMLElement[] = [];                   // 正在选择中的元素 (如果未在AB块内，还未开始选择，则为空)
 let selected_mdSrc: HTMLSelectorRangeSpec|null = null;  // 已经选中的范围   (如果未在AB块内，还未开始选择，则为空)
 /**
@@ -178,9 +197,6 @@ function findABBlock_cross(targetEl: HTMLElement, ctx: MarkdownPostProcessorCont
 
   // c1. 在AB块内。则判断本次是否结束ab块
   if (selected_mdSrc && selected_mdSrc.header) {
-    // b3. 文章末尾，强制结尾
-    // TODO
-
     // b1. 没有startFlag
     if (!selected_mdSrc.seFlag) {
       // b11. 无需endFlag，清空并渲染
@@ -241,13 +257,14 @@ function findABBlock_cross(targetEl: HTMLElement, ctx: MarkdownPostProcessorCont
 
 interface HTMLSelectorRangeSpec {
   // 通用部分
+  to_line_all: number // 全文片段的尾部，不包含 (已去除尾部空格) 当 to_line_all == to_line，说明片段在文章的结尾了
   from_line: number,  // div片段的头部
-  to_line: number,    // div片段的尾部 - 可变
-  to_line_all: number // 全文片段的尾部 (已去除尾部空格) 当 to_line_all == to_line，说明片段在文章的结尾了
+  to_line: number,    // div片段的尾部，不包含 - 可变
   content: string,    // 内容信息 - 可变 (已去除尾部空格)
-  type: string,       // 类型。6个el基本类型的基础上，paragraph多派生出 "header"/"mdit_head"/"mdit_tail" 三个新类型
+  content_all: string,// 全文信息
 
   // 选择器部分
+  type: string,       // 类型。6个el基本类型的基础上，paragraph多派生出 "header"/"mdit_head"/"mdit_tail" 三个新类型
   header: string,     // 头部信息
   seFlag: string,     // 开始/结束标志 - 可变
                       //     对于nowMdSrc来说，这是当前标志，对于selectedMdSrc来说，这是结束标志
@@ -274,30 +291,27 @@ function getSourceMarkdown(
 ): HTMLSelectorRangeSpec|null {
   let info = ctx.getSectionInfo(sectionEl);     // info: MarkdownSectionInformation | null
   if (info) {
-    let range:HTMLSelectorRangeSpec = {
-      from_line: 0,
-      to_line: 1,
-      to_line_all: 1,
-      content: "",
-      type: "",
-
-      header: "",
-      seFlag: "",
-      prefix: "",
-    }
-
     // 基本信息
     const {
       text,       // 全文文档
       lineStart,  // div部分的开始行
       lineEnd     // div部分的结束行（结束行是包含的，+1才是不包含）
     } = info; 
-    const list_text = text.replace(/(\s*$)/g,"").split("\n")      // div部分的内容 (去除了尾部空行)
-    const list_content = list_text.slice(lineStart, lineEnd + 1)  // div部分的内容。@attension 去除尾部空格否则无法判断 is_end，头部不能去除否则会错位
-    range.from_line = lineStart
-    range.to_line = lineEnd+1
-    range.to_line_all = list_text.length+1
-    range.content = list_content.join("\n")
+    const list_text = text.split("\n")                            // div部分的内容
+    const list_content = list_text.slice(lineStart, lineEnd + 1)  // div部分的内容
+
+    let range:HTMLSelectorRangeSpec = {
+      to_line_all: list_text.length,
+      from_line: lineStart, // (lineStart<3 && list_text.slice(0, lineStart).join("\n").trim() == "")?0:lineStart, // 如果前面是两个以内空行，则强行设置为0。TODO：后面还得判断metadata的情况，然后增加一个单独的 is_start
+      to_line: (list_text.length-lineEnd<3 && list_text.slice(lineEnd+1, list_text.length).join("\n").trim() == "")?list_text.length:lineEnd+1, // 如果后面是两个以内空行，则强行设置为0。TODO：后面可能增加一个单独的 is_end 属性
+      content: list_content.join("\n").replace(/(\s)*$/, ""),
+      content_all: text,
+
+      type: "",
+      header: "",
+      seFlag: "",
+      prefix: "",
+    }
 
     // 找类型、找前缀
     if (sectionEl instanceof HTMLUListElement) {
