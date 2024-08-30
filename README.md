@@ -92,6 +92,10 @@ plantuml mindmap (plantuml 思维导图)
 
 ![](./docs/zh/png/Pasted%20image%2020240808203534.png)
 
+nodes (ab mindmap) (转节点树图，AnyBlock版思维导图)
+
+![](./docs/zh/png/list2node.png)
+
 markmap mindmap (markmap 思维导图)
 
 ![](./docs/zh/png/Pasted%20image%2020240808203605.png)
