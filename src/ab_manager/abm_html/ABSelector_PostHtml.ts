@@ -49,7 +49,14 @@ export class ABSelector_PostHtml{
     else{
       // 一些基本信息
       let is_newContent = false                             // 新的md笔记或当前md笔记被修改过
-      if (cache_mdContent != mdSrc.content_all) { cache_mdContent = mdSrc.content_all; is_newContent = true; }
+      if (cache_mdLine != mdSrc.to_line_all || cache_mdContent != mdSrc.content_all) {
+        is_newContent = true;
+        // @ts-ignore 类型“View”上不存在属性“file”
+        cache_mdName = app.workspace.activeLeaf?.view.file.path
+        cache_mdContent = mdSrc.content_all;
+        cache_mdLength = mdSrc.content_all.length;
+        cache_mdLine = mdSrc.to_line_all;
+      }
       let is_onlyPart = false                               // 片段是否由于ob的缓存而未能重新渲染
       let is_start = false                                  // 片段为md的开头 (且非cache的情况)
       if (is_newContent) { // TODO FIX BUG: 如果是开头片段的仅加载，则这里判断出错
@@ -66,11 +73,16 @@ export class ABSelector_PostHtml{
       // 本来想用上面的 `is_onlyPart`，但不准的。因为开头片段被修改过，则判断不了，然后想象还是用回 `is_newContent` 作为判断依据
       // TODO 这里存在改进的空间，如果这里触发了实际上会渲染 n+m 次，n是受影响的div，m是全文的div。前者这里可以弄个flag来消除掉，没必要进行
       if (is_newContent) {
-        // @ts-ignore 类型“View”上不存在属性“file”
-        if (this.settings.is_debug) console.log("Local cache present, perform a global refresh (rebuildView): ", app.workspace.activeLeaf?.view.file.basename)
-        // @ts-ignore 类型“WorkspaceLeaf”上不存在属性“rebuildView”
-        app.workspace.activeLeaf?.rebuildView()
-        return
+        // 性能优化：如果不包含ab块，那就不强制刷新，以免影响正常页面
+        if (/\n((\s|>\s|-\s|\*\s|\+\s)*)(%%)?(\[((?!toc)(?!TOC)[0-9a-zA-Z\u4e00-\u9fa5].*)\]):?(%%)?\s*\n/.test(cache_mdContent) ||
+          /\n((\s|>\s|-\s|\*\s|\+\s)*)(:::)\s?(\S*)\n/.test(cache_mdContent)
+        ) {
+          // @ts-ignore 类型“View”上不存在属性“file”
+          if (this.settings.is_debug) console.log("Local cache present, perform a global refresh (rebuildView): ", app.workspace.activeLeaf?.view.file.basename)
+          // @ts-ignore 类型“WorkspaceLeaf”上不存在属性“rebuildView”
+          app.workspace.activeLeaf?.rebuildView()
+          return
+        }
       }
 
       // c21. 片段处理 (一个html界面被分成多个片段触发)
@@ -167,7 +179,11 @@ function findABBlock_end() {
   abConvertEvent(document)
 }
 
+// 缓存组，用来比较看内容是否发生了概念
 let cache_mdContent: string = ""
+let cache_mdName: string = ""
+let cache_mdLine: number = 0
+let cache_mdLength: number = 0
 let selected_els: HTMLElement[] = [];                   // 正在选择中的元素 (如果未在AB块内，还未开始选择，则为空)
 let selected_mdSrc: HTMLSelectorRangeSpec|null = null;  // 已经选中的范围   (如果未在AB块内，还未开始选择，则为空)
 /**
