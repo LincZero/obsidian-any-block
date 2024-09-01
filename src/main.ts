@@ -27,7 +27,7 @@ export default class AnyBlockPlugin extends Plugin {
     await this.loadSettings();
     this.addSettingTab(new ABSettingTab(this.app, this));
 
-    // 将ob的解耦行为传入回调函数 (目的是将转换器和Obsidian相解耦合)
+    // 将ob的渲染行为传入回调函数 (目的是将转换器和Obsidian相解耦合)
     ABConvertManager.getInstance().redefine_renderMarkdown((markdown: string, el: HTMLElement): void => {
       el.classList.add("markdown-rendered")
 

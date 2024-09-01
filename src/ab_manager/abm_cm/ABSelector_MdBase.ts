@@ -5,6 +5,14 @@ import {
   type MdSelectorRangeSpecSimp
 } from "./ABSelector_Md"
 
+/**
+ * 这个不是选择器，只是将多个选择器的共同逻辑抽取出来进行复用
+ * 
+ * @param list_text 内容
+ * @param from_line 现在位于第几行了
+ * @param selector  选择器名称
+ * @param frist_reg 首行应该满足什么正则
+ */
 function easySelector(
   list_text:string[],
   from_line:number,
@@ -43,6 +51,15 @@ function easySelector(
   return mdRange
 }
 
+/**
+ * 这个不是选择器，只是将多个选择器的共同逻辑抽取出来进行复用。
+ * 
+ * 基本同 easySelector
+ * 
+ * 区别：
+ * - easySelector:
+ * - easySelector_headtail: 特供给头尾选择器来使用
+ */
 function easySelector_headtail(
   list_text:string[],
   from_line:number,
