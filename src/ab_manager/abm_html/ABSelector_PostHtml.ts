@@ -48,25 +48,26 @@ export class ABSelector_PostHtml{
     //     Obsidian后处理机制：一个文档会被切割成成div stream，这是一个div数组，每个数组元素会在这里走一遍。即分步渲染，有益于性能优化
     else{
       // 一些基本信息
-      let is_newContent = false                             // 新的md笔记或当前md笔记被修改过
-      if (cache_mdLine != mdSrc.to_line_all || cache_mdContent != mdSrc.content_all) {
-        is_newContent = true;
+      const is_newContent = (cache_mdLine != mdSrc.to_line_all || cache_mdContent != mdSrc.content_all) // 新的md笔记或当前md笔记被修改过
+      const is_start = (mdSrc.from_line == 0 || mdSrc.content_all.split("\n").slice(0, mdSrc.from_line).join("\n").trim() == "") // 片段为md的开头 (且非cache的情况)
+      const is_end = (mdSrc.to_line == mdSrc.to_line_all)   // 片段是否为md的结尾
+      const is_onlyPart = (is_newContent && !is_start)      // 片段是否由于ob的缓存而未能重新渲染 // TODO FIX BUG: 如果是开头片段的仅加载，则这里判断出错
+      if (is_newContent || is_start) {
         // @ts-ignore 类型“View”上不存在属性“file”
         cache_mdName = app.workspace.activeLeaf?.view.file.path
         cache_mdContent = mdSrc.content_all;
         cache_mdLength = mdSrc.content_all.length;
         cache_mdLine = mdSrc.to_line_all;
+        selected_els = []
+        selected_mdSrc = null
       }
-      let is_onlyPart = false                               // 片段是否由于ob的缓存而未能重新渲染
-      let is_start = false                                  // 片段为md的开头 (且非cache的情况)
-      if (is_newContent) { // TODO FIX BUG: 如果是开头片段的仅加载，则这里判断出错
-        if (mdSrc.content_all.split("\n").slice(0, mdSrc.from_line).join("\n").trim() == "") { is_start = true }
-        else { is_onlyPart = true }
+      if (this.settings.is_debug) {
+        console.log(` -- ABPosthtmlManager.processor, called by 'ReadMode'. `+
+          `[${mdSrc.from_line},${mdSrc.to_line})/${mdSrc.to_line_all}. `+
+          `${(selected_mdSrc && selected_mdSrc.header)?"before in ABBlock: "+selected_mdSrc.header+". ":""}`+
+          `${is_start?"is_start, ":""}${is_end?"is_end, ":""}${is_onlyPart?"is_onlyPart":""}`
+        );
       }
-      const is_end = (mdSrc.to_line == mdSrc.to_line_all)   // 片段是否为md的结尾
-      if (is_newContent && !is_start) is_onlyPart = true
-      if (this.settings.is_debug) console.log(` -- ABPosthtmlManager.processor, called by 'ReadMode', [${mdSrc.from_line},${mdSrc.to_line})/${mdSrc.to_line_all}. 
-        ${is_start?"is_start, ":""}${is_end?"is_end, ":""}${is_onlyPart?"is_onlyPart":""}`);
 
       // 特殊，如果是带缓存的情况下，应该强制重新刷新
       // 如果没有这个，如果从阅读模式切换回实时模式，并只修改一部分内容再切换回阅读模式，那么 `ABPosthtmlManager.processor, called by 'ReadMode'` 只会识别到那些有改动的块，其他不再走这里
