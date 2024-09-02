@@ -711,134 +711,134 @@ div.md-table-fig1 table.ab-setting.md-table-fig2 {
 }
 
 .ab-custom-text-red {
-  color: red;
+  color: red !important;
 }
 
 .ab-custom-text-orange {
-  color: orange;
+  color: orange !important;
 }
 
 .ab-custom-text-yellow {
-  color: yellow;
+  color: yellow !important;
 }
 
 .ab-custom-text-green {
-  color: green;
+  color: green !important;
 }
 
 .ab-custom-text-cyan {
-  color: cyan;
+  color: cyan !important;
 }
 
 .ab-custom-text-blue {
-  color: blue;
+  color: blue !important;
 }
 
 .ab-custom-text-purple {
-  color: purple;
+  color: purple !important;
 }
 
 .ab-custom-text-white {
-  color: white;
+  color: white !important;
 }
 
 .ab-custom-text-black {
-  color: black;
+  color: black !important;
 }
 
 .ab-custom-bg-red {
-  background-color: red;
+  background-color: red !important;
 }
 
 .ab-custom-bg-orange {
-  background-color: orange;
+  background-color: orange !important;
 }
 
 .ab-custom-bg-yellow {
-  background-color: yellow;
+  background-color: yellow !important;
 }
 
 .ab-custom-bg-green {
-  background-color: green;
+  background-color: green !important;
 }
 
 .ab-custom-bg-cyan {
-  background-color: cyan;
+  background-color: cyan !important;
 }
 
 .ab-custom-bg-blue {
-  background-color: blue;
+  background-color: blue !important;
 }
 
 .ab-custom-bg-purple {
-  background-color: purple;
+  background-color: purple !important;
 }
 
 .ab-custom-bg-white {
-  background-color: white;
+  background-color: white !important;
 }
 
 .ab-custom-bg-black {
-  background-color: black;
+  background-color: black !important;
 }
 
-.ab-custom-dire-top {
-  vertical-align: top;
+.ab-custom-dire-top * {
+  vertical-align: top !important;
 }
 
-.ab-custom-dire-down {
-  vertical-align: bottom;
+.ab-custom-dire-down * {
+  vertical-align: bottom !important;
 }
 
-.ab-custom-dire-left {
-  text-align: left;
+.ab-custom-dire-left * {
+  text-align: left !important;
 }
 
-.ab-custom-dire-right {
-  text-align: right;
+.ab-custom-dire-right * {
+  text-align: right !important;
 }
 
-.ab-custom-dire-center {
-  vertical-align: middle;
-  text-align: center;
+.ab-custom-dire-center * {
+  vertical-align: middle !important;
+  text-align: center !important;
 }
 
-.ab-custom-dire-hcenter {
-  text-align: center;
+.ab-custom-dire-hcenter * {
+  text-align: center !important;
 }
 
-.ab-custom-dire-vcenter {
-  vertical-align: middle;
+.ab-custom-dire-vcenter * {
+  vertical-align: middle !important;
 }
 
-.ab-custom-dire-justify {
-  text-align: justify;
+.ab-custom-dire-justify * {
+  text-align: justify !important;
 }
 
 .ab-custom-font-large {
-  font-size: large;
+  font-size: large !important;
 }
 
 .ab-custom-font-largex {
-  font-size: x-large;
+  font-size: x-large !important;
 }
 
 .ab-custom-font-largexx {
-  font-size: xx-large;
+  font-size: xx-large !important;
 }
 
 .ab-custom-font-small {
-  font-size: small;
+  font-size: small !important;
 }
 
 .ab-custom-font-smallx {
-  font-size: x-small;
+  font-size: x-small !important;
 }
 
 .ab-custom-font-smallxx {
-  font-size: xx-small;
+  font-size: xx-small !important;
 }
 
 .ab-custom-font-bold {
-  font-weight: bold;
+  font-weight: bold !important;
 }
