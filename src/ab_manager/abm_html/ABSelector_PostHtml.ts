@@ -51,7 +51,7 @@ export class ABSelector_PostHtml{
       const is_newContent = (cache_mdLine != mdSrc.to_line_all || cache_mdContent != mdSrc.content_all) // 新的md笔记或当前md笔记被修改过
       const is_start = (mdSrc.from_line == 0 || mdSrc.content_all.split("\n").slice(0, mdSrc.from_line).join("\n").trim() == "") // 片段为md的开头 (且非cache的情况)
       const is_end = (mdSrc.to_line == mdSrc.to_line_all)   // 片段是否为md的结尾
-      const is_onlyPart = (is_newContent && !is_start)      // 片段是否由于ob的缓存而未能重新渲染 // TODO FIX BUG: 如果是开头片段的仅加载，则这里判断出错
+      const is_onlyPart = (is_newContent && !is_start)      // 片段是否由于ob的缓存而未能重新渲染 // TODO FIX BUG: 如果是开头片段的仅加载，则这里判断出错，以为不是仅加载
       if (is_newContent || is_start) {
         // @ts-ignore 类型“View”上不存在属性“file”
         cache_mdName = app.workspace.activeLeaf?.view.file.path
@@ -321,7 +321,7 @@ function getSourceMarkdown(
       to_line_all: list_text.length,
       from_line: lineStart, // (lineStart<3 && list_text.slice(0, lineStart).join("\n").trim() == "")?0:lineStart, // 如果前面是两个以内空行，则强行设置为0。TODO：后面还得判断metadata的情况，然后增加一个单独的 is_start
       to_line: (list_text.length-lineEnd<3 && list_text.slice(lineEnd+1, list_text.length).join("\n").trim() == "")?list_text.length:lineEnd+1, // 如果后面是两个以内空行，则强行设置为0。TODO：后面可能增加一个单独的 is_end 属性
-      content: list_content.join("\n").replace(/(\s)*$/, ""),
+      content: list_content.join("\n").replace(/(\n)+$/, ""), // 应当去除尾部空行而不要去除非空行的尾部空格，会影响 list2lt 的尾部空的单元格
       content_all: text,
 
       type: "",
