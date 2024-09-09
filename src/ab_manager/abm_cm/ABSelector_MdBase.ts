@@ -8,8 +8,11 @@ import {
 /**
  * 这个不是选择器，只是将多个选择器的共同逻辑抽取出来进行复用
  * 
+ * @detail 功能是验证header和header下面的首行，其他的不进行验证
+ * 
  * @param list_text 内容
- * @param from_line 现在位于第几行了
+ * @param from_line 现在位于第几行了，现在所处于的行实际上位于header下的某行。
+ *   但这个逻辑是有问题的，不利于扩展。应该以header为基础进行选择才对，能更方便地添加反向选择器
  * @param selector  选择器名称
  * @param frist_reg 首行应该满足什么正则
  */
