@@ -7,8 +7,24 @@
  * vuepress-mdit环境直接用scss，ob这边需要使用css
  * 编辑ABC模块的该文件时，需要手动编译/使用vscode `easy sass` 插件
  */
+/**
+  * 默认颜色
+  */
 :root {
   --pre-background-color: #1b1b1b;
+  --ab-tab-root-bg-color: #0d1117;
+  --ab-tab-root-bd-color: #34343f;
+  --ab-tab-root-tx-color: #9e9e9e;
+}
+
+/**
+  * 获取一些Obsidian的默认颜色并覆盖默认颜色 (mdit不可用)
+  */
+.theme-dark,
+.theme-light {
+  --ab-tab-root-bg-color: var(--color-base-00);
+  --ab-tab-root-bd-color: var(--color-base-30);
+  --ab-tab-root-tx-color: var(--color-base-70);
 }
 
 .app-container .markdown-reading-view .ab-replace {
@@ -77,12 +93,6 @@
   border: solid 1px;
   border-radius: 6px;
   width: 100%;
-}
-
-.ab-note .ab-tab-root {
-  --ab-tab-root-bg-color: #0d1117;
-  --ab-tab-root-bd-color: #34343f;
-  --ab-tab-root-tx-color: #9e9e9e;
 }
 
 .ab-note .ab-tab-root .ab-tab-nav {
@@ -545,12 +555,6 @@
 
 .ab-note .ab-deco-title .ab-deco-title-title[title-type="ul"] > p {
   font-weight: bold;
-}
-
-.ab-note .ab-items {
-  --ab-tab-root-bg-color: #0d1117;
-  --ab-tab-root-bd-color: #34343f;
-  --ab-tab-root-tx-color: #9e9e9e;
 }
 
 .ab-note .ab-items.ab-col {
