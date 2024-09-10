@@ -8,25 +8,32 @@
  * 编辑ABC模块的该文件时，需要手动编译/使用vscode `easy sass` 插件
  */
 /**
-  * 默认颜色
-  */
+ * 颜色相关
+ */
 :root {
-  --pre-background-color: #1b1b1b;
   --ab-tab-root-bg-color: #0d1117;
   --ab-tab-root-bd-color: #34343f;
   --ab-tab-root-tx-color: #9e9e9e;
   --ab-bright-color: orange;
+  --pre-background-color: #1b1b1b;
 }
 
-/**
-  * 获取一些Obsidian的默认颜色并覆盖默认颜色 (mdit不可用)
-  */
 .theme-dark,
 .theme-light {
   --ab-tab-root-bg-color: var(--color-base-00);
   --ab-tab-root-bd-color: var(--color-base-30);
   --ab-tab-root-tx-color: var(--color-base-70);
   --ab-bright-color: var(--blockquote-border-color);
+  --pre-background-color: var(--secondary-background);
+}
+
+html[data-theme="light"] #app,
+html[data-theme="dark"] #app {
+  --ab-tab-root-bg-color: var(--bg-color);
+  --ab-tab-root-bd-color: var(--border-color);
+  --ab-tab-root-tx-color: var(--text-color);
+  --ab-bright-color: var(--theme-color);
+  --pre-background-color: var(--code-bg-color);
 }
 
 .app-container .markdown-reading-view .ab-replace {
