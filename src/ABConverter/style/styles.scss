@@ -539,7 +539,7 @@ html[data-theme="dark"] #app{
     color:#fff;
   }
 
-  // 标题
+  // 标题 // TODO 在ob阅读模式下间距不正常
   .ab-deco-title{
     width: 100%;
     p{
@@ -568,7 +568,7 @@ html[data-theme="dark"] #app{
     }
     .ab-deco-title-title[title-type="quote"]>p{
       font-weight: bold;
-      margin-bottom: 5px;
+      margin-bottom: 20px;
     }
     .ab-deco-title-title[title-type="ul"]>p{
       font-weight: bold;

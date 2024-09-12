@@ -559,7 +559,7 @@ html[data-theme="dark"] #app {
 
 .ab-note .ab-deco-title .ab-deco-title-title[title-type="quote"] > p {
   font-weight: bold;
-  margin-bottom: 5px;
+  margin-bottom: 20px;
 }
 
 .ab-note .ab-deco-title .ab-deco-title-title[title-type="ul"] > p {

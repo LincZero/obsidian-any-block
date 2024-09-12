@@ -213,7 +213,17 @@ const abc_title = ABConvert.factory({
 
     // 判断元素类型修改，以修改title风格
     let title_type = "none"
-    if (el_content_sub instanceof HTMLQuoteElement){title_type = "quote"}
+    if (el_content_sub instanceof HTMLQuoteElement){title_type = "quote"
+      // 这里借用callout的样式，并去除原来的引用块样式
+      el_root.classList.add("callout")
+      el_title.classList.add("callout-title");
+      el_content.classList.add("callout-content");
+
+      while (el_content_sub.firstChild) {
+        el_content.insertBefore(el_content_sub.firstChild, el_content_sub);
+      }
+      el_content.removeChild(el_content_sub)
+    }
     else if (el_content_sub instanceof HTMLTableElement){title_type = "table"}
     else if (el_content_sub instanceof HTMLUListElement){title_type = "ul"}
     else if (el_content_sub instanceof HTMLPreElement){title_type = "pre"}
