@@ -219,6 +219,16 @@ const abc_callout = ABConvert.factory({
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.text,
   process: (el, header, content: string): string=>{
-    return "```ad-"+header.slice(1)+"\n"+content+"\n```"
+    // 之前的写法需要ad插件，这里应该换用成更通用的callout语法
+    // return "```ad-"+header.slice(1)+"\n"+content+"\n```"
+    
+    header = header.slice(1)
+    let callout_type = "[!note]"
+    if (header.startsWith("note_")) {callout_type = "[!note]"; header.slice(5);}
+    else if (header.startsWith("warn_")) {callout_type = "[!warning]"; header.slice(5);}
+    else if (header.startsWith("warning_")) {callout_type = "[!warning]"; header.slice(8);}
+    else if (header.startsWith("error_")) {callout_type = "[!error]"; header.slice(6);}
+
+    return `> ${callout_type} ${header}\n` + content.split("\n").map(line=>{return "> "+line}).join("\n")
   }
 })

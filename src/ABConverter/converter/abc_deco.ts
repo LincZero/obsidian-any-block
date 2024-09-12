@@ -205,39 +205,27 @@ const abc_title = ABConvert.factory({
 
     // 修改元素
     if(content.children.length!=1) return content
-    const sub_el = content.children[0] as HTMLElement
-    sub_el.remove()
-    sub_el.classList.add("ab-deco-title-content")
-    const mid_el = document.createElement("div"); content.appendChild(mid_el); mid_el.classList.add("ab-deco-title");
-    const sub_title = document.createElement("div"); mid_el.appendChild(sub_title); sub_title.classList.add("ab-deco-title-title");
-    const p_el = document.createElement("p"); sub_title.appendChild(p_el); p_el.textContent = arg1;
-    mid_el.appendChild(sub_title)
-    mid_el.appendChild(sub_el)
+    const el_root = document.createElement("div"); content.appendChild(el_root); el_root.classList.add("ab-deco-title");
+    const el_title = document.createElement("div"); el_root.appendChild(el_title); el_title.classList.add("ab-deco-title-title");
+    const el_title_p = document.createElement("p"); el_title.appendChild(el_title_p); el_title_p.textContent = arg1;
+    const el_content = content.children[0] as HTMLElement; el_content.remove(); el_root.appendChild(el_content); el_content.classList.add("ab-deco-title-content");
+    const el_content_sub = el_content.childNodes[0]; if (!el_content_sub) return content;
 
     // 判断元素类型修改，以修改title风格
     let title_type = "none"
-    if (sub_el instanceof HTMLQuoteElement){title_type = "quote"}
-    else if (sub_el instanceof HTMLTableElement){title_type = "table"}
-    else if (sub_el instanceof HTMLPreElement){
-      title_type = "pre"
-      ;(()=>{
-        // 这里尝试获取代码块的背景颜色（失败）
-        console.log("style1", window.getComputedStyle(sub_el ,null),
-        "style2", window.getComputedStyle(sub_el ,null).getPropertyValue('background-color'),
-        "style3", window.getComputedStyle(sub_el ,null).getPropertyValue('background'),
-        "style4", window.getComputedStyle(sub_el ,null).backgroundColor,
-        "style5", window.getComputedStyle(sub_el ,null).background,
-        )
-        let color:string = window.getComputedStyle(sub_el ,null).getPropertyValue('background-color'); 
-        if (color) sub_title.setAttribute("style", `background-color:${color}`)
-        else {
-        color = window.getComputedStyle(sub_el ,null).getPropertyValue('background'); 
-        sub_title.setAttribute("style", `background:${color}`)
-        }
-      })//()
-    }
-    else if (sub_el instanceof HTMLUListElement){title_type = "ul"}
-    sub_title.setAttribute("title-type", title_type)
+    if (el_content_sub instanceof HTMLQuoteElement){title_type = "quote"}
+    else if (el_content_sub instanceof HTMLTableElement){title_type = "table"}
+    else if (el_content_sub instanceof HTMLUListElement){title_type = "ul"}
+    else if (el_content_sub instanceof HTMLPreElement){title_type = "pre"}
+    // ;(()=>{
+    //   let color:string = window.getComputedStyle(el_content_sub ,null).getPropertyValue('background-color'); 
+    //   if (color) el_title.setAttribute("style", `background-color:${color}`)
+    //   else {
+    //   color = window.getComputedStyle(el_content_sub ,null).getPropertyValue('background'); 
+    //   el_title.setAttribute("style", `background:${color}`)
+    //   }
+    // })//()
+    el_title.setAttribute("title-type", title_type)
     return content
   }
 })
