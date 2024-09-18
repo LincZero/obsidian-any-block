@@ -703,8 +703,8 @@ html[data-theme="dark"] #app{
         content: "";
         position: absolute;
         width: 10px;
-        height: 100%; // JS: 缩短第一个和最后一个节点的一半
-        top: 0;       // JS: 第一个节点的一半
+        height: calc(100% - 8px);  // JS: 缩短第一个和最后一个节点的一半
+        top: 4px;                  // JS: 第一个节点的一半
         left: -2px;
         border-radius: 10px 0 0 10px;
         border-left: 2px solid currentColor;

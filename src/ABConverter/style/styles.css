@@ -687,8 +687,8 @@ html[data-theme="dark"] #app {
   content: "";
   position: absolute;
   width: 10px;
-  height: 100%;
-  top: 0;
+  height: calc(100% - 8px);
+  top: 4px;
   left: -2px;
   border-radius: 10px 0 0 10px;
   border-left: 2px solid currentColor;
