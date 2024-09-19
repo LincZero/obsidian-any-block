@@ -663,7 +663,7 @@ html[data-theme="dark"] #app{
     &.ab-col8 { column-count: 8 !important; }
   }
 
-  // 括弧图
+  // 节点图、括弧图、ab思维导图
   .ab-nodes {
     // display: flex;
     // flex-direction: column;
@@ -723,6 +723,49 @@ html[data-theme="dark"] #app{
     // 最外面的那个不显示
     &>.ab-nodes-node>.ab-nodes-bracket { display: none; }
     &>.ab-nodes-node>.ab-nodes-bracket2 { display: none; }
+  }
+
+  // min版的node图
+  .ab-nodes.min {
+    .ab-nodes-content {
+      padding: 0;
+      background: none;
+      border-bottom: solid 1px currentColor;
+    }
+
+    .ab-nodes-children {
+      gap: 2px;
+
+      .ab-nodes-bracket2 {
+        border-width: 1px;
+      }
+
+      .ab-nodes-bracket {
+        width: 6px;
+        width: 6px;
+        top: calc(50% - 4px);
+        left: calc(-8px - 0px + 1px)
+      }
+    }
+  }
+  &>.ab-nodes.min>.ab-nodes-children {
+    &>.ab-nodes-node:nth-child(8n+1) { --node-color: var(--color-red); }
+    &>.ab-nodes-node:nth-child(8n+2) { --node-color: var(--color-orange); }
+    &>.ab-nodes-node:nth-child(8n+3) { --node-color: var(--color-yellow); }
+    &>.ab-nodes-node:nth-child(8n+4) { --node-color: var(--color-green); }
+    &>.ab-nodes-node:nth-child(8n+5) { --node-color: var(--color-cyan); }
+    &>.ab-nodes-node:nth-child(8n+6) { --node-color: var(--color-blue); }
+    &>.ab-nodes-node:nth-child(8n+7) { --node-color: var(--color-purple); }
+    &>.ab-nodes-node:nth-child(8n+0) { --node-color: var(--color-pink); }
+
+    &>.ab-nodes-node .ab-nodes-content,
+    &>.ab-nodes-node .ab-nodes-bracket,
+    &>.ab-nodes-node .ab-nodes-bracket2 {
+      border-color: var(--node-color);
+    }
+    &>.ab-nodes-node .ab-nodes-bracket {
+      background-color: var(--node-color);
+    }
   }
 }
 
