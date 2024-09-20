@@ -62,15 +62,15 @@ const abc_info = ABConvert.factory({
       const thead = document.createElement("thead"); table.appendChild(thead);
       const tr = document.createElement("tr"); thead.appendChild(tr);
       let th;
-      th = document.createElement("th"); tr.appendChild(th); th.textContent = "处理器名";
-      th = document.createElement("th"); tr.appendChild(th); th.textContent = "下拉框默认项";
-      th = document.createElement("th"); tr.appendChild(th); th.textContent = "用途描述";
-      th = document.createElement("th"); tr.appendChild(th); th.textContent = "处理类型";
-      th = document.createElement("th"); tr.appendChild(th); th.textContent = "输出类型";
-      th = document.createElement("th"); tr.appendChild(th); th.textContent = "正则";
-      th = document.createElement("th"); tr.appendChild(th); th.textContent = "别名替换";
-      th = document.createElement("th"); tr.appendChild(th); th.textContent = "是否启用";
-      th = document.createElement("th"); tr.appendChild(th); th.textContent = "定义来源";
+      th = document.createElement("th"); tr.appendChild(th); th.textContent = "处理器名\nProcessor name";
+      th = document.createElement("th"); tr.appendChild(th); th.textContent = "下拉框默认项\nThe default drop-down box";
+      th = document.createElement("th"); tr.appendChild(th); th.textContent = "用途描述\nPurpose description";
+      th = document.createElement("th"); tr.appendChild(th); th.textContent = "输入类型\nInput type";
+      th = document.createElement("th"); tr.appendChild(th); th.textContent = "输出类型\nOutput type";
+      th = document.createElement("th"); tr.appendChild(th); th.textContent = "正则\nRegExp";
+      th = document.createElement("th"); tr.appendChild(th); th.textContent = "是否启用\nIs enable";
+      th = document.createElement("th"); tr.appendChild(th); th.textContent = "定义来源\nSource";
+      th = document.createElement("th"); tr.appendChild(th); th.textContent = "别名替换\nAlias substitution";
     }
     const tbody = document.createElement("tbody"); table.appendChild(tbody);
     for (let item of ABConvertManager.getInstance().list_abConvert){
@@ -83,9 +83,9 @@ const abc_info = ABConvert.factory({
       td = document.createElement("td"); tr.appendChild(td); td.textContent = String(item.process_param);
       td = document.createElement("td"); tr.appendChild(td); td.textContent = String(item.process_return);
       td = document.createElement("td"); tr.appendChild(td); td.textContent = String(item.match);
-      td = document.createElement("td"); tr.appendChild(td); td.textContent = item.process_alias;
-      td = document.createElement("td"); tr.appendChild(td); td.textContent = item.is_disable?"禁用":"启用";
+      td = document.createElement("td"); tr.appendChild(td); td.textContent = item.is_disable?"No":"Yes";
       td = document.createElement("td"); tr.appendChild(td); td.textContent = item.register_from;
+      td = document.createElement("td"); tr.appendChild(td); td.textContent = item.process_alias;
     }
     return el
   }

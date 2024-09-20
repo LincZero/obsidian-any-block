@@ -728,7 +728,7 @@ html[data-theme="dark"] #app {
 .ab-note .ab-nodes.min .ab-nodes-children .ab-nodes-bracket {
   width: 6px;
   width: 6px;
-  top: calc(50% - 2px);
+  top: calc(50% - 4px);
   left: calc(-8px - 0px + 1px);
 }
 
@@ -783,7 +783,7 @@ div.md-table-fig1 table.ab-setting.md-table-fig2 {
   overflow-x: scroll;
   text-overflow: clip !important;
   transform: scaleY(-1);
-  white-space: nowrap;
+  white-space: pre-wrap;
 }
 
 .ab-custom-text-red {

@@ -777,7 +777,8 @@ div.md-table-fig1{
     overflow-x:scroll;
     text-overflow: clip !important;
     transform:scaleY(-1);
-    white-space: nowrap;
+    // white-space: nowrap;
+    white-space: pre-wrap;
   }
 }
 
