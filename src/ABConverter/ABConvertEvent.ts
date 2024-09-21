@@ -32,12 +32,19 @@ export function abConvertEvent(d: Element|Document) {
       const el_child_first = childNodes[2] as HTMLElement;
       const el_child_last = childNodes[childNodes.length - 1] as HTMLElement;
 
+      // if (childNodes.length == 3) { 
+      //   const heightToReduce = (el_child_first.offsetHeight + el_child_last.offsetHeight) / 2;
+      //   el_bracket2.style.setProperty("height", `0`);
+      //   el_bracket2.style.setProperty("top", `${el_child_first.offsetHeight/2-2}px`);
+      // }
+
       // 修改伪类
-      if (childNodes.length == 3) {
-        el_bracket2.style.setProperty("height", `calc(100% - ${(8+8)/2}px)`);
-        el_bracket2.style.setProperty("top", `${8/2}px`);
+      // 以前这里只判断childNodes.length，但后来发现哪怕后面只有一个，但这一个后面可能又接不止一个。所以要动态多算下高度
+      const heightToReduce = (el_child_first.offsetHeight + el_child_last.offsetHeight) / 2;
+      if (childNodes.length == 3 && el_bracket2.offsetHeight - heightToReduce < 20) {
+        el_bracket2.style.setProperty("height", `20px`);
+        el_bracket2.style.setProperty("top", `${el_child_first.offsetHeight/2-10}px`);
       } else {
-        const heightToReduce = (el_child_first.offsetHeight + el_child_last.offsetHeight) / 2;
         el_bracket2.style.setProperty("height", `calc(100% - ${heightToReduce}px)`);
         el_bracket2.style.setProperty("top", `${el_child_first.offsetHeight/2}px`);
       }
