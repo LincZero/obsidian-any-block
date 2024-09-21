@@ -62,6 +62,7 @@ function list2markmap(markdown: string, div: HTMLDivElement) {
 		// // if (assets.scripts) loadJS(assets.scripts, { getMarkmap: () => {} });
 		// const mindmaps = document.querySelectorAll('.ab-markmap-svg'); // 注意一下这里的选择器
 		// for(const mindmap of mindmaps) {
+		//  mindmap.innerHTML = "";
 		// 	const datajson: string|null = mindmap.getAttribute('data-json')
 		// 	if (datajson === null) { console.error("ab-markmap-svg without data-json") }
 		// 	g_markmap = Markmap.create(mindmap as SVGElement, undefined, JSON.parse(datajson as string));
@@ -90,6 +91,7 @@ function list2markmap(markdown: string, div: HTMLDivElement) {
 		// import { Markmap, } from 'https://jspm.dev/markmap-view';
 		// const mindmaps = document.querySelectorAll('.ab-markmap-svg');
 		// for(const mindmap of mindmaps) {
+		//  mindmap.innerHTML = "";
 		// 	Markmap.create(mindmap,null,JSON.parse(mindmap.getAttribute('data-json')));
 		// }\``);
 		// TODO 似乎是这里导致了`'`符号的异常

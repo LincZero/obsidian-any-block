@@ -106,6 +106,7 @@ export function abConvertEvent(d: Element|Document) {
     import { Markmap, } from 'https://jspm.dev/markmap-view';
     const mindmaps = document.querySelectorAll('.ab-markmap-svg'); // 注意一下这里的选择器
     for(const mindmap of mindmaps) {
+      mindmap.innerHTML = "";
       Markmap.create(mindmap,null,JSON.parse(mindmap.getAttribute('data-json')));
     }`;
   }
