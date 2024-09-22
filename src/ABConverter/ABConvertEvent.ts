@@ -106,12 +106,21 @@ export function abConvertEvent(d: Element|Document) {
   if (d.querySelector('.ab-markmap-svg')) {
     let script_el: HTMLScriptElement|null = document.querySelector('script[script-id="ab-markmap-script"]');
     if (script_el) script_el.remove();
+    const divEl = d as Element;
+    let markmapId = '';
+    if (divEl.tagName === 'DIV') {
+      markmapId = divEl.querySelector('.ab-markmap-svg')?.id || '';
+    }
     script_el = document.createElement('script'); document.head.appendChild(script_el);
     script_el.type = "module";
     script_el.setAttribute("script-id", "ab-markmap-script");
     script_el.textContent = `
     import { Markmap, } from 'https://jspm.dev/markmap-view';
-    const mindmaps = document.querySelectorAll('.ab-markmap-svg'); // 注意一下这里的选择器
+    const markmapId = "${markmapId || ''}";
+    let mindmaps = document.querySelectorAll('.ab-markmap-svg'); // 注意一下这里的选择器
+    if (markmapId) {
+      mindmaps = document.querySelectorAll('#' + markmapId);
+    }
     for(const mindmap of mindmaps) {
       mindmap.innerHTML = "";
       Markmap.create(mindmap,null,JSON.parse(mindmap.getAttribute('data-json')));
