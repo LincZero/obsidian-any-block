@@ -6,7 +6,6 @@ import {ABConvert_IOEnum, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
 import {ABConvertManager} from "../ABConvertManager"
 import {C2ListProcess, type List_C2ListItem} from "./abc_c2list"
 import {ABReg} from "../ABReg"
-import { add_classes } from "svelte/internal"
 
 /// 按mdit-tabs的标准转化为二列列表数据
 function mditTabs2listdata(content:string, reg: RegExp): List_C2ListItem {

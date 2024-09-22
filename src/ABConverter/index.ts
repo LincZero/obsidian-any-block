@@ -1,3 +1,8 @@
+/**
+ * - obsidian版的，那么index.ts是入口函数
+ * - mdit版的，那么index_mdit.ts是入口函数
+ */
+
 // 转换器模块
 export { ABConvertManager } from "./ABConvertManager"
 // 加载所有转换器 (都是可选的，可自行增删。当然，如果A转换器依赖B转换器，那么你导入A必然导入B)

@@ -17,10 +17,11 @@
 export function abConvertEvent(d: Element|Document) {
   // list2nodes，圆弧调整事件
   if (d.querySelector('.ab-nodes-node')) {
+    const els_min = document.querySelectorAll(".ab-nodes.min .ab-nodes-node");
     const list_children = d.querySelectorAll(".ab-nodes-node")
     for (let children of list_children) {
       // 元素准备
-      const el_child = children.querySelector(".ab-nodes-children"); if (!el_child) continue
+      const el_child = children.querySelector(".ab-nodes-children") as HTMLElement; if (!el_child) continue
       const el_bracket = el_child.querySelector(".ab-nodes-bracket") as HTMLElement; if (!el_bracket) continue
       const el_bracket2 = el_child.querySelector(".ab-nodes-bracket2") as HTMLElement; if (!el_bracket2) continue
       const childNodes = el_child.childNodes;
@@ -48,6 +49,53 @@ export function abConvertEvent(d: Element|Document) {
         el_bracket2.style.setProperty("height", `calc(100% - ${heightToReduce}px)`);
         el_bracket2.style.setProperty("top", `${el_child_first.offsetHeight/2}px`);
       }
+
+      // min版 (存在问题：内换行有问题，而且样式不统一。而且用canvas的思路应该是不对的，应该参考mehrmaid用svg，还能包裹div)
+      /*if (Array.prototype.includes.call(els_min, children)) {
+        if (childNodes.length == 3 && el_bracket2.offsetHeight - heightToReduce < 20) {
+          el_bracket2.style.setProperty("height", `0px`);
+          el_bracket2.style.setProperty("top", `${el_child_first.offsetHeight/2+11}px`);
+          el_bracket2.style.setProperty("border-top", `none`);
+          el_bracket2.style.setProperty("width", `38px`); // 可以溢出点
+          el_bracket2.style.setProperty("left", `-20px`);
+          el_bracket.style.setProperty("display", "none");
+        }
+        else {
+          el_bracket2.style.setProperty("height", `100%`);
+          el_bracket2.style.setProperty("top", `0`);
+          el_bracket2.style.setProperty("width", `38px`); // 可以溢出点
+          el_bracket2.style.setProperty("left", `-20px`);
+          el_bracket.style.setProperty("display", "none");
+
+          const el_canvas: HTMLCanvasElement = document.createElement("canvas"); el_bracket2.appendChild(el_canvas);
+            el_canvas.style.setProperty("width", "100%")
+            el_canvas.style.setProperty("height", "100%")
+          const rect_canvas = el_canvas.getBoundingClientRect()
+          const rect_bracket = el_bracket2.getBoundingClientRect()
+          const point_bracket = {
+            x: rect_bracket.right - rect_canvas.left,
+            y: rect_bracket.bottom - rect_canvas.top
+          };
+          for (let childNode of childNodes) { // TODO 应该跳过前两个，前两个是括号
+            const rect_childNode = (childNode as HTMLElement).getBoundingClientRect()
+            const point_childNode = {
+              x: rect_childNode.right - rect_canvas.left,
+              y: rect_childNode.bottom - rect_canvas.top
+            }
+            // 连线
+            const ctx = el_canvas.getContext('2d');
+            if (!ctx) continue;
+            console.log(".ab-nodes.min 获取 canvas ctx 成功", rect_canvas, rect_bracket, rect_childNode) // canvas和bracket是重合的其实……
+            // ctx.clearRect(0, 0, canvas.width, canvas.height); // 清除画布
+            ctx.beginPath(); // 开始绘制连线
+            ctx.moveTo(point_bracket.x - point_bracket.x, point_bracket.y - point_bracket.x);
+            ctx.lineTo(point_childNode.x - point_bracket.x, point_childNode.y - point_bracket.x);
+            ctx.strokeStyle = 'green';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+          }
+        }
+      }*/
     }
   }
 
