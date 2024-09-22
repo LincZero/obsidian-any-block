@@ -63,6 +63,7 @@ export default class AnyBlockPlugin extends Plugin {
 
     // 钩子组1 - 代码块
     this.registerMarkdownCodeBlockProcessor("ab", ABReplacer_CodeBlock.processor);
+    this.registerMarkdownCodeBlockProcessor("anyblock", ABReplacer_CodeBlock.processor);
     
     // 钩子组2 - 非渲染模式 cm扩展 - StateField
     {
