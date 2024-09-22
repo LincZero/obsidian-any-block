@@ -38,6 +38,26 @@ html[data-theme="dark"] #app{
   --ab-bright-color: var(--theme-color);
   --pre-background-color: var(--code-bg-color);
 }
+html[data-theme="light"] #app {
+  --color-red: #e93147;
+  --color-orange: #ec7500;
+  --color-yellow: #e0ac00;
+  --color-green: #08b94e;
+  --color-cyan: #00bfbc;
+  --color-blue: #086ddd;
+  --color-purple: #7852ee;
+  --color-pink: #d53984;
+}
+html[data-theme="dark"] #app {
+  --color-red: #fb464c;
+  --color-orange: #e9973f;
+  --color-yellow: #e0de71;
+  --color-green: #44cf6e;
+  --color-cyan: #53dfdd;
+  --color-blue: #027aff;
+  --color-purple: #a882ff;
+  --color-pink: #fa99cd;
+}
 
 // obsidian各模式下的微调
 .app-container {
