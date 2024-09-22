@@ -748,7 +748,7 @@ html[data-theme="dark"] #app{
       }
     }
   }
-  &>.ab-nodes.min>.ab-nodes-children {
+  .ab-nodes.min>.ab-nodes-children {
     &>.ab-nodes-node:nth-child(8n+1) { --node-color: var(--color-red); }
     &>.ab-nodes-node:nth-child(8n+2) { --node-color: var(--color-orange); }
     &>.ab-nodes-node:nth-child(8n+3) { --node-color: var(--color-yellow); }

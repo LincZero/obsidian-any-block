@@ -732,45 +732,45 @@ html[data-theme="dark"] #app {
   left: calc(-8px - 0px + 1px);
 }
 
-.ab-note > .ab-nodes.min > .ab-nodes-children > .ab-nodes-node:nth-child(8n+1) {
+.ab-note .ab-nodes.min > .ab-nodes-children > .ab-nodes-node:nth-child(8n+1) {
   --node-color: var(--color-red);
 }
 
-.ab-note > .ab-nodes.min > .ab-nodes-children > .ab-nodes-node:nth-child(8n+2) {
+.ab-note .ab-nodes.min > .ab-nodes-children > .ab-nodes-node:nth-child(8n+2) {
   --node-color: var(--color-orange);
 }
 
-.ab-note > .ab-nodes.min > .ab-nodes-children > .ab-nodes-node:nth-child(8n+3) {
+.ab-note .ab-nodes.min > .ab-nodes-children > .ab-nodes-node:nth-child(8n+3) {
   --node-color: var(--color-yellow);
 }
 
-.ab-note > .ab-nodes.min > .ab-nodes-children > .ab-nodes-node:nth-child(8n+4) {
+.ab-note .ab-nodes.min > .ab-nodes-children > .ab-nodes-node:nth-child(8n+4) {
   --node-color: var(--color-green);
 }
 
-.ab-note > .ab-nodes.min > .ab-nodes-children > .ab-nodes-node:nth-child(8n+5) {
+.ab-note .ab-nodes.min > .ab-nodes-children > .ab-nodes-node:nth-child(8n+5) {
   --node-color: var(--color-cyan);
 }
 
-.ab-note > .ab-nodes.min > .ab-nodes-children > .ab-nodes-node:nth-child(8n+6) {
+.ab-note .ab-nodes.min > .ab-nodes-children > .ab-nodes-node:nth-child(8n+6) {
   --node-color: var(--color-blue);
 }
 
-.ab-note > .ab-nodes.min > .ab-nodes-children > .ab-nodes-node:nth-child(8n+7) {
+.ab-note .ab-nodes.min > .ab-nodes-children > .ab-nodes-node:nth-child(8n+7) {
   --node-color: var(--color-purple);
 }
 
-.ab-note > .ab-nodes.min > .ab-nodes-children > .ab-nodes-node:nth-child(8n+0) {
+.ab-note .ab-nodes.min > .ab-nodes-children > .ab-nodes-node:nth-child(8n+0) {
   --node-color: var(--color-pink);
 }
 
-.ab-note > .ab-nodes.min > .ab-nodes-children > .ab-nodes-node .ab-nodes-content,
-.ab-note > .ab-nodes.min > .ab-nodes-children > .ab-nodes-node .ab-nodes-bracket,
-.ab-note > .ab-nodes.min > .ab-nodes-children > .ab-nodes-node .ab-nodes-bracket2 {
+.ab-note .ab-nodes.min > .ab-nodes-children > .ab-nodes-node .ab-nodes-content,
+.ab-note .ab-nodes.min > .ab-nodes-children > .ab-nodes-node .ab-nodes-bracket,
+.ab-note .ab-nodes.min > .ab-nodes-children > .ab-nodes-node .ab-nodes-bracket2 {
   border-color: var(--node-color);
 }
 
-.ab-note > .ab-nodes.min > .ab-nodes-children > .ab-nodes-node .ab-nodes-bracket {
+.ab-note .ab-nodes.min > .ab-nodes-children > .ab-nodes-node .ab-nodes-bracket {
   background-color: var(--node-color);
 }
 
