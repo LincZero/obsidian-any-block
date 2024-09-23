@@ -28,7 +28,7 @@ export class ABReplacer_Widget extends WidgetType {
     this.div.setAttribute("type_header", this.rangeSpec.header)
     this.div.addClasses(["ab-replace", "cm-embed-block"]) // , "show-indentation-guide"
 
-    // 内容替换元素
+    // AnyBlock主体，内容替换元素
     let dom_note = this.div.createEl("div", {cls: ["ab-note", "drop-shadow"]});
     ABConvertManager.autoABConvert(dom_note, this.rangeSpec.header, this.rangeSpec.content, this.rangeSpec.selector)
 
