@@ -35,6 +35,7 @@ function getID(length=16){
 import { Transformer, builtInPlugins } from 'markmap-lib'
 import type { C2ListItem } from "./abc_c2list";
 import { abc_title2listdata } from "./abc_list";
+import { abConvertEvent } from "../ABConvertEvent";
 const transformer = new Transformer();
 //import { Markmap, loadCSS, loadJS } from 'markmap-view'
 
@@ -45,6 +46,7 @@ process_param: ABConvert_IOEnum.text,
 process_return: ABConvert_IOEnum.el,
 process: (el, header, content: string): HTMLElement=>{
 		list2markmap(content, el)
+    abConvertEvent(el)
 		return el
 	}
 })

@@ -22,7 +22,7 @@ export class ABReplacer_CodeBlock{
     if (list_src.length) {
       const match = list_src[0].match(ABReg.reg_header_noprefix)
       if (match && match[5]) {
-        // AnyBlock主体
+        // AnyBlock主体部分
         const dom_note = root_div.createDiv({
           cls: ["ab-note", "drop-shadow"]
         })
@@ -31,10 +31,10 @@ export class ABReplacer_CodeBlock{
         })
         ABConvertManager.autoABConvert(dom_replaceEl, match[5], list_src.slice(1).join("\n").trimStart())
 
-        // 编辑按钮
+        // 编辑按钮部分
         // codeblock自带编辑按钮，不需要额外追加
 
-        // 刷新按钮
+        // 刷新按钮部分
         let dom_edit = root_div.createEl("div", {
           cls: ["ab-button", "edit-block-button"],
           attr: {"aria-label": "Refresh the block", "style": "right: 40px"}
@@ -42,10 +42,6 @@ export class ABReplacer_CodeBlock{
         dom_edit.innerHTML = ABReplacer_Widget.str_icon_refresh
         dom_edit.onclick = ()=>{abConvertEvent(root_div);}
 
-        // 初始默认刷新 (仅markmap可以用这个，其他用似乎会有问题)
-        if (match[5].indexOf("markmap")>=0) {
-          abConvertEvent(dom_replaceEl)
-        }
         return
       }
     }

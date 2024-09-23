@@ -28,11 +28,11 @@ export class ABReplacer_Widget extends WidgetType {
     this.div.setAttribute("type_header", this.rangeSpec.header)
     this.div.addClasses(["ab-replace", "cm-embed-block"]) // , "show-indentation-guide"
 
-    // AnyBlock主体，内容替换元素
+    // AnyBlock主体部分，内容替换元素
     let dom_note = this.div.createEl("div", {cls: ["ab-note", "drop-shadow"]});
     ABConvertManager.autoABConvert(dom_note, this.rangeSpec.header, this.rangeSpec.content, this.rangeSpec.selector)
 
-    // 编辑按钮
+    // 编辑按钮部分
     if (this.global_editor){
       let dom_edit = this.div.createEl("div", {
         cls: ["ab-button", "edit-block-button"], // cm-embed-block和edit-block-button是自带的js样式，用来悬浮显示的，不是我写的
@@ -42,7 +42,7 @@ export class ABReplacer_Widget extends WidgetType {
       dom_edit.onclick = ()=>{this.moveCursor()}
     }
 
-    // 刷新按钮
+    // 刷新按钮部分
     if (this.global_editor){
       let dom_edit = this.div.createEl("div", {
         cls: ["ab-button", "edit-block-button"],
@@ -51,7 +51,7 @@ export class ABReplacer_Widget extends WidgetType {
       dom_edit.innerHTML = ABReplacer_Widget.str_icon_refresh
       dom_edit.onclick = ()=>{abConvertEvent(this.div); this.moveCursor(-1)}
     }
-    
+
     return this.div;
   }
 

@@ -33,7 +33,7 @@ export class ABReplacer_Render extends MarkdownRenderChild {
     });
     div.setAttribute("type_header", this.header)
 
-    // 主体部分
+    // AnyBlock主体部分
     const dom_note = div.createDiv({
       cls: ["ab-note", "drop-shadow"]
     })
