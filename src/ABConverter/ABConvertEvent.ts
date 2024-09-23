@@ -153,32 +153,36 @@ export function abConvertEvent(d: Element|Document) {
   }
 
   // xxx2markmap，高度重调事件
-  if (d.querySelector('.ab-markmap-svg')) {
+  if (d.querySelector('.ab-markmap-div')) {
     const divEl = d as Element;
     let markmapId = '';
     if (divEl.tagName === 'DIV') {
-      markmapId = divEl.querySelector('.ab-markmap-svg')?.id || '';
+      markmapId = divEl.querySelector('.ab-markmap-div')?.id || '';
     }
-
-    let mindmaps;
+    let mindmaps: NodeListOf<HTMLElement>;
     if (markmapId) {
       mindmaps = document.querySelectorAll('#' + markmapId);
     } else {
-      mindmaps = document.querySelectorAll('.ab-markmap-svg'); // 注意一下这里的选择器
+      mindmaps = document.querySelectorAll('.ab-markmap-div'); // 注意一下这里的选择器
     }
 
-    for(const mindmap of mindmaps) {
-      const g: SVGGraphicsElement|null = mindmap.querySelector("g")
-      if (g) {
-        const transformValue = g.getAttribute('transform');
-        if (transformValue && transformValue.indexOf('scale') > -1) {
-          const scaleMatch = transformValue.match(/scale\(([^)]+)\)/);
-          if (scaleMatch) {
-            var scaleValue = parseFloat(scaleMatch[1]);
-            mindmap.setAttribute("style", `height:${g.getBBox().height*scaleValue+40}px`);
-            markmap_event(d) // 重调大小成功则重渲染markmap
-          }
-        }
+    for(const el_div of mindmaps) {
+      const el_svg: SVGGraphicsElement|null = el_div.querySelector("svg")
+      const el_g: SVGGraphicsElement|null|undefined = el_svg?.querySelector("g")
+      if (el_svg && el_g) {
+        // 获取缩放倍数
+        // const transformValue = el_g.getAttribute('transform');
+        // if (transformValue && transformValue.indexOf('scale') > -1) {
+        //   const scaleMatch = transformValue.match(/scale\(([^)]+)\)/);
+        //   if (scaleMatch) {
+        //     const scale_old = parseFloat(scaleMatch[1]);
+        //     ...
+        //   }
+        // }
+        const scale_new = el_g.getBBox().height/el_div.offsetWidth;
+        el_svg.setAttribute("style", `height:${el_g.getBBox().height*scale_new+40}px`); // 重调容器大小
+        // el_g.setAttribute("transform", `translate(20.0,80.0) scale(${scale_new})`) // 重调位置和缩放
+        markmap_event(d) // 好像调位置有问题，只能重渲染了……
       }
     }
   }
