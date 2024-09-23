@@ -21,6 +21,7 @@
 import {ABConvert_IOEnum, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
 import {ABConvertManager} from "../ABConvertManager"
 import {ABReg} from "../ABReg"
+import { markmap_event } from "../ABConvertEvent";
 
 /**
  * 生成一个随机id
@@ -107,37 +108,4 @@ function list2markmap(markdown: string, div: HTMLDivElement) {
 	}
 
 	return div
-}
-
-/**
- * 一些AB块的后触发事件 - markmap_dom加载完触发
- */
-export function markmap_event(d: Element|Document) {
-  // xxx2markmap，渲染事件
-  if (d.querySelector('.ab-markmap-svg')) {
-    let script_el: HTMLScriptElement|null = document.querySelector('script[script-id="ab-markmap-script"]');
-    if (script_el) script_el.remove();
-    const divEl = d as Element;
-    let markmapId = '';
-    if (divEl.tagName === 'DIV') {
-      markmapId = divEl.querySelector('.ab-markmap-svg')?.id || '';
-    }
-    script_el = document.createElement('script'); document.head.appendChild(script_el);
-    script_el.type = "module";
-    script_el.setAttribute("script-id", "ab-markmap-script");
-    script_el.textContent = `
-    import { Markmap, } from 'https://jspm.dev/markmap-view';
-    const markmapId = "${markmapId || ''}";
-    let mindmaps = document.querySelectorAll('.ab-markmap-svg'); // 注意一下这里的选择器
-    if (markmapId) {
-      mindmaps = document.querySelectorAll('#' + markmapId);
-    }
-    for(const mindmap of mindmaps) {
-      mindmap.innerHTML = "";
-      Markmap.create(mindmap,null,JSON.parse(mindmap.getAttribute('data-json')));
-      // 这个时机不对，高度还没确定下来
-      // console.log("test", mindmap.querySelector('g').getBBox(), mindmap.querySelector('g').getBBox().height+20+"px")
-      // mindmap.setAttribute("height", mindmap.querySelector('g').getBBox().height+20+"px");
-    }`;
-  }
 }
