@@ -21,7 +21,7 @@
 import {ABConvert_IOEnum, ABConvert, type ABConvert_SpecSimp} from "./ABConvert"
 import {ABConvertManager} from "../ABConvertManager"
 import {ABReg} from "../ABReg"
-import { markmap_event } from "../ABConvertEvent";
+import { abConvertEvent, markmap_event } from "../ABConvertEvent";
 
 /**
  * 生成一个随机id
@@ -47,6 +47,7 @@ process_return: ABConvert_IOEnum.el,
 process: (el, header, content: string): HTMLElement=>{
 		list2markmap(content, el)
     markmap_event(el)
+    setTimeout(()=>{abConvertEvent(el)}, 500);
 		return el
 	}
 })

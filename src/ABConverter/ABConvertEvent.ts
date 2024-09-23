@@ -170,13 +170,12 @@ export function abConvertEvent(d: Element|Document) {
     for(const mindmap of mindmaps) {
       const g: SVGGraphicsElement|null = mindmap.querySelector("g")
       if (g) {
-        console.log("test", g, g.getBBox(), g.getBBox().height+20+"px")
         const transformValue = g.getAttribute('transform');
         if (transformValue && transformValue.indexOf('scale') > -1) {
           const scaleMatch = transformValue.match(/scale\(([^)]+)\)/);
           if (scaleMatch) {
             var scaleValue = parseFloat(scaleMatch[1]);
-            mindmap.setAttribute("style", `height:${g.getBBox().height*scaleValue+20}px`);
+            mindmap.setAttribute("style", `height:${g.getBBox().height*scaleValue+40}px`);
             markmap_event(d) // 重调大小成功则重渲染markmap
           }
         }
