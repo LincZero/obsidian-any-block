@@ -8,17 +8,11 @@
  */
 
 /**
- * 一些AB块的后触发事件
+ * 一些AB块的后触发事件 - css加载完触发
  * 
  * @param d 这里有两种可能：
  *   - 一是局部刷新，d就是局部的div
  *   - 二是全局刷新，当页面加载完成后会自动调一次，d就是document
- * 
- * 另外在生命周期上还有两种可能：
- *   - 一是css完全加载完
- *   - 二是css还未完全加载完
- * 对于后者来说可以触发markmap的事件，可以判断 `header.indexOf("markmap")>=0`，如果符合也能调用该函数
- * 但对于前者来不能触发像nodes和card的事件，如果还是触发会报错
  */
 export function abConvertEvent(d: Element|Document) {
   // list2nodes，圆弧调整事件
@@ -154,33 +148,5 @@ export function abConvertEvent(d: Element|Document) {
         }
       }
     }
-  }
-
-  // xxx2markmap，渲染事件
-  if (d.querySelector('.ab-markmap-svg')) {
-    let script_el: HTMLScriptElement|null = document.querySelector('script[script-id="ab-markmap-script"]');
-    if (script_el) script_el.remove();
-    const divEl = d as Element;
-    let markmapId = '';
-    if (divEl.tagName === 'DIV') {
-      markmapId = divEl.querySelector('.ab-markmap-svg')?.id || '';
-    }
-    script_el = document.createElement('script'); document.head.appendChild(script_el);
-    script_el.type = "module";
-    script_el.setAttribute("script-id", "ab-markmap-script");
-    script_el.textContent = `
-    import { Markmap, } from 'https://jspm.dev/markmap-view';
-    const markmapId = "${markmapId || ''}";
-    let mindmaps = document.querySelectorAll('.ab-markmap-svg'); // 注意一下这里的选择器
-    if (markmapId) {
-      mindmaps = document.querySelectorAll('#' + markmapId);
-    }
-    for(const mindmap of mindmaps) {
-      mindmap.innerHTML = "";
-      Markmap.create(mindmap,null,JSON.parse(mindmap.getAttribute('data-json')));
-      // 这个时机不对，高度还没确定下来
-      // console.log("test", mindmap.querySelector('g').getBBox(), mindmap.querySelector('g').getBBox().height+20+"px")
-      // mindmap.setAttribute("height", mindmap.querySelector('g').getBBox().height+20+"px");
-    }`;
   }
 }
