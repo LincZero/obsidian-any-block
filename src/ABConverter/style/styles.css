@@ -168,10 +168,12 @@ html[data-theme="dark"] #app {
 .ab-note td > ul:first-child, .ab-note th > ul:first-child,
 .ab-note .ab-list-table-witharrow > p:first-child,
 .ab-note .ab-nodes-content > p:first-child,
+.ab-note .ab-items-item > div > p:first-child, .ab-note .ab-items-item > div > ul:first-child,
 .ab-note td > div > p:first-child, .ab-note th > div > p:first-child,
 .ab-note td > div > ul:first-child, .ab-note th > div > ul:first-child,
 .ab-note .ab-list-table-witharrow > div > p:first-child,
-.ab-note .ab-nodes-content > div > p:first-child {
+.ab-note .ab-nodes-content > div > p:first-child,
+.ab-note .ab-items-item > div > div > p:first-child, .ab-note .ab-items-item > div > div > ul:first-child {
   margin-top: 0;
 }
 
@@ -179,10 +181,12 @@ html[data-theme="dark"] #app {
 .ab-note td > ul:last-child, .ab-note th > ul:last-child,
 .ab-note .ab-list-table-witharrow > p:last-child,
 .ab-note .ab-nodes-content > p:last-child,
+.ab-note .ab-items-item > div > p:last-child, .ab-note .ab-items-item > div > ul:last-child,
 .ab-note td > div > p:last-child, .ab-note th > div > p:last-child,
 .ab-note td > div > ul:last-child, .ab-note th > div > ul:last-child,
 .ab-note .ab-list-table-witharrow > div > p:last-child,
-.ab-note .ab-nodes-content > div > p:last-child {
+.ab-note .ab-nodes-content > div > p:last-child,
+.ab-note .ab-items-item > div > div > p:last-child, .ab-note .ab-items-item > div > div > ul:last-child {
   margin-bottom: 0;
 }
 
@@ -639,8 +643,17 @@ html[data-theme="dark"] #app {
   background-color: var(--ab-tab-root-bg-color);
   border: solid 2px var(--ab-tab-root-bd-color);
   box-shadow: #34343f;
-  padding: 5px 10px;
   margin-bottom: 10px;
+  padding: 5px 10px;
+}
+
+.ab-note .ab-items.ab-card .ab-items-item > div {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.ab-note .ab-items.ab-card .ab-items-item .ab-items-title {
+  border-bottom: 1px solid currentColor;
 }
 
 .ab-note .ab-items.ab-card .ab-items-item {

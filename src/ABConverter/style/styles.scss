@@ -177,25 +177,29 @@ html[data-theme="dark"] #app {
   }
 
   // 使单元格内容更紧凑 - 去除单元格内部的间隔 (首尾)
-  td>p:first-child, th>p:first-child, // ob x 5
+  td>p:first-child, th>p:first-child, // ob x 8
   td>ul:first-child, th>ul:first-child,
   .ab-list-table-witharrow>p:first-child,
   .ab-nodes-content>p:first-child,
-  td>div>p:first-child, th>div>p:first-child, // mdit x 5
+  .ab-items-item>div>p:first-child, .ab-items-item>div>ul:first-child,
+  td>div>p:first-child, th>div>p:first-child, // mdit x 8
   td>div>ul:first-child, th>div>ul:first-child, 
   .ab-list-table-witharrow>div>p:first-child,
-  .ab-nodes-content>div>p:first-child
+  .ab-nodes-content>div>p:first-child,
+  .ab-items-item>div>div>p:first-child, .ab-items-item>div>div>ul:first-child
   {
     margin-top: 0;
   }
-  td>p:last-child, th>p:last-child, // ob x 5
+  td>p:last-child, th>p:last-child, // ob x 8
   td>ul:last-child, th>ul:last-child, 
   .ab-list-table-witharrow>p:last-child,
   .ab-nodes-content>p:last-child,
-  td>div>p:last-child, th>div>p:last-child, // mdit x 5
+  .ab-items-item>div>p:last-child, .ab-items-item>div>ul:last-child,
+  td>div>p:last-child, th>div>p:last-child, // mdit x 8
   td>div>ul:last-child, th>div>ul:last-child,
   .ab-list-table-witharrow>div>p:last-child,
-  .ab-nodes-content>div>p:last-child
+  .ab-nodes-content>div>p:last-child,
+  .ab-items-item>div>div>p:last-child, .ab-items-item>div>div>ul:last-child
   {
     margin-bottom: 0;
   }
@@ -618,9 +622,20 @@ html[data-theme="dark"] #app {
         background-color: var(--ab-tab-root-bg-color);
         border: solid 2px var(--ab-tab-root-bd-color);
         box-shadow: #34343f;
-
-        padding: 5px 10px;
         margin-bottom: 10px;
+        padding: 5px 10px;
+
+        &>div {
+          padding-top: 5px;
+          padding-bottom: 5px;
+        }
+
+        .ab-items-title {
+          border-bottom: 1px solid currentColor;
+        }
+        .ab-items-content {
+          
+        }
       }
 
       // 方式一，对齐, flex布局
