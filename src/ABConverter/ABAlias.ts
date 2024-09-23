@@ -118,7 +118,7 @@ const ABAlias_json_title: ABAlias_json_item[] = [
   // list  - 多叉多层树
   {regex: /\|title 140lne\|2?(flow|流程图)\|/, replacement: "|title2list" + "|list2mermaid|"},
   {regex: /\|title 140lne\|2?(puml)?(mindmap|脑图|思维导图)\|/, replacement: "|title2list" + "|list2pumlMindmap|"},
-  {regex: /\|title 140lne\|2?md(Mindmap|脑图|思维导图)\|/, replacement: "|title2list" + "|list2markmap|"},
+  {regex: /\|title 140lne\|2?(markmap|mdMindmap|md脑图|md思维导图)\|/, replacement: "|title2list" + "|list2markmap|"},
   {regex: /\|title 140lne\|2?(wbs|(工作)?分解(图|结构))\|/, replacement: "|title2list" + "|list2pumlWBS|"},
   {regex: /\|title 140lne\|2?(table|multiWayTable|multiCrossTable|表格?|多叉表格?|跨行表格?)\|/, replacement: "|title2list" + "|list2table|"},
 
@@ -145,7 +145,7 @@ const ABAlias_json_list: ABAlias_json_item[] = [
   // list  - 多叉多层树
   {regex: /\|list 140lne\|2?(flow|流程图)\|/, replacement: "|list2mermaid|"},
   {regex: /\|list 140lne\|2?(puml)?(mindmap|脑图|思维导图)\|/, replacement: "|list2pumlMindmap|"},
-  {regex: /\|list 140lne\|2?md(Mindmap|脑图|思维导图)\|/, replacement: "|list2markmap|"},
+  {regex: /\|list 140lne\|2?(markmap|mdMindmap|md脑图|md思维导图)\|/, replacement: "|list2markmap|"},
   {regex: /\|list 140lne\|2?(wbs|(工作)?分解(图|结构))\|/, replacement: "|list2pumlWBS|"},
   {regex: /\|list 140lne\|2?(table|multiWayTable|multiCrossTable|表格?|多叉表格?|跨行表格?)\|/, replacement: "|list2table|"},
 
