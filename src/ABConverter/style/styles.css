@@ -642,6 +642,7 @@ html[data-theme="dark"] #app {
   color: var(--ab-tab-root-tx-color);
   background-color: var(--ab-tab-root-bg-color);
   border: solid 2px var(--ab-tab-root-bd-color);
+  border-radius: 6px;
   box-shadow: #34343f;
   margin-bottom: 10px;
   padding: 5px 10px;
@@ -653,7 +654,8 @@ html[data-theme="dark"] #app {
 }
 
 .ab-note .ab-items.ab-card .ab-items-item .ab-items-title {
-  border-bottom: 1px solid currentColor;
+  color: var(--ab-bright-color);
+  border-bottom: 1px solid var(--ab-bright-color);
 }
 
 .ab-note .ab-items.ab-card .ab-items-item {
