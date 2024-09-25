@@ -23,28 +23,23 @@ export function abConvertEvent(d: Element|Document) {
     const list_children = d.querySelectorAll(".ab-nodes-node")
     for (let children of list_children) {
       // 元素准备
+      const el_content = children.querySelector(".ab-nodes-content") as HTMLElement; if (!el_content) continue
       const el_child = children.querySelector(".ab-nodes-children") as HTMLElement; if (!el_child) continue
       const el_bracket = el_child.querySelector(".ab-nodes-bracket") as HTMLElement; if (!el_bracket) continue
       const el_bracket2 = el_child.querySelector(".ab-nodes-bracket2") as HTMLElement; if (!el_bracket2) continue
-      const childNodes = el_child.childNodes;
-      if (childNodes.length < 3) {
+      const els_child = el_child.childNodes;
+      if (els_child.length < 3) {
         el_bracket.style.setProperty("display", "none")
         el_bracket2.style.setProperty("display", "none")
         continue
       }
-      const el_child_first = childNodes[2] as HTMLElement;
-      const el_child_last = childNodes[childNodes.length - 1] as HTMLElement;
-
-      // if (childNodes.length == 3) { 
-      //   const heightToReduce = (el_child_first.offsetHeight + el_child_last.offsetHeight) / 2;
-      //   el_bracket2.style.setProperty("height", `0`);
-      //   el_bracket2.style.setProperty("top", `${el_child_first.offsetHeight/2-2}px`);
-      // }
+      const el_child_first = els_child[2] as HTMLElement;
+      const el_child_last = els_child[els_child.length - 1] as HTMLElement;
 
       // 修改伪类
       // 以前这里只判断childNodes.length，但后来发现哪怕后面只有一个，但这一个后面可能又接不止一个。所以要动态多算下高度
       const heightToReduce = (el_child_first.offsetHeight + el_child_last.offsetHeight) / 2;
-      if (childNodes.length == 3 && el_bracket2.offsetHeight - heightToReduce < 20) {
+      if (els_child.length == 3 && el_bracket2.offsetHeight - heightToReduce < 20) {
         el_bracket2.style.setProperty("height", `20px`);
         el_bracket2.style.setProperty("top", `${el_child_first.offsetHeight/2-10}px`);
       } else {
@@ -52,17 +47,24 @@ export function abConvertEvent(d: Element|Document) {
         el_bracket2.style.setProperty("top", `${el_child_first.offsetHeight/2}px`);
       }
 
-      // min版 (存在问题：内换行有问题，而且样式不统一。而且用canvas的思路应该是不对的，应该参考mehrmaid用svg，还能包裹div)
-      /*if (Array.prototype.includes.call(els_min, children)) {
-        if (childNodes.length == 3 && el_bracket2.offsetHeight - heightToReduce < 20) {
-          el_bracket2.style.setProperty("height", `0px`);
-          el_bracket2.style.setProperty("top", `${el_child_first.offsetHeight/2+11}px`);
-          el_bracket2.style.setProperty("border-top", `none`);
-          el_bracket2.style.setProperty("width", `38px`); // 可以溢出点
-          el_bracket2.style.setProperty("left", `-20px`);
-          el_bracket.style.setProperty("display", "none");
+      // 修改伪类 - min样式版
+      if (Array.prototype.includes.call(els_min, children)) {
+        // 用横线代替括号 (1-1-3 结构无法识别)
+        if (els_child.length == 3 && el_content.offsetHeight == el_child_first.offsetHeight) {
+          el_bracket2.style.cssText = `
+            height: 100%;
+            top: 0;
+            left: -20px;
+            border-radius: 0;
+            border: none;
+            border-bottom: 1px solid var(--node-color);
+            width: 38px; /* 可以溢出点 */
+          `
+          el_bracket.style.setProperty("top", `${el_child_first.offsetHeight-8/2}px`)
+          el_bracket.style.setProperty("clip-path", `circle(40% at 50% 40%)`)
         }
-        else {
+        // 存在问题：用canvas的思路应该是不对的，应该参考mehrmaid用svg，还能包裹div
+        /*else {
           el_bracket2.style.setProperty("height", `100%`);
           el_bracket2.style.setProperty("top", `0`);
           el_bracket2.style.setProperty("width", `38px`); // 可以溢出点
@@ -96,8 +98,8 @@ export function abConvertEvent(d: Element|Document) {
             ctx.lineWidth = 2;
             ctx.stroke();
           }
-        }
-      }*/
+        }*/
+      }
     }
   }
 
