@@ -854,3 +854,10 @@ div.md-table-fig1{
 .ab-custom-font-smallx {font-size: x-small !important;}
 .ab-custom-font-smallxx {font-size: xx-small !important;}
 .ab-custom-font-bold {font-weight: bold !important;}
+
+/**************** 兼容性补充 ******************/
+
+// BT主题在阅读模式下会干扰表格高度 (不确定有无其他误影响)
+:is(.markdown-preview-view,.markdown-rendered).is-readable-line-width:not(.matrix) :is(.markdown-rendered) {
+  width: auto;
+}
