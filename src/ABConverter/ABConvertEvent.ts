@@ -48,7 +48,7 @@ export function abConvertEvent(d: Element|Document) {
         height = (el_child_first_content.offsetHeight-20) > 20 ? (el_child_first_content.offsetHeight-20) : 20
         el_bracket2.style.cssText = `
           height: ${height}px;
-          top: calc(50% - ${(height)/2}px);
+          top: calc(50% - ${height/2}px);
         `
       } else { // 结构：1-n
         el_bracket2.style.cssText = `
@@ -82,8 +82,7 @@ export function abConvertEvent(d: Element|Document) {
           el_bracket2.style.cssText = `
             height: 1px;
             top: calc(50% + ${el_content.offsetHeight/2}px - 1px);
-            width: 38px; /* 可以溢出点 */
-            left: -20px;
+            width: 18px; /* 可以溢出点 */
             border-radius: 0;
             border: none;
             border-bottom: 1px solid var(--node-color);

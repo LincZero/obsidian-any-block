@@ -716,6 +716,7 @@ html[data-theme="dark"] #app {
 
 .ab-note .ab-nodes .ab-nodes-children .ab-nodes-bracket {
   content: "";
+  box-sizing: border-box;
   position: absolute;
   width: 8px;
   height: 8px;
@@ -727,6 +728,7 @@ html[data-theme="dark"] #app {
 
 .ab-note .ab-nodes .ab-nodes-children .ab-nodes-bracket2 {
   content: "";
+  box-sizing: border-box;
   position: absolute;
   width: 10px;
   height: calc(100% - 8px);

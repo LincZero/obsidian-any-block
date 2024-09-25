@@ -732,6 +732,7 @@ html[data-theme="dark"] #app {
       // 圆弧样式 - 中间箭头
       .ab-nodes-bracket {
         content: "";
+        box-sizing: border-box;
         position: absolute;
         width: 8px;
         height: 8px;
@@ -743,6 +744,7 @@ html[data-theme="dark"] #app {
       // 圆弧样式 - 两头弯曲
       .ab-nodes-bracket2 {
         content: "";
+        box-sizing: border-box;
         position: absolute;
         width: 10px;
         height: calc(100% - 8px);  // JS: 缩短第一个和最后一个节点的一半
@@ -785,6 +787,7 @@ html[data-theme="dark"] #app {
       .ab-nodes-bracket {
         display: none;
         width: 6px;
+        height: 6px;
         top: calc(50% - 4px);
         left: calc(-8px + 2px)
       }
