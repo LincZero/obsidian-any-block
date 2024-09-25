@@ -716,7 +716,7 @@ html[data-theme="dark"] #app {
   width: 8px;
   height: 8px;
   top: calc(50% - 4px);
-  left: calc(-8px - 2px + 1px);
+  left: calc(-8px + 1px);
   clip-path: polygon(100% 0, 100% 100%, 13.4% 50%);
   background-color: currentColor;
 }
@@ -727,7 +727,7 @@ html[data-theme="dark"] #app {
   width: 10px;
   height: calc(100% - 8px);
   top: 4px;
-  left: -2px;
+  left: 0;
   border-radius: 10px 0 0 10px;
   border-left: 2px solid currentColor;
   border-top: 2px solid currentColor;
@@ -768,6 +768,14 @@ html[data-theme="dark"] #app {
   width: 6px;
   top: calc(50% - 4px);
   left: calc(-8px - 0px + 1px);
+}
+
+.ab-note .ab-nodes.min .ab-nodes-content {
+  padding-right: 1.2em;
+}
+
+.ab-note .ab-nodes.min .ab-nodes-children .ab-nodes-node {
+  gap: 0;
 }
 
 .ab-note .ab-nodes.min > .ab-nodes-children > .ab-nodes-node:nth-child(8n+1) {

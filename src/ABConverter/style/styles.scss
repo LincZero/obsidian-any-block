@@ -732,7 +732,7 @@ html[data-theme="dark"] #app {
         width: 8px;
         height: 8px;
         top: calc(50% - 4px);
-        left: calc(-8px - 2px + 1px); // 重合一个px避免出现黑线
+        left: calc(-8px + 1px); // 重合一个px避免出现黑线
         clip-path: polygon(100% 0, 100% 100%, 13.40% 50%); // 裁剪成等边三角形
         background-color: currentColor;
       }
@@ -743,7 +743,7 @@ html[data-theme="dark"] #app {
         width: 10px;
         height: calc(100% - 8px);  // JS: 缩短第一个和最后一个节点的一半
         top: 4px;                  // JS: 第一个节点的一半
-        left: -2px;
+        left: 0;
         border-radius: 10px 0 0 10px;
         border-left: 2px solid currentColor;
         border-top: 2px solid currentColor;
@@ -783,6 +783,16 @@ html[data-theme="dark"] #app {
         width: 6px;
         top: calc(50% - 4px);
         left: calc(-8px - 0px + 1px)
+      }
+    }
+
+    // 间隔换padding，方便 “接线”
+    .ab-nodes-content {
+      padding-right: 1.2em;
+    }
+    .ab-nodes-children {
+      .ab-nodes-node {
+        gap: 0;
       }
     }
   }
