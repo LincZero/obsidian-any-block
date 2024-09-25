@@ -431,6 +431,7 @@ html[data-theme="dark"] #app {
       color: var(--ab-bright-color);
 
       position: relative;
+      overflow: visible;
       &::after {
         position: absolute;
         top: 1em;

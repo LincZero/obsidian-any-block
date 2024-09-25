@@ -420,6 +420,7 @@ html[data-theme="dark"] #app {
   padding-right: 20px;
   color: var(--ab-bright-color);
   position: relative;
+  overflow: visible;
 }
 
 .ab-note table.ab-table-timeline td[col_index="0"]::after {
