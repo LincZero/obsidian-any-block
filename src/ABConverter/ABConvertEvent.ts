@@ -37,11 +37,14 @@ export function abConvertEvent(d: Element|Document) {
       const el_child_last = els_child[els_child.length - 1] as HTMLElement;
       const el_child_first_content = el_child_first.querySelector(".ab-nodes-content") as HTMLElement
 
-      // 修改伪类
-      // 以前这里只判断childNodes.length，但后来发现哪怕后面只有一个，但这一个后面可能又接不止一个。所以要动态多算下高度
+      // 参数准备
+      // 有两种情况，如果height非零则高度等于 (height) (通常1-1结构会是这种情况)，若无则高度等于 (100%-heightToReduce)
+      let height = 0;
       const heightToReduce = (el_child_first.offsetHeight + el_child_last.offsetHeight) / 2;
+
+      // 修改伪类
       if (els_child.length == 3) { // 结构：1-1
-        const height = (el_child_first_content.offsetHeight-20) > 20 ? (el_child_first_content.offsetHeight-20) : 20
+        height = (el_child_first_content.offsetHeight-20) > 20 ? (el_child_first_content.offsetHeight-20) : 20
         el_bracket2.style.cssText = `
           height: ${height}px;
           top: calc(50% - ${(height)/2}px);
@@ -55,37 +58,24 @@ export function abConvertEvent(d: Element|Document) {
 
       // 修改伪类 - min样式版 (注意：不要因为用cssText覆盖而把样式给漏了)
       if (Array.prototype.includes.call(els_min, children)) {
-        if (els_child.length == 3) { // 结构：1-1
-          if (el_content.offsetHeight == el_child_first_content.offsetHeight) { // 结构：1-1，且高度相同，则用横线代替括号
-            el_bracket2.style.cssText = `
-              height: 1px;
-              top: calc(50% + ${el_content.offsetHeight/2}px - 1px);
-              width: 38px; /* 可以溢出点 */
-              left: -20px;
-              border-radius: 0;
-              border: none;
-              border-bottom: 1px solid var(--node-color);
-            `
-            el_bracket.style.cssText = `
-              top: calc(50% + ${el_content.offsetHeight/2}px - 3px);
-              clip-path: circle(40% at 50% 40%);
-            `
-          } else { // 结构：1-1，且高度不同
-            // el_bracket2.style.cssText 保持不变
-            // 这个同下
-            el_bracket.style.cssText = `
-              height: 1px;
-              top: calc(50% + ${el_content.offsetHeight/2}px - 1px);
-              width: 18px; /* 可以溢出点 */
-              left: -20px;
-              border-bottom: 1px solid var(--node-color);
-              clip-path: none;
-            `
-          }
+        if (els_child.length == 3 && el_content.offsetHeight == el_child_first_content.offsetHeight) { // 结构：1-1且高度相同，则用横线代替括号
+          el_bracket2.style.cssText = `
+            height: 1px;
+            top: calc(50% + ${el_content.offsetHeight/2}px - 1px);
+            width: 38px; /* 可以溢出点 */
+            left: -20px;
+            border-radius: 0;
+            border: none;
+            border-bottom: 1px solid var(--node-color);
+          `
+          el_bracket.style.cssText = `
+            top: calc(50% + ${el_content.offsetHeight/2}px - 3px);
+            clip-path: circle(40% at 50% 40%);
+          `
         }
-        else { // 结构：1-n
+        else { // 否则在原有基础上微调即可
           // el_bracket2.style.setProperty("border-radius", "2px 0 0 2px")
-          el_bracket2.style.setProperty("height", `calc(100% - ${heightToReduce}px + 10px)`);
+          if (height==0) el_bracket2.style.setProperty("height", `calc(100% - ${heightToReduce}px + 10px)`);
           el_bracket.style.cssText = `
             height: 1px;
             top: calc(50% + ${el_content.offsetHeight/2}px - 1px);
@@ -95,7 +85,8 @@ export function abConvertEvent(d: Element|Document) {
             clip-path: none;
           `
         }
-        // 存在问题：用canvas的思路应该是不对的，应该参考mehrmaid用svg，还能包裹div
+
+        // 下面的内容弃用。存在问题：用canvas的思路应该是不对的，应该参考mehrmaid用svg，还能包裹div
         /*else {
           el_bracket2.style.setProperty("height", `100%`);
           el_bracket2.style.setProperty("top", `0`);
