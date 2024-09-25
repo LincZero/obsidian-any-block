@@ -717,6 +717,10 @@ html[data-theme="dark"] #app {
     }
     // 圆弧节点组，最右测必是
     .ab-nodes-children {
+      &[has_children="false"] {
+        display: none;
+      }
+
       display: flex;
       flex-direction: column;
       // align-items
@@ -732,7 +736,7 @@ html[data-theme="dark"] #app {
         width: 8px;
         height: 8px;
         top: calc(50% - 4px);
-        left: calc(-8px + 1px); // 重合一个px避免出现黑线
+        left: calc(-8px + 2px); // 重合一个px避免出现黑线
         clip-path: polygon(100% 0, 100% 100%, 13.40% 50%); // 裁剪成等边三角形
         background-color: currentColor;
       }
@@ -779,10 +783,10 @@ html[data-theme="dark"] #app {
       }
 
       .ab-nodes-bracket {
-        width: 6px;
+        display: none;
         width: 6px;
         top: calc(50% - 4px);
-        left: calc(-8px - 0px + 1px)
+        left: calc(-8px + 2px)
       }
     }
 

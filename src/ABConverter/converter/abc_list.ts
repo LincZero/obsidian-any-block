@@ -497,9 +497,9 @@ export class ListProcess{
       const el_node = document.createElement("div"); el_node.classList.add("ab-nodes-node")
       const el_node_content = document.createElement("div"); el_node.appendChild(el_node_content); el_node_content.classList.add("ab-nodes-content")
       ABConvertManager.getInstance().m_renderMarkdownFn(item.content, el_node_content)
-      const el_node_children = document.createElement("div"); el_node.appendChild(el_node_children); el_node_children.classList.add("ab-nodes-children")
-      const el_node_barcket = document.createElement("div"); el_node_children.appendChild(el_node_barcket); el_node_barcket.classList.add("ab-nodes-bracket"); el_node_barcket.style.setProperty("display", "none")
-      const el_node_barcket2 = document.createElement("div"); el_node_children.appendChild(el_node_barcket2); el_node_barcket2.classList.add("ab-nodes-bracket2"); el_node_barcket2.style.setProperty("display", "none")
+      const el_node_children = document.createElement("div"); el_node.appendChild(el_node_children); el_node_children.classList.add("ab-nodes-children"); el_node_children.setAttribute("has_children", "false"); // 为false则不应该显示
+      const el_node_barcket = document.createElement("div"); el_node_children.appendChild(el_node_barcket); el_node_barcket.classList.add("ab-nodes-bracket");
+      const el_node_barcket2 = document.createElement("div"); el_node_children.appendChild(el_node_barcket2); el_node_barcket2.classList.add("ab-nodes-bracket2");
       cache_els[item.level] = el_node_children
       
       // 将节点放入合适的位置
@@ -507,8 +507,7 @@ export class ListProcess{
         el_root2.appendChild(el_node)
       } else if (item.level >= 1 && cache_els.hasOwnProperty(item.level-1)) {
         cache_els[item.level-1].appendChild(el_node)
-        ;(cache_els[item.level-1].childNodes[0] as HTMLElement)?.style?.setProperty("display", "block")
-        ;(cache_els[item.level-1].childNodes[1] as HTMLElement)?.style?.setProperty("display", "block")
+        cache_els[item.level-1].setAttribute("has_children", "true") // 要隐藏最后面括弧
       }
       else {
         console.error("节点错误")

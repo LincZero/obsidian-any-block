@@ -710,13 +710,17 @@ html[data-theme="dark"] #app {
   position: relative;
 }
 
+.ab-note .ab-nodes .ab-nodes-children[has_children="false"] {
+  display: none;
+}
+
 .ab-note .ab-nodes .ab-nodes-children .ab-nodes-bracket {
   content: "";
   position: absolute;
   width: 8px;
   height: 8px;
   top: calc(50% - 4px);
-  left: calc(-8px + 1px);
+  left: calc(-8px + 2px);
   clip-path: polygon(100% 0, 100% 100%, 13.4% 50%);
   background-color: currentColor;
 }
@@ -764,10 +768,10 @@ html[data-theme="dark"] #app {
 }
 
 .ab-note .ab-nodes.min .ab-nodes-children .ab-nodes-bracket {
-  width: 6px;
+  display: none;
   width: 6px;
   top: calc(50% - 4px);
-  left: calc(-8px - 0px + 1px);
+  left: calc(-8px + 2px);
 }
 
 .ab-note .ab-nodes.min .ab-nodes-content {

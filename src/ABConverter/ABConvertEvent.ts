@@ -61,18 +61,21 @@ export function abConvertEvent(d: Element|Document) {
       if (Array.prototype.includes.call(els_min, children)) {
         if (els_child.length == 3) { // 结构：1-1，有圆点
           el_bracket.style.cssText = `
+            display: block;
             top: calc(50% + ${el_content.offsetHeight/2}px - 3px);
             clip-path: circle(40% at 50% 40%);
           `
         } else { // 结构：1-n，无圆点，是延长线
-          el_bracket.style.cssText = `
-            height: 1px;
-            top: calc(50% + ${el_content.offsetHeight/2}px - 1px);
-            width: 18px; /* 可以溢出点 */
-            left: -20px;
-            border-bottom: 1px solid var(--node-color);
-            clip-path: none;
-          `
+          el_bracket.setAttribute("display", "none")
+          // el_bracket.style.cssText = `
+          //   display: block;
+          //   height: 1px;
+          //   top: calc(50% + ${el_content.offsetHeight/2}px - 1px);
+          //   width: 18px; /* 可以溢出点 */
+          //   left: -20px;
+          //   border-bottom: 1px solid var(--node-color);
+          //   clip-path: none;
+          // `
         }
 
         if (els_child.length == 3 && el_content.offsetHeight == el_child_first_content.offsetHeight) { // 结构：1-1且高度相同，则用横线代替括号
