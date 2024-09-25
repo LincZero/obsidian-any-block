@@ -858,6 +858,6 @@ div.md-table-fig1{
 /**************** 兼容性补充 ******************/
 
 // BT主题在阅读模式下会干扰表格高度 (不确定有无其他误影响)
-:is(.markdown-preview-view,.markdown-rendered).is-readable-line-width:not(.matrix) :is(.markdown-rendered) {
+.ab-note :is(.markdown-preview-view,.markdown-rendered).is-readable-line-width:not(.matrix) :is(.markdown-rendered) {
   width: auto;
 }

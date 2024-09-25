@@ -958,6 +958,6 @@ div.md-table-fig1 table.ab-setting.md-table-fig2 {
 }
 
 /**************** 兼容性补充 ******************/
-:is(.markdown-preview-view, .markdown-rendered).is-readable-line-width:not(.matrix) :is(.markdown-rendered) {
+.ab-note :is(.markdown-preview-view, .markdown-rendered).is-readable-line-width:not(.matrix) :is(.markdown-rendered) {
   width: auto;
 }
