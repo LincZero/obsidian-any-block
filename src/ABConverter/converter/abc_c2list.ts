@@ -413,7 +413,7 @@ const abc_c2listdata2items = ABConvert.factory({
   id: "c2listdata2items",
   name: "c2listdata转容器结构",
   match: "c2listdata2items",
-  default: "c2listdata转容器结构",
+  default: "c2listdata2items",
   process_param: ABConvert_IOEnum.c2list_strem,
   process_return: ABConvert_IOEnum.el,
   process: (el, header, content: List_C2ListItem): HTMLElement=>{
