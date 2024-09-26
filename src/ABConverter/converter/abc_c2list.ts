@@ -188,8 +188,11 @@ export class C2ListProcess{
    * @detail
    * 为什么要直接转，而不能list2data|data2c2data来复用
    * 因为会损失信息
+   * 
+   * @param text 列表的md文本
+   * @param modeG 识别内换行符号。内换行符被替换为换行+前缀，比listdata的处理简单些，后面不需要再提高level // TODO 这部分逻辑应该抽离出来做成独立的处理器
    */
-  static list2c2data(text: string){
+  static list2c2data(text: string, modeG=true){
     let list_itemInfo:List_C2ListItem = []
     const list_text = text.trimStart().split("\n")
 
@@ -208,8 +211,19 @@ export class C2ListProcess{
       const match_list = line.match(ABReg.reg_list_noprefix)
       if (match_list && !match_list[1] && match_list[1].length<=root_list_level){ // 遇到同等标题
         add_current_content()
+        let content = match_list[4]
+        // 替换掉内换行符
+        if (modeG) {
+          const inlines = match_list[4].split(ABReg.inline_split)
+          if (inlines.length > 1) {
+            const second_part = content.indexOf(inlines[1])
+            current_content += content.slice(second_part) + "\n"
+            content = inlines[0]
+          }
+        }
+        // 新项
         list_itemInfo.push({
-          content: match_list[4],
+          content: content,
           level: 0
         })
       } else { // 子内容
