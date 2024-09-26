@@ -272,7 +272,7 @@ export class ListProcess{
     let list_itemInfo:List_ListItem = []
 
     const list_text = text.split("\n")
-    let mul_mode:"title"|"para"|"list"|"" = ""                // 多行模式，标题/正文/列表/空
+    let mul_mode:"heading"|"para"|"list"|"" = ""                // 多行模式，标题/正文/列表/空
     for (let line of list_text) {
       const match_heading = line.match(ABReg.reg_heading_noprefix)
       const match_list = line.match(ABReg.reg_list_noprefix)
@@ -282,7 +282,7 @@ export class ListProcess{
           content: match_heading[4],
           level: (match_heading[3].length-1)-10
         })
-        mul_mode = "title"
+        mul_mode = "heading"
       }
       else if (match_list){                                   // 2. 列表层级 ~~（只识别根处）~~
         removeTailBlank()

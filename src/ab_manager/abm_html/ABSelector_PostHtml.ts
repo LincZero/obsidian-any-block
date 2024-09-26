@@ -225,7 +225,7 @@ function findABBlock_cross(targetEl: HTMLElement, ctx: MarkdownPostProcessorCont
         const replaceEl = selected_els.pop()!; if (replaceEl) {ctx.addChild(new ABReplacer_Render(replaceEl, selected_mdSrc.header, selected_mdSrc.content.split("\n").slice(2,).join("\n"), selected_mdSrc.type)); for (const el of selected_els) {el.hide()}; selected_mdSrc = null; selected_els = []; } // 将selected缓存输出渲染
       }
       // b12. 找到startFlag，后面找endFlag
-      else if (current_mdSrc.type == "heading" || current_mdSrc.type == "mdit_head") {
+      else if (current_mdSrc.type == "heading" || current_mdSrc.type == "mdit") {
         selected_els.push(targetEl); selected_mdSrc.to_line = current_mdSrc.to_line; selected_mdSrc.content += "\n\n" + current_mdSrc.content; // 追加到selected缓存
         selected_mdSrc.seFlag = current_mdSrc.seFlag
       }
@@ -236,7 +236,7 @@ function findABBlock_cross(targetEl: HTMLElement, ctx: MarkdownPostProcessorCont
     }
     // b2. 有startFlag，寻找endFlag
     else {
-      if ((current_mdSrc.type == "mdit_tail" || current_mdSrc.type == "mdit_head") && selected_mdSrc!.seFlag.length == current_mdSrc.seFlag.length) {
+      if ((current_mdSrc.type == "mdit_tail" || current_mdSrc.type == "mdit") && selected_mdSrc!.seFlag.length == current_mdSrc.seFlag.length) {
         selected_els.push(targetEl); selected_mdSrc.to_line = current_mdSrc.to_line; selected_mdSrc.content += "\n\n" + current_mdSrc.content; // 追加到selected缓存
         const replaceEl = selected_els.pop()!; if (replaceEl) {ctx.addChild(new ABReplacer_Render(replaceEl, selected_mdSrc.header, selected_mdSrc.content.split("\n").slice(2, -1).join("\n"), selected_mdSrc.type)); for (const el of selected_els) {el.hide()}; selected_mdSrc = null; selected_els = []; } // 将selected缓存输出渲染 (注意减了末尾的:::)
       }
@@ -256,7 +256,7 @@ function findABBlock_cross(targetEl: HTMLElement, ctx: MarkdownPostProcessorCont
   // c2. 不在AB块内。则判断本次是否开始AB块 (注意结束和开始可以同时进行)
   if (!selected_mdSrc || !selected_mdSrc.header) {
     // b1. 现在开始
-    if (current_mdSrc.type == "header" || current_mdSrc.type == "mdit_head") {
+    if (current_mdSrc.type == "header" || current_mdSrc.type == "mdit") {
       selected_mdSrc = current_mdSrc; selected_els = [targetEl];
     }
     // b2. 还没开始
@@ -281,7 +281,7 @@ interface HTMLSelectorRangeSpec {
   content_all: string,// 全文信息
 
   // 选择器部分
-  type: string,       // 类型。6个el基本类型的基础上，paragraph多派生出 "header"/"mdit_head"/"mdit_tail" 三个新类型
+  type: string,       // 类型。6个el基本类型的基础上，paragraph多派生出 "header"/"mdit"/"mdit_tail" 3个新类型，共9种类型。而其中只有6种类型属于选择器种类
   header: string,     // 头部信息
   seFlag: string,     // 开始/结束标志 - 可变
                       //     对于nowMdSrc来说，这是当前标志，对于selectedMdSrc来说，这是结束标志
@@ -330,7 +330,7 @@ function getSourceMarkdown(
       prefix: "",
     }
 
-    // 找类型、找前缀
+    // 找类型、找前缀 (见range.type的定义，一共6个基本类型上，多了3个新类型，共9种类型。而其中只有6种类型属于选择器种类)
     if (sectionEl instanceof HTMLUListElement) {
       range.type = "list"
       const match = list_content[0].match(ABReg.reg_list)
@@ -371,7 +371,7 @@ function getSourceMarkdown(
         range.prefix = match_header[1]
         range.header = match_header[5]
       } else if (match_mdit_head) {
-        range.type = "mdit_head"
+        range.type = "mdit"
         range.prefix = match_mdit_head[1]
         range.seFlag = match_mdit_head[3]
         range.header = match_mdit_head[4]

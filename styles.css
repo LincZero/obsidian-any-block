@@ -772,6 +772,7 @@ html[data-theme="dark"] #app {
 .ab-note .ab-nodes.min .ab-nodes-children .ab-nodes-bracket {
   display: none;
   width: 6px;
+  height: 6px;
   top: calc(50% - 4px);
   left: calc(-8px + 2px);
 }

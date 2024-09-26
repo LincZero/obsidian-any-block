@@ -93,12 +93,12 @@ function easySelector_headtail(
  * 首尾选择器
  */
 const mdSelector_headtail:MdSelectorSpecSimp = {
-  id: "headtail",
-  name: "头尾选择器",
+  id: "mdit",
+  name: "mdit:::头尾选择器",
   detail: "以`:::`开头和结尾，处理器名写在第一个`:::`的后面，不需要加`[]`。其实就和代码块差不多，这也是VuePress的一个md扩展语法",
   match: ABReg.reg_mdit_head,
   selector: (list_text, from_line)=>{
-    let mdRangeTmp = easySelector_headtail(list_text, from_line, "headtail", ABReg.reg_mdit_head)
+    let mdRangeTmp = easySelector_headtail(list_text, from_line, "mdit", ABReg.reg_mdit_head)
     if (!mdRangeTmp) return null
     const mdRange = mdRangeTmp
     // 开头找到了，现在开始找结束。不需要循环尾处理器

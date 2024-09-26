@@ -56,14 +56,14 @@ export function autoABAlias (header:string, selectorName:string, content:string)
   if (!header.trimStart().startsWith("|")) header = "|" + header
 
   // 2. 别名模块 - 标注选择类型
-  if (selectorName == "headtail") { // `:::`不在正文里，这个判断不到：if (ABReg.reg_mdit_head_noprefix.test(content.trimStart()))
+  if (selectorName == "mdit") { // `:::`不在正文里，这个判断不到：if (ABReg.reg_mdit_head_noprefix.test(content.trimStart()))
     header = "|::: 140lne" + header.trimStart()
   }
   else if (selectorName == "list" || ABReg.reg_list_noprefix.test(content.trimStart())) {
     header = "|list 140lne" + header
   }
-  else if (selectorName == "title" || ABReg.reg_heading_noprefix.test(content.trimStart())) {
-    header = "|title 140lne" + header
+  else if (selectorName == "heading" || ABReg.reg_heading_noprefix.test(content.trimStart())) {
+    header = "|heading 140lne" + header
   }
   else if (selectorName == "code" || ABReg.reg_code_noprefix.test(content.trimStart())) {
     header = "|code 140lne" + header
@@ -109,26 +109,26 @@ const ABAlias_json_title: ABAlias_json_item[] = [
   {regex: "|title2list|", replacement: "|title2listdata|listdata2strict|listdata2list|"},
 
   // title - list&title
-  {regex: /\|title 140lne\|2?(timeline|时间线)\|/, replacement: "|title2timeline|"},
-  {regex: /\|title 140lne\|2?(tabs?|标签页?)\||\|title2tabs?\|/, replacement: "|title2c2listdata|c2listdata2tab|"},
-  {regex: /\|title 140lne\|2?(col|分栏)\||\|title2col\|/, replacement: "|title2c2listdata|c2listdata2items|addClass(ab-col)|"},
-  {regex: /\|title 140lne\|2?(card|卡片)\||\|title2card\|/, replacement: "|title2c2listdata|c2listdata2items|addClass(ab-card)|"},
-  {regex: /\|title 140lne\|2?(nodes?|节点)\||\|(title2node|title2abMindmap)\|/, replacement: "|title2listdata|listdata2strict|listdata2nodes|"},
+  {regex: /\|heading 140lne\|2?(timeline|时间线)\|/, replacement: "|title2timeline|"},
+  {regex: /\|heading 140lne\|2?(tabs?|标签页?)\||\|title2tabs?\|/, replacement: "|title2c2listdata|c2listdata2tab|"},
+  {regex: /\|heading 140lne\|2?(col|分栏)\||\|title2col\|/, replacement: "|title2c2listdata|c2listdata2items|addClass(ab-col)|"},
+  {regex: /\|heading 140lne\|2?(card|卡片)\||\|title2card\|/, replacement: "|title2c2listdata|c2listdata2items|addClass(ab-card)|"},
+  {regex: /\|heading 140lne\|2?(nodes?|节点)\||\|(title2node|title2abMindmap)\|/, replacement: "|title2listdata|listdata2strict|listdata2nodes|"},
 
   // list  - 多叉多层树
-  {regex: /\|title 140lne\|2?(flow|流程图)\|/, replacement: "|title2list" + "|list2mermaid|"},
-  {regex: /\|title 140lne\|2?(puml)?(mindmap|脑图|思维导图)\|/, replacement: "|title2list" + "|list2pumlMindmap|"},
-  {regex: /\|title 140lne\|2?(markmap|mdMindmap|md脑图|md思维导图)\|/, replacement: "|title2list" + "|list2markmap|"},
-  {regex: /\|title 140lne\|2?(wbs|(工作)?分解(图|结构))\|/, replacement: "|title2list" + "|list2pumlWBS|"},
-  {regex: /\|title 140lne\|2?(table|multiWayTable|multiCrossTable|表格?|多叉表格?|跨行表格?)\|/, replacement: "|title2list" + "|list2table|"},
+  {regex: /\|heading 140lne\|2?(flow|流程图)\|/, replacement: "|title2list" + "|list2mermaid|"},
+  {regex: /\|heading 140lne\|2?(puml)?(mindmap|脑图|思维导图)\|/, replacement: "|title2list" + "|list2pumlMindmap|"},
+  {regex: /\|heading 140lne\|2?(markmap|mdMindmap|md脑图|md思维导图)\|/, replacement: "|title2list" + "|list2markmap|"},
+  {regex: /\|heading 140lne\|2?(wbs|(工作)?分解(图|结构))\|/, replacement: "|title2list" + "|list2pumlWBS|"},
+  {regex: /\|heading 140lne\|2?(table|multiWayTable|multiCrossTable|表格?|多叉表格?|跨行表格?)\|/, replacement: "|title2list" + "|list2table|"},
 
   // list - lt树 (属于多层一叉树)
-  {regex: /\|title 140lne\|2?(lt|listTable|treeTable|listGrid|treeGrid|列表格|树形表格?)\|/, replacement: "|title2list" + "|list2lt|"},
-  {regex: /\|title 140lne\|2?(list|列表)\|/, replacement: "|title2list" + "|list2lt|addClass(ab-listtable-likelist)|"},
-  {regex: /\|title 140lne\|2?(dir|dirTree|目录树?|目录结构)\|/, replacement: "|title2list" + "|list2dt|"},
+  {regex: /\|heading 140lne\|2?(lt|listTable|treeTable|listGrid|treeGrid|列表格|树形表格?)\|/, replacement: "|title2list" + "|list2lt|"},
+  {regex: /\|heading 140lne\|2?(list|列表)\|/, replacement: "|title2list" + "|list2lt|addClass(ab-listtable-likelist)|"},
+  {regex: /\|heading 140lne\|2?(dir|dirTree|目录树?|目录结构)\|/, replacement: "|title2list" + "|list2dt|"},
 
   // list - 二层树
-  {regex: /\|title 140lne\|(fakeList|仿列表)\|/, replacement: "|title2list" + "|list2table|addClass(ab-table-fc)|addClass(ab-table-likelist)|"},
+  {regex: /\|heading 140lne\|(fakeList|仿列表)\|/, replacement: "|title2list" + "|list2table|addClass(ab-table-fc)|addClass(ab-table-likelist)|"},
 ]
 
 // 列表块
@@ -231,7 +231,7 @@ export let ABAlias_json: ABAlias_json_item[] = [
 
 const ABAlias_json_end: ABAlias_json_item[] = [
   {regex: "|::: 140lne", replacement: ""},
-  {regex: "|title 140lne", replacement: ""},
+  {regex: "|heading 140lne", replacement: ""},
   {regex: "|list 140lne", replacement: ""},
   {regex: "|code 140lne", replacement: ""},
   {regex: "|qutoe 140lne", replacement: ""},

@@ -87,8 +87,8 @@ export function autoMdSelector(
         /*
         // 而且这里应该用selecotr.id吧
         if (sim.selector=="list") if (sim.header.indexOf("2")==0) sim.header="list"+sim.header
-        if (sim.selector=="title") {
-          if (sim.header.indexOf("2")==0) sim.header="title"+sim.header
+        if (sim.selector=="heading") {
+          if (sim.header.indexOf("2")==0) sim.header="heading"+sim.header
           else if(sim.header.indexOf("list")==0) sim.header="title2list|"+sim.header
         }*/
         // 行改ch
