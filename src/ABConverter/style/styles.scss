@@ -17,6 +17,9 @@
 
   --ab-bright-color: orange;        // lightgoldenrodyellow、yellowgreen
   --pre-background-color: #1b1b1b;  // rgb(36,36,36)
+
+  --ab-table-border-width: 1px;
+  --ab-table-border-color: #363636;
 }
 // 获取一些Obsidian的默认颜色并覆盖默认颜色 (mdit不可用)
 .theme-dark,
@@ -27,6 +30,9 @@
 
   --ab-bright-color: var(--blockquote-border-color);
   --pre-background-color: var(--secondary-background);
+
+  --ab-table-border-width: var(--table-border-width);
+  --ab-table-border-color: var(--table-border-color);
 }
 // 获取VuePress的默认颜色并覆盖默认颜色
 html[data-theme="light"] #app,
@@ -210,7 +216,7 @@ html[data-theme="dark"] #app {
     border-collapse:collapse;
     td,th{
       padding: 2px 5px;
-      border: solid #363636 1px;
+      border: solid var(--ab-table-border-width) var(--ab-table-border-color);
     }
 
     // 取消自带的隔行表格着色
@@ -306,7 +312,7 @@ html[data-theme="dark"] #app {
           top: 5px;
           left: 2px;
           border: 6px solid transparent;
-          border-left-color: #d9d9d9;
+          border-left-color: currentColor;
           cursor: pointer;
         }
       }
@@ -315,7 +321,7 @@ html[data-theme="dark"] #app {
           top: 9px;
           left: -1px;
           border: 6px solid transparent;
-          border-top-color: #d9d9d9;
+          border-top-color: currentColor;
           cursor: pointer;
         }
       }
