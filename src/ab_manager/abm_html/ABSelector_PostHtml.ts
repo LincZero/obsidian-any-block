@@ -43,7 +43,10 @@ export class ABSelector_PostHtml{
 
       // callout的情况下要简化el
       const calloutEl = el.querySelector(":scope>div>div.callout-content")
-      if (calloutEl) el = calloutEl as HTMLElement
+      if (calloutEl) {
+        el = calloutEl as HTMLElement
+        el.classList.add("ab-note")
+      }
 
       findABBlock_recurve(el)
       return
