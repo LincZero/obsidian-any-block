@@ -328,8 +328,8 @@ export class C2ListProcess{
         }
       }
       // 元素全部创建完再来绑按钮事件，不然有可能有问题
-      const lis:NodeListOf<HTMLButtonElement> = tab.querySelectorAll(".ab-tab-nav-item")
-      const contents = tab.querySelectorAll(".ab-tab-content-item")
+      const lis:NodeListOf<HTMLButtonElement> = tab.querySelectorAll(":scope>.ab-tab-nav>.ab-tab-nav-item")
+      const contents = tab.querySelectorAll(":scope>.ab-tab-content>.ab-tab-content-item")
       if (lis.length!=contents.length) console.warn("ab-tab-nav-item和ab-tab-content-item的数量不一致")
       for (let i=0; i<lis.length; i++){
         // 1. 二选一，常规绑定
@@ -351,9 +351,9 @@ export class C2ListProcess{
         //   const tab_current = this
         //   const tab_nav = this.parentNode
         //   const tab_root = tab_nav.parentNode
-        //   const tab_content = tab_root.querySelector(".ab-tab-content")
-        //   const tab_nav_items = tab_nav.querySelectorAll(".ab-tab-nav-item")
-        //   const tab_content_items = tab_content.querySelectorAll(".ab-tab-content-item")
+        //   const tab_content = tab_root.querySelector(":scope>.ab-tab-content")
+        //   const tab_nav_items = tab_nav.querySelectorAll(":scope>.ab-tab-nav-item")
+        //   const tab_content_items = tab_content.querySelectorAll(":scope>.ab-tab-content-item")
         //   for (let j=0; j<tab_content_items.length; j++){
         //     tab_nav_items[j].setAttribute("is_activate", "false")
         //     tab_content_items[j].setAttribute("is_activate", "false")
