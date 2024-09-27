@@ -209,7 +209,7 @@ export class C2ListProcess{
     let current_content_prefix:string = "" // level1的子内容的前缀
     for (let line of list_text) {
       const match_list = line.match(ABReg.reg_list_noprefix)
-      if (match_list && !match_list[1] && match_list[1].length<=root_list_level){ // 遇到同等标题
+      if (match_list && !match_list[1] && match_list[1].length<=root_list_level){ // b1. 遇到同等标题，level0新项出现
         add_current_content()
         let content = match_list[4]
         // 替换掉内换行符
@@ -218,6 +218,7 @@ export class C2ListProcess{
           if (inlines.length > 1) {
             const second_part = content.indexOf(inlines[1])
             current_content += content.slice(second_part) + "\n"
+            current_content_prefix = "  " // 内换行前缀必是双空格
             content = inlines[0]
           }
         }
@@ -226,7 +227,7 @@ export class C2ListProcess{
           content: content,
           level: 0
         })
-      } else { // 子内容
+      } else { // b2. 子内容
         if (current_content.trim()=="") { // 第一行的子内容前缀提取
           if (match_list && match_list[1]) current_content_prefix = match_list[1]
           else current_content_prefix = ""
