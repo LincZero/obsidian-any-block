@@ -39,7 +39,12 @@ export class ABSelector_PostHtml{
     // b1. RenderMarkdown引起的调用（需要嵌套寻找）
     if (!mdSrc) {
       if (false && this.settings.is_debug) console.log(" -- ABPosthtmlManager.processor, called by 'ReRender'");
-      if (!el.classList.contains("markdown-rendered")) return
+      if (!el.classList.contains("markdown-rendered")) return // anyblock / 一些插件 / callout 都会触发 (但callout的阅读模式不触发)
+
+      // callout的情况下要简化el
+      const calloutEl = el.querySelector(":scope>div>div.callout-content")
+      if (calloutEl) el = calloutEl as HTMLElement
+
       findABBlock_recurve(el)
       return
     }
@@ -110,6 +115,10 @@ export class ABSelector_PostHtml{
  * called by 'ReRender'，每次被重渲染时从外部进入一次
  * 特点
  *  1. 递归调用
+ * 
+ * @param targetEl 这里的el要符合规则：
+ *   子元素包含 (p|ul|ol|pre|table)[]
+ *   如果是callout这种，则应该要提取到callout-content级别，以满足以上规则
  */
 function findABBlock_recurve(targetEl: HTMLElement){
   /** @fail 原来的想法无法成立……这里本来打算用来递归寻找嵌套的ab块的，
@@ -206,6 +215,8 @@ let selected_mdSrc: HTMLSelectorRangeSpec|null = null;  // 已经选中的范围
  * - 中间：追加到selected缓存中
  * - 结尾：将selected缓存渲染、清空
  * - 取消：将selected缓存清空
+ * 
+ * TODO 阅读模式没有嵌套判断，在 quote/callout/list 内的 AnyBlock 不被识别
  */
 function findABBlock_cross(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext, is_last:boolean = false){
   // 寻找AB块
