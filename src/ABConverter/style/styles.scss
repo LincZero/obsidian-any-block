@@ -83,6 +83,10 @@ html[data-theme="dark"] #app {
   // 源码模式
   .markdown-source-view.is-live-preview {}
 }
+// 打印模式
+.print .ab-button {
+  display: none;
+}
 
 /**
  * 替换内容

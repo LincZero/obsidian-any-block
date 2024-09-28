@@ -71,6 +71,10 @@ html[data-theme="dark"] #app {
   margin-bottom: -18px;
 }
 
+.print .ab-button {
+  display: none;
+}
+
 /**
  * 替换内容
  * .ab-replace
