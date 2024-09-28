@@ -42,7 +42,7 @@ export class ABReplacer_CodeBlock{
     }
     else { // b2. 非法内容，普通渲染处理 (还是说代码渲染会更好?)
       // @ts-ignore 新接口，但旧接口似乎不支持
-      MarkdownRenderer.render(app, src, root_div, "", new MarkdownRenderChild(root_div));
+      MarkdownRenderer.render(app, src, dom_replaceEl, "", new MarkdownRenderChild(dom_replaceEl));
     }
 
     // 编辑按钮部分
