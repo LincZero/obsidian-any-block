@@ -79,7 +79,7 @@ export class ABReplacer_Render extends MarkdownRenderChild {
       dom_replaceEl = new_dom_replaceEl
     }
 
-    // 下拉框隐藏
+    // 控件部分的隐藏
     const button_show = ()=>{dom_edit.show()}
     const button_hide  = ()=>{dom_edit.hide()}
     dom_edit.hide()

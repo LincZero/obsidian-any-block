@@ -65,11 +65,20 @@ html[data-theme="dark"] #app {
   --color-pink: #fa99cd;
 }
 
-// obsidian各模式下的微调
+/**
+ * obsidian各模式下的微调
+ * 
+ * 替换内容
+ * .ab-replace
+ *   &>.ab-note
+ *     &>.ab-replaceEl
+ *   &>.ab-button
+ */
 .app-container {
   // 阅读模式
   .markdown-reading-view {
     .ab-replace{
+      margin-top: 0;
       margin-bottom: 22px;
     }
   }
@@ -79,32 +88,39 @@ html[data-theme="dark"] #app {
       margin-top: -18px; // 消除CM自带的间隙
       margin-bottom: -18px;
     }
+    .block-language-anyblock>.ab-replace {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
   }
   // 源码模式
   .markdown-source-view.is-live-preview {}
 }
 // 打印模式
-.print .ab-button {
-  display: none;
+.print{
+  .ab-replace>.ab-button {
+    display: none;
+  }
 }
 
 /**
  * 替换内容
  * .ab-replace
- *   .ab-note
- *   .ab-button
+ *   &>.ab-note
+ *     &>.ab-replaceEl
+ *   &>.ab-button
  */
 .ab-replace{
   /*background-color: #272e3a;*/
   position: relative;
   border-radius: 4px;
 
-  .ab-note{
+  &>.ab-note{
     position: relative;
     /*padding: 24px 12px 12px 12px;*/
   }
 
-  .ab-button{
+  &>.ab-button{
     box-sizing: border-box;
     position: absolute;
     right: 4px;

@@ -52,6 +52,9 @@ export class ABReplacer_Widget extends WidgetType {
       dom_edit.onclick = ()=>{abConvertEvent(this.div); this.moveCursor(-1)}
     }
 
+    // 控件部分的隐藏
+    // 不需要，.edit-block-button 自带非悬浮隐藏的特性
+
     return this.div;
   }
 
