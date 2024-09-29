@@ -1,5 +1,7 @@
 import { MarkdownRenderChild } from "obsidian";
 import { ABConvertManager } from "../../ABConverter/ABConvertManager"
+import { ABReplacer_Widget } from "../abm_cm/ABReplacer_Widget";
+import { abConvertEvent } from "src/ABConverter/ABConvertEvent";
 
 export class ABReplacer_Render extends MarkdownRenderChild {
   content: string;
@@ -43,9 +45,17 @@ export class ABReplacer_Render extends MarkdownRenderChild {
     ABConvertManager.autoABConvert(dom_replaceEl, this.header, this.content, this.selectorName)
     this.containerEl.replaceWith(div);
     
+    // 刷新按钮部分
+    let dom_edit2 = div.createEl("div", {
+      cls: ["ab-button", "ab-button-1", "edit-block-button"],
+      attr: {"aria-label": "Refresh the block"}
+    });
+    dom_edit2.innerHTML = ABReplacer_Widget.str_icon_refresh
+    dom_edit2.onclick = ()=>{abConvertEvent(div)}
+
     // 下拉框格式部分
     const dom_edit = div.createEl("select", {
-      cls: ["ab-button", "edit-block-button"], 
+      cls: ["ab-button", "ab-button-2", "edit-block-button"], 
       attr: {"aria-label": "Change the block - "+this.header}
     });
     const first_dom_option = dom_edit.createEl("option",{ // 这个需要在首选
@@ -80,13 +90,15 @@ export class ABReplacer_Render extends MarkdownRenderChild {
     }
 
     // 控件部分的隐藏
-    const button_show = ()=>{dom_edit.show()}
-    const button_hide  = ()=>{dom_edit.hide()}
-    dom_edit.hide()
+    const button_show = ()=>{dom_edit.show(); dom_edit2.show()}
+    const button_hide  = ()=>{dom_edit.hide(); dom_edit2.hide()}
+    button_hide()
     dom_note.onmouseover = button_show
     dom_note.onmouseout = button_hide
     dom_edit.onmouseover = button_show
     dom_edit.onmouseout = button_hide
+    dom_edit2.onmouseover = button_show
+    dom_edit2.onmouseout = button_hide
   }
 
   static str_icon_code2 = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-darkreader-inline-stroke="" style="--darkreader-inline-stroke:currentColor;"><path d="m18 16 4-4-4-4"></path><path d="m6 8-4 4 4 4"></path><path d="m14.5 4-5 16"></path></svg>`

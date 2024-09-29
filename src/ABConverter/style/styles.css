@@ -111,8 +111,19 @@ html[data-theme="dark"] #app {
 .ab-replace > .ab-button {
   box-sizing: border-box;
   position: absolute;
-  right: 4px;
   top: 4px;
+}
+
+.ab-replace > .ab-button.ab-button-1 {
+  right: 4px;
+}
+
+.ab-replace > .ab-button.ab-button-2 {
+  right: 40px;
+}
+
+.ab-replace > .ab-button.ab-button-3 {
+  right: 76px;
 }
 
 .ab-replace img.cm-widgetBuffer {

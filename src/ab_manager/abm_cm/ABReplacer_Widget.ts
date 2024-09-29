@@ -35,8 +35,8 @@ export class ABReplacer_Widget extends WidgetType {
     // 编辑按钮部分
     if (this.global_editor){
       let dom_edit = this.div.createEl("div", {
-        cls: ["ab-button", "edit-block-button"], // cm-embed-block和edit-block-button是自带的js样式，用来悬浮显示的，不是我写的
-        attr: {"aria-label": "Edit the block - "+this.rangeSpec.header}
+        cls: ["ab-button", "ab-button-1", "edit-block-button"], // cm-embed-block和edit-block-button是自带的js样式，用来悬浮显示的，不是我写的
+        attr: {"aria-label": "Edit the block - "+this.rangeSpec.header},
       });
       dom_edit.innerHTML = ABReplacer_Widget.str_icon_code2
       dom_edit.onclick = ()=>{this.moveCursor()}
@@ -45,8 +45,8 @@ export class ABReplacer_Widget extends WidgetType {
     // 刷新按钮部分
     if (this.global_editor){
       let dom_edit = this.div.createEl("div", {
-        cls: ["ab-button", "edit-block-button"],
-        attr: {"aria-label": "Refresh the block", "style": "right: 40px"}
+        cls: ["ab-button", "ab-button-2", "edit-block-button"],
+        attr: {"aria-label": "Refresh the block"}
       });
       dom_edit.innerHTML = ABReplacer_Widget.str_icon_refresh
       dom_edit.onclick = ()=>{abConvertEvent(this.div); this.moveCursor(-1)}

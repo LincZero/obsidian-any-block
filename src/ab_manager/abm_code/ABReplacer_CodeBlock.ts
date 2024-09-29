@@ -50,8 +50,8 @@ export class ABReplacer_CodeBlock{
 
     // 刷新按钮部分
     let dom_edit = root_div.createEl("div", {
-      cls: ["ab-button", "edit-block-button"],
-      attr: {"aria-label": "Refresh the block", "style": "right: 40px"}
+      cls: ["ab-button", "ab-button-2", "edit-block-button"],
+      attr: {"aria-label": "Refresh the block"}
     });
     dom_edit.innerHTML = ABReplacer_Widget.str_icon_refresh
     dom_edit.onclick = ()=>{abConvertEvent(root_div);}
@@ -59,7 +59,7 @@ export class ABReplacer_CodeBlock{
     // 控件部分的隐藏
     const button_show = ()=>{dom_edit.show()}
     const button_hide  = ()=>{dom_edit.hide()}
-    dom_edit.hide()
+    button_hide()
     dom_note.onmouseover = button_show
     dom_note.onmouseout = button_hide
     dom_edit.onmouseover = button_show

@@ -123,8 +123,16 @@ html[data-theme="dark"] #app {
   &>.ab-button{
     box-sizing: border-box;
     position: absolute;
-    right: 4px;
     top: 4px;
+    &.ab-button-1 {
+      right: 4px;
+    }
+    &.ab-button-2 {
+      right: 40px;
+    }
+    &.ab-button-3 {
+      right: 76px;
+    }
   }
 
   img.cm-widgetBuffer{

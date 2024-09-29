@@ -66,10 +66,10 @@ html[data-theme="dark"] #app {
  * obsidian各模式下的微调
  * 
  * 替换内容
- * .ab-replace
- *   &>.ab-note
- *     &>.ab-replaceEl
- *   &>.ab-button
+ * .ab-replace         // 整体 (外框、圆角)
+ *   &>.ab-note        // 内容
+ *     &>.ab-replaceEl // 内容 (感觉冗余了)
+ *   &>.ab-button      // 操作控件 (刷新/编辑/下拉框)
  */
 .app-container .markdown-reading-view .ab-replace {
   margin-top: 0;
@@ -92,10 +92,10 @@ html[data-theme="dark"] #app {
 
 /**
  * 替换内容
- * .ab-replace
- *   &>.ab-note
- *     &>.ab-replaceEl
- *   &>.ab-button
+ * .ab-replace         // 整体 (外框、圆角)
+ *   &>.ab-note        // 内容
+ *     &>.ab-replaceEl // 内容 (感觉冗余了)
+ *   &>.ab-button      // 操作控件 (刷新/编辑/下拉框)
  */
 .ab-replace {
   /*background-color: #272e3a;*/
@@ -111,8 +111,19 @@ html[data-theme="dark"] #app {
 .ab-replace > .ab-button {
   box-sizing: border-box;
   position: absolute;
-  right: 4px;
   top: 4px;
+}
+
+.ab-replace > .ab-button.ab-button-1 {
+  right: 4px;
+}
+
+.ab-replace > .ab-button.ab-button-2 {
+  right: 40px;
+}
+
+.ab-replace > .ab-button.ab-button-3 {
+  right: 76px;
 }
 
 .ab-replace img.cm-widgetBuffer {
