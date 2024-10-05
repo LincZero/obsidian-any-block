@@ -46,7 +46,7 @@ export default class AnyBlockPlugin extends Plugin {
        * @public
        * 
        */
-      //MarkdownRenderer.renderMarkdown(markdown, el, "", new MarkdownRenderChild(el))
+      //MarkdownRenderer.renderMarkdown(markdown, el, app.workspace.activeLeaf?.view?.file.path, new MarkdownRenderChild(el))
 
       /**
        * Renders markdown string to an HTML element.
@@ -58,7 +58,7 @@ export default class AnyBlockPlugin extends Plugin {
        * @public
        */
       // @ts-ignore 新接口，但旧接口似乎不支持
-      MarkdownRenderer.render(app, markdown, el, "", new MarkdownRenderChild(el))
+      MarkdownRenderer.render(app, markdown, el, app.workspace.activeLeaf?.view?.file.path, new MarkdownRenderChild(el))
     })
 
     // 钩子组1 - 代码块
