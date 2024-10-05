@@ -13,7 +13,7 @@ import { MarkdownEditView } from "obsidian";
  * 一些AB块的后触发事件 - css加载完触发
  * 
  * @param d 这里有两种可能：
- *   - 一是局部刷新，d就是局部的div
+ *   - 一是局部刷新，d就是局部的div，此时d必须是 `.ab-replace`，且满足预设结构
  *   - 二是全局刷新，当页面加载完成后会自动调一次，d就是document
  */
 export function abConvertEvent(d: Element|Document) {
@@ -231,6 +231,27 @@ export function abConvertEvent(d: Element|Document) {
         el_svg.setAttribute("style", `height:${el_g.getBBox().height*scale_new+40}px`); // 重调容器大小
         // el_g.setAttribute("transform", `translate(20.0,80.0) scale(${scale_new})`) // 重调位置和缩放
         markmap_event(d) // 好像调位置有问题，只能重渲染了……
+      }
+    }
+  }
+
+  // 超宽div事件 - 全局 (仅obsidian)
+  if (d.querySelector('.app-container .workspace-leaf')) {
+    const els_view: NodeListOf<Element> = d.querySelectorAll(".app-container .workspace-leaf"); // 支持多窗口
+    for (const el_view of els_view) {
+      (el_view as HTMLElement).style.setProperty('--ab-width-outer', ((el_view as HTMLElement).offsetWidth - 40).toString() + "px"); // 40/2是边距 (必须大于滚动条)
+      console.log("el_view", el_view)
+    }
+  }
+  // 超宽div事件 - 局部
+  if (d.querySelector('.ab-super-width')) {
+    const els_note: NodeListOf<Element> = d.querySelectorAll(".ab-note");
+    for (const el_note of els_note) {
+      if (el_note.querySelector(".ab-super-width")) {
+        const el_replace: ParentNode | null | undefined = el_note.parentNode;
+        if (el_replace) {
+          (el_replace as HTMLElement).classList.add("ab-super-width-p");
+        }
       }
     }
   }

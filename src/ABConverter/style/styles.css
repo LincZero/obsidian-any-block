@@ -18,6 +18,8 @@
   --pre-background-color: #1b1b1b;
   --ab-table-border-width: 1px;
   --ab-table-border-color: #363636;
+  --ab-width-inner: 100%;
+  --ab-width-outer: 100%;
 }
 
 .theme-dark,
@@ -130,9 +132,13 @@ html[data-theme="dark"] #app {
   height: 2px;
 }
 
-.ab-note .ab-note table,
 .ab-note .markdown-rendered table {
   min-width: 0;
+}
+
+.ab-note .markdown-rendered ul li,
+.ab-note .markdown-rendered ol li {
+  margin-bottom: 0;
 }
 
 .ab-note table {
@@ -1005,6 +1011,11 @@ div.md-table-fig1 table.ab-setting.md-table-fig2 {
 
 .ab-custom-font-bold {
   font-weight: bold !important;
+}
+
+.ab-super-width-p {
+  width: var(--ab-width-outer);
+  margin-left: calc((100% - var(--ab-width-outer)) / 2);
 }
 
 /**************** 兼容性补充 ******************/

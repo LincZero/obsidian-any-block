@@ -20,6 +20,9 @@
 
   --ab-table-border-width: 1px;
   --ab-table-border-color: #363636;
+
+  --ab-width-inner: 100%;
+  --ab-width-outer: 100%;
 }
 // 获取一些Obsidian的默认颜色并覆盖默认颜色 (mdit不可用)
 .theme-dark,
@@ -141,11 +144,15 @@ html[data-theme="dark"] #app {
 }
 
 .ab-note{
-  // 修复重渲染表格宽度过宽的问题
-  .ab-note table,
-  .markdown-rendered table {
+  // 修复重渲染问题
+  .markdown-rendered table { // 重渲染的表格宽度过宽的问题 (这里好像是Sp主题引起的)
     min-width: 0;
   }
+  .markdown-rendered ul li,
+  .markdown-rendered ol li { // 重渲染的列表间隔会变得特别高
+    margin-bottom: 0;
+  }
+
   // 修复ob新版本导致表格宽度减少
   table {
     display: table;
@@ -905,6 +912,14 @@ div.md-table-fig1{
 .ab-custom-font-smallx {font-size: x-small !important;}
 .ab-custom-font-smallxx {font-size: xx-small !important;}
 .ab-custom-font-bold {font-weight: bold !important;}
+// .ab-super-width {
+//   width: var(--ab-width-outer);
+//   margin-left: calc((100% - var(--ab-width-outer)) / 2);
+// }
+.ab-super-width-p { // 指定ab-super-width后的延伸物，不可直接指定
+  width: var(--ab-width-outer);
+  margin-left: calc((100% - var(--ab-width-outer)) / 2);
+}
 
 /**************** 兼容性补充 ******************/
 
