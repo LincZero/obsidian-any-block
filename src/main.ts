@@ -28,10 +28,10 @@ export default class AnyBlockPlugin extends Plugin {
     this.addSettingTab(new ABSettingTab(this.app, this));
 
     // 将ob的渲染行为传入回调函数 (目的是将转换器和Obsidian相解耦合)
-    ABConvertManager.getInstance().redefine_renderMarkdown((markdown: string, el: HTMLElement): void => {
+    ABConvertManager.getInstance().redefine_renderMarkdown((markdown: string, el: HTMLElement, ctx?: any): void => {
       el.classList.add("markdown-rendered")
 
-      /**
+      /*
        * Renders markdown string to an HTML element.
        * @deprecated - use {@link MarkdownRenderer.render}
        * 
@@ -48,6 +48,8 @@ export default class AnyBlockPlugin extends Plugin {
        */
       //MarkdownRenderer.renderMarkdown(markdown, el, app.workspace.activeLeaf?.view?.file.path, new MarkdownRenderChild(el))
 
+      const mdrc: MarkdownRenderChild = new MarkdownRenderChild(el);
+      if (ctx) ctx.addChild(mdrc);
       /**
        * Renders markdown string to an HTML element.
        * @param app - A reference to the app object
@@ -58,7 +60,7 @@ export default class AnyBlockPlugin extends Plugin {
        * @public
        */
       // @ts-ignore 新接口，但旧接口似乎不支持
-      MarkdownRenderer.render(app, markdown, el, app.workspace.activeLeaf?.view?.file.path, new MarkdownRenderChild(el))
+      MarkdownRenderer.render(app, markdown, el, app.workspace.activeLeaf?.view?.file.path, mdrc)
     })
 
     // 钩子组1 - 代码块

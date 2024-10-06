@@ -45,6 +45,7 @@ ABConvertManager.getInstance().redefine_renderMarkdown((markdown: string, el: HT
      */
     //MarkdownRenderer.renderMarkdown(markdown, el, "", new MarkdownRenderChild(el))
 
+    const mdrc: MarkdownRenderChild = new MarkdownRenderChild(el); ctx.addChild(mdrc);
     /**
      * Renders markdown string to an HTML element.
      * @param app - A reference to the app object
@@ -55,7 +56,7 @@ ABConvertManager.getInstance().redefine_renderMarkdown((markdown: string, el: HT
      * @public
      */
     // @ts-ignore 新接口，但旧接口似乎不支持
-    MarkdownRenderer.render(app, markdown, el, "", new MarkdownRenderChild(el))
+    MarkdownRenderer.render(app, markdown, el, "", mdrc)
 })
 ```
 

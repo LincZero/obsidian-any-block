@@ -321,99 +321,98 @@ function getSourceMarkdown(
   ctx: MarkdownPostProcessorContext,
 ): HTMLSelectorRangeSpec|null {
   let info = ctx.getSectionInfo(sectionEl);     // info: MarkdownSectionInformation | null
-  if (info) {
-    // 基本信息
-    const {
-      text,       // 全文文档
-      lineStart,  // div部分的开始行
-      lineEnd     // div部分的结束行（结束行是包含的，+1才是不包含）
-    } = info; 
-    const list_text = text.split("\n")                            // div部分的内容
-    const list_content = list_text.slice(lineStart, lineEnd + 1)  // div部分的内容
+  if (!info) { return null }                    // 重渲染没有这个，为null，要阅读模式直接渲染才会有
 
-    let range:HTMLSelectorRangeSpec = {
-      to_line_all: list_text.length,
-      from_line: lineStart, // (lineStart<3 && list_text.slice(0, lineStart).join("\n").trim() == "")?0:lineStart, // 如果前面是两个以内空行，则强行设置为0。TODO：后面还得判断metadata的情况，然后增加一个单独的 is_start
-      to_line: (list_text.length-lineEnd<3 && list_text.slice(lineEnd+1, list_text.length).join("\n").trim() == "")?list_text.length:lineEnd+1, // 如果后面是两个以内空行，则强行设置为0。TODO：后面可能增加一个单独的 is_end 属性
-      content: list_content.join("\n").replace(/(\n)+$/, ""), // 应当去除尾部空行而不要去除非空行的尾部空格，会影响 list2lt 的尾部空的单元格
-      content_all: text,
+  // 基本信息
+  const {
+    text,       // 全文文档
+    lineStart,  // div部分的开始行
+    lineEnd     // div部分的结束行（结束行是包含的，+1才是不包含）
+  } = info; 
+  const list_text = text.split("\n")                            // div部分的内容
+  const list_content = list_text.slice(lineStart, lineEnd + 1)  // div部分的内容
 
-      type: "",
-      header: "",
-      seFlag: "",
-      prefix: "",
-    }
+  let range:HTMLSelectorRangeSpec = {
+    to_line_all: list_text.length,
+    from_line: lineStart, // (lineStart<3 && list_text.slice(0, lineStart).join("\n").trim() == "")?0:lineStart, // 如果前面是两个以内空行，则强行设置为0。TODO：后面还得判断metadata的情况，然后增加一个单独的 is_start
+    to_line: (list_text.length-lineEnd<3 && list_text.slice(lineEnd+1, list_text.length).join("\n").trim() == "")?list_text.length:lineEnd+1, // 如果后面是两个以内空行，则强行设置为0。TODO：后面可能增加一个单独的 is_end 属性
+    content: list_content.join("\n").replace(/(\n)+$/, ""), // 应当去除尾部空行而不要去除非空行的尾部空格，会影响 list2lt 的尾部空的单元格
+    content_all: text,
 
-    // 找类型、找前缀 (见range.type的定义，一共6个基本类型上，多了3个新类型，共9种类型。而其中只有6种类型属于选择器种类)
-    if (sectionEl instanceof HTMLUListElement) {
-      range.type = "list"
-      const match = list_content[0].match(ABReg.reg_list)
-      if (!match) return range
-      range.prefix = match[1]
-    }
-    else if (sectionEl instanceof HTMLQuoteElement) {
-      range.type = "quote"
-      const match = list_content[0].match(ABReg.reg_quote)
-      if (!match) return range
-      range.prefix = match[1]
-    }
-    else if (sectionEl instanceof HTMLPreElement) {
-      range.type = "code"
-      const match = list_content[0].match(ABReg.reg_code)
-      if (!match) return range
-      range.prefix = match[1]
-    }
-    else if (sectionEl instanceof HTMLTableElement) {
-      range.type = "table"
-      const match = list_content[0].match(ABReg.reg_table)
-      if (!match) return range
-      range.prefix = match[1]
-    }
-    else if (sectionEl instanceof HTMLHeadingElement) {
-      range.type = "heading"
-      const match = list_content[0].match(ABReg.reg_heading)
-      if (!match) return range
-      range.seFlag = match[3]
-    }
-    else if (sectionEl instanceof HTMLParagraphElement) { // mdit/ab_header
-      range.type = "paragraph"
-      const match_header = list_content[0].match(ABReg.reg_header)
-      const match_mdit_head = list_content[0].match(ABReg.reg_mdit_head)
-      const match_mdit_tail = list_content[0].match(ABReg.reg_mdit_tail)
-      if (match_header) {
-        range.type = "header"
-        range.prefix = match_header[1]
-        range.header = match_header[5]
-      } else if (match_mdit_head) {
-        range.type = "mdit"
-        range.prefix = match_mdit_head[1]
-        range.seFlag = match_mdit_head[3]
-        range.header = match_mdit_head[4]
-      } else if (match_mdit_tail) {
-        range.type = "mdit_tail"
-        range.prefix = match_mdit_tail[1]
-        range.seFlag = match_mdit_tail[3]
-      }
-    } else {
-      range.type = "other"
-    }
-
-    // 旧版本方法。从文本中向上查找。如果找到了，last_el 属性缓存了 header 所对应的 el，便可以将其删掉。缺点是无法使用部分选择器 (标题和mdit)
-    // 找头部header
-    // let match_header
-    // if (lineStart==0) { // 1. 没有上行
-    //   return range
-    // } else if (lineStart>2 && list_text[lineStart-1].trim()=="") { // 2. 找上上行
-    //   if (list_text[lineStart-2].indexOf(range.prefix)!=0) return range
-    //   match_header = list_text[lineStart-2].replace(range.prefix, "").match(ABReg.reg_header)
-    // } else { // 3. 找上一行
-    //   if (lineStart>1 && list_text[lineStart-1].indexOf(range.prefix)!=0 && list_text[lineStart-1].trim()=="") return range
-    //   match_header = list_text[lineStart-1].replace(range.prefix, "").match(ABReg.reg_header)
-    // }
-    // if (!match_header) return range
-    // range.header = match_header[5] // （外部通过有无header属性来判断是否是ab块）
-
-    return range
+    type: "",
+    header: "",
+    seFlag: "",
+    prefix: "",
   }
-  return null
+
+  // 找类型、找前缀 (见range.type的定义，一共6个基本类型上，多了3个新类型，共9种类型。而其中只有6种类型属于选择器种类)
+  if (sectionEl instanceof HTMLUListElement) {
+    range.type = "list"
+    const match = list_content[0].match(ABReg.reg_list)
+    if (!match) return range
+    range.prefix = match[1]
+  }
+  else if (sectionEl instanceof HTMLQuoteElement) {
+    range.type = "quote"
+    const match = list_content[0].match(ABReg.reg_quote)
+    if (!match) return range
+    range.prefix = match[1]
+  }
+  else if (sectionEl instanceof HTMLPreElement) {
+    range.type = "code"
+    const match = list_content[0].match(ABReg.reg_code)
+    if (!match) return range
+    range.prefix = match[1]
+  }
+  else if (sectionEl instanceof HTMLTableElement) {
+    range.type = "table"
+    const match = list_content[0].match(ABReg.reg_table)
+    if (!match) return range
+    range.prefix = match[1]
+  }
+  else if (sectionEl instanceof HTMLHeadingElement) {
+    range.type = "heading"
+    const match = list_content[0].match(ABReg.reg_heading)
+    if (!match) return range
+    range.seFlag = match[3]
+  }
+  else if (sectionEl instanceof HTMLParagraphElement) { // mdit/ab_header
+    range.type = "paragraph"
+    const match_header = list_content[0].match(ABReg.reg_header)
+    const match_mdit_head = list_content[0].match(ABReg.reg_mdit_head)
+    const match_mdit_tail = list_content[0].match(ABReg.reg_mdit_tail)
+    if (match_header) {
+      range.type = "header"
+      range.prefix = match_header[1]
+      range.header = match_header[5]
+    } else if (match_mdit_head) {
+      range.type = "mdit"
+      range.prefix = match_mdit_head[1]
+      range.seFlag = match_mdit_head[3]
+      range.header = match_mdit_head[4]
+    } else if (match_mdit_tail) {
+      range.type = "mdit_tail"
+      range.prefix = match_mdit_tail[1]
+      range.seFlag = match_mdit_tail[3]
+    }
+  } else {
+    range.type = "other"
+  }
+
+  // 旧版本方法。从文本中向上查找。如果找到了，last_el 属性缓存了 header 所对应的 el，便可以将其删掉。缺点是无法使用部分选择器 (标题和mdit)
+  // 找头部header
+  // let match_header
+  // if (lineStart==0) { // 1. 没有上行
+  //   return range
+  // } else if (lineStart>2 && list_text[lineStart-1].trim()=="") { // 2. 找上上行
+  //   if (list_text[lineStart-2].indexOf(range.prefix)!=0) return range
+  //   match_header = list_text[lineStart-2].replace(range.prefix, "").match(ABReg.reg_header)
+  // } else { // 3. 找上一行
+  //   if (lineStart>1 && list_text[lineStart-1].indexOf(range.prefix)!=0 && list_text[lineStart-1].trim()=="") return range
+  //   match_header = list_text[lineStart-1].replace(range.prefix, "").match(ABReg.reg_header)
+  // }
+  // if (!match_header) return range
+  // range.header = match_header[5] // （外部通过有无header属性来判断是否是ab块）
+
+  return range
 }

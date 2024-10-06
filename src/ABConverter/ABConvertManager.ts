@@ -25,6 +25,7 @@ import {
 } from './converter/ABConvert'
 import { autoABAlias } from "./ABAlias"
 import { ABCSetting } from "./ABReg"
+import type { MarkdownRenderChild } from 'obsidian';
  
 /**
   * AB转换器的管理器。注意：使用前必须先执行：`redefine_renderMarkdown`
@@ -83,14 +84,15 @@ export class ABConvertManager {
    * @detail 这里需要能够被回调函数替换。从而用于接回软件自身的html渲染机制，来进行解耦
    * @param markdown 原md
    * @param el 要追加到的元素
+   * @param ctx Obsidian在这里需要传入 MarkdownRenderChild 类型，但为了跨平台我这里修改成可选的any类型
    */
-  public m_renderMarkdownFn:(markdown: string, el: HTMLElement) => void = (markdown, el) => {
+  public m_renderMarkdownFn:(markdown: string, el: HTMLElement, ctx?: any) => void = (markdown, el) => {
     el.classList.add("markdown-rendered") // 并注意，应当在使用该函数前将el添加该css类，或者重定义时增加该条语句
     console.error("AnyBlockError: 请先制定/重定义md渲染器")
   }
 
   /// 用回调函数替换重渲染器
-  public redefine_renderMarkdown(callback: (markdown: string, el: HTMLElement) => void) {
+  public redefine_renderMarkdown(callback: (markdown: string, el: HTMLElement, ctx?: any) => void) {
     this.m_renderMarkdownFn = callback
   }
 

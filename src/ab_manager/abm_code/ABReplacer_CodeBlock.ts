@@ -18,8 +18,12 @@ export class ABReplacer_CodeBlock{
     const root_div = document.createElement("div");  blockEl.appendChild(root_div); root_div.classList.add("ab-replace");
     const list_src = src.split("\n")
 
-    // 判断当前是实时还是阅读模式
-    // ...
+    // 判断当前是实时还是阅读模式、判断处于重渲染中的还是阅读模式渲染的
+    // (可以通过ctx来判断)
+    // @ts-ignore 类型“MarkdownPostProcessorContext”上不存在属性“containerEl”
+    // if (!ctx.containerEl?.classList.contains("cm-scroller")) {
+    //   console.log("rerender-env")
+    // }
 
     // 判断是否AnyBlock块
     let header = ""
@@ -40,9 +44,10 @@ export class ABReplacer_CodeBlock{
     if (header != "") { // b1. 规范的AnyBlock
       ABConvertManager.autoABConvert(dom_replaceEl, header, list_src.slice(1).join("\n").trimStart())
     }
-    else { // b2. 非法内容，普通渲染处理 (还是说代码渲染会更好?)
+    else { // b2. 非法内容，普通渲染处理 (还是说代码渲染会更好？主要是普通渲染便于对render接口进行调试，比较方便)
+      const mdrc: MarkdownRenderChild = new MarkdownRenderChild(dom_replaceEl); ctx.addChild(mdrc);
       // @ts-ignore 新接口，但旧接口似乎不支持
-      MarkdownRenderer.render(app, src, dom_replaceEl, app.workspace.activeLeaf?.view?.file.path, new MarkdownRenderChild(dom_replaceEl));
+      MarkdownRenderer.render(app, src, dom_replaceEl, app.workspace.activeLeaf?.view?.file.path, mdrc);
     }
 
     // 编辑按钮部分
