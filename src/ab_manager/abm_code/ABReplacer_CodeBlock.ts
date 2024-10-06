@@ -49,7 +49,7 @@ export class ABReplacer_CodeBlock{
     else { // b2. 非法内容，普通渲染处理 (还是说代码渲染会更好？主要是普通渲染便于对render接口进行调试，比较方便)
       const mdrc: MarkdownRenderChild = new MarkdownRenderChild(dom_replaceEl); ctx.addChild(mdrc);
       // @ts-ignore 新接口，但旧接口似乎不支持
-      MarkdownRenderer.render(app, src, dom_replaceEl, app.workspace.activeLeaf?.view?.file.path, mdrc);
+      MarkdownRenderer.render(app, src, dom_replaceEl, app.workspace.activeLeaf?.view?.file?.path??"", mdrc);
     }
 
     // 编辑按钮部分

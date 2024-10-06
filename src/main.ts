@@ -47,7 +47,7 @@ export default class AnyBlockPlugin extends Plugin {
        * @public
        * 
        */
-      //MarkdownRenderer.renderMarkdown(markdown, el, app.workspace.activeLeaf?.view?.file.path, new MarkdownRenderChild(el))
+      //MarkdownRenderer.renderMarkdown(markdown, el, app.workspace.activeLeaf?.view?.file?.path??"", new MarkdownRenderChild(el))
 
       const mdrc: MarkdownRenderChild = new MarkdownRenderChild(el);
       if (ctx) ctx.addChild(mdrc);
@@ -62,7 +62,7 @@ export default class AnyBlockPlugin extends Plugin {
        * @public
        */
       // @ts-ignore 新接口，但旧接口似乎不支持
-      MarkdownRenderer.render(app, markdown, el, app.workspace.activeLeaf?.view?.file.path, mdrc)
+      MarkdownRenderer.render(app, markdown, el, app.workspace.activeLeaf?.view?.file?.path??"", mdrc)
     })
 
     // 钩子组1 - 代码块
