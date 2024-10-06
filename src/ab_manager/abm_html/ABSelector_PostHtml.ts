@@ -9,6 +9,7 @@ import type AnyBlockPlugin from "../../main"
 import { ABReplacer_Render } from "./ABReplacer_Render"
 import { ABConvertManager } from "src/ABConverter/ABConvertManager"
 import { abConvertEvent } from "src/ABConverter/ABConvertEvent";
+import { ABCSetting } from 'src/ABConverter/ABReg'
 
 /**
  * Html处理器
@@ -33,6 +34,8 @@ export class ABSelector_PostHtml{
     el: HTMLElement, 
     ctx: MarkdownPostProcessorContext
   ) {
+    ABCSetting.global_ctx = ctx;
+
     if (this.settings.decoration_render==ConfDecoration.none) return // 若设置里不启用，直接退出
     const mdSrc: HTMLSelectorRangeSpec | null = getSourceMarkdown(el, ctx) // 获取el对应的源md
     

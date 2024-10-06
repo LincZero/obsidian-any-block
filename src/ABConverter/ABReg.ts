@@ -58,6 +58,7 @@ export const ABReg = {
  * @detail
  * 可以被obsidian的设置覆盖，如果没有GUI设置页面，可以人工修改
  */
-export let ABCSetting = {
-  is_debug: false
+export let ABCSetting: {is_debug: boolean, global_ctx: any} = {
+  is_debug: false,
+  global_ctx: null // MarkdownPostProcessorContext类型, obsidian专用
 }
