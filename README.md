@@ -142,3 +142,7 @@ Here are some of the more common processors:
 ![](./docs/zh/png/heimu.gif)
 
 ![](./docs/zh/png/userProcessor.png)
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=obsidian-any-block/obsidian-any-block,LincZero/obsidian-any-block&type=Date)](https://star-history.com/#obsidian-any-block/obsidian-any-block&LincZero/obsidian-any-block&Date)
