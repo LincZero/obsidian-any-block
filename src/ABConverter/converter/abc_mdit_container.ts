@@ -88,7 +88,7 @@ const abc_midt_co = ABConvert.factory({
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
   process: (el, header, content: string): HTMLElement=>{
-    let c2listdata: List_C2ListItem = mditTabs2listdata(content, /^@[a-zA-Z](.*)$/)
+    let c2listdata: List_C2ListItem = mditTabs2listdata(content, /^@col (.*)$/) // /^@[a-zA-Z]* (.*)$/
     C2ListProcess.c2data2items(c2listdata, el)
     el.querySelector("div")?.classList.add("ab-col")
     return el
@@ -101,7 +101,7 @@ const abc_midt_card = ABConvert.factory({
   process_param: ABConvert_IOEnum.text,
   process_return: ABConvert_IOEnum.el,
   process: (el, header, content: string): HTMLElement=>{
-    let c2listdata: List_C2ListItem = mditTabs2listdata(content, /^@[a-zA-Z](.*)$/)
+    let c2listdata: List_C2ListItem = mditTabs2listdata(content, /^@card (.*)$/) // /^@[a-zA-Z]* (.*)$/
     C2ListProcess.c2data2items(c2listdata, el)
     el.querySelector("div")?.classList.add("ab-card")
     return el
