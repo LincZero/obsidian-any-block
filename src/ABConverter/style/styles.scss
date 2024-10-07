@@ -758,10 +758,6 @@ html[data-theme="dark"] #app {
     }
     // 圆弧节点组，最右测必是
     .ab-nodes-children {
-      &[has_children="false"] {
-        display: none;
-      }
-
       display: flex;
       flex-direction: column;
       // align-items
@@ -805,9 +801,15 @@ html[data-theme="dark"] #app {
         gap: 1.2em;   // 左右间隙
       }
     }
-    // 最外面的那个不显示
+    // 最左侧节点处理，不显示
     &>.ab-nodes-node>.ab-nodes-bracket { display: none; }
     &>.ab-nodes-node>.ab-nodes-bracket2 { display: none; }
+    // 最右侧节点处理
+    .ab-nodes-node[has_children="false"] {
+      &>.ab-nodes-children {
+        display: none;
+      }
+    }
   }
 
   // min版的node图
@@ -844,6 +846,13 @@ html[data-theme="dark"] #app {
       }
     }
   }
+  // 最右侧节点处理
+  .ab-nodes-node[has_children="false"] {
+    &>.ab-nodes-content {
+      padding-right: 4px;
+    }
+  }
+  // 颜色
   .ab-nodes.min>.ab-nodes-children {
     &>.ab-nodes-node:nth-child(8n+1) { --node-color: var(--color-red); }
     &>.ab-nodes-node:nth-child(8n+2) { --node-color: var(--color-orange); }

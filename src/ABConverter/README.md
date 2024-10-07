@@ -27,7 +27,7 @@ ABConvertManager.autoABConvert(el:HTMLDivElement, header:string, content:string)
 ### Obsidian 回调函数设置
 
 ```typescript
-ABConvertManager.getInstance().redefine_renderMarkdown((markdown: string, el: HTMLElement): void => {
+ABConvertManager.getInstance().redefine_renderMarkdown((markdown: string, el: HTMLElement, ctx?: any): void => {
     /**
      * Renders markdown string to an HTML element.
      * @deprecated - use {@link MarkdownRenderer.render}
@@ -45,7 +45,9 @@ ABConvertManager.getInstance().redefine_renderMarkdown((markdown: string, el: HT
      */
     //MarkdownRenderer.renderMarkdown(markdown, el, "", new MarkdownRenderChild(el))
 
-    const mdrc: MarkdownRenderChild = new MarkdownRenderChild(el); ctx.addChild(mdrc);
+    const mdrc: MarkdownRenderChild = new MarkdownRenderChild(el);
+    if (ctx) ctx.addChild(mdrc);
+    else if (ABCSetting.global_ctx) ABCSetting.global_ctx.addChild(mdrc);
     /**
      * Renders markdown string to an HTML element.
      * @param app - A reference to the app object
@@ -56,7 +58,7 @@ ABConvertManager.getInstance().redefine_renderMarkdown((markdown: string, el: HT
      * @public
      */
     // @ts-ignore 新接口，但旧接口似乎不支持
-    MarkdownRenderer.render(app, markdown, el, "", mdrc)
+    MarkdownRenderer.render(app, markdown, el, app.workspace.activeLeaf?.view?.file?.path??"", mdrc)
 })
 ```
 

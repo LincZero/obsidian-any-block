@@ -751,10 +751,6 @@ html[data-theme="dark"] #app {
   position: relative;
 }
 
-.ab-note .ab-nodes .ab-nodes-children[has_children="false"] {
-  display: none;
-}
-
 .ab-note .ab-nodes .ab-nodes-children .ab-nodes-bracket {
   content: "";
   box-sizing: border-box;
@@ -796,6 +792,10 @@ html[data-theme="dark"] #app {
   display: none;
 }
 
+.ab-note .ab-nodes .ab-nodes-node[has_children="false"] > .ab-nodes-children {
+  display: none;
+}
+
 .ab-note .ab-nodes.min .ab-nodes-content {
   padding: 0;
   background: none;
@@ -824,6 +824,10 @@ html[data-theme="dark"] #app {
 
 .ab-note .ab-nodes.min .ab-nodes-children .ab-nodes-node {
   gap: 0;
+}
+
+.ab-note .ab-nodes-node[has_children="false"] > .ab-nodes-content {
+  padding-right: 4px;
 }
 
 .ab-note .ab-nodes.min > .ab-nodes-children > .ab-nodes-node:nth-child(8n+1) {

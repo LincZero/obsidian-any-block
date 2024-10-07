@@ -481,33 +481,34 @@ export class ListProcess{
    * 将多列列表转 `节点` 结构
    * 
    * .ab-nodes
-   *   .ab-nodes-content
-   *   .ab-nodes-children
-   *     (递归包含)
-   *     .ab-nodes
-   *     .ab-nodes
+   *   .ab-nodes-node
+   *     .ab-nodes-content
+   *     .ab-nodes-children
+   *       (递归包含)
+   *       .ab-nodes-node
+   *       .ab-nodes-node
    */
   static data2nodes(listdata:List_ListItem, el:HTMLElement): HTMLElement {
     const el_root = document.createElement("div"); el.appendChild(el_root); el_root.classList.add("ab-nodes")
     const el_root2 = document.createElement("div"); el_root.appendChild(el_root2); el_root2.classList.add("ab-nodes-children") // 特点是无对应的content和bracket
-    let cache_els:HTMLElement[] = []  // 缓存各个level的最新节点 (level为0的节点在序列0处)，根节点另外处理
+    let cache_els:{node: HTMLElement, content: HTMLElement, children: HTMLElement}[] = []  // 缓存各个level的最新节点 (level为0的节点在序列0处)，根节点另外处理
     
     for (let item of listdata) {
       // 节点准备
-      const el_node = document.createElement("div"); el_node.classList.add("ab-nodes-node")
-      const el_node_content = document.createElement("div"); el_node.appendChild(el_node_content); el_node_content.classList.add("ab-nodes-content")
+      const el_node = document.createElement("div"); el_node.classList.add("ab-nodes-node"); el_node.setAttribute("has_children", "false"); // 为false则: chileren不应该显示、content线短一些
+      const el_node_content = document.createElement("div"); el_node.appendChild(el_node_content); el_node_content.classList.add("ab-nodes-content");
       ABConvertManager.getInstance().m_renderMarkdownFn(item.content, el_node_content)
-      const el_node_children = document.createElement("div"); el_node.appendChild(el_node_children); el_node_children.classList.add("ab-nodes-children"); el_node_children.setAttribute("has_children", "false"); // 为false则不应该显示
+      const el_node_children = document.createElement("div"); el_node.appendChild(el_node_children); el_node_children.classList.add("ab-nodes-children");
       const el_node_barcket = document.createElement("div"); el_node_children.appendChild(el_node_barcket); el_node_barcket.classList.add("ab-nodes-bracket");
       const el_node_barcket2 = document.createElement("div"); el_node_children.appendChild(el_node_barcket2); el_node_barcket2.classList.add("ab-nodes-bracket2");
-      cache_els[item.level] = el_node_children
+      cache_els[item.level] = {node: el_node, content: el_node_content, children: el_node_children}
       
       // 将节点放入合适的位置
-      if (item.level == 0) {
+      if (item.level == 0) { // 父节点是树的根节点
         el_root2.appendChild(el_node)
       } else if (item.level >= 1 && cache_els.hasOwnProperty(item.level-1)) {
-        cache_els[item.level-1].appendChild(el_node)
-        cache_els[item.level-1].setAttribute("has_children", "true") // 要隐藏最后面括弧
+        cache_els[item.level-1].children.appendChild(el_node)
+        cache_els[item.level-1].node.setAttribute("has_children", "true") // 要隐藏最后面括弧
       }
       else {
         console.error("节点错误")
