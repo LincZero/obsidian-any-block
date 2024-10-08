@@ -74,9 +74,9 @@ export class ABSelector_PostHtml{
       }
       if (this.settings.is_debug) {
         console.log(` -- ABPosthtmlManager.processor, called by 'ReadMode'. `+
-          `[${mdSrc.from_line},${mdSrc.to_line})/${mdSrc.to_line_all}. `+
-          `${(selected_mdSrc && selected_mdSrc.header)?"before in ABBlock: "+selected_mdSrc.header+". ":""}`+
-          `${is_start?"is_start, ":""}${is_end?"is_end, ":""}${is_onlyPart?"is_onlyPart":""}`
+          "[current] " + `[${mdSrc.from_line},${mdSrc.to_line})/${mdSrc.to_line_all}. `+
+            `${is_start?"is_start ":""}${is_end?"is_end ":""}${is_onlyPart?"is_onlyPart ":""}`+
+          "[last] " + `${(selected_mdSrc && selected_mdSrc.header)?"in ABBlock: "+selected_mdSrc.header+". ":""}`
         );
       }
 
@@ -99,8 +99,19 @@ export class ABSelector_PostHtml{
 
       // c21. 片段处理 (一个html界面被分成多个片段触发)
       //      其中，每一个subEl项都是无属性的div项，内部才是有效信息。
-      //      一般el.children里都是只有一个项 (table/pre等)，只会循环一次。特殊情况是p-br的情况
-      for (const subEl of el.children) {
+      //      subEl内部：
+      //          一般el.children里都是只有一个项 (table/pre等)，只会循环一次
+      //          特殊情况：
+      //          - 是p-br的情况 (但后来试了下好像不会？)
+      //          - 图片会重复调用三次，三次的结果似乎是一样的。图片是 <div>空p, 图片, 空p</div>，前后多了个 `空p`，而这三个东西的 getSourceMarkdown 数据似乎是完全一样的
+      //            注意这里的原逻辑是 `for (const subEl of el.children) {` 但会导致 #77 的问题："阅读模式下，标题选择器和头尾选择器中，图片位于文档根部时会被重复识别"
+      //          - 不知道还有没有其他情况
+      if (el.children.length == 3) {
+        const subEl = el.children[1];
+        findABBlock_cross(subEl as HTMLElement, ctx, is_end)
+      }
+      else if (el.children.length > 0) {
+        const subEl = el.children[0];
         findABBlock_cross(subEl as HTMLElement, ctx, is_end)
       }
       
