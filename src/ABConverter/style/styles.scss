@@ -643,6 +643,8 @@ html[data-theme="dark"] #app {
 
   // 快捷的二层容器 container
   .ab-items {
+    word-break: break-all;
+
     // 分栏
     &.ab-col{
       display: flex; // Flexbox 布局
@@ -744,6 +746,7 @@ html[data-theme="dark"] #app {
 
   // 节点图、括弧图、ab思维导图
   .ab-nodes {
+    word-break: break-all;
     // display: flex;
     // flex-direction: column;
     // align-items: flex-start;

@@ -175,8 +175,19 @@ export function abConvertEvent(d: Element|Document) {
       // 1. 准备原元素
       root_el.classList.add("js-waterfall") // 避免：触发两次时，第二次触发会以第一次触发的顺序为基准，再进行调整
       const list_children = root_el.querySelectorAll(".ab-items-item")
+      // 计算列数和列宽
       const columnCountTmp = parseInt(window.getComputedStyle(root_el).getPropertyValue('column-count'))
-      const columnCount: number = (columnCountTmp && !isNaN(columnCountTmp) && columnCountTmp>0)?columnCountTmp:4 // 计算列数和列宽
+      let columnCount: number;
+      if (columnCountTmp && !isNaN(columnCountTmp) && columnCountTmp>0) {
+        columnCount = columnCountTmp;
+      } else if (root_el.classList.contains("ab-col-auto") && list_children.length<=4) {
+        columnCount = list_children.length;
+        root_el.classList.add("ab-col"+columnCount)
+      }
+      else {
+        columnCount = 4;
+        root_el.classList.add("ab-col"+columnCount)
+      }
       // const columnWidth = root_el.clientWidth / columnCount;
 
       // 2. 准备高度缓存、元素缓存

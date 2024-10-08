@@ -634,6 +634,10 @@ html[data-theme="dark"] #app {
   font-weight: bold;
 }
 
+.ab-note .ab-items {
+  word-break: break-all;
+}
+
 .ab-note .ab-items.ab-col {
   display: flex;
   flex-wrap: wrap;
@@ -734,6 +738,10 @@ html[data-theme="dark"] #app {
 
 .ab-note .ab-items.ab-col8 {
   column-count: 8 !important;
+}
+
+.ab-note .ab-nodes {
+  word-break: break-all;
 }
 
 .ab-note .ab-nodes .ab-nodes-content {
