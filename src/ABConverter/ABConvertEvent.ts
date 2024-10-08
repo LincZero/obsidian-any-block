@@ -176,7 +176,7 @@ export function abConvertEvent(d: Element|Document) {
       root_el.classList.add("js-waterfall") // 避免：触发两次时，第二次触发会以第一次触发的顺序为基准，再进行调整
       const list_children = root_el.querySelectorAll(".ab-items-item")
       const columnCountTmp = parseInt(window.getComputedStyle(root_el).getPropertyValue('column-count'))
-      const columnCount: number = (columnCountTmp && columnCountTmp>0)?columnCountTmp:4 // 计算列数和列宽
+      const columnCount: number = (columnCountTmp && !isNaN(columnCountTmp) && columnCountTmp>0)?columnCountTmp:4 // 计算列数和列宽
       // const columnWidth = root_el.clientWidth / columnCount;
 
       // 2. 准备高度缓存、元素缓存
@@ -191,7 +191,8 @@ export function abConvertEvent(d: Element|Document) {
       for (let children of list_children) {
         const minValue: number =  Math.min.apply(null, height_cache);
         const minIndex: number =  height_cache.indexOf(minValue)
-        height_cache[minIndex] += parseInt(window.getComputedStyle(children).getPropertyValue("height"))
+        const heightTmp = parseInt(window.getComputedStyle(children).getPropertyValue("height"))
+        height_cache[minIndex] += (heightTmp && !isNaN(heightTmp) && heightTmp>0) ? heightTmp : 10;
         el_cache[minIndex].push(children as HTMLElement)
       }
 
