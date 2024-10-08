@@ -98,21 +98,23 @@ export class ABSelector_PostHtml{
       }
 
       // c21. 片段处理 (一个html界面被分成多个片段触发)
-      //      其中，每一个subEl项都是无属性的div项，内部才是有效信息。
-      //      subEl内部：
-      //          一般el.children里都是只有一个项 (table/pre等)，只会循环一次
-      //          特殊情况：
-      //          - 是p-br的情况 (但后来试了下好像不会？)
-      //          - 图片会重复调用三次，三次的结果似乎是一样的。图片是 <div>空p, 图片, 空p</div>，前后多了个 `空p`，而这三个东西的 getSourceMarkdown 数据似乎是完全一样的
-      //            注意这里的原逻辑是 `for (const subEl of el.children) {` 但会导致 #77 的问题："阅读模式下，标题选择器和头尾选择器中，图片位于文档根部时会被重复识别"
-      //          - 不知道还有没有其他情况
-      if (el.children.length == 3) {
-        const subEl = el.children[1];
-        findABBlock_cross(subEl as HTMLElement, ctx, is_end)
-      }
-      else if (el.children.length > 0) {
-        const subEl = el.children[0];
-        findABBlock_cross(subEl as HTMLElement, ctx, is_end)
+      //     其中，每一个根el项都是无属性的div项，内部才是有效信息。
+      //     根el内部：
+      //         一般el.children里都是只有一个项 (table/pre等)，只会循环一次
+      //         特殊情况：
+      //         - 是同段多行的情况 (手动br不算，是多个单换行导致的，可以是纯文字，也可以是文字和图片混搭等情况)
+      //         - 图片会重复调用三次，三次的结果似乎是一样的。图片是 <div>空p, 图片, 空p</div>，前后多了个 `空p`
+      //         - 不知道还有没有其他情况
+      //     遍历还是只处理一个：
+      //         需要注意的事项：
+      //         - 不要重复识别：如 #77 的问题："阅读模式下，标题选择器和头尾选择器中，图片位于文档根部时会被重复识别"
+      //         - 不要漏删除元素，元素都应该被添加起来，然后一起被删除
+      //         - 同一个根el项的每个子元素的 getSourceMarkdown 数据是完全一样的
+      //         即在缓存中添加content只处理一个，添加待删元素是遍历
+      //         并且我们期望起始和结束标志中，根el内应当只有一个元素
+      for (let i=0; i<el.children.length; i++) {
+        const subEl = el.children[i];
+        findABBlock_cross(subEl as HTMLElement, ctx, is_end, i)
       }
       
       // c22. 末处理钩子 (页面完全被加载后触发)
@@ -234,8 +236,10 @@ let selected_mdSrc: HTMLSelectorRangeSpec|null = null;  // 已经选中的范围
  * - 取消：将selected缓存清空
  * 
  * TODO 阅读模式没有嵌套判断，在 quote/callout/list 内的 AnyBlock 不被识别
+ * 
+ * @param sub_index 位于空div内的第几个元素，仅当为0时才应该被添加到selected_mdSrc.content中，无论为几都添加到selected_els中
  */
-function findABBlock_cross(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext, is_last:boolean = false){
+function findABBlock_cross(targetEl: HTMLElement, ctx: MarkdownPostProcessorContext, is_last:boolean = false, sub_index:number){
   // 寻找AB块
   const current_mdSrc = getSourceMarkdown(targetEl, ctx)
   if (!current_mdSrc) { return false }
@@ -249,12 +253,12 @@ function findABBlock_cross(targetEl: HTMLElement, ctx: MarkdownPostProcessorCont
         if (current_mdSrc.type=="list"){ // 语法糖 TODO 将弃用
           if (current_mdSrc.header.indexOf("2")==0) current_mdSrc.header="list"+current_mdSrc.header
         }
-        selected_els.push(targetEl); selected_mdSrc.to_line = current_mdSrc.to_line; selected_mdSrc.content += "\n\n" + current_mdSrc.content; // 追加到selected缓存
+        selected_els.push(targetEl); selected_mdSrc.to_line = current_mdSrc.to_line; if(sub_index==0){selected_mdSrc.content += "\n\n" + current_mdSrc.content;}; // 追加到selected缓存
         const replaceEl = selected_els.pop()!; if (replaceEl) {ctx.addChild(new ABReplacer_Render(replaceEl, selected_mdSrc.header, selected_mdSrc.content.split("\n").slice(2,).join("\n"), selected_mdSrc.type)); for (const el of selected_els) {el.hide()}; selected_mdSrc = null; selected_els = []; } // 将selected缓存输出渲染
       }
       // b12. 找到startFlag，后面找endFlag
       else if (current_mdSrc.type == "heading" || current_mdSrc.type == "mdit") {
-        selected_els.push(targetEl); selected_mdSrc.to_line = current_mdSrc.to_line; selected_mdSrc.content += "\n\n" + current_mdSrc.content; // 追加到selected缓存
+        selected_els.push(targetEl); selected_mdSrc.to_line = current_mdSrc.to_line; if(sub_index==0){selected_mdSrc.content += "\n\n" + current_mdSrc.content;}; // 追加到selected缓存
         selected_mdSrc.seFlag = current_mdSrc.seFlag
       }
       // b13. 找不到startFlag，放弃本次AnyBlock
@@ -265,18 +269,18 @@ function findABBlock_cross(targetEl: HTMLElement, ctx: MarkdownPostProcessorCont
     // b2. 有startFlag，寻找endFlag
     else {
       if ((current_mdSrc.type == "mdit_tail" || current_mdSrc.type == "mdit") && selected_mdSrc!.seFlag.length == current_mdSrc.seFlag.length) {
-        selected_els.push(targetEl); selected_mdSrc.to_line = current_mdSrc.to_line; selected_mdSrc.content += "\n\n" + current_mdSrc.content; // 追加到selected缓存
+        selected_els.push(targetEl); selected_mdSrc.to_line = current_mdSrc.to_line; if(sub_index==0){selected_mdSrc.content += "\n\n" + current_mdSrc.content;}; // 追加到selected缓存
         const replaceEl = selected_els.pop()!; if (replaceEl) {ctx.addChild(new ABReplacer_Render(replaceEl, selected_mdSrc.header, selected_mdSrc.content.split("\n").slice(2, -1).join("\n"), selected_mdSrc.type)); for (const el of selected_els) {el.hide()}; selected_mdSrc = null; selected_els = []; } // 将selected缓存输出渲染 (注意减了末尾的:::)
       }
       else if (current_mdSrc.type == "heading" && selected_mdSrc!.seFlag.length > current_mdSrc.seFlag.length) {
         const replaceEl = selected_els.pop()!; if (replaceEl) {ctx.addChild(new ABReplacer_Render(replaceEl, selected_mdSrc.header, selected_mdSrc.content.split("\n").slice(2,).join("\n"), selected_mdSrc.type)); for (const el of selected_els) {el.hide()}; selected_mdSrc = null; selected_els = []; } // 将selected缓存输出渲染
       }
       else if (is_last) {
-        selected_els.push(targetEl); selected_mdSrc.to_line = current_mdSrc.to_line; selected_mdSrc.content += "\n\n" + current_mdSrc.content; // 追加到selected缓存
+        selected_els.push(targetEl); selected_mdSrc.to_line = current_mdSrc.to_line; if(sub_index==0){selected_mdSrc.content += "\n\n" + current_mdSrc.content;}; // 追加到selected缓存
         const replaceEl = selected_els.pop()!; if (replaceEl) {ctx.addChild(new ABReplacer_Render(replaceEl, selected_mdSrc.header, selected_mdSrc.content.split("\n").slice(2,).join("\n"), selected_mdSrc.type)); for (const el of selected_els) {el.hide()}; selected_mdSrc = null; selected_els = []; } // 将selected缓存输出渲染
       }
       else {
-        selected_els.push(targetEl); selected_mdSrc.to_line = current_mdSrc.to_line; selected_mdSrc.content += "\n\n" + current_mdSrc.content; // 追加到selected缓存
+        selected_els.push(targetEl); selected_mdSrc.to_line = current_mdSrc.to_line; if(sub_index==0){selected_mdSrc.content += "\n\n" + current_mdSrc.content;}; // 追加到selected缓存
       }
     }
   }
