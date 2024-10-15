@@ -6,6 +6,13 @@
  *
  * vuepress-mdit环境直接用scss，ob这边需要使用css
  * 编辑ABC模块的该文件时，需要手动编译/使用vscode `easy sass` 插件
+ *
+ * 换行问题：AnyBlock的块宽度很多都是不满100%的，在窄区域中显示多文本时经常需要使用换行
+ * - 不换行时
+ *   - white-space: pre (有换行符要换)
+ * - 换行时
+ *   - white-space: normal
+ *   - overflow-wrap: break-word (单词换行)
  */
 /**
  * 颜色相关
@@ -236,6 +243,8 @@ html[data-theme="dark"] #app {
 }
 
 .ab-note table.ab-table td, .ab-note table.ab-table th {
+  white-space: normal;
+  overflow-wrap: break-word;
   padding: 2px 5px;
   border: solid var(--ab-table-border-width) var(--ab-table-border-color);
 }
@@ -414,7 +423,7 @@ html[data-theme="dark"] #app {
 }
 
 .ab-note table.ab-list-table.ab-table-folder .ab-foldable-tr td:first-child {
-  white-space: nowrap;
+  white-space: pre;
   vertical-align: top;
 }
 
@@ -443,7 +452,7 @@ html[data-theme="dark"] #app {
 }
 
 .ab-note table.ab-table-fc td[col_index="0"] {
-  white-space: nowrap;
+  white-space: pre;
   font-weight: 500;
   vertical-align: top;
 }
@@ -550,7 +559,7 @@ html[data-theme="dark"] #app {
 
 .ab-note .ab-deco-scroll.ab-deco-scroll-x {
   overflow-x: auto;
-  white-space: nowrap;
+  white-space: pre;
 }
 
 .ab-note .ab-deco-overfold {
@@ -635,7 +644,8 @@ html[data-theme="dark"] #app {
 }
 
 .ab-note .ab-items {
-  word-break: break-all;
+  white-space: normal;
+  overflow-wrap: break-word;
 }
 
 .ab-note .ab-items.ab-col {
@@ -741,7 +751,8 @@ html[data-theme="dark"] #app {
 }
 
 .ab-note .ab-nodes {
-  word-break: break-all;
+  white-space: normal;
+  overflow-wrap: break-word;
 }
 
 .ab-note .ab-nodes .ab-nodes-content {

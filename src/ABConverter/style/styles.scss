@@ -5,6 +5,13 @@
  *
  * vuepress-mdit环境直接用scss，ob这边需要使用css
  * 编辑ABC模块的该文件时，需要手动编译/使用vscode `easy sass` 插件
+ *
+ * 换行问题：AnyBlock的块宽度很多都是不满100%的，在窄区域中显示多文本时经常需要使用换行
+ * - 不换行时
+ *   - white-space: pre (有换行符要换)
+ * - 换行时
+ *   - white-space: normal
+ *   - overflow-wrap: break-word (单词换行)
  */
 
 /**
@@ -248,8 +255,10 @@ html[data-theme="dark"] #app {
   // 通用表格
   table.ab-table{
     // 使空格内容更紧凑 -  去除单元格之间的间距
-    border-collapse:collapse;
+    border-collapse: collapse;
     td,th{
+      white-space: normal;
+      overflow-wrap: break-word;
       padding: 2px 5px;
       border: solid var(--ab-table-border-width) var(--ab-table-border-color);
     }
@@ -421,7 +430,7 @@ html[data-theme="dark"] #app {
     // 仿目录结构的列表格
     &.ab-table-folder .ab-foldable-tr{
       td:first-child {
-        white-space: nowrap;
+        white-space: pre;
         vertical-align: top;
       }
       &>td>div{
@@ -451,7 +460,7 @@ html[data-theme="dark"] #app {
   // 首列重点表格
   table.ab-table-fc {
     td[col_index="0"] {
-      white-space: nowrap;
+      white-space: pre;
       font-weight: 500;
       vertical-align: top;
     }
@@ -563,7 +572,7 @@ html[data-theme="dark"] #app {
   }
   .ab-deco-scroll.ab-deco-scroll-x{
     overflow-x:auto;
-    white-space: nowrap;
+    white-space: pre;
   }
 
   // 超出折叠
@@ -643,7 +652,8 @@ html[data-theme="dark"] #app {
 
   // 快捷的二层容器 container
   .ab-items {
-    word-break: break-all;
+    white-space: normal;
+    overflow-wrap: break-word;
 
     // 分栏
     &.ab-col{
@@ -746,7 +756,8 @@ html[data-theme="dark"] #app {
 
   // 节点图、括弧图、ab思维导图
   .ab-nodes {
-    word-break: break-all;
+    white-space: normal;
+    overflow-wrap: break-word;
     // display: flex;
     // flex-direction: column;
     // align-items: flex-start;

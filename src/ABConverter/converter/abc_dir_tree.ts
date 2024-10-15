@@ -246,6 +246,33 @@ export class DirProcess{
         }
       }
 
+      // 折叠全列表格 事件绑定 // TODO，可以简化、复用。tr.onclick(这里加上可空传参)
+      const btn = document.createElement("button"); div.appendChild(btn); btn.textContent="全部折叠/展开"; btn.setAttribute("is_fold", "false");
+      btn.onclick = ()=>{
+        const l_tr:NodeListOf<HTMLElement> = table.querySelectorAll("tr");
+        for (let i=0; i<l_tr.length; i++) {
+          const tr = l_tr[i]
+          ;(()=>{
+            const tr_level = Number(tr.getAttribute("tr_level"))
+            if (isNaN(tr_level)) return
+            const tr_isfold = btn.getAttribute("is_fold"); // [!code] tr->btn
+            if (!tr_isfold) return
+            let flag_do_fold = false  // 防止折叠最小层
+            for (let j=i+1; j<l_tr.length; j++){
+              const tr2 = l_tr[j]
+              const tr_level2 = Number(tr2.getAttribute("tr_level"))
+              if (isNaN(tr_level2)) break
+              if (tr_level2<=tr_level) break
+              (tr_isfold == "true") ? tr2.style.display = "" : tr2.style.display = "none"
+              flag_do_fold = true
+            }
+            if (flag_do_fold) tr.setAttribute("is_fold", tr_isfold=="true"?"false":"true")
+          })()
+        }
+        if (btn.getAttribute("is_fold")) {
+          btn.setAttribute("is_fold", (btn.getAttribute("is_fold")=="true")?"false":"true")
+        }
+      }
     }
 
     return div
