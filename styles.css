@@ -451,12 +451,6 @@ html[data-theme="dark"] #app {
   border-bottom: none;
 }
 
-.ab-note table.ab-table-fc td[col_index="0"] {
-  white-space: pre;
-  font-weight: 500;
-  vertical-align: top;
-}
-
 .ab-note table.ab-table-timeline td {
   border-right: none;
   padding-left: 20px;
@@ -1034,6 +1028,50 @@ div.md-table-fig1 table.ab-setting.md-table-fig2 {
 
 .ab-custom-font-bold {
   font-weight: bold !important;
+}
+
+table.ab-table-fc td[col_index="0"] {
+  white-space: pre;
+  font-weight: 500;
+  vertical-align: top;
+  width: 0px;
+}
+
+.ab-custom-td-nowrap td, .ab-custom-td1-nowrap tr > td:first-child {
+  white-space: pre !important;
+}
+
+.ab-custom-td-wrap td, .ab-custom-td1-wrap tr > td:first-child {
+  white-space: normal !important;
+  overflow-wrap: break-word;
+}
+
+.ab-custom-td-0 td, .ab-custom-td1-0 tr > td:first-child {
+  width: 0px !important;
+}
+
+.ab-custom-td-100 td, .ab-custom-td1-100 tr > td:first-child {
+  width: 100px !important;
+}
+
+.ab-custom-td-150 td, .ab-custom-td1-150 tr > td:first-child {
+  width: 150px !important;
+}
+
+.ab-custom-td-200 td, .ab-custom-td1-200 tr > td:first-child {
+  width: 200px !important;
+}
+
+.ab-custom-td-250 td, .ab-custom-td1-250 tr > td:first-child {
+  width: 250px !important;
+}
+
+.ab-custom-td-300 td, .ab-custom-td1-300 tr > td:first-child {
+  width: 300px !important;
+}
+
+.ab-custom-td-half td, .ab-custom-td1-half tr > td:first-child {
+  width: 50% !important;
 }
 
 .ab-super-width-p {

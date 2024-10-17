@@ -64,7 +64,7 @@ export class TableProcess{
     let data = C2ListProcess.list2c2data(text)
     div = TableProcess.data2table(data, div, modeT)
     const table = div.querySelector("table")
-    if (table) table.classList.add("ab-table-fc", "ab-table-timeline")
+    if (table) table.classList.add("ab-table-fc", "ab-custom-td-0")
     return div 
   }
 
@@ -73,7 +73,7 @@ export class TableProcess{
     let data = C2ListProcess.title2c2data(text)
     div = TableProcess.data2table(data, div, modeT)
     const table = div.querySelector("table")
-    if (table) table.classList.add("ab-table-fc", "ab-table-timeline")
+    if (table) table.classList.add("ab-table-fc", "ab-custom-td-0")
     return div 
   }
 
