@@ -12,6 +12,7 @@
  * - 换行时
  *   - white-space: normal
  *   - overflow-wrap: break-word (单词换行)
+ *   - code {white-space: pre;} (一个用于手动控制不换行的方式)
  */
 
 /**
@@ -259,6 +260,7 @@ html[data-theme="dark"] #app {
     td,th{
       white-space: normal;
       overflow-wrap: break-word;
+      code {white-space: pre;}
       padding: 2px 5px;
       border: solid var(--ab-table-border-width) var(--ab-table-border-color);
     }
@@ -645,6 +647,7 @@ html[data-theme="dark"] #app {
   .ab-items {
     white-space: normal;
     overflow-wrap: break-word;
+    code {white-space: pre;}
 
     // 分栏
     &.ab-col{
@@ -749,6 +752,7 @@ html[data-theme="dark"] #app {
   .ab-nodes {
     white-space: normal;
     overflow-wrap: break-word;
+    code {white-space: pre;}
     // display: flex;
     // flex-direction: column;
     // align-items: flex-start;
